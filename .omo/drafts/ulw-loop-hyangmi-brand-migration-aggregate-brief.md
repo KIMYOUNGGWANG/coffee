@@ -1,0 +1,3 @@
+# ULW Loop Aggregate Brief: Hyangmi Brand Migration
+
+Implement the approved Hyangmi brand migration plan at `.omo/plans/hyangmi-brand-migration.md` as one aggregate ULW goal. The plan file is authoritative for implementation tasks, QA commands, evidence paths, constraints, and final verification. The objective is to rebrand CoffeeDex to Hyangmi / 향미 across visible product, paid artifacts, exports, docs, and tests while preserving stable API/database contracts. Use bundled Node commands, avoid `npm`, avoid live Stripe mutation, do not rename Supabase schema/routes for branding only, do not add unsupported marketplace/social/shipping/print/poster/roaster analytics scope, and record observable evidence plus cleanup receipts for every pass.

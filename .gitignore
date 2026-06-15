@@ -1,0 +1,32 @@
+# Orchestrator Local State (project-local, never committed)
+/.agent/memory/*
+!/.agent/memory/.gitkeep
+/.agent/runtime/*
+!/.agent/runtime/.gitkeep
+/.claude/settings.local.json
+/.claude/worktrees/
+
+# Generated / machine-local artifacts
+.agent_backup_*
+.env*
+!.env.example
+.next/
+out/
+node_modules/
+coverage/
+playwright-report/
+test-results/
+.omo/evidence/
+.omo/ulw-loop/
+.agents/
+.agent/scripts
+.agent/skills
+.agent/workflows
+.claude/commands
+.claude/skills
+.vscode/
+.DS_Store
+*.log
+*.tsbuildinfo
+__pycache__/
+*.pyc

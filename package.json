@@ -1,0 +1,40 @@
+{
+  "name": "hyangmi",
+  "description": "Hyangmi AI specialty coffee taste archive.",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --webpack",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test:smoke": "node --test test/smoke.test.mjs",
+    "test:e2e": "playwright test",
+    "validate:full": "npm run test:smoke && npm run typecheck && npm run build && npm run test:e2e"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.49.8",
+    "@tailwindcss/postcss": "^4.3.1",
+    "@tanstack/react-query": "^5.76.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.511.0",
+    "next": "^16.0.0",
+    "postcss": "^8.5.15",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "stripe": "^22.2.1",
+    "tailwind-merge": "^3.3.0",
+    "zod": "^3.24.4",
+    "zustand": "^5.0.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "tailwindcss": "^4.1.7",
+    "typescript": "^5.8.3"
+  }
+}
