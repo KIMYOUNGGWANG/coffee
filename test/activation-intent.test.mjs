@@ -17,8 +17,19 @@ async function loadActivationIntentModule() {
   const tempDirectory = mkdtempSync(path.join(tmpdir(), "hyangmi-activation-intent-"));
   const sourcePath = path.join(projectRoot, "lib/activation-intent.ts");
   const zodModuleUrl = pathToFileURL(path.join(projectRoot, "node_modules/zod/index.js")).href;
-  const source = read("lib/activation-intent.ts").replaceAll('"zod"', `"${zodModuleUrl}"`);
-  const transpiled = ts.transpileModule(source, {
+  const tasteProfileTranspiled = ts.transpileModule(read("lib/taste-profile.ts"), {
+    compilerOptions: {
+      esModuleInterop: true,
+      module: ts.ModuleKind.ES2022,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      target: ts.ScriptTarget.ES2022,
+    },
+    fileName: path.join(projectRoot, "lib/taste-profile.ts"),
+  }).outputText;
+  const source = read("lib/activation-intent.ts")
+    .replaceAll('"zod"', `"${zodModuleUrl}"`)
+    .replaceAll('"@/lib/taste-profile"', '"./taste-profile.mjs"');
+  const activationIntentTranspiled = ts.transpileModule(source, {
     compilerOptions: {
       esModuleInterop: true,
       module: ts.ModuleKind.ES2022,
@@ -28,7 +39,8 @@ async function loadActivationIntentModule() {
     fileName: sourcePath,
   }).outputText;
 
-  writeFileSync(path.join(tempDirectory, "activation-intent.mjs"), transpiled);
+  writeFileSync(path.join(tempDirectory, "taste-profile.mjs"), tasteProfileTranspiled);
+  writeFileSync(path.join(tempDirectory, "activation-intent.mjs"), activationIntentTranspiled);
 
   try {
     return await import(pathToFileURL(path.join(tempDirectory, "activation-intent.mjs")));
@@ -50,6 +62,7 @@ test("activation intent preserves public-card source and token", async () => {
     kind: "first_card",
     source: "public_card",
     token: "public-token-001",
+    tasteProfile: null,
   });
   assert.equal(
     buildDashboardActivationHref(intent),
@@ -68,4 +81,43 @@ test("activation intent ignores unsupported query values", async () => {
 
   assert.deepEqual(intent, { kind: "none" });
   assert.equal(buildDashboardActivationHref(intent), "/dashboard");
+});
+
+test("activation intent carries supported taste profile values", async () => {
+  const { buildDashboardActivationHref, readActivationIntentFromRecord } = await loadActivationIntentModule();
+
+  const intent = readActivationIntentFromRecord({
+    intent: "first_card",
+    source: "onboarding",
+    taste_profile: "sweet",
+  });
+
+  assert.deepEqual(intent, {
+    kind: "first_card",
+    source: "onboarding",
+    token: null,
+    tasteProfile: "sweet",
+  });
+  assert.equal(
+    buildDashboardActivationHref(intent),
+    "/dashboard?intent=first_card&source=onboarding&taste_profile=sweet",
+  );
+});
+
+test("activation intent ignores malformed taste profile values", async () => {
+  const { buildDashboardActivationHref, readActivationIntentFromRecord } = await loadActivationIntentModule();
+
+  const intent = readActivationIntentFromRecord({
+    intent: "first_card",
+    source: "onboarding",
+    taste_profile: "espresso-script",
+  });
+
+  assert.deepEqual(intent, {
+    kind: "first_card",
+    source: "onboarding",
+    token: null,
+    tasteProfile: null,
+  });
+  assert.equal(buildDashboardActivationHref(intent), "/dashboard?intent=first_card&source=onboarding");
 });

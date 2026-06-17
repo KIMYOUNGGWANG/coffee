@@ -211,27 +211,51 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
             </div>
           </div>
           <div className="mt-8 space-y-2 border-t border-warm-gray pt-6">
-            <button onClick={handleCopyPublicLink} disabled={isPublishing} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-[#f5f4f0] hover:bg-warm-gray/35 text-espresso rounded-xl text-xs font-bold transition-all border border-warm-gray disabled:opacity-60">
-              {isPublishing ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : copied ? (
-                <>
-                  <Check size={14} className="text-caramel" />
-                  <span>공개 링크 복사 완료!</span>
-                </>
-              ) : (
-                <>
-                  <Share2 size={14} />
-                  <span>공개 카드 링크 복사</span>
-                </>
-              )}
-            </button>
+            <div className="flex flex-col gap-2">
+              <button onClick={handleCopyPublicLink} disabled={isPublishing} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-[#f5f4f0] hover:bg-warm-gray/35 text-espresso rounded-xl text-xs font-bold transition-all border border-warm-gray disabled:opacity-60">
+                {isPublishing ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : copied ? (
+                  <>
+                    <Check size={14} className="text-caramel" />
+                    <span>공개 링크 복사 완료!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 size={14} />
+                    <span>공개 카드 링크 복사</span>
+                  </>
+                )}
+              </button>
+              
+              <button onClick={async () => {
+                setIsPublishing(true);
+                try {
+                  const response = await fetch(`/api/v1/cards/${card.id}/share`, { method: "POST" });
+                  const parsed = shareResponseSchema.safeParse(await response.json());
+                  if (response.ok && parsed.success) {
+                    const token = parsed.data.data.publicShareToken;
+                    const quizUrl = `${window.location.origin}/quiz/${token}`;
+                    await navigator.clipboard.writeText(quizUrl);
+                    markCopied();
+                  }
+                } catch (e) {
+                  console.error(e);
+                } finally {
+                  setIsPublishing(false);
+                }
+              }} disabled={isPublishing} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-caramel/10 hover:bg-caramel/20 text-caramel rounded-xl text-xs font-bold transition-all border border-caramel/30 disabled:opacity-60">
+                <Sparkles size={14} />
+                <span>블라인드 퀴즈 링크 복사</span>
+              </button>
+            </div>
+
             {publicUrl && (
-              <p className="break-all rounded-xl border border-warm-gray bg-white px-3 py-2 text-[10px] leading-relaxed text-espresso/55">
+              <p className="break-all rounded-xl border border-warm-gray bg-white px-3 py-2 text-[10px] leading-relaxed text-espresso/55 mt-2">
                 {publicUrl}
               </p>
             )}
-            <button onClick={handleDownloadStory} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-espresso hover:bg-espresso/90 text-white rounded-xl text-xs font-bold transition-all shadow-md">
+            <button onClick={handleDownloadStory} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-espresso hover:bg-espresso/90 text-white rounded-xl text-xs font-bold transition-all shadow-md mt-2">
               <Download size={14} />
               <span>Story 이미지 다운로드</span>
             </button>

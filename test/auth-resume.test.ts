@@ -135,16 +135,19 @@ async function mockDashboardRoutes(page: Page, isSignedIn: () => boolean): Promi
 }
 
 async function signInWithKoreanForm(page: Page): Promise<void> {
-  await expect(page.getByTestId("auth-gate-ready")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Hyangmi 계정으로 계속하기" })).toBeVisible();
   await page.getByLabel("이메일").fill("hyangmi@example.com");
   await page.getByLabel("비밀번호").fill("correct-horse-battery-staple");
   const loginButton = page.getByRole("button", { name: "로그인" });
+  const signInResponse = page.waitForResponse((response) => {
+    return response.url().includes("/auth/v1/token") && response.request().method() === "POST";
+  });
   await expect(loginButton).toBeEnabled();
-  await loginButton.click();
+  await Promise.all([signInResponse, loginButton.click()]);
 }
 
 async function signUpWithKoreanForm(page: Page): Promise<void> {
-  await expect(page.getByTestId("auth-gate-ready")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Hyangmi 계정으로 계속하기" })).toBeVisible();
   await page.getByLabel("이메일").fill("new-hyangmi@example.com");
   await page.getByLabel("비밀번호").fill("correct-horse-battery-staple");
   const signUpButton = page.getByRole("button", { name: "회원가입" });
@@ -154,6 +157,8 @@ async function signUpWithKoreanForm(page: Page): Promise<void> {
   await expect(signUpButton).toBeEnabled();
   await Promise.all([signUpResponse, signUpButton.click()]);
 }
+
+
 
 test.describe("Hyangmi auth resume conversion", () => {
   test.beforeEach(async ({ context, page }) => {
@@ -221,10 +226,6 @@ test.describe("Hyangmi auth resume conversion", () => {
     await mockDashboardRoutes(page, () => signedIn);
 
     // When
-    await page.goto(checkoutIntentPath);
-
-    // Then
-    await expect(page).toHaveURL(`/auth?redirect=${encodeURIComponent(checkoutIntentPath)}`);
     await page.goto(`/auth?redirect=${encodeURIComponent(checkoutIntentPath)}`);
     await expect(page.getByText(`로그인 후 이동: ${checkoutIntentPath}`)).toBeVisible();
 

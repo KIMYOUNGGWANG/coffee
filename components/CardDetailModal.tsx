@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Calendar, Plus, Clock, Scale, Thermometer, Star, Sparkles, Droplet } from "lucide-react";
-import { TastingCardData, useBrewingNotes, useCreateBrewingNote } from "@/hooks/useTastingCards";
+import { X, Calendar, Plus, Clock, Scale, Thermometer, Star, Sparkles, Droplet, Edit2, Trash2 } from "lucide-react";
+import { TastingCardData, useBrewingNotes, useCreateBrewingNote, useUpdateBrewingNote, useDeleteBrewingNote } from "@/hooks/useTastingCards";
 import { Button } from "./ui/button";
 
 interface CardDetailModalProps {
@@ -14,6 +14,8 @@ interface CardDetailModalProps {
 export default function CardDetailModal({ card, isOpen, onClose }: CardDetailModalProps) {
   const { data: notes, isLoading } = useBrewingNotes(card.id);
   const createNoteMutation = useCreateBrewingNote(card.id);
+  const updateNoteMutation = useUpdateBrewingNote(card.id);
+  const deleteNoteMutation = useDeleteBrewingNote(card.id);
 
   // Form states for a new brewing log
   const [method, setMethod] = useState("Hario V60");
@@ -26,7 +28,64 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
   const [memo, setMemo] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  // Form states for editing an existing brewing log
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [editMethod, setEditMethod] = useState("Hario V60");
+  const [editBeanAmount, setEditBeanAmount] = useState<number>(15);
+  const [editWaterAmount, setEditWaterAmount] = useState<number>(225);
+  const [editGrindSize, setEditGrindSize] = useState("");
+  const [editWaterTemp, setEditWaterTemp] = useState<number>(92);
+  const [editBrewTime, setEditBrewTime] = useState<number>(150); // in seconds
+  const [editRating, setEditRating] = useState<number>(3);
+  const [editMemo, setEditMemo] = useState("");
+
   if (!isOpen) return null;
+
+  const handleEditStart = (note: any) => {
+    setEditingNoteId(note.id);
+    setEditMethod(note.method);
+    setEditBeanAmount(note.bean_amount);
+    setEditWaterAmount(note.water_amount);
+    setEditGrindSize(note.grind_size || "");
+    setEditWaterTemp(note.water_temp || 92);
+    setEditBrewTime(note.brew_time || 150);
+    setEditRating(note.rating || 3);
+    setEditMemo(note.memo || "");
+  };
+
+  const handleUpdateNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingNoteId) return;
+    try {
+      await updateNoteMutation.mutateAsync({
+        id: editingNoteId,
+        fields: {
+          method: editMethod,
+          beanAmount: editBeanAmount,
+          waterAmount: editWaterAmount,
+          grindSize: editGrindSize || null,
+          waterTemp: editWaterTemp,
+          brewTime: editBrewTime,
+          rating: editRating,
+          memo: editMemo || null,
+        },
+      });
+      setEditingNoteId(null);
+    } catch (err) {
+      console.error("Failed to update brewing note:", err);
+      alert("추출 노트를 수정하는 데 실패했습니다.");
+    }
+  };
+
+  const handleDeleteNote = async (noteId: string) => {
+    if (!confirm("이 추출 기록을 정말 삭제하시겠습니까?")) return;
+    try {
+      await deleteNoteMutation.mutateAsync(noteId);
+    } catch (err) {
+      console.error("Failed to delete brewing note:", err);
+      alert("추출 노트를 삭제하는 데 실패했습니다.");
+    }
+  };
 
   const handleSubmitNote = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -296,59 +355,191 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
                   </div>
                 </div>
               ) : (
-                notes.map((note) => (
-                  <div key={note.id} className="bg-[#fcfcfa] border border-warm-gray rounded-2xl p-4 shadow-sm hover:border-caramel/20 transition-all">
-                    <div className="flex justify-between items-center pb-2 border-b border-warm-gray/60 text-xs">
-                      <div className="flex items-center gap-1.5 font-bold">
-                        <span className="bg-caramel/10 text-caramel px-2 py-0.5 rounded-md text-[10px]">
-                          {note.method}
-                        </span>
-                        <span>{note.bean_amount}g ➡️ {note.water_amount}g</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-[10px] text-espresso/45">
-                        <Calendar size={11} />
-                        <span>{note.created_at.slice(0, 16).replace(/-/g, ".").replace("T", " ")}</span>
-                      </div>
-                    </div>
+                notes.map((note) => {
+                  if (editingNoteId === note.id) {
+                    return (
+                      <form key={note.id} onSubmit={handleUpdateNote} className="bg-[#fcfcfa] border border-caramel/30 rounded-2xl p-4 shadow-sm space-y-3.5 animate-in fade-in duration-250">
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] font-bold text-espresso/60">추출 도구</label>
+                            <select
+                              value={editMethod}
+                              onChange={(e) => setEditMethod(e.target.value)}
+                              className="border border-warm-gray rounded-lg px-2 py-1 text-xs bg-white"
+                            >
+                              {["Hario V60", "Kalita Wave", "Espresso", "AeroPress", "French Press", "Moka Pot", "Cold Brew"].map(m => (
+                                <option key={m} value={m}>{m}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] font-bold text-espresso/60">원두량 (g)</label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={editBeanAmount}
+                              onChange={(e) => setEditBeanAmount(parseFloat(e.target.value) || 0)}
+                              className="border border-warm-gray rounded-lg px-2 py-1 text-xs bg-white"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] font-bold text-espresso/60">추출량 (g)</label>
+                            <input
+                              type="number"
+                              value={editWaterAmount}
+                              onChange={(e) => setEditWaterAmount(parseInt(e.target.value) || 0)}
+                              className="border border-warm-gray rounded-lg px-2 py-1 text-xs bg-white"
+                            />
+                          </div>
+                        </div>
 
-                    <div className="grid grid-cols-4 gap-2 pt-2.5 text-[11px] text-espresso/60 font-semibold border-b border-warm-gray/30 pb-2">
-                      {note.grind_size && (
-                        <div className="flex items-center gap-1">
-                          <Scale size={11} className="text-caramel/75" />
-                          <span>분쇄: {note.grind_size}</span>
+                        <div className="grid grid-cols-4 gap-2">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] font-bold text-espresso/60">분쇄도</label>
+                            <input
+                              type="text"
+                              value={editGrindSize}
+                              onChange={(e) => setEditGrindSize(e.target.value)}
+                              className="border border-warm-gray rounded-lg px-2 py-1 text-xs bg-white"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] font-bold text-espresso/60">물 온도 (°C)</label>
+                            <input
+                              type="number"
+                              value={editWaterTemp}
+                              onChange={(e) => setEditWaterTemp(parseInt(e.target.value) || 0)}
+                              className="border border-warm-gray rounded-lg px-2 py-1 text-xs bg-white"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] font-bold text-espresso/60">시간 (초)</label>
+                            <input
+                              type="number"
+                              value={editBrewTime}
+                              onChange={(e) => setEditBrewTime(parseInt(e.target.value) || 0)}
+                              className="border border-warm-gray rounded-lg px-2 py-1 text-xs bg-white"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] font-bold text-espresso/60">만족도 (1-5)</label>
+                            <div className="flex items-center gap-0.5 mt-1">
+                              {[1, 2, 3, 4, 5].map(star => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setEditRating(star)}
+                                  className="text-caramel"
+                                >
+                                  <Star size={12} fill={star <= editRating ? "currentColor" : "none"} />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
                         </div>
-                      )}
-                      {note.water_temp && (
-                        <div className="flex items-center gap-1">
-                          <Thermometer size={11} className="text-caramel/75" />
-                          <span>온도: {note.water_temp}°C</span>
-                        </div>
-                      )}
-                      {note.brew_time && (
-                        <div className="flex items-center gap-1">
-                          <Clock size={11} className="text-caramel/75" />
-                          <span>시간: {Math.floor(note.brew_time / 60)}분 {note.brew_time % 60}초</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-0.5 justify-end">
-                        {[1, 2, 3, 4, 5].map(star => (
-                          <Star
-                            key={star}
-                            size={10}
-                            className="text-caramel"
-                            fill={star <= (note.rating || 0) ? "currentColor" : "none"}
+
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[9px] font-bold text-espresso/60">메모 및 개선점</label>
+                          <textarea
+                            value={editMemo}
+                            onChange={(e) => setEditMemo(e.target.value)}
+                            className="border border-warm-gray rounded-lg px-2 py-1 text-xs h-12 resize-none bg-white"
                           />
-                        ))}
-                      </div>
-                    </div>
+                        </div>
 
-                    {note.memo && (
-                      <p className="text-[11px] text-espresso/85 leading-relaxed pt-2">
-                        {note.memo}
-                      </p>
-                    )}
-                  </div>
-                ))
+                        <div className="flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingNoteId(null)}
+                            className="px-3 py-1 bg-white border border-warm-gray hover:bg-warm-gray/10 text-espresso rounded-lg text-[10px] font-bold"
+                          >
+                            취소
+                          </button>
+                          <Button
+                            type="submit"
+                            disabled={updateNoteMutation.isPending}
+                            className="px-4 py-1 bg-caramel hover:bg-caramel/90 text-white rounded-lg text-[10px] font-bold"
+                          >
+                            {updateNoteMutation.isPending ? "저장 중..." : "수정 완료"}
+                          </Button>
+                        </div>
+                      </form>
+                    );
+                  }
+
+                  return (
+                    <div key={note.id} className="bg-[#fcfcfa] border border-warm-gray rounded-2xl p-4 shadow-sm hover:border-caramel/20 transition-all relative group">
+                      <div className="flex justify-between items-center pb-2 border-b border-warm-gray/60 text-xs">
+                        <div className="flex items-center gap-1.5 font-bold">
+                          <span className="bg-caramel/10 text-caramel px-2 py-0.5 rounded-md text-[10px]">
+                            {note.method}
+                          </span>
+                          <span>{note.bean_amount}g ➡️ {note.water_amount}g</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {/* Actions (visible on hover) */}
+                          <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => handleEditStart(note)}
+                              className="p-1 rounded hover:bg-warm-gray text-espresso/65 hover:text-espresso"
+                              title="추출 로그 수정"
+                            >
+                              <Edit2 size={11} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteNote(note.id)}
+                              className="p-1 rounded hover:bg-red-50 text-espresso/65 hover:text-red-600"
+                              title="추출 로그 삭제"
+                            >
+                              <Trash2 size={11} />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-1 text-[10px] text-espresso/45 ml-1">
+                            <Calendar size={11} />
+                            <span>{note.created_at.slice(0, 16).replace(/-/g, ".").replace("T", " ")}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-2 pt-2.5 text-[11px] text-espresso/60 font-semibold border-b border-warm-gray/30 pb-2">
+                        {note.grind_size && (
+                          <div className="flex items-center gap-1">
+                            <Scale size={11} className="text-caramel/75" />
+                            <span>분쇄: {note.grind_size}</span>
+                          </div>
+                        )}
+                        {note.water_temp && (
+                          <div className="flex items-center gap-1">
+                            <Thermometer size={11} className="text-caramel/75" />
+                            <span>온도: {note.water_temp}°C</span>
+                          </div>
+                        )}
+                        {note.brew_time && (
+                          <div className="flex items-center gap-1">
+                            <Clock size={11} className="text-caramel/75" />
+                            <span>시간: {Math.floor(note.brew_time / 60)}분 {note.brew_time % 60}초</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-0.5 justify-end">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <Star
+                              key={star}
+                              size={10}
+                              className="text-caramel"
+                              fill={star <= (note.rating || 0) ? "currentColor" : "none"}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {note.memo && (
+                        <p className="text-[11px] text-espresso/85 leading-relaxed pt-2">
+                          {note.memo}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>

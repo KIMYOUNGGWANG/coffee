@@ -4,6 +4,7 @@ import React from "react";
 import { X, ArrowRight, ArrowLeft, Coffee, Sparkles, Loader2, Image as ImageIcon, AlertCircle, CheckCircle } from "lucide-react";
 import { useTastingStore } from "@/stores/tastingStore";
 import { useCreateTastingCard, useGenerateAiNote, useUserProfile, useScanCoffeePackage } from "@/hooks/useTastingCards";
+import { tasteProfilePresetByKey, type TasteProfileKey } from "@/lib/taste-profile";
 import TastingCard from "./TastingCard";
 import PaymentDialog from "./PaymentDialog";
 
@@ -20,6 +21,7 @@ const ROASTING_POINTS = ["Light", "Medium", "Dark"];
 interface CardCreatorWizardProps {
   isOpen: boolean;
   onClose: () => void;
+  initialTasteProfile?: TasteProfileKey | null;
 }
 
 function getErrorMessage(error: unknown, fallbackMessage: string): string {
@@ -30,7 +32,7 @@ function getErrorMessage(error: unknown, fallbackMessage: string): string {
   return fallbackMessage;
 }
 
-export default function CardCreatorWizard({ isOpen, onClose }: CardCreatorWizardProps) {
+export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile = null }: CardCreatorWizardProps) {
   const {
     step,
     form,
@@ -57,7 +59,9 @@ export default function CardCreatorWizard({ isOpen, onClose }: CardCreatorWizard
   const [scanSuccessMessage, setScanSuccessMessage] = React.useState<string | null>(null);
   const [aiNoteError, setAiNoteError] = React.useState<string | null>(null);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
+  const appliedTasteProfileRef = React.useRef<TasteProfileKey | null>(null);
   const { data: profile } = useUserProfile();
+  const initialTasteProfilePreset = initialTasteProfile ? tasteProfilePresetByKey[initialTasteProfile] : null;
 
   const [loadingMessageIdx, setLoadingMessageIdx] = React.useState(0);
   const loadingMessages = [
@@ -78,6 +82,26 @@ export default function CardCreatorWizard({ isOpen, onClose }: CardCreatorWizard
     }
     return () => clearInterval(interval);
   }, [isGeneratingAiNote]);
+
+  React.useEffect(() => {
+    if (!isOpen || !initialTasteProfilePreset || appliedTasteProfileRef.current === initialTasteProfilePreset.key) {
+      return;
+    }
+
+    updateForm({
+      metric1: initialTasteProfilePreset.formDefaults.metric1,
+      metric2: initialTasteProfilePreset.formDefaults.metric2,
+      metric3: initialTasteProfilePreset.formDefaults.metric3,
+      tags: [...initialTasteProfilePreset.formDefaults.tags],
+      rawNote: initialTasteProfilePreset.formDefaults.rawNote,
+    });
+    appliedTasteProfileRef.current = initialTasteProfilePreset.key;
+  }, [initialTasteProfilePreset, isOpen, updateForm]);
+
+  React.useEffect(() => {
+    if (isOpen) return;
+    appliedTasteProfileRef.current = null;
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -269,6 +293,37 @@ export default function CardCreatorWizard({ isOpen, onClose }: CardCreatorWizard
               <div className="space-y-4 animate-in slide-in-from-right-5 duration-200">
                 <h3 className="font-serif font-bold text-espresso text-base mb-2">1단계: 원두 및 추출 정보</h3>
 
+                {initialTasteProfilePreset && (
+                  <div
+                    data-testid="taste-profile-prefill"
+                    className="border border-[#1f4651]/25 bg-[#e8f2f1] p-4 text-[#1f4651]"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.18em]">Taste Finder prefill</p>
+                        <p className="mt-2 break-keep font-serif text-lg font-black leading-tight">
+                          {initialTasteProfilePreset.label}으로 시작합니다.
+                        </p>
+                        <p className="mt-2 text-xs font-extrabold leading-5 opacity-75">
+                          {initialTasteProfilePreset.cue}
+                        </p>
+                      </div>
+                      <Sparkles size={18} className="shrink-0" />
+                    </div>
+                    <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[11px] font-black">
+                      <span className="border border-[#1f4651]/20 bg-white/55 px-2 py-1">
+                        산미 {form.metric1}
+                      </span>
+                      <span data-testid="taste-profile-prefill-sweetness" className="border border-[#1f4651]/20 bg-white/55 px-2 py-1">
+                        단맛 {form.metric2}
+                      </span>
+                      <span className="border border-[#1f4651]/20 bg-white/55 px-2 py-1">
+                        바디 {form.metric3}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {/* AI Photo Scan Upload Panel */}
                 <div className="bg-[#faf9f6] border border-dashed border-caramel/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2">
                   <div className="flex items-center gap-2">
@@ -393,7 +448,7 @@ export default function CardCreatorWizard({ isOpen, onClose }: CardCreatorWizard
                   <div className="flex flex-col gap-2 bg-cream/30 border border-warm-gray/40 p-3 rounded-2xl">
                     <div className="flex justify-between items-center">
                       <span className="text-xs font-bold text-espresso">산미 (Acidity)</span>
-                      <span className="text-xs font-bold text-caramel bg-caramel/10 px-2 py-0.5 rounded-full">{form.metric1}점</span>
+                      <span data-testid="metric1-value" className="text-xs font-bold text-caramel bg-caramel/10 px-2 py-0.5 rounded-full">{form.metric1}점</span>
                     </div>
                     <input
                       type="range"
@@ -414,7 +469,7 @@ export default function CardCreatorWizard({ isOpen, onClose }: CardCreatorWizard
                   <div className="flex flex-col gap-2 bg-cream/30 border border-warm-gray/40 p-3 rounded-2xl">
                     <div className="flex justify-between items-center">
                       <span className="text-xs font-bold text-espresso">단맛 (Sweetness)</span>
-                      <span className="text-xs font-bold text-caramel bg-caramel/10 px-2 py-0.5 rounded-full">{form.metric2}점</span>
+                      <span data-testid="metric2-value" className="text-xs font-bold text-caramel bg-caramel/10 px-2 py-0.5 rounded-full">{form.metric2}점</span>
                     </div>
                     <input
                       type="range"
@@ -435,7 +490,7 @@ export default function CardCreatorWizard({ isOpen, onClose }: CardCreatorWizard
                   <div className="flex flex-col gap-2 bg-cream/30 border border-warm-gray/40 p-3 rounded-2xl">
                     <div className="flex justify-between items-center">
                       <span className="text-xs font-bold text-espresso">바디감 (Body)</span>
-                      <span className="text-xs font-bold text-caramel bg-caramel/10 px-2 py-0.5 rounded-full">{form.metric3}점</span>
+                      <span data-testid="metric3-value" className="text-xs font-bold text-caramel bg-caramel/10 px-2 py-0.5 rounded-full">{form.metric3}점</span>
                     </div>
                     <input
                       type="range"

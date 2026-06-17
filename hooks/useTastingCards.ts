@@ -323,6 +323,84 @@ export function useCreateBrewingNote(cardId: string) {
   });
 }
 
+// Update an existing brewing note
+export function useUpdateBrewingNote(cardId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    BrewingNoteData,
+    Error,
+    {
+      id: string;
+      fields: {
+        method?: string;
+        beanAmount?: number;
+        waterAmount?: number;
+        grindSize?: string | null;
+        waterTemp?: number | null;
+        brewTime?: number | null;
+        rating?: number | null;
+        memo?: string | null;
+      };
+    }
+  >({
+    mutationFn: async ({ id: noteId, fields }) => {
+      const response = await fetch(`/api/v1/cards/${cardId}/brewing-notes/${noteId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields),
+      });
+
+      const json = await readJsonResponse(response);
+      if (!response.ok) {
+        throw new Error(getResponseErrorMessage(json, "추출 노트를 수정하는 데 실패했습니다."));
+      }
+
+      const data = getResponseData<BrewingNoteData>(json);
+      if (!data) {
+        throw new Error("수정된 추출 응답이 비어 있습니다.");
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["brewing-notes", cardId] });
+      queryClient.invalidateQueries({ queryKey: ["tasting-cards"] });
+      queryClient.invalidateQueries({ queryKey: ["tasting-cards", cardId] });
+      queryClient.invalidateQueries({ queryKey: ["taste-analytics"] });
+    },
+  });
+}
+
+// Delete a brewing note
+export function useDeleteBrewingNote(cardId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ id: string; success: boolean }, Error, string>({
+    mutationFn: async (noteId: string) => {
+      const response = await fetch(`/api/v1/cards/${cardId}/brewing-notes/${noteId}`, {
+        method: "DELETE",
+      });
+
+      const json = await readJsonResponse(response);
+      if (!response.ok) {
+        throw new Error(getResponseErrorMessage(json, "추출 노트를 삭제하는 데 실패했습니다."));
+      }
+
+      const data = getResponseData<{ id: string; success: boolean }>(json);
+      if (!data) {
+        throw new Error("삭제 결과가 비어 있습니다.");
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["brewing-notes", cardId] });
+      queryClient.invalidateQueries({ queryKey: ["tasting-cards"] });
+      queryClient.invalidateQueries({ queryKey: ["tasting-cards", cardId] });
+      queryClient.invalidateQueries({ queryKey: ["taste-analytics"] });
+    },
+  });
+}
+
 export interface TasteAnalyticsData {
   averageAcidity: number;
   averageSweetness: number;
@@ -330,6 +408,12 @@ export interface TasteAnalyticsData {
   topTags: string[];
   totalCards: number;
   aiAnalysis: string;
+  brewingStats?: {
+    totalNotes: number;
+    favoriteMethod: string;
+    averageRating: number;
+    bestTemp: number | null;
+  };
 }
 
 // Fetch coffee flavor preference analytics

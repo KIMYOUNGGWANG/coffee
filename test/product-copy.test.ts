@@ -126,8 +126,22 @@ test.describe("Hyangmi product copy", () => {
     await expect(page.getByRole("heading", { name: /한국 스페셜티 커피를/ })).toBeVisible();
     await expect(page.getByText("AI 보조 테이스팅 초안")).toBeVisible();
     await expect(page.getByText("디지털 아티팩트")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Taste Finder 시작" })).toHaveAttribute("href", "/onboarding");
+    await expect(page.getByRole("link", { name: /30초 Taste Finder로 시작/ })).toHaveAttribute("href", "/onboarding");
     await expectNoUnsupportedVisibleCopy(page);
     await captureEvidenceScreenshot(page, screenshotPaths.home);
+  });
+
+  test("routes cold-start visitors from home into Taste Finder onboarding", async ({ page }) => {
+    // Given / When
+    await page.goto("/");
+    await page.getByRole("link", { name: /30초 Taste Finder로 시작/ }).click();
+
+    // Then
+    await expect(page).toHaveURL("/onboarding");
+    await expect(page.getByText("Taste profile cards")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "커피 추천은 첫 기록에서 시작됩니다." })).toBeVisible();
+    await expect(page).not.toHaveURL(/\/auth|\/dashboard/);
   });
 
   test("keeps the dashboard scoped to archive, assisted notes, and recap", async ({ page }) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Sparkles, BookOpen, Loader2, ArrowRight, Camera } from "lucide-react";
 import { z } from "zod";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
@@ -13,11 +13,22 @@ const checkoutResponseSchema = z.object({
   error: z.object({ message: z.string().optional() }).optional(),
 });
 
+type CheckoutResponse = z.infer<typeof checkoutResponseSchema>;
+
 type PaymentDialogProps = {
   readonly isOpen: boolean;
   readonly onClose: () => void;
   readonly resumeItemType?: CheckoutItemType | null;
 };
+
+function readCheckoutFailureMessage(responseData: CheckoutResponse | null): string {
+  const message = responseData?.error?.message?.trim();
+  if (message) {
+    return message;
+  }
+
+  return "결제 세션을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+}
 
 function itemLabel(itemType: CheckoutItemType): string {
   return checkoutProductCatalog[itemType].name;
@@ -25,15 +36,23 @@ function itemLabel(itemType: CheckoutItemType): string {
 
 export default function PaymentDialog({ isOpen, onClose, resumeItemType = null }: PaymentDialogProps) {
   const [loadingItem, setLoadingItem] = useState<CheckoutItemType | null>(null);
+  const [checkoutErrorMessage, setCheckoutErrorMessage] = useState<string | null>(null);
   const { trackEvent } = useAnalyticsEvents();
   const premiumProduct = checkoutProductCatalog.premium_subscription;
   const creditsProduct = checkoutProductCatalog.credits_10;
   const pdfProduct = checkoutProductCatalog.pdf_book;
 
+  useEffect(() => {
+    if (!isOpen) {
+      setCheckoutErrorMessage(null);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleCheckout = async (itemType: CheckoutItemType) => {
     setLoadingItem(itemType);
+    setCheckoutErrorMessage(null);
     trackEvent("checkout_started", { itemType });
     try {
       const response = await fetch("/api/v1/checkout", {
@@ -44,22 +63,19 @@ export default function PaymentDialog({ isOpen, onClose, resumeItemType = null }
 
       const responseData: unknown = await response.json();
       const parsedData = checkoutResponseSchema.safeParse(responseData);
-      const errorMessage = parsedData.success ? parsedData.data.error?.message : null;
+      const parsedResponseData = parsedData.success ? parsedData.data : null;
+      const errorMessage = parsedResponseData?.error?.message ?? null;
       if (!response.ok && (response.status === 401 || isAuthRequiredError(errorMessage))) {
         trackEvent("checkout_failed", { itemType, reason: "auth_required" });
         window.location.href = buildAuthGateHref(buildDashboardCheckoutIntentHref(itemType));
         return;
       }
 
-      if (response.ok && parsedData.success && parsedData.data.url) {
-        window.location.href = parsedData.data.url;
+      if (response.ok && parsedResponseData?.url) {
+        window.location.href = parsedResponseData.url;
       } else {
         trackEvent("checkout_failed", { itemType, reason: "session_creation_failed" });
-        alert(
-          parsedData.success && parsedData.data.error?.message
-            ? parsedData.data.error.message
-            : "결제 세션 개설에 실패했습니다. 관리자에게 문의해주세요.",
-        );
+        setCheckoutErrorMessage(readCheckoutFailureMessage(parsedResponseData));
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -68,19 +84,19 @@ export default function PaymentDialog({ isOpen, onClose, resumeItemType = null }
         console.error("Stripe redirect failed:", error);
       }
       trackEvent("checkout_failed", { itemType, reason: "network_error" });
-      alert("네트워크 통신 중 오류가 발생했습니다.");
+      setCheckoutErrorMessage("네트워크 통신 중 오류가 발생했습니다. 연결을 확인한 뒤 다시 시도해 주세요.");
     } finally {
       setLoadingItem(null);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-espresso/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-espresso/60 backdrop-blur-sm z-50 flex items-start justify-center overflow-y-auto p-4 sm:items-center">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="payment-dialog-title"
-        className="bg-white border border-warm-gray rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-espresso"
+        className="bg-white border border-warm-gray rounded-3xl w-full max-w-xl max-h-[calc(100dvh-2rem)] shadow-2xl overflow-x-hidden overflow-y-auto animate-in fade-in zoom-in-95 duration-200 text-espresso"
       >
 
         <div className="bg-gradient-to-r from-espresso to-caramel text-cream p-6 relative">
@@ -111,6 +127,17 @@ export default function PaymentDialog({ isOpen, onClose, resumeItemType = null }
         </div>
 
         <div className="p-6 space-y-4 bg-[#f7f7f4]">
+          {checkoutErrorMessage && (
+            <div role="alert" className="rounded-2xl border border-caramel/35 bg-white px-4 py-3 text-left shadow-sm">
+              <p className="text-xs font-extrabold text-caramel">Hyangmi 결제 연결을 열지 못했어요.</p>
+              <p className="mt-1 text-xs leading-relaxed text-espresso/70">
+                {checkoutErrorMessage}
+              </p>
+              <p className="mt-2 text-[11px] leading-relaxed text-espresso/50">
+                상품 버튼을 다시 누르면 새 Stripe 결제창을 요청합니다. 문제가 계속되면 잠시 뒤 다시 시도해 주세요.
+              </p>
+            </div>
+          )}
 
           <div className={`bg-white border rounded-2xl p-4 flex justify-between items-center hover:border-caramel/65 hover:shadow-sm transition-all group relative overflow-hidden ${
             resumeItemType === "premium_subscription" ? "border-caramel shadow-sm" : "border-caramel/30"

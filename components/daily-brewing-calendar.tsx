@@ -1,0 +1,624 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Star, Coffee, Loader2, Clock, Thermometer, Droplet, Layers, X, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+interface ShelfItem {
+  id: string;
+  roaster_name: string;
+  bean_name: string;
+}
+
+interface BrewingLog {
+  id: string;
+  shelf_item_id: string | null;
+  brewed_at: string;
+  method: string;
+  parameters: {
+    waterTemp?: number | null;
+    waterAmount?: number | null;
+    coffeeAmount?: number | null;
+    grindSize?: string | null;
+    brewTime?: string | null;
+  };
+  rating: number | null;
+  simple_note: string | null;
+  coffee_shelf_items?: ShelfItem;
+}
+
+interface DailyBrewingCalendarProps {
+  refreshTrigger?: number;
+  onLogAdded?: () => void;
+}
+
+export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }: DailyBrewingCalendarProps) {
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [logs, setLogs] = useState<BrewingLog[]>([]);
+  const [activeShelfItems, setActiveShelfItems] = useState<ShelfItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Dialog/Modal States
+  const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDayLogs, setSelectedDayLogs] = useState<BrewingLog[]>([]);
+
+  // Form State
+  const [shelfItemId, setShelfItemId] = useState("");
+  const [method, setMethod] = useState("Drip");
+  const [waterTemp, setWaterTemp] = useState("");
+  const [waterAmount, setWaterAmount] = useState("");
+  const [coffeeAmount, setCoffeeAmount] = useState("");
+  const [grindSize, setGrindSize] = useState("");
+  const [brewTime, setBrewTime] = useState("");
+  const [rating, setRating] = useState<number>(5);
+  const [simpleNote, setSimpleNote] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchLogsAndShelf = async () => {
+    try {
+      setIsLoading(true);
+      const shelfRes = await fetch("/api/v1/shelf?include_finished=false");
+      const shelfData = await shelfRes.json();
+      if (shelfData.data) {
+        setActiveShelfItems(shelfData.data);
+      }
+
+      const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toISOString();
+      const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59).toISOString();
+      
+      const logsRes = await fetch(`/api/v1/brewing-logs?start_date=${startOfMonth}&end_date=${endOfMonth}`);
+      const logsData = await logsRes.json();
+      if (logsData.data) {
+        setLogs(logsData.data);
+      }
+    } catch (error) {
+      console.error("Error loading calendar data:", error);
+      alert("드링킹 다이어리 기록을 가져오지 못했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLogsAndShelf();
+  }, [currentDate, refreshTrigger]);
+
+  const handlePrevMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  };
+
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const days = new Date(year, month + 1, 0).getDate();
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    return { days, firstDayIndex };
+  };
+
+  const { days, firstDayIndex } = getDaysInMonth(currentDate);
+
+  const getLogsForDay = (day: number) => {
+    return logs.filter(log => {
+      const logDate = new Date(log.brewed_at);
+      return (
+        logDate.getDate() === day &&
+        logDate.getMonth() === currentDate.getMonth() &&
+        logDate.getFullYear() === currentDate.getFullYear()
+      );
+    });
+  };
+
+  const handleDayClick = (day: number) => {
+    const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    const dayLogs = getLogsForDay(day);
+    
+    setSelectedDate(clickedDate);
+    setSelectedDayLogs(dayLogs);
+
+    if (dayLogs.length > 0) {
+      setIsDetailDialogOpen(true);
+    } else {
+      resetForm();
+      if (activeShelfItems.length > 0) {
+        setShelfItemId(activeShelfItems[0].id);
+      }
+      setIsLogDialogOpen(true);
+    }
+  };
+
+  const handleCreateLog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDate) return;
+
+    try {
+      setIsSubmitting(true);
+      const payload = {
+        shelfItemId: shelfItemId || null,
+        brewedAt: new Date(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth(),
+          selectedDate.getDate(),
+          new Date().getHours(),
+          new Date().getMinutes()
+        ).toISOString(),
+        method,
+        parameters: {
+          waterTemp: waterTemp ? Number(waterTemp) : null,
+          waterAmount: waterAmount ? Number(waterAmount) : null,
+          coffeeAmount: coffeeAmount ? Number(coffeeAmount) : null,
+          grindSize: grindSize || null,
+          brewTime: brewTime || null,
+        },
+        rating,
+        simpleNote: simpleNote || null,
+      };
+
+      const response = await fetch("/api/v1/brewing-logs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Failed to save log");
+
+      alert("오늘의 커피 추출 로그를 기록했습니다!");
+      setIsLogDialogOpen(false);
+      resetForm();
+      fetchLogsAndShelf();
+      onLogAdded?.();
+    } catch (error) {
+      console.error("Error creating brewing log:", error);
+      alert("추출 로그 저장 중 오류가 발생했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteLog = async (logId: string) => {
+    if (!confirm("이 추출 로그를 정말 삭제하시겠습니까?")) return;
+    try {
+      const response = await fetch(`/api/v1/brewing-logs/${logId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete log");
+
+      alert("추출 로그를 삭제했습니다.");
+      setIsDetailDialogOpen(false);
+      fetchLogsAndShelf();
+      onLogAdded?.();
+    } catch (error) {
+      console.error("Error deleting log:", error);
+      alert("추출 로그 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  const resetForm = () => {
+    setShelfItemId("");
+    setMethod("Drip");
+    setWaterTemp("");
+    setWaterAmount("");
+    setCoffeeAmount("");
+    setGrindSize("");
+    setBrewTime("");
+    setRating(5);
+    setSimpleNote("");
+  };
+
+  const renderCalendarCells = () => {
+    const cells = [];
+    const totalSlots = Math.ceil((days + firstDayIndex) / 7) * 7;
+
+    for (let i = 0; i < totalSlots; i++) {
+      const dayNumber = i - firstDayIndex + 1;
+      const isCurrentMonthDay = dayNumber > 0 && dayNumber <= days;
+      const dayLogs = isCurrentMonthDay ? getLogsForDay(dayNumber) : [];
+      const hasLogs = dayLogs.length > 0;
+
+      const today = new Date();
+      const isToday =
+        isCurrentMonthDay &&
+        dayNumber === today.getDate() &&
+        currentDate.getMonth() === today.getMonth() &&
+        currentDate.getFullYear() === today.getFullYear();
+
+      cells.push(
+        <div
+          key={i}
+          onClick={() => isCurrentMonthDay && handleDayClick(dayNumber)}
+          className={cn(
+            "aspect-[7/6] p-1.5 md:p-2 border-r border-b border-sand/40 flex flex-col justify-between items-start transition-all",
+            isCurrentMonthDay
+              ? "bg-white hover:bg-canvas/50 cursor-pointer"
+              : "bg-canvas/20 text-espresso/20",
+            isToday && "bg-[#b87d4b]/5 border-2 border-caramel/40"
+          )}
+        >
+          {isCurrentMonthDay ? (
+            <>
+              <span className={cn(
+                "text-xs font-bold font-mono",
+                isToday ? "text-caramel" : "text-espresso/60"
+              )}>
+                {dayNumber}
+              </span>
+
+              {hasLogs && (
+                <div className="w-full flex flex-wrap gap-1 justify-center pb-1">
+                  {dayLogs.map((log) => (
+                    <div
+                      key={log.id}
+                      title={`${log.coffee_shelf_items?.bean_name || "원두"} (${log.method})`}
+                      className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#b87d4b] text-white flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+                    >
+                      <Coffee size={10} className="md:scale-110" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : null}
+        </div>
+      );
+    }
+    return cells;
+  };
+
+  const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+
+  return (
+    <div className="space-y-6">
+      {/* Header with navigation */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-sand pb-4">
+        <div>
+          <h2 className="text-xl font-bold font-serif text-espresso flex items-center gap-2">
+            <CalendarIcon className="text-caramel" size={20} />
+            데일리 드링킹 다이어리 (Brewing Diary)
+          </h2>
+          <p className="text-xs text-cocoa mt-1">
+            캘린더를 통해 하루 동안 마신 스페셜티 커피의 기록을 수집하고, 바리스타 스탬프를 가꿔보세요.
+          </p>
+        </div>
+
+        {/* Date Selector */}
+        <div className="flex items-center gap-2 bg-white border border-sand px-3 py-1.5 rounded-xl shadow-sm self-stretch sm:self-auto justify-between">
+          <button
+            onClick={handlePrevMonth}
+            className="w-8 h-8 rounded-lg hover:bg-canvas flex items-center justify-center border-none bg-transparent cursor-pointer"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span className="text-xs font-bold font-serif text-espresso px-4 min-w-[80px] text-center">
+            {currentDate.getFullYear()}년 {monthNames[currentDate.getMonth()]}
+          </span>
+          <button
+            onClick={handleNextMonth}
+            className="w-8 h-8 rounded-lg hover:bg-canvas flex items-center justify-center border-none bg-transparent cursor-pointer"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-white border border-sand rounded-3xl">
+          <Loader2 className="animate-spin text-caramel" size={32} />
+          <p className="text-xs text-cocoa font-medium">드링킹 캘린더를 로드하는 중입니다...</p>
+        </div>
+      ) : (
+        /* Calendar Grid */
+        <div className="bg-white border border-sand/70 rounded-3xl overflow-hidden shadow-sm">
+          {/* Days of Week Header */}
+          <div className="grid grid-cols-7 bg-canvas/30 border-b border-sand/40 text-center py-2 text-[10px] uppercase font-bold text-cocoa tracking-wider">
+            {["일", "월", "화", "수", "목", "금", "토"].map((dayName, idx) => (
+              <div
+                key={idx}
+                className={cn(
+                  idx === 0 && "text-[#d9463e]",
+                  idx === 6 && "text-espresso/60"
+                )}
+              >
+                {dayName}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar Day Grid Cells */}
+          <div className="grid grid-cols-7 border-l border-t border-sand/20">
+            {renderCalendarCells()}
+          </div>
+        </div>
+      )}
+
+      {/* dialog for CREATING brewing log */}
+      {isLogDialogOpen && (
+        <div className="fixed inset-0 bg-[#2c1d11]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-sand rounded-3xl max-w-md w-full p-6 shadow-[0_20px_50px_rgba(44,29,17,0.12)] space-y-4 relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setIsLogDialogOpen(false)}
+              className="absolute top-4 right-4 p-1 rounded-lg text-cocoa hover:text-espresso hover:bg-canvas transition-colors border-none bg-transparent cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="space-y-1">
+              <h3 className="font-serif font-bold text-espresso text-lg">
+                {selectedDate && `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`} 브루잉 기록
+              </h3>
+              <p className="text-[11px] text-cocoa">선택한 날짜에 추출한 커피 레시피와 노트를 저장합니다.</p>
+            </div>
+
+            <form onSubmit={handleCreateLog} className="space-y-4 pt-2">
+              <div className="space-y-1">
+                <label htmlFor="bean-select" className="text-xs font-bold text-espresso">사용 원두 *</label>
+                {activeShelfItems.length > 0 ? (
+                  <select
+                    id="bean-select"
+                    className="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    value={shelfItemId}
+                    onChange={(e) => setShelfItemId(e.target.value)}
+                    required
+                  >
+                    {activeShelfItems.map(item => (
+                      <option key={item.id} value={item.id}>
+                        [{item.roaster_name}] {item.bean_name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="text-xs text-[#d9463e] border border-[#d9463e]/20 bg-[#d9463e]/5 p-2 rounded-lg font-semibold">
+                    보관함에 등록된 활성 원두가 없습니다. 원두를 먼저 등록해 주세요!
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label htmlFor="brew-method" className="text-xs font-semibold text-cocoa">추출 방식 *</label>
+                  <select
+                    id="brew-method"
+                    className="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    value={method}
+                    onChange={(e) => setMethod(e.target.value)}
+                  >
+                    {["Drip", "Espresso", "AeroPress", "FrenchPress", "ColdBrew", "Other"].map(m => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-cocoa block">별점 (만족도)</span>
+                  <div className="flex gap-1 items-center h-9">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        className="text-caramel hover:scale-115 transition-transform border-none bg-transparent cursor-pointer"
+                      >
+                        <Star size={18} fill={rating >= star ? "#b87d4b" : "none"} strokeWidth={1.5} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Brewing Parameters Grid */}
+              <div className="bg-[#f7f7f4] p-3.5 rounded-xl border border-sand/50 space-y-3">
+                <h4 className="text-[10px] uppercase font-bold text-caramel tracking-wider flex items-center gap-1">
+                  <Clock size={12} />
+                  세부 추출 파라미터 (선택)
+                </h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label htmlFor="temp" className="text-[10px] text-cocoa font-medium flex items-center gap-1">
+                      <Thermometer size={11} /> 물 온도 (°C)
+                    </label>
+                    <input
+                      id="temp"
+                      type="number"
+                      placeholder="예: 92"
+                      value={waterTemp}
+                      onChange={e => setWaterTemp(e.target.value)}
+                      className="w-full bg-white border border-sand rounded-xl px-3 py-1.5 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label htmlFor="water" className="text-[10px] text-cocoa font-medium flex items-center gap-1">
+                      <Droplet size={11} /> 추출 양 (g / ml)
+                    </label>
+                    <input
+                      id="water"
+                      type="number"
+                      placeholder="예: 300"
+                      value={waterAmount}
+                      onChange={e => setWaterAmount(e.target.value)}
+                      className="w-full bg-white border border-sand rounded-xl px-3 py-1.5 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label htmlFor="coffee-weight" className="text-[10px] text-cocoa font-medium flex items-center gap-1">
+                      <Layers size={11} /> 원두 무게 (g)
+                    </label>
+                    <input
+                      id="coffee-weight"
+                      type="number"
+                      placeholder="예: 20"
+                      value={coffeeAmount}
+                      onChange={e => setCoffeeAmount(e.target.value)}
+                      className="w-full bg-white border border-sand rounded-xl px-3 py-1.5 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label htmlFor="grind" className="text-[10px] text-cocoa font-medium flex items-center gap-1">
+                      🎚️ 분쇄도 (Grind)
+                    </label>
+                    <input
+                      id="grind"
+                      placeholder="예: Medium"
+                      value={grindSize}
+                      onChange={e => setGrindSize(e.target.value)}
+                      className="w-full bg-white border border-sand rounded-xl px-3 py-1.5 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="note" className="text-xs font-semibold text-cocoa">한 줄 감상 메모</label>
+                <input
+                  id="note"
+                  placeholder="예: 화사한 자스민 아로마, 깔끔한 후미가 돋보였습니다."
+                  value={simpleNote}
+                  onChange={e => setSimpleNote(e.target.value)}
+                  className="w-full bg-white border border-sand rounded-xl px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t border-sand/40">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsLogDialogOpen(false)}
+                  className="rounded-xl text-xs h-9 cursor-pointer"
+                >
+                  취소
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || activeShelfItems.length === 0}
+                  className="bg-espresso text-white rounded-xl text-xs h-9 font-bold cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin mr-1" size={12} />
+                      기록 중...
+                    </>
+                  ) : "저장"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* dialog for viewing DETAIL and DELETING brewing log */}
+      {isDetailDialogOpen && (
+        <div className="fixed inset-0 bg-[#2c1d11]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-sand rounded-3xl max-w-md w-full p-6 shadow-[0_20px_50px_rgba(44,29,17,0.12)] space-y-4 relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setIsDetailDialogOpen(false)}
+              className="absolute top-4 right-4 p-1 rounded-lg text-cocoa hover:text-espresso hover:bg-canvas transition-colors border-none bg-transparent cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="space-y-1">
+              <h3 className="font-serif font-bold text-espresso text-lg">
+                {selectedDate && `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`} 커피 로그
+              </h3>
+              <p className="text-[11px] text-cocoa">선택한 날짜에 기록된 추출 정보 목록입니다.</p>
+            </div>
+            
+            <div className="space-y-4 py-2 max-h-[300px] overflow-y-auto scrollbar-none">
+              {selectedDayLogs.map((log) => (
+                <div key={log.id} className="border border-sand rounded-xl p-4 bg-[#f7f7f4]/40 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      {log.coffee_shelf_items && (
+                        <p className="text-[10px] uppercase font-bold text-caramel tracking-wider">
+                          {log.coffee_shelf_items.roaster_name}
+                        </p>
+                      )}
+                      <h4 className="font-bold text-espresso font-serif text-sm">
+                        {log.coffee_shelf_items ? log.coffee_shelf_items.bean_name : "삭제된 원두"}
+                      </h4>
+                    </div>
+                    <span className="text-[10px] bg-espresso text-white font-bold px-2 py-0.5 rounded-full">
+                      {log.method}
+                    </span>
+                  </div>
+
+                  {log.rating && (
+                    <div className="flex gap-0.5 items-center">
+                      {Array.from({ length: 5 }).map((_, idx) => (
+                        <Star
+                          key={idx}
+                          size={12}
+                          className="text-caramel"
+                          fill={log.rating! > idx ? "#b87d4b" : "none"}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-3 gap-2 text-[10px] text-cocoa bg-white p-2 rounded-lg border border-sand/40 font-mono">
+                    <div className="flex items-center gap-1">
+                      <Thermometer size={10} className="text-caramel/70" />
+                      <span>온도: {log.parameters?.waterTemp ? `${log.parameters.waterTemp}°C` : "-"}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Droplet size={10} className="text-caramel/70" />
+                      <span>추출: {log.parameters?.waterAmount ? `${log.parameters.waterAmount}g` : "-"}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Layers size={10} className="text-caramel/70" />
+                      <span>원두: {log.parameters?.coffeeAmount ? `${log.parameters.coffeeAmount}g` : "-"}</span>
+                    </div>
+                  </div>
+
+                  {log.simple_note && (
+                    <p className="text-xs text-espresso/80 leading-relaxed italic border-l-2 border-caramel/30 pl-2">
+                      "{log.simple_note}"
+                    </p>
+                  )}
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      onClick={() => handleDeleteLog(log.id)}
+                      className="text-cocoa hover:text-[#d9463e] hover:bg-[#d9463e]/5 rounded-lg h-8 px-2 text-[11px] font-bold flex items-center gap-1 transition-colors border-none bg-transparent cursor-pointer"
+                    >
+                      <Trash2 size={12} />
+                      로그 삭제
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4 border-t border-sand/40">
+              <Button
+                variant="outline"
+                onClick={() => setIsDetailDialogOpen(false)}
+                className="rounded-xl text-xs h-9 cursor-pointer"
+              >
+                닫기
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsDetailDialogOpen(false);
+                  resetForm();
+                  if (activeShelfItems.length > 0) {
+                    setShelfItemId(activeShelfItems[0].id);
+                  }
+                  setIsLogDialogOpen(true);
+                }}
+                className="bg-espresso text-white rounded-xl text-xs h-9 font-bold cursor-pointer"
+              >
+                추가 추출 기록하기
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

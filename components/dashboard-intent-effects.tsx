@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { AnalyticsEventName } from "@/lib/analytics-events";
 import type { DashboardActivationIntent } from "@/lib/activation-intent";
 import type { CheckoutIntent, CheckoutItemType } from "@/lib/checkout-return";
+import type { TasteProfileKey } from "@/lib/taste-profile";
 
 type AnalyticsProperties = Record<string, string | number | boolean | null>;
 type TrackEvent = (eventName: AnalyticsEventName, properties?: AnalyticsProperties) => void;
@@ -14,7 +15,7 @@ type DashboardIntentEffectsProps = {
   readonly isCardsLoading: boolean;
   readonly cardsError: unknown;
   readonly cardsFailureReason: unknown;
-  readonly onOpenWizard: () => void;
+  readonly onOpenWizard: (tasteProfile: TasteProfileKey | null) => void;
   readonly onOpenPayment: (itemType: CheckoutItemType) => void;
   readonly trackEvent: TrackEvent;
 };
@@ -53,10 +54,11 @@ export default function DashboardIntentEffects({
     trackEvent("first_card_cta_clicked", {
       source: initialActivationIntent.source,
       token: initialActivationIntent.token,
+      tasteProfile: initialActivationIntent.tasteProfile,
     });
-    onOpenWizard();
+    onOpenWizard(initialActivationIntent.tasteProfile);
     setHasHandledActivationIntent(true);
-    removeDashboardSearchParams(["intent", "source", "token"]);
+    removeDashboardSearchParams(["intent", "source", "token", "taste_profile"]);
   }, [hasHandledActivationIntent, initialActivationIntent, isCardsBlocked, onOpenWizard, trackEvent]);
 
   useEffect(() => {

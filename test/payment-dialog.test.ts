@@ -155,4 +155,91 @@ test.describe("PaymentDialog checkout honesty", () => {
     );
     expect(checkoutCalls).toBe(1);
   });
+
+  test("shows checkout creation failures inline without native alert on mobile", async ({ page }) => {
+    let checkoutCalls = 0;
+    let nativeDialogMessage: string | null = null;
+
+    page.on("dialog", async (dialog) => {
+      nativeDialogMessage = dialog.message();
+      await dialog.dismiss();
+    });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.route("**/api/v1/**", async (route) => {
+      const pathname = new URL(route.request().url()).pathname;
+
+      switch (pathname) {
+        case "/api/v1/cards":
+          await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify(emptyCardsResponse),
+          });
+          return;
+        case "/api/v1/profile/analytics":
+          await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify(analyticsResponse),
+          });
+          return;
+        case "/api/v1/profile":
+          await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify(profileResponse),
+          });
+          return;
+        case "/api/v1/subscription":
+          await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify(subscriptionResponse),
+          });
+          return;
+        case "/api/v1/checkout":
+          checkoutCalls += 1;
+          await route.fulfill({
+            status: 500,
+            contentType: "application/json",
+            body: JSON.stringify({
+              error: {
+                message: "Stripe 결제창을 열 수 없습니다. 잠시 후 다시 시도해주세요.",
+              },
+            }),
+          });
+          return;
+        case "/api/v1/analytics":
+          await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify({ received: true }),
+          });
+          return;
+        default:
+          await route.fulfill({
+            status: 404,
+            contentType: "application/json",
+            body: JSON.stringify({ error: { message: `Unhandled test route: ${pathname}` } }),
+          });
+      }
+    });
+
+    await page.goto("/dashboard");
+    await page.getByRole("button", { name: "월 $3.99로 구독하기" }).click();
+
+    const dialog = page.getByRole("dialog", { name: "프리미엄 커피 도서관 패키지" });
+    await expect(dialog).toBeVisible();
+
+    await dialog.getByRole("button", { name: "구독하기", exact: true }).click();
+
+    expect(nativeDialogMessage).toBeNull();
+    const inlineError = dialog.getByRole("alert");
+    await expect(inlineError).toContainText("Hyangmi 결제 연결을 열지 못했어요.");
+    await expect(inlineError).toContainText("Stripe 결제창을 열 수 없습니다. 잠시 후 다시 시도해주세요.");
+    await expect(inlineError).toContainText("다시 시도");
+
+    const overflowY = await dialog.evaluate((element) => window.getComputedStyle(element).overflowY);
+    const maxHeight = await dialog.evaluate((element) => window.getComputedStyle(element).maxHeight);
+    expect(overflowY).toBe("auto");
+    expect(maxHeight).not.toBe("none");
+    await expect(dialog.getByRole("button", { name: "구독하기", exact: true })).toBeEnabled();
+    expect(checkoutCalls).toBe(1);
+  });
 });

@@ -65,6 +65,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!user.email) {
+      return NextResponse.json(
+        { error: { code: 400, message: "이메일 주소가 없어 결제를 진행할 수 없습니다." } },
+        { status: 400 },
+      );
+    }
+
     const checkoutRequest = await readCheckoutRequest(request);
     if (!checkoutRequest) {
       return NextResponse.json(

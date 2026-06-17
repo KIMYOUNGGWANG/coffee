@@ -101,6 +101,33 @@ async function mockActivationRoutes(page: Page, eventNames: string[]): Promise<v
 }
 
 test.describe("Viral activation loop", () => {
+  test("prefills first-card wizard from selected onboarding taste profile", async ({ page }) => {
+    // Given
+    const eventNames: string[] = [];
+    await mockActivationRoutes(page, eventNames);
+
+    // When
+    await page.goto("/onboarding");
+    await page.getByTestId("taste-profile-sweet").click();
+
+    // Then
+    await expect(page.getByTestId("taste-profile-selection-copy")).toContainText("달고 고소한 컵");
+    const onboardingCta = page.getByTestId("onboarding-first-card-cta");
+    await expect(onboardingCta).toHaveAttribute(
+      "href",
+      "/dashboard?intent=first_card&source=onboarding&taste_profile=sweet",
+    );
+
+    // When
+    await onboardingCta.click();
+
+    // Then
+    await expect(page.getByRole("heading", { name: "새로운 테이스팅 카드" })).toBeVisible();
+    await expect(page.getByTestId("taste-profile-prefill")).toContainText("달고 고소한 컵");
+    await expect(page.getByTestId("taste-profile-prefill-sweetness")).toHaveText("단맛 5");
+    await expect.poll(() => eventNames).toContain("first_card_cta_clicked");
+  });
+
   test("routes public-card visitors through onboarding into first-card creation", async ({ page }) => {
     // Given
     const eventNames: string[] = [];

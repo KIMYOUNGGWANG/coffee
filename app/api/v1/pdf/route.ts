@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { promises as fs } from "fs";
+import path from "path";
 import { hyangmiBrand } from "@/lib/brand";
 import { generateHyangmiTastePassportPdf } from "@/lib/pdf-generator";
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -79,21 +81,38 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Read the Korean font file from local workspace
+    const fontPath = path.join(process.cwd(), "public", "fonts", "NanumGothic-Regular.ttf");
+    let fontBuffer: Buffer;
+    try {
+      fontBuffer = await fs.readFile(fontPath);
+    } catch (readError) {
+      console.error("Font read failed, attempting dynamic download fallback:", readError);
+      // Fallback: download if missing in runtime
+      const response = await fetch("https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf");
+      if (!response.ok) {
+        throw new Error("Korean font file not found and download failed.");
+      }
+      fontBuffer = Buffer.from(await response.arrayBuffer());
+    }
+
     const exportedAt = new Date().toISOString();
     const ownerLabel = user.email?.split("@")[0] ?? "Hyangmi user";
-    const pdfBytes = generateHyangmiTastePassportPdf({
+    const pdfUint8Array = await generateHyangmiTastePassportPdf({
       ownerLabel,
       exportedAt,
       cards: cardsResult.data,
-    });
+    }, fontBuffer);
+    
+    const pdfBuffer = Buffer.from(pdfUint8Array);
     const filename = `${hyangmiBrand.filenameSlug}-taste-passport-${exportedAt.slice(0, 10)}.pdf`;
 
-    return new NextResponse(pdfBytes, {
+    return new NextResponse(pdfBuffer, {
       status: 200,
       headers: {
         "Cache-Control": "private, no-store",
         "Content-Disposition": `attachment; filename="${filename}"`,
-        "Content-Length": pdfBytes.byteLength.toString(),
+        "Content-Length": pdfBuffer.byteLength.toString(),
         "Content-Type": "application/pdf",
       },
     });

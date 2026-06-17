@@ -78,6 +78,44 @@ function statusCopy(subscription: SubscriptionSummary): string {
   return "무료 스캔과 저장 기능으로 시작하고, 필요할 때 Premium 또는 크레딧을 결제하세요.";
 }
 
+function planLabel(plan: SubscriptionSummary["plan"]): string {
+  switch (plan) {
+    case "premium":
+      return "Premium";
+    case "free":
+      return "무료";
+  }
+}
+
+function formatBillingDate(value: string | null): string {
+  if (!value) return "없음";
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) return "확인 필요";
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(parsedDate);
+}
+
+function invoiceStatusLabel(lastInvoiceStatus: string | null): string {
+  switch (lastInvoiceStatus) {
+    case "paid":
+      return "결제 완료";
+    case "open":
+      return "결제 대기";
+    case "void":
+      return "무효 처리";
+    case "uncollectible":
+      return "회수 불가";
+    case null:
+      return "없음";
+    default:
+      return lastInvoiceStatus;
+  }
+}
+
 export default function DashboardBillingStatusPanel({ onOpenPayment }: DashboardBillingStatusPanelProps) {
   const { trackEvent } = useAnalyticsEvents();
   const { data: subscription, isLoading, error } = useQuery({
@@ -91,6 +129,7 @@ export default function DashboardBillingStatusPanel({ onOpenPayment }: Dashboard
       status: subscription.status,
       plan: subscription.plan,
       cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      currentPeriodEnd: subscription.currentPeriodEnd,
     });
   }, [subscription, trackEvent]);
 
@@ -121,10 +160,30 @@ export default function DashboardBillingStatusPanel({ onOpenPayment }: Dashboard
         ) : (
           <CheckCircle2 size={16} className="text-caramel" />
         )}
-        <span className="text-[10px] font-extrabold uppercase tracking-widest text-caramel">Billing state</span>
+        <span className="text-[11px] font-extrabold tracking-wide text-caramel">결제 상태</span>
       </div>
       <h3 className="mt-2 font-serif text-base font-bold">{statusTitle(subscription)}</h3>
       <p className="mt-2 text-xs leading-relaxed text-espresso/60">{statusCopy(subscription)}</p>
+      <div className="mt-4 grid grid-cols-1 gap-2 rounded-2xl border border-warm-gray bg-cream/40 p-3 text-xs text-espresso/60">
+        <p>
+          플랜 <span className="font-extrabold text-espresso">{planLabel(subscription.plan)}</span>
+        </p>
+        <p>
+          현재 기간 종료{" "}
+          <span className="font-extrabold text-espresso">
+            {formatBillingDate(subscription.currentPeriodEnd)}
+          </span>
+        </p>
+        <p>
+          최근 청구서 <span className="font-extrabold text-espresso">{invoiceStatusLabel(subscription.lastInvoiceStatus)}</span>
+        </p>
+        <p>
+          취소 예약 <span className="font-extrabold text-espresso">{subscription.cancelAtPeriodEnd ? "예" : "아니오"}</span>
+        </p>
+        <p>
+          마지막 동기화 <span className="font-extrabold text-espresso">{formatBillingDate(subscription.updatedAt)}</span>
+        </p>
+      </div>
       <div className="mt-4 flex flex-col gap-2">
         {isPaymentProblem && (
           <Button onClick={onOpenPayment} className="rounded-xl bg-espresso text-xs font-bold text-white hover:bg-espresso/90">

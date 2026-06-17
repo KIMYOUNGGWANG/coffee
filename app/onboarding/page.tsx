@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { Camera, Coffee, Compass, FileText, ScanLine, Sparkles } from "lucide-react";
+import OnboardingTasteFinder from "@/components/onboarding-taste-finder";
 import {
   buildDashboardActivationHref,
   buildFirstCardActivationIntent,
@@ -7,14 +8,32 @@ import {
 } from "@/lib/activation-intent";
 import { hyangmiBrand } from "@/lib/brand";
 
-const onboardingChecklist = [
-  "첫 Hyangmi 테이스팅 카드에 원두 이름과 한국 로스터리 기록",
-  "산미, 단맛, 바디, 애프터테이스트 기준으로 오늘의 맛 선택",
-  "귤, 꿀, 재스민, 고소함 같은 한국어 향미 단어로 메모",
-  "패키지 스캔 초안을 확인하고 틀린 원두 정보를 직접 수정",
-  "홈카페 대시보드에서 저장된 기록 기반 취향 지도 확인",
-  "공유용 Hyangmi 스토리 카드와 PDF 내보내기 점검",
-];
+const onboardingFlow = [
+  {
+    eyebrow: "01 / Taste profile",
+    title: "오늘 취향의 시작점 선택",
+    copy: "처음부터 정답을 쓰지 않아도 됩니다. 밝음, 단맛, 균형 중 가까운 컵을 고르면 첫 취향 지도가 열립니다.",
+    icon: Compass,
+  },
+  {
+    eyebrow: "02 / AI label scan",
+    title: "패키지 스캔 초안 확인",
+    copy: "라벨 초안은 원두명, 로스터리, 산지, 가공 방식을 빠르게 채우고 저장 전 사용자가 직접 고칩니다.",
+    icon: ScanLine,
+  },
+  {
+    eyebrow: "03 / Korean flavor words",
+    title: "한국어 향미 단어로 기억",
+    copy: "귤, 꿀, 재스민, 고소함처럼 내가 말하는 맛을 기록하고 SCA 스타일 컵 노트로 다듬습니다.",
+    icon: Coffee,
+  },
+  {
+    eyebrow: "04 / Archive output",
+    title: "추천과 리캡의 재료 만들기",
+    copy: "쌓인 카드는 취향 지도, 공유 카드, PDF 기록북, 다음 원두 추천의 근거가 됩니다.",
+    icon: FileText,
+  },
+] as const;
 
 type OnboardingPageProps = {
   readonly searchParams: Promise<Record<string, string | readonly string[] | undefined>>;
@@ -52,41 +71,88 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
   const dashboardHref = buildDashboardActivationHref(activationIntent);
 
   return (
-    <main className="starter-shell">
-      <section className="surface-panel">
-        <div className="surface-header">
-          <div>
-            <p className="hero-kicker">Hyangmi Korea-first Onboarding</p>
-            <h1>{activationHeadline(onboardingContext.kind)}</h1>
-            <p className="hero-copy">{activationCopy(onboardingContext.kind)}</p>
-          </div>
-        </div>
-
-        <ul className="checklist">
-          {onboardingChecklist.map((item) => (
-            <li key={item}>
-              <span className="checkmark" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-
-        <div className="button-row" style={{ marginTop: "1rem" }}>
-          <Link
-            href={dashboardHref}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--accent-foreground)] transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-4"
-          >
-            첫 Taste Card 시작하기
-            <ChevronRight size={15} />
+    <main className="hyangmi-paper min-h-screen overflow-hidden text-espresso">
+      <div className="mx-auto max-w-7xl px-4 py-5 md:px-8 md:py-8">
+        <header className="flex items-center justify-between border-b border-espresso/15 pb-4">
+          <Link href="/" className="group flex items-center gap-3">
+            <span className="grid size-10 place-items-center border border-espresso bg-espresso text-cream shadow-[4px_4px_0_rgba(47,37,31,0.12)] transition-transform group-hover:-translate-y-0.5">
+              <Coffee size={18} />
+            </span>
+            <span>
+              <span className="block font-serif text-xl font-black leading-none">{hyangmiBrand.name}</span>
+              <span className="mt-1 block text-[10px] font-extrabold uppercase tracking-[0.26em] text-espresso/45">
+                Taste Onboarding
+              </span>
+            </span>
           </Link>
           <Link
             href="/dashboard"
-            className="inline-flex h-10 items-center justify-center rounded-md border border-[var(--border)] bg-transparent px-4 py-2 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-4"
+            className="hidden border-b border-espresso/30 px-1 py-2 text-xs font-black text-espresso/62 transition hover:border-espresso hover:text-espresso sm:inline-flex"
           >
             샘플 Hyangmi 기록 보기
           </Link>
-        </div>
-      </section>
+        </header>
+
+        <section className="grid min-h-[calc(100vh-6rem)] grid-cols-1 items-center gap-10 py-10 lg:grid-cols-[0.94fr_1.06fr] lg:py-14">
+          <div className="max-w-2xl">
+            <div className="issue-marker mb-6 text-[10px] font-black uppercase tracking-[0.22em] text-[#7b4d34]">
+              <Sparkles size={12} />
+              Hyangmi Korea-first Onboarding
+            </div>
+            <h1 className="break-keep font-serif text-4xl font-black leading-tight text-espresso md:text-6xl">
+              {activationHeadline(onboardingContext.kind)}
+            </h1>
+            <p className="mt-6 max-w-xl text-sm font-semibold leading-7 text-espresso/64 md:text-base">
+              {activationCopy(onboardingContext.kind)}
+            </p>
+
+            <div className="mt-7 border-l border-espresso/20 pl-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#9f6a4a]">
+                30-second Taste Finder
+              </p>
+              <p className="mt-2 break-keep font-serif text-2xl font-black leading-tight text-espresso">
+                먼저 취향을 고르고, 봉투 사진으로 첫 카드를 완성하세요.
+              </p>
+            </div>
+
+          </div>
+
+          <div className="grid gap-4">
+            <div>
+              <OnboardingTasteFinder dashboardHref={dashboardHref} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-px border border-espresso/18 bg-espresso/18 md:grid-cols-2">
+              {onboardingFlow.map(({ eyebrow, title, copy, icon: Icon }) => (
+                <article key={title} className="bg-[#2f251f] p-5 text-cream">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#e1b698]">{eyebrow}</p>
+                      <h3 className="mt-4 break-keep font-serif text-2xl font-black leading-tight">{title}</h3>
+                    </div>
+                    <span className="grid size-10 shrink-0 place-items-center border border-cream/25 text-[#e1b698]">
+                      <Icon size={17} />
+                    </span>
+                  </div>
+                  <p className="mt-5 text-sm font-semibold leading-7 text-cream/64">{copy}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-[0.8fr_1.2fr] gap-3 border border-[#1f4651] bg-[#dcecf0] p-4 text-[#1f4651] shadow-[6px_6px_0_rgba(31,70,81,0.13)]">
+              <div className="grid place-items-center border border-[#1f4651]/20 bg-[#f5fbfb]">
+                <Camera size={30} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em]">next useful hook</p>
+                <p className="mt-2 break-keep text-sm font-extrabold leading-6">
+                  원두 봉투를 찍으면 기록이 쉬워지고, 쌓인 기록은 다음 원두 추천의 이유가 됩니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

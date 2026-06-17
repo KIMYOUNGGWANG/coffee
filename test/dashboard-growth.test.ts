@@ -55,6 +55,18 @@ const subscriptionResponse = {
     updatedAt: null,
   },
 } as const;
+const premiumSubscriptionResponse = {
+  data: {
+    cancelAtPeriodEnd: false,
+    currentPeriodEnd: "2026-07-15",
+    isPremium: true,
+    lastInvoiceStatus: "paid",
+    plan: "premium",
+    status: "active",
+    stripeSubscriptionId: "sub_growth_001",
+    updatedAt: "2026-06-15T00:00:00.000Z",
+  },
+};
 
 async function fulfillJson(route: Route, body: unknown): Promise<void> {
   await route.fulfill({
@@ -63,7 +75,11 @@ async function fulfillJson(route: Route, body: unknown): Promise<void> {
   });
 }
 
-async function mockDashboardApiRoutes(page: Page, cardsResponse: unknown = emptyCardsResponse): Promise<void> {
+async function mockDashboardApiRoutes(
+  page: Page,
+  cardsResponse: unknown = emptyCardsResponse,
+  subscriptionSummary: unknown = subscriptionResponse,
+): Promise<void> {
   await page.route("**/api/v1/**", async (route) => {
     const pathname = new URL(route.request().url()).pathname;
 
@@ -78,7 +94,7 @@ async function mockDashboardApiRoutes(page: Page, cardsResponse: unknown = empty
         await fulfillJson(route, analyticsResponse);
         return;
       case "/api/v1/subscription":
-        await fulfillJson(route, subscriptionResponse);
+        await fulfillJson(route, subscriptionSummary);
         return;
       case "/api/v1/analytics":
         await fulfillJson(route, { received: true });
@@ -138,5 +154,20 @@ test.describe("Hyangmi growth dashboard", () => {
     await expect(page.getByText("보유 크레딧 2개")).toBeVisible();
     await expect(page.getByText("PDF 기록북 미보유")).toBeVisible();
     await expect(page.getByText("아직 로스터 기록 없음")).toBeVisible();
+  });
+
+  test("shows compact billing plan and current period metadata", async ({ page }) => {
+    // Given
+    await mockDashboardApiRoutes(page, emptyCardsResponse, premiumSubscriptionResponse);
+
+    // When
+    await page.goto("/dashboard");
+
+    // Then
+    await expect(page.getByText("플랜 Premium")).toBeVisible();
+    await expect(page.getByText("현재 기간 종료 2026년 7월 15일")).toBeVisible();
+    await expect(page.getByText("최근 청구서 결제 완료")).toBeVisible();
+    await expect(page.getByText("취소 예약 아니오")).toBeVisible();
+    await expect(page.getByText("마지막 동기화 2026년 6월 15일")).toBeVisible();
   });
 });

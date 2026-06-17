@@ -4,27 +4,30 @@
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
 
-  --color-cream: hsl(30, 20%, 98%);
-  --color-espresso: hsl(25, 20%, 15%);
-  --color-caramel: hsl(28, 45%, 35%);
-  --color-warm-gray: hsl(30, 15%, 90%);
+  --color-cream: hsl(45, 12%, 96%);
+  --color-espresso: hsl(26, 44%, 12%);
+  --color-caramel: hsl(27, 45%, 51%);
+  --color-warm-gray: hsl(36, 14%, 88%);
 }
 
 :root {
   color-scheme: light;
+  --font-sans: "IBM Plex Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-serif: "Noto Serif KR", "AppleMyungjo", "Songti SC", Georgia, serif;
   --background: #f7f7f4;
   --surface: #ffffff;
-  --surface-muted: #f0efe8;
-  --foreground: #111318;
-  --muted-foreground: #5f6672;
-  --border: #d8dde5;
-  --accent: #2453ff;
+  --surface-muted: #f2ede4;
+  --foreground: #2c1d11;
+  --muted-foreground: #5c4a3c;
+  --border: #e6e1da;
+  --accent: #b87d4b;
   --accent-foreground: #ffffff;
-  --success: #0f9f6e;
-  --warning: #c8811a;
-  --danger: #c63b3b;
-  --ring: rgba(36, 83, 255, 0.22);
+  --success: #4d7c54;
+  --warning: #dfa857;
+  --danger: #d9463e;
+  --ring: rgba(184, 125, 75, 0.3);
 }
+
 
 * {
   box-sizing: border-box;
@@ -38,14 +41,57 @@ body {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at top left, rgba(36, 83, 255, 0.08), transparent 28rem),
-    linear-gradient(180deg, #faf9f5 0%, #f4f2ec 100%);
+    linear-gradient(90deg, rgba(47, 37, 31, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(47, 37, 31, 0.025) 1px, transparent 1px),
+    linear-gradient(180deg, #fbf6ec 0%, #f3eadb 100%);
+  background-size: 4rem 4rem, 4rem 4rem, auto;
   color: var(--foreground);
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.text-cream {
+  color: hsl(30, 20%, 98%);
+}
+
+.hyangmi-paper {
+  position: relative;
+  background:
+    radial-gradient(circle at 9% 8%, rgba(159, 106, 74, 0.16), transparent 26rem),
+    radial-gradient(circle at 92% 16%, rgba(31, 70, 81, 0.1), transparent 24rem),
+    linear-gradient(90deg, rgba(47, 37, 31, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(47, 37, 31, 0.035) 1px, transparent 1px),
+    #f6efe3;
+  background-size: auto, auto, 4.5rem 4.5rem, 4.5rem 4.5rem, auto;
+}
+
+.hyangmi-paper::before {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background-image:
+    linear-gradient(rgba(47, 37, 31, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 37, 31, 0.014) 1px, transparent 1px);
+  background-size: 0.72rem 0.72rem;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.85), transparent 74%);
+}
+
+.issue-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(47, 37, 31, 0.18);
+  background: rgba(255, 250, 240, 0.76);
+  padding: 0.45rem 0.68rem;
+  box-shadow: 3px 3px 0 rgba(47, 37, 31, 0.08);
 }
 
 .starter-shell {

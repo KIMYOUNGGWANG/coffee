@@ -27,13 +27,19 @@ export function useAnalyticsEvents(): AnalyticsTracker {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
       keepalive: true,
-    }).catch((error: unknown) => {
-      if (error instanceof Error) {
-        console.warn("Hyangmi analytics event dropped:", error.message);
-        return;
-      }
-      throw error;
-    });
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.warn("Hyangmi analytics event dropped:", `${response.status} ${response.statusText}`.trim());
+        }
+      })
+      .catch((error: unknown) => {
+        if (error instanceof Error) {
+          console.warn("Hyangmi analytics event dropped:", error.message);
+          return;
+        }
+        throw error;
+      });
   }, []);
 
   return { trackEvent };

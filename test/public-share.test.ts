@@ -148,7 +148,11 @@ test.describe("public card sharing", () => {
     await mockDashboardApiRoutes(page);
 
     // When
+    const cardsResponse = page.waitForResponse((response) => {
+      return response.url().includes("/api/v1/cards") && response.request().method() === "GET";
+    });
     await page.goto("/dashboard");
+    await cardsResponse;
     await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();
     await page.getByTitle("인스타그램 스토리 공유").click();
     await page.getByRole("button", { name: "공개 카드 링크 복사" }).click();

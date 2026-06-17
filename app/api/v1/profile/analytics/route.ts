@@ -29,6 +29,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Fetch brewing notes for statistics
+    const { data: notes, error: notesError } = await supabase
+      .from("brewing_notes")
+      .select("method, water_temp, rating")
+      .eq("user_id", user.id);
+
     // Default response if no cards yet
     if (!cards || cards.length === 0) {
       return NextResponse.json({
@@ -39,6 +45,12 @@ export async function GET(request: NextRequest) {
           topTags: [],
           totalCards: 0,
           aiAnalysis: "아직 등록된 테이스팅 카드가 없습니다. 첫 카드를 기록하시면 AI가 정교한 취향 분석을 시작합니다.",
+          brewingStats: {
+            totalNotes: 0,
+            favoriteMethod: "-",
+            averageRating: 0,
+            bestTemp: null,
+          }
         }
       });
     }
@@ -71,6 +83,47 @@ export async function GET(request: NextRequest) {
       .slice(0, 5)
       .map(([tag]) => tag);
 
+    // Brewing Stats Calculation
+    let brewingStats = {
+      totalNotes: 0,
+      favoriteMethod: "-",
+      averageRating: 0,
+      bestTemp: null as number | null,
+    };
+
+    if (notes && notes.length > 0) {
+      const methodCounts: Record<string, number> = {};
+      let totalRating = 0;
+      let ratedCount = 0;
+      const highRatedTemps: number[] = [];
+
+      notes.forEach((note) => {
+        if (note.method) {
+          methodCounts[note.method] = (methodCounts[note.method] || 0) + 1;
+        }
+        if (typeof note.rating === "number" && note.rating > 0) {
+          totalRating += note.rating;
+          ratedCount++;
+        }
+        if (typeof note.rating === "number" && note.rating >= 4 && typeof note.water_temp === "number" && note.water_temp > 0) {
+          highRatedTemps.push(note.water_temp);
+        }
+      });
+
+      const favoriteMethod = Object.entries(methodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
+      const averageRating = ratedCount > 0 ? Math.round((totalRating / ratedCount) * 10) / 10 : 0;
+      const bestTemp = highRatedTemps.length > 0
+        ? Math.round(highRatedTemps.reduce((sum, t) => sum + t, 0) / highRatedTemps.length)
+        : null;
+
+      brewingStats = {
+        totalNotes: notes.length,
+        favoriteMethod,
+        averageRating,
+        bestTemp,
+      };
+    }
+
     // Call Gemini to generate coffee taste story
     let env;
     try {
@@ -91,6 +144,8 @@ export async function GET(request: NextRequest) {
 - Average Sweetness: ${averageSweetness}/5
 - Average Body: ${averageBody}/5
 - Top flavor profiles selected: [${topTags.join(", ")}]
+- Favorite brewing method: ${brewingStats.favoriteMethod}
+- Total brewing logs: ${brewingStats.totalNotes}
 
 Generate a personalized, witty, and beautiful 2-3 sentence coffee lover "Taste Profile Analysis" in Korean. Call them a nickname like "현대적 내추럴 탐험가" or "클래식 에스프레소 애호가" based on metrics (e.g. high acidity => fruity/african beans explorer, high body/sweetness => classic robust flavors lover). Keep the tone warm, intellectual, and poetic (like wine description). Do not output markdown, prefixes, quotes, or JSON. Just Korean text.`;
 
@@ -126,7 +181,7 @@ Generate a personalized, witty, and beautiful 2-3 sentence coffee lover "Taste P
       if (averageAcidity >= 3.8) {
         aiAnalysis = `유저님은 에티오피아와 케냐 등 아프리카 계열 원두가 주는 화사하고 쥬시한 산미를 사랑하는 '싱그러운 아로마 탐험가'입니다. 특히 V60 드립 추출에서 가벼운 바디감과 과일 향미의 만족도가 높게 나타납니다.`;
       } else if (averageSweetness >= 3.8 && averageBody >= 3.5) {
-        aiAnalysis = `유저님은 캐러멜의 달콤함과 밀크 초콜릿의 부드럽고 묵직한 마우스필을 선호하는 '클래식 로스트 애호가'입니다. 밸런스가 뛰어나고 단맛의 여운이 길게 남는 커피를 즐기시네요.`;
+        aiAnalysis = `유저님은 캐러멜의 달콤함และ 밀크 초콜릿의 부드럽고 묵직한 마우스필을 선호하는 '클래식 로스트 애호가'입니다. 밸런스가 뛰어나고 단맛의 여운이 길게 남는 커피를 즐기시네요.`;
       } else {
         aiAnalysis = `유저님은 산미, 단맛, 바디감이 한쪽으로 치우치지 않고 정교하게 어우러진 맛의 균형을 중시하는 '균형주의 홈바리스타'입니다. 다양한 원두와 브루잉 변수를 차분히 탐구하며 취향을 확장하고 계십니다.`;
       }
@@ -140,6 +195,7 @@ Generate a personalized, witty, and beautiful 2-3 sentence coffee lover "Taste P
         topTags,
         totalCards,
         aiAnalysis,
+        brewingStats,
       }
     });
 

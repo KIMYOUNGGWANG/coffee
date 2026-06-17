@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Coffee, Sparkles, ChevronRight, Share2, Layers, BookOpen, Heart } from "lucide-react";
 import LandingPricingSection from "@/components/landing-pricing-section";
+import LandingPlaygroundClient from "@/components/landing-playground-client";
 import LegalFooterLinks from "@/components/legal-footer-links";
 import { buttonVariants } from "@/components/ui/button";
 import { hyangmiBrand } from "@/lib/brand";
@@ -24,8 +25,8 @@ export default function HyangmiHomePage() {
             <Link className="text-xs font-semibold text-espresso/60 hover:text-espresso transition-colors" href="/onboarding">
               온보딩 가이드
             </Link>
-            <Link className={cn(buttonVariants({ size: "sm" }), "bg-espresso hover:bg-espresso/90 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer")} href="/dashboard">
-              대시보드 시작
+            <Link className={cn(buttonVariants({ size: "sm" }), "bg-espresso hover:bg-espresso/90 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer")} href="/onboarding">
+              Taste Finder 시작
             </Link>
           </div>
         </header>
@@ -42,13 +43,14 @@ export default function HyangmiHomePage() {
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-extrabold text-espresso leading-[1.15]">
               한국 스페셜티 커피를 <br />
-              <span className="text-caramel italic font-light">기억 카드와 기록북</span>으로, <br />
+              <span className="text-caramel italic font-light">나만의 맛 여권(Taste Passport)</span>으로, <br />
               {hyangmiBrand.name}.
             </h1>
 
             <p className="text-sm md:text-base text-espresso/70 leading-relaxed max-w-xl font-medium">
-              카페에서 마신 원두, 로스터리, 한 줄 맛 기억을 남겨주세요. AI 스캔은 원두 라벨 초안을 도와주고, 사용자가 확인한 기록만 테이스팅 아카이브와 공유용 카드, PDF 기록북으로 남깁니다.
+              마신 원두의 라벨을 AI로 간편하게 스캔하여 나의 Taste Passport에 스탬프를 적립해 보세요. 내 커피 취향을 정밀 분석하고 매주 신선한 마이크로 로스터리의 원두를 추천합니다.
             </p>
+
 
             <div className="flex flex-wrap gap-3.5 pt-2">
               <Link
@@ -68,7 +70,7 @@ export default function HyangmiHomePage() {
                 )}
                 href="/onboarding"
               >
-                기록 흐름 둘러보기
+                30초 Taste Finder로 시작
               </Link>
             </div>
           </div>
@@ -124,9 +126,9 @@ export default function HyangmiHomePage() {
                 <Sparkles size={18} />
               </div>
               <div className="space-y-1.5 text-left">
-                <h3 className="font-serif font-bold text-base">01. 한국 카페 테이스팅 카드</h3>
+                <h3 className="font-serif font-bold text-base">01. 한국 카페 테이스팅 카드 (맛 여권)</h3>
                 <p className="text-xs text-espresso/70 leading-relaxed">
-                  프릳츠, 테라로사, 모모스처럼 익숙한 로스터리 이름과 원두 사진을 한 장의 Hyangmi 카드로 정리합니다.
+                  마신 원두의 정보를 수집하여 에티오피아, 콜롬비아 등 나만의 디지털 맛 여권(Taste Passport) 스탬프로 채워나갑니다.
                 </p>
               </div>
             </div>
@@ -150,9 +152,9 @@ export default function HyangmiHomePage() {
                 <Heart size={18} />
               </div>
               <div className="space-y-1.5 text-left">
-                <h3 className="font-serif font-bold text-base">03. 개인 취향 지도와 월간 리캡</h3>
+                <h3 className="font-serif font-bold text-base">03. 취향 분석과 로스터리 매칭</h3>
                 <p className="text-xs text-espresso/70 leading-relaxed">
-                  저장한 카드의 산미, 단맛, 바디와 향미 태그를 누적해 내 취향을 요약합니다. 추천 엔진이 아니라 내 기록의 리캡입니다.
+                  내가 기록한 카드들의 산미, 단맛, 바디감 점수를 기반으로 내 커피 스타일을 분석하고 최적의 로컬 원두 상품을 연결합니다.
                 </p>
               </div>
             </div>
@@ -163,9 +165,9 @@ export default function HyangmiHomePage() {
                 <Share2 size={18} />
               </div>
               <div className="space-y-1.5 text-left">
-                <h3 className="font-serif font-bold text-base">04. 공유 카드와 PDF 내보내기</h3>
+                <h3 className="font-serif font-bold text-base">04. 소셜 스토리 공유 및 여권 내보내기</h3>
                 <p className="text-xs text-espresso/70 leading-relaxed">
-                  저장한 테이스팅을 인스타 스토리 카드나 홈카페 PDF 기록북으로 꺼내볼 수 있습니다. 오늘의 결과물은 디지털 아티팩트입니다.
+                  기록을 소셜 피드용 이미지나 나만의 커피 포트폴리오 PDF로 내려받을 수 있으며, 오늘의 결과물은 멋진 디지털 아티팩트입니다.
                 </p>
               </div>
             </div>
@@ -173,7 +175,11 @@ export default function HyangmiHomePage() {
           </div>
         </section>
 
-        <LandingPricingSection />
+        <div className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+        <LandingPlaygroundClient />
+      </div>
+
+      <LandingPricingSection />
 
         {/* Current product boundary section */}
         <section className="bg-white/30 backdrop-blur-md border border-white/40 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
@@ -194,9 +200,9 @@ export default function HyangmiHomePage() {
 
             <div className="bg-white border border-warm-gray rounded-2xl p-4 flex flex-col justify-between space-y-4 hover:border-caramel/30 transition-all duration-300 text-left">
               <div>
-                <span className="text-[9px] uppercase font-bold tracking-wider text-caramel bg-caramel/10 px-2 py-0.5 rounded-full inline-block">Memory Card</span>
-                <h4 className="text-sm font-bold mt-2">테이스팅 카드 저장</h4>
-                <p className="text-[10px] text-espresso/50 mt-1 leading-relaxed">원두명, 로스터리, 산지, 가공 방식, 산미·단맛·바디 점수를 한 장으로 보관</p>
+                <span className="text-[9px] uppercase font-bold tracking-wider text-caramel bg-caramel/10 px-2 py-0.5 rounded-full inline-block">Taste Passport</span>
+                <h4 className="text-sm font-bold mt-2">맛 여권 스탬프 적립</h4>
+                <p className="text-[10px] text-espresso/50 mt-1 leading-relaxed">원두명, 로스터리, 산지, 가공 방식, 그리고 컵 노트를 디지털 여권 스탬프로 기록 및 소장</p>
               </div>
               <span className="text-xs font-extrabold text-espresso mt-3 block">현재 제공</span>
             </div>
@@ -212,11 +218,11 @@ export default function HyangmiHomePage() {
 
             <div className="bg-white border border-warm-gray rounded-2xl p-4 flex flex-col justify-between space-y-4 hover:border-caramel/30 transition-all duration-300 text-left">
               <div>
-                <span className="text-[9px] uppercase font-bold tracking-wider text-caramel bg-caramel/10 px-2 py-0.5 rounded-full inline-block">Taste Recap</span>
-                <h4 className="text-sm font-bold mt-2">커피 취향 지도 PDF</h4>
-                <p className="text-[10px] text-espresso/50 mt-1 leading-relaxed">누적 카드의 향미 태그와 점수를 모아 디지털 홈카페 기록북으로 내보내기</p>
+                <span className="text-[9px] uppercase font-bold tracking-wider text-caramel bg-caramel/10 px-2 py-0.5 rounded-full inline-block">Roaster Network</span>
+                <h4 className="text-sm font-bold mt-2">취향 분석 & 원두 추천</h4>
+                <p className="text-[10px] text-espresso/50 mt-1 leading-relaxed">내 취향 분석 결과에 맞추어 다양한 마이크로 로스터리의 원두 추천 및 편리한 앱 내 구매 제공</p>
               </div>
-              <span className="text-xs font-extrabold text-espresso mt-3 block">디지털 PDF</span>
+              <span className="text-xs font-extrabold text-espresso mt-3 block">매칭 연동</span>
             </div>
 
             <div className="bg-white border border-warm-gray rounded-2xl p-4 flex flex-col justify-between space-y-4 hover:border-caramel/30 transition-all duration-300 text-left">

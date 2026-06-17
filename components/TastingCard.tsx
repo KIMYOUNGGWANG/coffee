@@ -3,6 +3,7 @@
 import React from "react";
 import { Coffee, Trash2, Calendar, MapPin, Thermometer, Share2 } from "lucide-react";
 import { TastingCardData } from "@/hooks/useTastingCards";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 interface TastingCardProps {
   card: TastingCardData;
@@ -19,6 +20,36 @@ export default function TastingCard({
   onSelect,
   onShare,
 }: TastingCardProps) {
+  // Motion values for 3D tilt
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ["100%", "-100%"]);
+  const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ["100%", "-100%"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   // Safe parsing for nested properties
   const footerMeta = card.footer_meta || {};
   const badges = card.badges || [];
@@ -47,10 +78,23 @@ export default function TastingCard({
   };
 
   return (
-    <div
-      onClick={() => onSelect && onSelect(card)}
-      className="relative aspect-[4/5] w-full max-w-[420px] bg-cream border border-warm-gray rounded-3xl p-6 shadow-sm hover:shadow-[0_20px_50px_rgba(25,20,15,0.06)] hover:-translate-y-2 hover:border-caramel/30 transition-all duration-300 ease-out flex flex-col justify-between overflow-hidden group select-none text-espresso cursor-pointer"
-    >
+    <div style={{ perspective: "1200px" }} className="w-full max-w-[420px] mx-auto">
+      <motion.div
+        onClick={() => onSelect && onSelect(card)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d",
+        }}
+        className="relative aspect-[4/5] w-full h-full bg-cream border border-warm-gray rounded-3xl p-6 shadow-sm hover:shadow-[0_20px_50px_rgba(25,20,15,0.06)] transition-shadow duration-300 ease-out flex flex-col justify-between overflow-hidden group select-none text-espresso cursor-pointer"
+      >
+        {/* Glare Effect */}
+        <motion.div
+          style={{ x: glareX, y: glareY }}
+          className="absolute inset-0 z-50 pointer-events-none rounded-3xl bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        />
       {/* Decorative Top Accent line */}
       <div className="absolute top-0 left-0 w-full h-1.5 bg-caramel/20 group-hover:bg-caramel transition-colors duration-300" />
 
@@ -103,7 +147,7 @@ export default function TastingCard({
             ) : (
               <div className="flex flex-col items-center gap-1 text-espresso/20">
                 <Coffee size={32} strokeWidth={1.5} />
-                <span className="text-[10px] tracking-tight">Bean Photo</span>
+                <span className="text-[10px]">Bean Photo</span>
               </div>
             )}
           </div>
@@ -173,6 +217,7 @@ export default function TastingCard({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
+  </div>
   );
 }

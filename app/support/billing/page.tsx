@@ -20,6 +20,9 @@ export default function BillingSupportPage() {
             <p className="rounded-2xl border border-warm-gray bg-cream/50 p-4">
               환불 요청: 중복 결제, 접근 불가, 오결제 여부를 확인한 뒤 안내합니다.
             </p>
+            <p className="rounded-2xl border border-warm-gray bg-cream/50 p-4">
+              Stripe ID가 있으면 영업일 1일 내 확인하고, 없으면 이메일과 문의 내용으로 먼저 조회합니다.
+            </p>
           </div>
         </section>
         <BillingSupportForm />

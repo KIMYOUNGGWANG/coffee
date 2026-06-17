@@ -44,7 +44,6 @@ export default function BillingSupportForm() {
 
   const submitSupportRequest = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    trackEvent("billing_support_started", { surface: "support_page" });
     const formData = new FormData(event.currentTarget);
     const parsedPayload = supportRequestSchema.safeParse({
       email: readFormString(formData, "email"),
@@ -59,6 +58,7 @@ export default function BillingSupportForm() {
       return;
     }
 
+    trackEvent("billing_support_started", { surface: "support_page" });
     setStatus({ kind: "submitting" });
     const response = await fetch("/api/v1/support", {
       method: "POST",
@@ -86,7 +86,7 @@ export default function BillingSupportForm() {
       className="rounded-3xl border border-warm-gray bg-white p-6 shadow-sm"
     >
       <div className="space-y-1">
-        <p className="text-[10px] font-extrabold uppercase tracking-widest text-caramel">Support ticket</p>
+        <p className="text-[11px] font-extrabold tracking-wide text-caramel">고객지원 접수</p>
         <h2 className="font-serif text-2xl font-bold">문의 접수</h2>
         <p className="text-xs leading-relaxed text-espresso/55">
           결제 기록 확인에 필요한 정보를 남겨주세요. 카드 전체 번호는 입력하지 마세요.
@@ -132,14 +132,25 @@ export default function BillingSupportForm() {
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <label className="grid gap-1.5 text-xs font-bold text-espresso/70">
-            Checkout Session ID
-            <input name="checkoutSessionId" className="rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2.5 text-sm outline-none focus:border-caramel" />
+            체크아웃 세션 ID <span className="font-medium text-espresso/45">선택</span>
+            <input
+              name="checkoutSessionId"
+              className="rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2.5 text-sm outline-none focus:border-caramel"
+              placeholder="cs_test_..."
+            />
           </label>
           <label className="grid gap-1.5 text-xs font-bold text-espresso/70">
-            Subscription ID
-            <input name="subscriptionId" className="rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2.5 text-sm outline-none focus:border-caramel" />
+            구독 ID <span className="font-medium text-espresso/45">선택</span>
+            <input
+              name="subscriptionId"
+              className="rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2.5 text-sm outline-none focus:border-caramel"
+              placeholder="sub_..."
+            />
           </label>
         </div>
+        <p className="rounded-2xl border border-caramel/15 bg-caramel/10 px-3 py-2 text-xs leading-relaxed text-espresso/60">
+          <span className="font-extrabold text-espresso/75">Stripe ID는 선택 입력입니다.</span> 영수증의 cs_ 또는 sub_ 값을 남기면 영업일 1일 내 확인이 빨라집니다.
+        </p>
       </div>
 
       {status.kind === "success" && (
