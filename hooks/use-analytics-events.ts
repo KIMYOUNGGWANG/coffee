@@ -10,7 +10,7 @@ type AnalyticsTracker = {
 };
 
 function currentPath(): string {
-  return `${globalThis.location.pathname}${globalThis.location.search}`;
+  return globalThis.location.pathname;
 }
 
 export function useAnalyticsEvents(): AnalyticsTracker {
@@ -30,12 +30,12 @@ export function useAnalyticsEvents(): AnalyticsTracker {
     })
       .then((response) => {
         if (!response.ok) {
-          console.warn("Hyangmi analytics event dropped:", `${response.status} ${response.statusText}`.trim());
+          console.warn("CoffeeDex analytics event dropped:", `${response.status} ${response.statusText}`.trim());
         }
       })
       .catch((error: unknown) => {
         if (error instanceof Error) {
-          console.warn("Hyangmi analytics event dropped:", error.message);
+          console.warn("CoffeeDex analytics event dropped:", error.message);
           return;
         }
         throw error;

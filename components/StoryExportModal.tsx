@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Download, Loader2, Share2, Sparkles, X } from "lucide-react";
+import { Check, Download, Link2Off, Loader2, Share2, Sparkles, X } from "lucide-react";
 import { z } from "zod";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import type { TastingCardData } from "@/hooks/useTastingCards";
-import { hyangmiBrand } from "@/lib/brand";
+import { coffeeDexBrand } from "@/lib/brand";
 import {
   STORY_SKIN_KEYS,
   STORY_SKINS,
@@ -13,6 +13,7 @@ import {
   storySvg,
   type SkinType,
 } from "@/components/story-export-assets";
+import FluidRadarChart from "@/components/FluidRadarChart";
 
 type StoryExportModalProps = {
   readonly card: TastingCardData;
@@ -33,6 +34,8 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
   const [isPublishing, setIsPublishing] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
+  const [shareNotice, setShareNotice] = useState<string | null>(null);
+  const [isPublic, setIsPublic] = useState(card.is_public === true);
   const [publicUrl, setPublicUrl] = useState<string | null>(null);
   const copyResetTimerRef = useRef<number | null>(null);
   const { trackEvent } = useAnalyticsEvents();
@@ -50,12 +53,6 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
   const skin = STORY_SKINS[activeSkin];
   const dateText = card.footer_meta?.date || card.created_at.slice(0, 10).replace(/-/g, ".");
   const originText = card.footer_meta?.origin || "Unknown Origin";
-  const metrics = [
-    { label: "산미 (Acidity)", value: card.metric1 },
-    { label: "단맛 (Sweetness)", value: card.metric2 },
-    { label: "바디감 (Body)", value: card.metric3 },
-  ] as const;
-
   const markCopied = () => {
     setCopied(true);
     if (copyResetTimerRef.current !== null) {
@@ -70,6 +67,7 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
   const handleCopyPublicLink = async () => {
     setIsPublishing(true);
     setShareError(null);
+    setShareNotice(null);
     try {
       const response = await fetch(`/api/v1/cards/${card.id}/share`, { method: "POST" });
       const parsedResponse = shareResponseSchema.safeParse(await response.json());
@@ -78,6 +76,7 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
         return;
       }
       const nextPublicUrl = parsedResponse.data.data.publicUrl;
+      setIsPublic(true);
       setPublicUrl(nextPublicUrl);
       await navigator.clipboard.writeText(nextPublicUrl);
       trackEvent("public_share_link_copied", { cardId: card.id });
@@ -88,6 +87,27 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
         return;
       }
       throw error;
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const handleRevokePublicLink = async () => {
+    setIsPublishing(true);
+    setShareError(null);
+    setShareNotice(null);
+    try {
+      const response = await fetch(`/api/v1/cards/${card.id}/share`, { method: "DELETE" });
+      if (!response.ok) {
+        setShareError("공개 링크를 해제하지 못했습니다. 잠시 후 다시 시도해주세요.");
+        return;
+      }
+      setIsPublic(false);
+      setPublicUrl(null);
+      setCopied(false);
+      setShareNotice("공개 링크가 해제되었습니다.");
+    } catch (error: unknown) {
+      setShareError(error instanceof Error ? error.message : "공개 링크를 해제하지 못했습니다.");
     } finally {
       setIsPublishing(false);
     }
@@ -112,22 +132,22 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
   };
 
   return (
-    <div className="fixed inset-0 bg-espresso/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="story-export-title"
-        className="bg-white border border-warm-gray rounded-3xl w-full max-w-4xl shadow-2xl h-[90vh] md:h-[680px] flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-espresso"
+        className="glass-card border border-white/10 rounded-3xl w-full max-w-4xl shadow-2xl h-[90vh] md:h-[680px] flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-foreground"
       >
-        <div className="flex-1 bg-warm-gray/25 p-4 flex items-center justify-center relative overflow-hidden border-r border-warm-gray">
-          <div className="absolute top-4 left-4 z-10 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-bold text-espresso/60 border border-warm-gray">
+        <div className="flex-1 bg-black/40 p-4 flex items-center justify-center relative overflow-hidden border-r border-white/10">
+          <div className="absolute top-4 left-4 z-10 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-bold text-muted-foreground border border-white/10">
             9:16 Story Card Live Preview
           </div>
           <div id="story-container" className={`w-[270px] h-[480px] rounded-[24px] ${skin.bg} relative p-6 flex flex-col justify-between shadow-2xl overflow-hidden select-none animate-in fade-in duration-300`}>
-            <div className="absolute -top-12 -left-12 w-36 h-36 rounded-full bg-caramel/10 blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full bg-caramel/10 blur-3xl pointer-events-none" />
+            <div className="absolute -top-12 -left-12 w-36 h-36 rounded-full bg-primary-amber/10 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full bg-primary-amber/10 blur-3xl pointer-events-none" />
             <div className="flex justify-between items-center z-10">
-              <span className={`text-[8px] uppercase tracking-widest font-extrabold ${skin.subColor}`}>Hyangmi Archive</span>
+              <span className={`text-[8px] uppercase tracking-widest font-extrabold ${skin.subColor}`}>CoffeeDex Archive</span>
               <span className={`text-[8px] font-semibold ${skin.textColor}/40`}>{dateText}</span>
             </div>
             <div className={`rounded-2xl border ${skin.cardBg} p-4 mt-2 flex flex-col gap-3.5 z-10`}>
@@ -142,18 +162,14 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
                   <img src={card.image_url} alt={card.title} className="w-10 h-10 object-cover rounded-xl border border-white/10" />
                 )}
               </div>
-              <div className="space-y-1.5">
-                {metrics.map((metric) => (
-                  <div key={metric.label} className="flex flex-col gap-0.5">
-                    <div className="flex justify-between text-[9px] font-medium">
-                      <span className={`${skin.textColor}/50`}>{metric.label}</span>
-                      <span className={skin.textColor}>{metric.value} / 5</span>
-                    </div>
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-caramel" style={{ width: `${(metric.value / 5) * 100}%` }} />
-                    </div>
-                  </div>
-                ))}
+              <div className="flex justify-center -my-2 opacity-90 scale-90">
+                <FluidRadarChart
+                  acidity={card.metric1}
+                  sweetness={card.metric2}
+                  body={card.metric3}
+                  size={120}
+                  hideLabels={false}
+                />
               </div>
               <div className={`flex flex-wrap gap-1 border-t ${skin.divider} pt-2`}>
                 {card.tags.slice(0, 3).map((tag) => (
@@ -168,56 +184,56 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
               <span className={`text-[8px] font-medium tracking-wider ${skin.textColor}/60`}>Origin: {originText}</span>
               <div className={`h-[1px] w-6 ${skin.divider}`} />
               <div className="flex items-center gap-1 mt-0.5">
-                <Sparkles size={8} className="text-caramel animate-pulse" />
-                <span className="text-[7px] uppercase font-bold tracking-widest text-white/50">Shared via {hyangmiBrand.name}</span>
+                <Sparkles size={8} className="text-primary-amber animate-pulse" />
+                <span className="text-[7px] uppercase font-bold tracking-widest text-white/50">Shared via {coffeeDexBrand.name}</span>
               </div>
             </div>
           </div>
         </div>
         <div className="w-full md:w-5/12 p-6 md:p-8 flex flex-col justify-between overflow-y-auto">
           <div>
-            <div className="flex justify-between items-center pb-4 border-b border-warm-gray">
+            <div className="flex justify-between items-center pb-4 border-b border-white/10">
               <div>
-                <h3 id="story-export-title" className="font-serif font-bold text-lg">인스타그램 스토리 공유</h3>
-                <p className="text-xs text-espresso/50">카드 이미지는 다운로드하고, 공개 링크는 Hyangmi 페이지로 연결됩니다.</p>
+                <h3 id="story-export-title" className="font-serif font-bold text-lg">공유 및 내보내기</h3>
+                <p className="text-xs text-muted-foreground">상세 기록에서 카드 이미지를 받거나 CoffeeDex 공개 링크를 관리합니다.</p>
               </div>
-              <button onClick={onClose} className="p-1.5 rounded-full hover:bg-warm-gray/30 text-espresso/60 transition-colors" aria-label="닫기">
+              <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/10 text-muted-foreground transition-colors" aria-label="닫기">
                 <X size={18} />
               </button>
             </div>
             <div className="space-y-3.5 mt-6">
-              <span className="text-xs font-bold text-espresso/65 uppercase tracking-wider block">디자인 테마 스킨</span>
+              <span className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider block">디자인 테마 스킨</span>
               <div className="grid grid-cols-2 gap-2.5">
                 {STORY_SKIN_KEYS.map((key) => (
-                  <button key={key} onClick={() => setActiveSkin(key)} className={`p-3 rounded-2xl border text-xs font-bold transition-all text-left flex flex-col justify-between h-16 ${activeSkin === key ? "border-caramel bg-cream shadow-sm" : "border-warm-gray bg-[#faf9f6] hover:bg-warm-gray/20"}`}>
-                    <span className="text-[10px] text-espresso/60">{STORY_SKINS[key].name}</span>
+                  <button key={key} onClick={() => setActiveSkin(key)} className={`p-3 rounded-2xl border text-xs font-bold transition-all text-left flex flex-col justify-between h-16 ${activeSkin === key ? "border-primary-amber bg-white/10 shadow-sm" : "border-white/10 bg-black/40/5 hover:bg-white/10"}`}>
+                    <span className="text-[10px] text-muted-foreground">{STORY_SKINS[key].name}</span>
                     <div className="flex gap-1.5 mt-2">
-                      <div className="w-3.5 h-3.5 rounded-full bg-caramel border border-white" />
+                      <div className="w-3.5 h-3.5 rounded-full bg-primary-amber border border-white" />
                       <div className={`w-3.5 h-3.5 rounded-full ${STORY_SKINS[key].swatch} border border-white`} />
                     </div>
                   </button>
                 ))}
               </div>
             </div>
-            <div className="mt-8 bg-cream/40 border border-warm-gray rounded-2xl p-4 space-y-2 text-xs text-espresso/70 leading-relaxed">
-              <span className="font-bold text-caramel flex items-center gap-1 text-[11px]">
+            <div className="mt-8 bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 text-xs text-muted-foreground leading-relaxed">
+              <span className="font-bold text-primary-amber flex items-center gap-1 text-[11px]">
                 <Share2 size={13} />
                 성장 루프
               </span>
-              <ul className="list-disc pl-4 space-y-1 text-[11px] text-espresso/80">
+              <ul className="list-disc pl-4 space-y-1 text-[11px] text-foreground/80">
                 <li>이미지는 스토리에 올리고, 공개 링크는 링크 스티커나 프로필에 붙이세요.</li>
                 <li>공개 페이지에는 카드 정보만 표시되고 사용자 계정 정보는 노출하지 않습니다.</li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 space-y-2 border-t border-warm-gray pt-6">
+          <div className="mt-8 space-y-2 border-t border-white/10 pt-6">
             <div className="flex flex-col gap-2">
-              <button onClick={handleCopyPublicLink} disabled={isPublishing} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-[#f5f4f0] hover:bg-warm-gray/35 text-espresso rounded-xl text-xs font-bold transition-all border border-warm-gray disabled:opacity-60">
+              <button onClick={handleCopyPublicLink} disabled={isPublishing} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/5 hover:bg-white/10 text-foreground rounded-xl text-xs font-bold transition-all border border-white/10 disabled:opacity-60">
                 {isPublishing ? (
                   <Loader2 size={14} className="animate-spin" />
                 ) : copied ? (
                   <>
-                    <Check size={14} className="text-caramel" />
+                    <Check size={14} className="text-primary-amber" />
                     <span>공개 링크 복사 완료!</span>
                   </>
                 ) : (
@@ -244,22 +260,29 @@ export default function StoryExportModal({ card, isOpen, onClose }: StoryExportM
                 } finally {
                   setIsPublishing(false);
                 }
-              }} disabled={isPublishing} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-caramel/10 hover:bg-caramel/20 text-caramel rounded-xl text-xs font-bold transition-all border border-caramel/30 disabled:opacity-60">
+              }} disabled={isPublishing} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-primary-amber/10 hover:bg-primary-amber/20 text-primary-amber rounded-xl text-xs font-bold transition-all border border-primary-amber/30 disabled:opacity-60">
                 <Sparkles size={14} />
                 <span>블라인드 퀴즈 링크 복사</span>
               </button>
             </div>
 
             {publicUrl && (
-              <p className="break-all rounded-xl border border-warm-gray bg-white px-3 py-2 text-[10px] leading-relaxed text-espresso/55 mt-2">
+              <p className="break-all rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[10px] leading-relaxed text-muted-foreground mt-2">
                 {publicUrl}
               </p>
             )}
-            <button onClick={handleDownloadStory} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-espresso hover:bg-espresso/90 text-white rounded-xl text-xs font-bold transition-all shadow-md mt-2">
+            {isPublic && (
+              <button onClick={handleRevokePublicLink} disabled={isPublishing} className="w-full flex items-center justify-center gap-1.5 py-2 text-muted-foreground hover:text-foreground rounded-xl text-[11px] font-semibold transition-colors disabled:opacity-60">
+                <Link2Off size={13} />
+                <span>공개 링크 해제</span>
+              </button>
+            )}
+            <button onClick={handleDownloadStory} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-primary-amber hover:opacity-90 text-[#0D0A07] rounded-xl text-xs font-bold transition-all shadow-md mt-2">
               <Download size={14} />
               <span>Story 이미지 다운로드</span>
             </button>
             {shareError && <p role="alert" className="text-[11px] leading-relaxed text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">{shareError}</p>}
+            {shareNotice && <p role="status" className="text-[11px] leading-relaxed text-muted-foreground px-3 py-2">{shareNotice}</p>}
             {downloadError && <p role="alert" className="text-[11px] leading-relaxed text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2">{downloadError}</p>}
           </div>
         </div>

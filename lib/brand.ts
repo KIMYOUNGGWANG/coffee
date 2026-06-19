@@ -1,29 +1,32 @@
-export type HyangmiBrand = {
-  readonly name: "Hyangmi";
-  readonly koreanDisplay: "향미";
-  readonly category: "Coffee Taste Archive";
-  readonly tagline: "마신 원두가 취향의 기록이 되는 곳";
-  readonly englishTagline: "Your coffee taste, beautifully remembered.";
+export type CoffeeDexBrand = {
+  readonly name: "CoffeeDex";
+  readonly koreanDisplay: "커피덱스";
+  readonly category: "Coffee Memory & Repurchase";
+  readonly tagline: "좋았던 원두를 잊지 않고, 다시 찾는 가장 빠른 방법";
+  readonly englishTagline: "Remember coffee worth buying again.";
   readonly artifacts: {
     readonly free: "Taste Card";
     readonly paid: "Taste Passport";
   };
-  readonly analytics: "Taste Map";
-  readonly dashboard: "Archive";
-  readonly filenameSlug: "hyangmi";
+  readonly analytics: "Taste Snapshot";
+  readonly dashboard: "Memory Shelf";
+  readonly filenameSlug: "coffeedex";
 };
 
-export const hyangmiBrand = {
-  name: "Hyangmi",
-  koreanDisplay: "향미",
-  category: "Coffee Taste Archive",
-  tagline: "마신 원두가 취향의 기록이 되는 곳",
-  englishTagline: "Your coffee taste, beautifully remembered.",
+export const coffeeDexBrand = {
+  name: "CoffeeDex",
+  koreanDisplay: "커피덱스",
+  category: "Coffee Memory & Repurchase",
+  tagline: "좋았던 원두를 잊지 않고, 다시 찾는 가장 빠른 방법",
+  englishTagline: "Remember coffee worth buying again.",
   artifacts: {
     free: "Taste Card",
     paid: "Taste Passport",
   },
-  analytics: "Taste Map",
-  dashboard: "Archive",
-  filenameSlug: "hyangmi",
-} as const satisfies HyangmiBrand;
+  analytics: "Taste Snapshot",
+  dashboard: "Memory Shelf",
+  filenameSlug: "coffeedex",
+} as const satisfies CoffeeDexBrand;
+
+/** @deprecated Use coffeeDexBrand. Kept while existing imports migrate. */
+export const hyangmiBrand = coffeeDexBrand;

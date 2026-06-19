@@ -36,7 +36,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
     if (error || !data) {
       return NextResponse.json(
-        { error: { code: 404, message: "공개 Hyangmi 카드를 찾을 수 없습니다." } },
+        { error: { code: 404, message: "공개 CoffeeDex 카드를 찾을 수 없습니다." } },
         { status: 404 },
       );
     }

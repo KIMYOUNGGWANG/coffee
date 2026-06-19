@@ -38,7 +38,7 @@ const subscriptionResponse = {
 const loginRequiredResponse = {
   error: {
     code: 401,
-    message: "로그인이 필요합니다. Hyangmi 계정으로 다시 로그인해주세요.",
+    message: "로그인이 필요합니다. CoffeeDex 계정으로 다시 로그인해주세요.",
   },
 } as const;
 const authUser = {
@@ -135,7 +135,7 @@ async function mockDashboardRoutes(page: Page, isSignedIn: () => boolean): Promi
 }
 
 async function signInWithKoreanForm(page: Page): Promise<void> {
-  await expect(page.getByRole("heading", { name: "Hyangmi 계정으로 계속하기" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "CoffeeDex 계정으로 계속하기" })).toBeVisible();
   await page.getByLabel("이메일").fill("hyangmi@example.com");
   await page.getByLabel("비밀번호").fill("correct-horse-battery-staple");
   const loginButton = page.getByRole("button", { name: "로그인" });
@@ -147,7 +147,7 @@ async function signInWithKoreanForm(page: Page): Promise<void> {
 }
 
 async function signUpWithKoreanForm(page: Page): Promise<void> {
-  await expect(page.getByRole("heading", { name: "Hyangmi 계정으로 계속하기" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "CoffeeDex 계정으로 계속하기" })).toBeVisible();
   await page.getByLabel("이메일").fill("new-hyangmi@example.com");
   await page.getByLabel("비밀번호").fill("correct-horse-battery-staple");
   const signUpButton = page.getByRole("button", { name: "회원가입" });
@@ -160,7 +160,7 @@ async function signUpWithKoreanForm(page: Page): Promise<void> {
 
 
 
-test.describe("Hyangmi auth resume conversion", () => {
+test.describe("CoffeeDex auth resume conversion", () => {
   test.beforeEach(async ({ context, page }) => {
     await context.clearCookies();
     await page.addInitScript(() => {
@@ -186,7 +186,7 @@ test.describe("Hyangmi auth resume conversion", () => {
 
       // Then
       await expect(page.getByRole("status")).toContainText("가입 확인 메일을 보냈습니다");
-      await expect(page.getByRole("status")).toContainText("메일 인증 후 Hyangmi에 로그인해주세요");
+      await expect(page.getByRole("status")).toContainText("메일 인증 후 CoffeeDex에 로그인해주세요");
       await expect(page.getByRole("status")).toContainText(`로그인 후 이동: ${checkoutIntentPath}`);
 
       // When
@@ -235,7 +235,7 @@ test.describe("Hyangmi auth resume conversion", () => {
     // Then
     await expect(page).toHaveURL(/\/dashboard(?:\?|$)/);
     await expect(page.getByRole("dialog", { name: "프리미엄 커피 도서관 패키지" })).toBeVisible();
-    await expect(page.getByText("로그인 후 이어서 결제할 상품: Hyangmi Premium 구독 (월간)")).toBeVisible();
+    await expect(page.getByText("로그인 후 이어서 결제할 상품: CoffeeDex Premium 구독 (월간)")).toBeVisible();
     await expect(page.getByText(/401|AuthApiError|로그인이 필요|인증되지 않은/)).toHaveCount(0);
     await page.screenshot({ path: ".omo/evidence/auth-resume-c002.png", fullPage: true });
   });

@@ -97,7 +97,11 @@ export async function createServerSupabase() {
 function writePdfGeneratorModule(tempDirectory) {
   const generatorPath = path.join(projectRoot, "lib/pdf-generator.ts");
   try {
-    const source = readFileSync(generatorPath, "utf8");
+    const pdfLibUrl = pathToFileURL(path.join(projectRoot, "node_modules/pdf-lib/cjs/index.js")).href;
+    const fontkitUrl = pathToFileURL(path.join(projectRoot, "node_modules/@pdf-lib/fontkit/dist/fontkit.umd.js")).href;
+    const source = readFileSync(generatorPath, "utf8")
+      .replaceAll('"pdf-lib"', `"${pdfLibUrl}"`)
+      .replaceAll('"@pdf-lib/fontkit"', `"${fontkitUrl}"`);
     writeFileSync(
       path.join(tempDirectory, "pdf-generator.mjs"),
       transpileTypescript(source, generatorPath),
@@ -119,7 +123,7 @@ function writeBrandModule(tempDirectory) {
 }
 
 async function loadPdfRoute() {
-  const tempDirectory = mkdtempSync(path.join(tmpdir(), "hyangmi-pdf-route-"));
+  const tempDirectory = mkdtempSync(path.join(tmpdir(), "coffeedex-pdf-route-"));
   const zodModuleUrl = pathToFileURL(path.join(projectRoot, "node_modules/zod/index.js")).href;
   writeNextResponseMock(tempDirectory);
   writeSupabaseMock(tempDirectory);
@@ -180,7 +184,7 @@ test("GET /api/v1/pdf returns a downloadable PDF for an entitled user", async ()
     assert.match(response.headers.get("content-type") ?? "", /^application\/pdf/);
     assert.match(
       response.headers.get("content-disposition") ?? "",
-      /^attachment; filename="hyangmi-taste-passport-\d{4}-\d{2}-\d{2}\.pdf"$/,
+      /^attachment; filename="coffeedex-taste-passport-\d{4}-\d{2}-\d{2}\.pdf"$/,
     );
 
     const bytes = new Uint8Array(await response.arrayBuffer());

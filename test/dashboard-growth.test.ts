@@ -109,7 +109,7 @@ async function mockDashboardApiRoutes(
   });
 }
 
-test.describe("Hyangmi growth dashboard", () => {
+test.describe("CoffeeDex growth dashboard", () => {
   test("turns the empty state into a first-record activation path", async ({ page }) => {
     // Given
     await mockDashboardApiRoutes(page);
@@ -121,7 +121,7 @@ test.describe("Hyangmi growth dashboard", () => {
     await expect(page.getByText("60초 안에 첫 원두 기록")).toBeVisible();
     await expect(page.getByText("오늘의 다음 행동")).toBeVisible();
     await expect(page.getByText("무료 Taste Card", { exact: true })).toBeVisible();
-    await expect(page.getByText("Hyangmi Premium")).toBeVisible();
+    await expect(page.getByText("CoffeeDex Premium")).toBeVisible();
     await expect(page.getByText("Taste Passport", { exact: true }).last()).toBeVisible();
     await expect(page.getByRole("button", { name: "첫 Taste Card 만들기" })).toBeVisible();
     await expect(page.getByText("샘플 테이스팅 카드")).toBeVisible();

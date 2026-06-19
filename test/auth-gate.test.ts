@@ -23,7 +23,7 @@ const publicCardResponse = {
 
 const loginRequiredResponse = {
   error: {
-    message: "로그인이 필요합니다. Hyangmi 계정으로 다시 로그인해주세요.",
+    message: "로그인이 필요합니다. CoffeeDex 계정으로 다시 로그인해주세요.",
   },
 } as const;
 
@@ -66,7 +66,7 @@ async function mockAuthGateRoutes(page: Page): Promise<void> {
 }
 
 async function expectKoreanAuthGate(page: Page): Promise<void> {
-  await expect(page.getByRole("heading", { name: "Hyangmi 계정으로 계속하기" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "CoffeeDex 계정으로 계속하기" })).toBeVisible();
   await expect(page.getByRole("button", { name: "회원가입" })).toBeVisible();
   await expect(page.getByRole("button", { name: "로그인" })).toBeVisible();
   await expect(page.getByText(/401/)).not.toBeVisible();
@@ -74,14 +74,14 @@ async function expectKoreanAuthGate(page: Page): Promise<void> {
   await expect(page.getByText(/Supabase 연결/)).not.toBeVisible();
 }
 
-test.describe("Hyangmi authenticated activation gate", () => {
+test.describe("CoffeeDex authenticated activation gate", () => {
   test("routes public-card activation into Korean auth gate with safe dashboard redirect", async ({ page }) => {
     // Given
     await mockAuthGateRoutes(page);
 
     // When
     await page.goto("/cards/public-token-001");
-    await page.getByRole("link", { name: "내 Hyangmi Taste Card 만들기" }).click();
+    await page.getByRole("link", { name: "내 CoffeeDex Taste Card 만들기" }).click();
     await expect(page).toHaveURL("/onboarding?source=public_card&token=public-token-001");
     await page.getByRole("link", { name: "첫 Taste Card 시작하기" }).click();
 

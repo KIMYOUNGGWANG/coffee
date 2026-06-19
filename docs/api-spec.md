@@ -1,8 +1,8 @@
-# Hyangmi API Spec
+# CoffeeDex API Spec
 
-Hyangmi is a Korea-first AI specialty coffee memory and artifact product. The current product lets a logged-in user record private coffee cards, generate assisted SCA-style note drafts, scan bean-package labels into editable draft fields, review a saved-record taste recap, and export/share digital artifacts.
+CoffeeDex is a Korea-first coffee memory product centered on recall and repurchase. The primary contract lets a user capture editable package claims, record user-perceived taste and repurchase intent, save a private memory, and retrieve it later. Taste snapshots are evidence-labeled summaries of confirmed records.
 
-- Project: Hyangmi
+- Project: CoffeeDex
 - Version: v1.0
 - Base URL: `/api/v1`
 - Auth method: Supabase session/JWT
@@ -10,7 +10,7 @@ Hyangmi is a Korea-first AI specialty coffee memory and artifact product. The cu
 
 ## Authentication And Security
 
-All `/api/v1` product routes require an authenticated Supabase user. Database access is owner-scoped: users should only read and mutate rows where `auth.uid() = user_id`.
+Durable memory, export, deletion, analytics, and paid-entitlement routes require an authenticated Supabase user. Database access is owner-scoped: users should only read and mutate rows where `auth.uid() = user_id`. The scan route also permits one anonymous trial under the process-local limitation documented below. Tokenized public-share routes are deliberately separate read surfaces.
 
 The public health endpoint lives outside this contract at `/api/health`.
 
@@ -25,22 +25,29 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `DELETE` | `/api/v1/cards/:id` | Delete one tasting card owned by the current user. |
 | `POST` | `/api/v1/cards/ai-note` | Generate an SCA-style coffee tasting sentence from tags and a raw note. |
 | `POST` | `/api/v1/cards/scan` | Scan a coffee bean package image and return draft card fields. |
+| `GET` | `/api/v1/export?format=json\|csv` | Download the current user's owned data in JSON or CSV. |
+| `DELETE` | `/api/v1/account` | Permanently delete the authenticated account after explicit confirmation. |
 | `GET` | `/api/v1/profile` | Read credits, PDF access, premium status, and scan limits. |
 | `GET` | `/api/v1/profile/analytics` | Return taste averages, top flavor tags, and an AI taste profile summary. |
 | `POST` | `/api/v1/checkout` | Create a Stripe Checkout session for premium, card credits, or PDF export. |
-| `GET` | `/api/v1/pdf` | Return the current user's Hyangmi home-cafe archive data for export. |
+| `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive data for export. |
 | `POST` | `/api/v1/webhooks/stripe` | Receive Stripe entitlement events for premium, scan credits, and PDF access. |
 
-Legacy compatibility routes may still exist while productization is in progress, but Hyangmi's primary user contract is the tasting-card workflow above.
+The historical `tasting_cards` table, generic metric columns, route paths, and applied migrations remain unchanged for compatibility. They are implementation identifiers, not the canonical brand.
+
+PDF export, Stripe checkout and entitlements, story export, and public share routes remain supported as secondary compatibility surfaces. They do not define the primary recall and repurchase journey and must not lead landing, onboarding, empty-state, or dashboard actions.
 
 ## Current Boundary And Future Roaster Layer
 
-Current capability is intentionally scoped to a private Korean specialty coffee archive:
+Current capability is intentionally scoped to private coffee memory and retrieval:
 
 - personal tasting cards for cafes, home brews, and roasters such as Fritz, Terarosa, Momos, and Anthracite;
 - AI-assisted scan and note drafts that the user reviews before saving;
-- saved-record taste recap based on acidity, sweetness, body, and flavor tags;
-- story image and PDF export artifacts.
+- explicit repurchase memory and retrieval based on confirmed saved records;
+- package claims kept distinct from user-perceived taste;
+- evidence-labeled taste snapshots based on sample count and coverage.
+
+Story images and PDF artifacts remain secondary compatibility outputs. Stripe remains the payment adapter for those existing entitlements.
 
 Future roaster partnership, referral, and community layers are not current API capabilities. They require separate contracts, consent, moderation, commercial terms, and verification before any user-facing launch.
 
@@ -67,12 +74,20 @@ interface TastingCard {
     date?: string;
     extraInfo?: string;
   };
+  package_origin: string | null;
+  package_process: string | null;
+  repurchase_intent: "again" | "maybe" | "no" | "undecided";
+  repurchase_reasons: string[];
+  scan_source: "gemini" | "manual" | null;
+  scan_confidence: number | null;
+  corrected_fields: Array<"title" | "subtitle" | "package_origin" | "package_process" | "tags">;
+  confirmed_at: string | null;
   created_at: string;
   updated_at: string;
 }
 ```
 
-The current Hyangmi UI creates coffee cards only. The database schema still contains legacy beverage-category compatibility, but the product contract for this pass is Korean specialty coffee memory.
+The current CoffeeDex UI creates coffee cards only. The database schema still contains legacy beverage-category compatibility, but the product contract is coffee memory and repurchase.
 
 For coffee cards, the generic metrics are currently interpreted as:
 
@@ -112,7 +127,7 @@ interface CreateCardResponse {
 
 ### `POST /api/v1/cards/ai-note`
 
-Generate a preview tasting note before card creation. If no AI key is configured, the route returns a local Hyangmi fallback sentence instead of breaking the workflow.
+Generate a preview tasting note before card creation. If no AI key is configured, the route returns a local CoffeeDex fallback sentence instead of breaking the workflow.
 
 ```typescript
 interface GenerateAiNoteRequest {
@@ -128,7 +143,7 @@ interface GenerateAiNoteResponse {
 
 ### `POST /api/v1/cards/scan`
 
-Analyze a bean package image and return an editable draft card payload. The route expects a base64 image string and can fall back to curated sample coffee data when the AI provider is unavailable. A scan result is assistance, not an authoritative roaster catalog record.
+Analyze a bean-package image in request memory and return an editable draft. Accepted data URLs are JPEG, PNG, or WebP, limited to 5 MiB after base64 decoding. CoffeeDex checks canonical base64, the declared MIME type, and the decoded file magic/signature before provider work. The route does not persist the raw image.
 
 ```typescript
 interface ScanCoffeePackageRequest {
@@ -137,18 +152,26 @@ interface ScanCoffeePackageRequest {
 
 interface ScanCoffeePackageResponse {
   data: {
-    title: string;
-    subtitle: string;
-    origin: string;
-    process: string;
-    tags: string[];
-    metric1_acidity: number;
-    metric2_sweetness: number;
-    metric3_body: number;
-    confidence: number;
-    source: "gemini_vision" | "fallback_mock";
+    kind: "success";
+    source: "gemini";
+    title: string | null;
+    subtitle: string | null;
+    origin: string | null;
+    process: string | null;
+    tags: string[] | null;
+    uncertainty: {
+      title: number | null;
+      subtitle: number | null;
+      origin: number | null;
+      process: number | null;
+      tags: number | null;
+    };
+  } | {
+    kind: "unavailable";
+    reason: "provider_unconfigured" | "provider_error";
+    manual_entry: true;
   };
-  entitlement: {
+  entitlement?: {
     allowed: boolean;
     source: "monthly_allowance" | "credit" | "premium" | "none";
     credits_spent: number;
@@ -156,15 +179,17 @@ interface ScanCoffeePackageResponse {
     scans_used: number;
     monthly_scan_limit: number;
   };
-  warning?: string;
+  guest?: { trial_used: true };
 }
 ```
 
-`confidence` is an assistant-confidence score, not a roaster-verified catalog signal. `source: "fallback_mock"` means the AI provider was unavailable or unconfigured and the user must treat the draft as sample data to review and edit before saving.
+The provider prompt is extraction-only: absent or unreadable claims remain `null`, uncertainty is field-specific, and no flavor or metric is inferred from other package facts. Provider failure returns manual-entry state, never fabricated fallback coffee data.
+
+An anonymous visitor may use one trial keyed from forwarded IP headers. This limiter is an in-memory, process-local MVP control: it resets with an instance restart, is not shared between instances, and is not production distributed rate limiting or a security boundary. Guest draft fields and corrections live in browser storage for less than 24 hours; expired or invalid drafts are removed when read. Raw image data is excluded from that local draft.
 
 ### `GET /api/v1/profile/analytics`
 
-Return the user's current saved-record taste recap. This summarizes the user's own cards; it is not a commerce recommendation engine or roaster business intelligence product.
+Return the user's current saved-record taste recap. Progressive passport fields use confirmed records only (`confirmed_at` is non-null). Legacy `totalCards` still counts all owned cards, while the existing averages and `topTags` keys remain for response compatibility and are calculated from confirmed cards.
 
 ```typescript
 interface TasteAnalyticsResponse {
@@ -175,9 +200,36 @@ interface TasteAnalyticsResponse {
     topTags: string[];
     totalCards: number;
     aiAnalysis: string;
+    topNotes: Array<{ note: string; count: number }>;
+    passport: {
+      kind: "empty" | "collage" | "first_signals" | "early_snapshot" | "current_snapshot";
+      sampleCount: number;
+      distinctOriginCount: number;
+      distinctProcessCount: number;
+      distinctTagCount: number;
+      coverage: "narrow" | "mixed" | "broad";
+    };
+    repurchaseBreakdown: {
+      again: number;
+      maybe: number;
+      no: number;
+      undecided: number;
+    };
   };
 }
 ```
+
+`sampleCount`, coverage, `topNotes`, and `repurchaseBreakdown` never include unconfirmed drafts. The summary describes current evidence and does not claim a fixed taste identity.
+
+### `GET /api/v1/export?format=json|csv`
+
+Free authenticated download of owner-filtered `tasting_cards`, `brewing_notes`, `coffee_shelf_items`, and `brewing_logs`. JSON returns the four collections in a versioned archive; CSV flattens them into typed rows. Responses are attachments with `private, no-store`, `Pragma: no-cache`, and `nosniff`. If any owned dataset query fails, no partial archive is returned.
+
+### `DELETE /api/v1/account`
+
+Requires the exact confirmation phrase `내 CoffeeDex 계정을 영구 삭제합니다` and `acknowledgePermanentDeletion: true`. The admin operation runs sequentially and stops on the first error: public cards are privatized; Stripe event payload and identifiers are redacted; product analytics events are detached from the user; owned brewing logs, shelf items, notes, cards, and entitlement audit rows are deleted; then the profile and Supabase Auth identity are deleted. Auth identity deletion is last so an earlier failure does not orphan a partially deleted account.
+
+The endpoint does not claim transactional rollback across those services. Redacted Stripe audit rows and anonymized product events may remain for payment, dispute, security, and aggregate-operational obligations. The implementation does not currently promise storage-object cleanup, so this contract does not claim it.
 
 ## Tables
 
@@ -198,12 +250,20 @@ interface TasteAnalyticsResponse {
 | `tags` | `text[]` | Flavor notes. |
 | `ai_description` | `text` | Generated or edited tasting sentence. |
 | `footer_meta` | `jsonb` | Origin, date, recipe, or other display metadata. |
+| `package_origin` | `text` | Nullable package claim, separate from perceived taste. |
+| `package_process` | `text` | Nullable package processing claim. |
+| `repurchase_intent` | `text` | `again`, `maybe`, `no`, or `undecided`. |
+| `repurchase_reasons` | `text[]` | User-recorded reasons for the intent. |
+| `scan_source` | `text` | Nullable `gemini` or `manual` provenance. |
+| `scan_confidence` | `numeric` | Nullable legacy aggregate confidence/provenance value. |
+| `corrected_fields` | `text[]` | Scan fields changed by the user before confirmation. |
+| `confirmed_at` | `timestamptz` | Null for a draft; timestamp for a user-confirmed memory. |
 | `created_at` | `timestamptz` | Creation timestamp. |
 | `updated_at` | `timestamptz` | Update timestamp. |
 
 ### `profiles`
 
-The profile surface powers Hyangmi paid and rate-limited features.
+The profile surface preserves CoffeeDex paid and rate-limited compatibility features.
 
 | Column | Purpose |
 | --- | --- |
@@ -215,8 +275,8 @@ The profile surface powers Hyangmi paid and rate-limited features.
 
 ## Verification
 
-The T2 smoke contract is executable with:
+The product-truth contracts are executable with:
 
 ```bash
-/Users/kim-young-gwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test test/smoke.test.mjs
+node --test test/product-copy.test.mjs test/smoke.test.mjs
 ```

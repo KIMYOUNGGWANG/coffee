@@ -57,6 +57,10 @@ test("Given unsafe redirect values, When sanitizing auth redirect, Then they fal
     "https://evil.example",
     "//evil.example",
     "/onboarding?source=public_card",
+    "/capture",
+    "/capture?resume=0",
+    "/capture?resume=1&next=https://evil.example",
+    "/capture?resume=1#fragment",
   ];
 
   // When
@@ -69,5 +73,20 @@ test("Given unsafe redirect values, When sanitizing auth redirect, Then they fal
     "/dashboard",
     "/dashboard",
     "/dashboard",
+    "/dashboard",
+    "/dashboard",
+    "/dashboard",
+    "/dashboard",
   ]);
+});
+
+test("Given the guest draft resume redirect, When sanitizing auth redirect, Then the exact capture token is preserved", async () => {
+  // Given
+  const { sanitizeAuthRedirect } = await loadAuthRedirectModule();
+
+  // When
+  const redirect = sanitizeAuthRedirect("/capture?resume=1");
+
+  // Then
+  assert.equal(redirect, "/capture?resume=1");
 });

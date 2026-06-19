@@ -18,7 +18,7 @@ test("PaymentDialog exposes lifecycle-safe checkout products", () => {
   const paymentDialog = read("components/PaymentDialog.tsx");
   const commerce = read("lib/commerce.ts");
 
-  assert.match(commerce, /Hyangmi Premium 구독 \(월간\)/);
+  assert.match(commerce, /CoffeeDex Premium 구독 \(월간\)/);
   assert.match(commerce, /\$3\.99/);
   assert.match(paymentDialog, /handleCheckout\("premium_subscription"\)/);
 
@@ -26,7 +26,7 @@ test("PaymentDialog exposes lifecycle-safe checkout products", () => {
   assert.match(commerce, /\$9\.99/);
   assert.match(paymentDialog, /handleCheckout\("pdf_book"\)/);
 
-  assert.match(commerce, /Hyangmi 테이스팅 10팩 충전/);
+  assert.match(commerce, /CoffeeDex 테이스팅 10팩 충전/);
   assert.match(commerce, /\$4\.99/);
   assert.match(paymentDialog, /handleCheckout\("credits_10"\)/);
 

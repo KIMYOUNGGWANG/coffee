@@ -135,7 +135,7 @@ export default function DashboardBillingStatusPanel({ onOpenPayment }: Dashboard
 
   if (isLoading) {
     return (
-      <div className="rounded-3xl border border-warm-gray bg-white p-5 text-xs text-espresso/55">
+      <div className="rounded-3xl border border-white/10 glass-card p-5 text-xs text-muted-foreground/80">
         구독 상태 확인 중...
       </div>
     );
@@ -143,7 +143,7 @@ export default function DashboardBillingStatusPanel({ onOpenPayment }: Dashboard
 
   if (error || !subscription) {
     return (
-      <div className="rounded-3xl border border-warm-gray bg-white p-5 text-xs text-espresso/55">
+      <div className="rounded-3xl border border-white/10 glass-card p-5 text-xs text-muted-foreground/80">
         구독 상태를 불러오지 못했습니다.
       </div>
     );
@@ -153,51 +153,51 @@ export default function DashboardBillingStatusPanel({ onOpenPayment }: Dashboard
   const isCanceled = subscription.status === "canceled" || subscription.cancelAtPeriodEnd;
 
   return (
-    <div className="rounded-3xl border border-warm-gray bg-white p-5 shadow-sm">
+    <div className="rounded-3xl border border-white/10 glass-card p-5 shadow-sm">
       <div className="flex items-center gap-2">
         {isPaymentProblem ? (
           <AlertTriangle size={16} className="text-red-600" />
         ) : (
-          <CheckCircle2 size={16} className="text-caramel" />
+          <CheckCircle2 size={16} className="text-primary-amber" />
         )}
-        <span className="text-[11px] font-extrabold tracking-wide text-caramel">결제 상태</span>
+        <span className="text-[11px] font-extrabold tracking-wide text-primary-amber">결제 상태</span>
       </div>
       <h3 className="mt-2 font-serif text-base font-bold">{statusTitle(subscription)}</h3>
-      <p className="mt-2 text-xs leading-relaxed text-espresso/60">{statusCopy(subscription)}</p>
-      <div className="mt-4 grid grid-cols-1 gap-2 rounded-2xl border border-warm-gray bg-cream/40 p-3 text-xs text-espresso/60">
+      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{statusCopy(subscription)}</p>
+      <div className="mt-4 grid grid-cols-1 gap-2 rounded-2xl border border-white/10 bg-white/5/40 p-3 text-xs text-muted-foreground">
         <p>
-          플랜 <span className="font-extrabold text-espresso">{planLabel(subscription.plan)}</span>
+          플랜 <span className="font-extrabold text-foreground">{planLabel(subscription.plan)}</span>
         </p>
         <p>
           현재 기간 종료{" "}
-          <span className="font-extrabold text-espresso">
+          <span className="font-extrabold text-foreground">
             {formatBillingDate(subscription.currentPeriodEnd)}
           </span>
         </p>
         <p>
-          최근 청구서 <span className="font-extrabold text-espresso">{invoiceStatusLabel(subscription.lastInvoiceStatus)}</span>
+          최근 청구서 <span className="font-extrabold text-foreground">{invoiceStatusLabel(subscription.lastInvoiceStatus)}</span>
         </p>
         <p>
-          취소 예약 <span className="font-extrabold text-espresso">{subscription.cancelAtPeriodEnd ? "예" : "아니오"}</span>
+          취소 예약 <span className="font-extrabold text-foreground">{subscription.cancelAtPeriodEnd ? "예" : "아니오"}</span>
         </p>
         <p>
-          마지막 동기화 <span className="font-extrabold text-espresso">{formatBillingDate(subscription.updatedAt)}</span>
+          마지막 동기화 <span className="font-extrabold text-foreground">{formatBillingDate(subscription.updatedAt)}</span>
         </p>
       </div>
       <div className="mt-4 flex flex-col gap-2">
         {isPaymentProblem && (
-          <Button onClick={onOpenPayment} className="rounded-xl bg-espresso text-xs font-bold text-white hover:bg-espresso/90">
+          <Button onClick={onOpenPayment} className="rounded-xl glass-card border border-white/10 text-xs font-bold text-white hover:glass-card border border-white/10/90">
             <RefreshCw size={13} />
             결제 다시 시도
           </Button>
         )}
         {isCanceled && (
-          <Link href="/support/billing" className="rounded-xl border border-warm-gray px-3 py-2 text-center text-xs font-bold text-caramel">
+          <Link href="/support/billing" className="rounded-xl border border-white/10 px-3 py-2 text-center text-xs font-bold text-primary-amber">
             구독 취소 / 환불 요청
           </Link>
         )}
         {!isPaymentProblem && !isCanceled && (
-          <Link href="/support/billing" className="rounded-xl border border-warm-gray px-3 py-2 text-center text-xs font-bold text-caramel">
+          <Link href="/support/billing" className="rounded-xl border border-white/10 px-3 py-2 text-center text-xs font-bold text-primary-amber">
             결제·환불 고객지원
           </Link>
         )}

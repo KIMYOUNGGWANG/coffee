@@ -294,16 +294,27 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0 }: Co
     return "bg-[#d9463e]"; // Crimson (Warning)
   };
 
+  const getRoastColorClasses = (roasterName: string, beanName: string, origin: string | null) => {
+    const allText = `${roasterName} ${beanName} ${origin || ""}`.toLowerCase();
+    if (allText.includes('light') || allText.includes('약배전')) {
+      return 'bg-[#FCEADE] group-hover:bg-[#FCEADE]';
+    }
+    if (allText.includes('dark') || allText.includes('강배전')) {
+      return 'bg-[#8C5E35]/60 group-hover:bg-[#8C5E35]';
+    }
+    return 'bg-[#E5C09B]/60 group-hover:bg-[#E5C09B]'; // default medium
+  };
+
   return (
     <div className="space-y-8">
       {/* Header and Add button */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-sand pb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border pb-4">
         <div>
-          <h2 className="text-xl font-bold font-serif text-espresso flex items-center gap-2">
-            <Coffee className="text-caramel" size={20} />
+          <h2 className="text-xl font-bold font-serif text-foreground flex items-center gap-2">
+            <Coffee className="text-primary-amber" size={20} />
             원두 보관함 (Coffee Shelf)
           </h2>
-          <p className="text-xs text-cocoa mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             현재 개봉하여 드시고 계시는 원두들의 남은 분량을 시각적으로 관리하고 추출에 활용해 보세요.
           </p>
         </div>
@@ -311,7 +322,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0 }: Co
         {/* Dialog Trigger Button (Custom dialog implementation) */}
         <button
           onClick={() => setIsDialogOpen(true)}
-          className="bg-espresso hover:bg-caramel text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 h-10 px-4 py-2 cursor-pointer border-none"
+          className="bg-primary-amber hover:opacity-90 text-[#0D0A07] rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 h-10 px-4 py-2 cursor-pointer border-none"
         >
           <Plus size={15} />
           새 원두 등록하기
@@ -320,28 +331,28 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0 }: Co
 
       {/* Custom Dialog / Modal Portal */}
       {isDialogOpen && (
-        <div className="fixed inset-0 bg-[#2c1d11]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-sand rounded-3xl max-w-md w-full p-6 shadow-[0_20px_50px_rgba(44,29,17,0.12)] space-y-4 relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass-card max-w-md w-full p-6 shadow-2xl space-y-4 relative animate-in fade-in zoom-in-95 duration-200">
             {/* Close Button */}
             <button
               onClick={() => { setIsDialogOpen(false); resetForm(); }}
-              className="absolute top-4 right-4 p-1 rounded-lg text-cocoa hover:text-espresso hover:bg-canvas transition-colors border-none cursor-pointer"
+              className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors border-none cursor-pointer bg-transparent"
             >
               <X size={18} />
             </button>
 
             <div className="space-y-1">
-              <h3 className="font-serif font-bold text-espresso text-lg">새 원두 보관함에 추가</h3>
-              <p className="text-[11px] text-cocoa">선반 위에 올릴 스페셜티 원두의 세부 정보를 입력하세요.</p>
+              <h3 className="font-serif font-bold text-foreground text-lg">새 원두 보관함에 추가</h3>
+              <p className="text-[11px] text-muted-foreground">선반 위에 올릴 스페셜티 원두의 세부 정보를 입력하세요.</p>
             </div>
 
             <form onSubmit={handleCreateItem} className="space-y-4 pt-2">
               {tastingCards.length > 0 && (
                 <div className="space-y-1">
-                  <label htmlFor="import-card" className="text-xs font-semibold text-cocoa">작성한 테이스팅 노트에서 불러오기 (선택)</label>
+                  <label htmlFor="import-card" className="text-xs font-semibold text-muted-foreground">작성한 테이스팅 노트에서 불러오기 (선택)</label>
                   <select
                     id="import-card"
-                    className="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber"
                     value={tastingCardId}
                     onChange={(e) => handleImportTastingCard(e.target.value)}
                   >
@@ -357,87 +368,87 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0 }: Co
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label htmlFor="roaster" className="text-xs font-bold text-espresso">로스터리 이름 *</label>
+                  <label htmlFor="roaster" className="text-xs font-bold text-foreground">로스터리 이름 *</label>
                   <input
                     id="roaster"
                     placeholder="예: 프릳츠, 센터커피"
                     value={roasterName}
                     onChange={e => setRoasterName(e.target.value)}
-                    className="w-full bg-white border border-sand rounded-xl px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel placeholder:text-cocoa/30"
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
                     required
                   />
                 </div>
                 <div className="space-y-1">
-                  <label htmlFor="bean" className="text-xs font-bold text-espresso">원두 이름 *</label>
+                  <label htmlFor="bean" className="text-xs font-bold text-foreground">원두 이름 *</label>
                   <input
                     id="bean"
                     placeholder="예: 서울 시네마, 에티오피아 예가체프"
                     value={beanName}
                     onChange={e => setBeanName(e.target.value)}
-                    className="w-full bg-white border border-sand rounded-xl px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel placeholder:text-cocoa/30"
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="origin" className="text-xs font-semibold text-cocoa">가공방식 및 원산지 정보</label>
+                <label htmlFor="origin" className="text-xs font-semibold text-muted-foreground">가공방식 및 원산지 정보</label>
                 <input
                   id="origin"
                   placeholder="예: Ethiopia Natural, Washed, 무산소 발효"
                   value={origin}
                   onChange={e => setOrigin(e.target.value)}
-                  className="w-full bg-white border border-sand rounded-xl px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel placeholder:text-cocoa/30"
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-1 col-span-1">
-                  <label htmlFor="weight" className="text-xs font-semibold text-cocoa">용량(g)</label>
+                  <label htmlFor="weight" className="text-xs font-semibold text-muted-foreground">용량(g)</label>
                   <input
                     id="weight"
                     type="number"
                     value={totalWeight}
                     onChange={e => setTotalWeight(Number(e.target.value))}
-                    className="w-full bg-white border border-sand rounded-xl px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber"
                     min="1"
                   />
                 </div>
                 <div className="space-y-1 col-span-1">
-                  <label htmlFor="roast-date" className="text-xs font-semibold text-cocoa">로스팅 일자</label>
+                  <label htmlFor="roast-date" className="text-xs font-semibold text-muted-foreground">로스팅 일자</label>
                   <input
                     id="roast-date"
                     type="date"
                     value={roastDate}
                     onChange={e => setRoastDate(e.target.value)}
-                    className="w-full bg-white border border-sand rounded-xl px-3 py-2 text-[10px] text-espresso focus:outline-none"
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-[10px] text-foreground focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1 col-span-1">
-                  <label htmlFor="opened-date" className="text-xs font-semibold text-cocoa">개봉 일자</label>
+                  <label htmlFor="opened-date" className="text-xs font-semibold text-muted-foreground">개봉 일자</label>
                   <input
                     id="opened-date"
                     type="date"
                     value={openedDate}
                     onChange={e => setOpenedDate(e.target.value)}
-                    className="w-full bg-white border border-sand rounded-xl px-3 py-2 text-[10px] text-espresso focus:outline-none"
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-[10px] text-foreground focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-sand/40">
+              <div className="flex justify-end gap-2 pt-4 border-t border-white/10">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => { setIsDialogOpen(false); resetForm(); }}
-                  className="rounded-xl text-xs h-9 cursor-pointer"
+                  className="rounded-xl text-xs h-9 cursor-pointer border-white/20 text-muted-foreground hover:bg-white/10 hover:text-foreground"
                 >
                   취소
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-espresso text-white rounded-xl text-xs h-9 font-bold cursor-pointer"
+                  className="bg-primary-amber hover:opacity-90 text-[#0D0A07] rounded-xl text-xs h-9 font-bold cursor-pointer border-none"
                 >
                   {isSubmitting ? (
                     <>
@@ -454,150 +465,155 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0 }: Co
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20 space-y-3">
-          <Loader2 className="animate-spin text-caramel" size={32} />
-          <p className="text-xs text-cocoa font-medium">선반의 원두를 가져오는 중입니다...</p>
+          <Loader2 className="animate-spin text-primary-amber" size={32} />
+          <p className="text-xs text-muted-foreground font-medium">선반의 원두를 가져오는 중입니다...</p>
         </div>
       ) : items.length === 0 ? (
-        <div className="bg-white border border-sand rounded-3xl p-12 text-center max-w-lg mx-auto space-y-4 shadow-sm">
-          <div className="w-12 h-12 bg-caramel/10 text-caramel rounded-full flex items-center justify-center mx-auto">
+        <div className="glass-card p-12 text-center max-w-lg mx-auto space-y-4 shadow-sm">
+          <div className="w-12 h-12 bg-primary-amber/10 text-primary-amber rounded-full flex items-center justify-center mx-auto">
             <Coffee size={24} />
           </div>
           <div className="space-y-1.5">
-            <h3 className="font-serif font-bold text-espresso text-base">보관함이 비어 있습니다</h3>
-            <p className="text-xs text-cocoa leading-relaxed">
+            <h3 className="font-serif font-bold text-foreground text-base">보관함이 비어 있습니다</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
               드시고 계시는 스페셜티 원두를 등록해 보세요. 남은 원두 잔량 게이지를 조정하고 데일리 드링킹 다이어리에 기록을 매핑할 수 있습니다.
             </p>
           </div>
           <Button
             onClick={() => setIsDialogOpen(true)}
-            className="bg-espresso text-white rounded-xl text-xs font-bold shadow-sm"
+            className="bg-primary-amber hover:opacity-90 text-[#0D0A07] rounded-xl text-xs font-bold shadow-sm border-none"
           >
             첫 원두 등록하기
           </Button>
         </div>
       ) : (
         /* Active Shelf Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mt-4 relative">
           {items.map((item) => (
-            <TiltCard
-              key={item.id}
-              onClick={() => onItemSelect?.(item)}
-              className="bg-white border border-sand rounded-2xl p-5 shadow-[0_4px_20px_rgba(44,29,17,0.02)] hover:shadow-[0_8px_25px_rgba(44,29,17,0.06)] cursor-pointer"
-            >
-              <div className="space-y-3">
-                {/* Roaster & Buttons */}
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-caramel tracking-wider bg-caramel/5 px-2 py-0.5 rounded border border-caramel/10">
-                      {item.roaster_name}
-                    </span>
-                    <h3 className="font-serif font-bold text-espresso text-base mt-1.5 leading-tight group-hover:text-caramel transition-colors">
-                      {item.bean_name}
-                    </h3>
-                  </div>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        handleToggleFinished(item.id, true);
-                      }}
-                      title="다 마쉼 (아카이브)"
-                      className="w-7 h-7 text-cocoa hover:text-matcha hover:bg-matcha/5 rounded-lg flex items-center justify-center transition-colors border-none bg-transparent cursor-pointer"
-                    >
-                      <Archive size={14} />
-                    </button>
-                    <button
-                      onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        handleDeleteItem(item.id);
-                      }}
-                      title="삭제"
-                      className="w-7 h-7 text-cocoa hover:text-cinnamon hover:bg-cinnamon/5 rounded-lg flex items-center justify-center transition-colors border-none bg-transparent cursor-pointer"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
+            <div key={item.id} className="relative group cursor-pointer" onClick={() => onItemSelect?.(item)}>
+              {/* Physical Shelf Shadow/Line beneath the card */}
+              <div className="absolute -bottom-4 left-[-5%] w-[110%] h-6 bg-black/40 blur-md rounded-full -z-10 group-hover:h-8 transition-all duration-300 opacity-60" />
+              <div className="absolute -bottom-1 left-[-2%] w-[104%] h-3 bg-gradient-to-b from-[#3E3124] to-[#1a140f] rounded-t-sm shadow-xl -z-10" />
 
-                {/* Subtitle / Description */}
-                {item.origin && (
-                  <p className="text-xs text-cocoa font-medium line-clamp-1">
-                    🌾 {item.origin}
-                  </p>
-                )}
+              <TiltCard
+                className="glass-card rounded-t-3xl rounded-b-md p-6 group-hover:-translate-y-2 transition-transform duration-300 relative overflow-hidden"
+              >
+                {/* Dynamic Top Accent */}
+                <div className={`absolute top-0 left-0 w-full h-2 transition-colors duration-300 ${getRoastColorClasses(item.roaster_name, item.bean_name, item.origin)}`} />
 
-                {/* Dates / Meta */}
-                <div className="grid grid-cols-2 gap-2 text-[10px] text-cocoa/80 font-medium bg-[#f7f7f4] p-2.5 rounded-lg border border-sand/40">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar size={11} className="text-caramel/70" />
-                    <span>로스팅: {item.roast_date ? item.roast_date : "미기재"}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Calendar size={11} className="text-caramel/70" />
-                    <span>개봉: {item.opened_date ? item.opened_date : "미기재"}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Fill Level Control Area */}
-              <div className="mt-5 pt-4 border-t border-sand/50 space-y-2.5">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-espresso flex items-center gap-1">
-                    <Scale size={13} className="text-caramel/70" />
-                    잔량: {item.fill_level}%
-                  </span>
-                  <span className="text-[10px] text-cocoa font-semibold">
-                    (총 {item.total_weight}g)
-                  </span>
-                </div>
-
-                {/* Custom Fill level indicator with quick action buttons */}
-                <div className="w-full bg-sand/30 h-2.5 rounded-full overflow-hidden border border-sand/30 shadow-inner">
-                  <div
-                    className={cn("h-full transition-all duration-300", getFillLevelColor(item.fill_level))}
-                    style={{ width: `${item.fill_level}%` }}
-                  />
-                </div>
-
-                {/* Quick actions for fill level */}
-                <div className="flex justify-between gap-1 pt-1">
-                  {[100, 75, 50, 25, 0].map((level) => (
-                    <motion.button
-                      key={level}
-                      whileHover={{ scale: 1.06 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        if (level === 0) {
+                <div className="space-y-4 pt-1">
+                  {/* Roaster & Buttons */}
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-primary-amber tracking-wider bg-primary-amber/10 px-2 py-0.5 rounded-full">
+                        {item.roaster_name}
+                      </span>
+                      <h3 className="font-serif font-extrabold text-foreground text-lg mt-2 leading-tight">
+                        {item.bean_name}
+                      </h3>
+                    </div>
+                    <div className="flex gap-1 z-20">
+                      <button
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
                           handleToggleFinished(item.id, true);
-                        } else {
-                          handleUpdateFillLevel(item.id, level);
-                        }
-                      }}
-                      className={cn(
-                        "text-[9px] font-bold px-1.5 py-0.5 rounded border transition-all cursor-pointer flex-1 text-center",
-                        item.fill_level === level
-                          ? "bg-espresso text-white border-espresso shadow-sm"
-                          : "bg-white text-cocoa border-sand hover:bg-[#f7f7f4]"
-                      )}
-                    >
-                      {level === 0 ? "Empty" : `${level}%`}
-                    </motion.button>
-                  ))}
+                        }}
+                        title="다 마쉼 (아카이브)"
+                        className="w-7 h-7 text-muted-foreground hover:text-green-400 hover:bg-green-400/10 rounded-lg flex items-center justify-center transition-colors border-none bg-transparent cursor-pointer"
+                      >
+                        <Archive size={14} />
+                      </button>
+                      <button
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          handleDeleteItem(item.id);
+                        }}
+                        title="삭제"
+                        className="w-7 h-7 text-muted-foreground hover:text-red-400 hover:bg-red-400/10 rounded-lg flex items-center justify-center transition-colors border-none bg-transparent cursor-pointer"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Subtitle / Description */}
+                  {item.origin && (
+                    <p className="text-xs text-muted-foreground font-semibold line-clamp-1 border-l-2 border-primary-amber/30 pl-2">
+                      {item.origin}
+                    </p>
+                  )}
+
+                  {/* Dates / Meta */}
+                  <div className="grid grid-cols-2 gap-2 text-[10px] text-foreground font-semibold bg-white/5 p-3 rounded-xl border border-white/5 shadow-inner mt-2">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar size={11} className="text-primary-amber" />
+                      <span>로스팅: {item.roast_date ? item.roast_date : "미기재"}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar size={11} className="text-primary-amber" />
+                      <span>개봉: {item.opened_date ? item.opened_date : "미기재"}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </TiltCard>
+
+                {/* Fill Level Control Area */}
+                <div className="mt-6 pt-5 border-t border-white/10 space-y-3">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-extrabold text-foreground flex items-center gap-1.5">
+                      <Scale size={13} className="text-primary-amber" />
+                      남은 잔량: {item.fill_level}%
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-bold bg-white/5 px-2 py-0.5 rounded-full">
+                      총 {item.total_weight}g
+                    </span>
+                  </div>
+
+                  {/* Custom Fill level indicator with quick action buttons */}
+                  <div className="w-full bg-black/40 h-2.5 rounded-full overflow-hidden shadow-inner">
+                    <div
+                      className={cn("h-full transition-all duration-300", getFillLevelColor(item.fill_level))}
+                      style={{ width: `${item.fill_level}%` }}
+                    />
+                  </div>
+
+                  {/* Quick actions for fill level */}
+                  <div className="flex justify-between gap-1.5 pt-1.5 relative z-20">
+                    {[100, 75, 50, 25, 0].map((level) => (
+                      <button
+                        key={level}
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          if (level === 0) {
+                            handleToggleFinished(item.id, true);
+                          } else {
+                            handleUpdateFillLevel(item.id, level);
+                          }
+                        }}
+                        className={cn(
+                          "text-[9px] font-extrabold px-1.5 py-1 rounded-lg border transition-all cursor-pointer flex-1 text-center shadow-sm active:scale-95",
+                          item.fill_level === level
+                            ? "bg-primary-amber text-[#0D0A07] border-primary-amber"
+                            : "bg-white/5 text-muted-foreground border-white/10 hover:bg-white/10 hover:text-foreground"
+                        )}
+                      >
+                        {level === 0 ? "Empty" : `${level}%`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </TiltCard>
+            </div>
           ))}
         </div>
       )}
 
       {/* Archived Items Section */}
       {archivedItems.length > 0 && (
-        <div className="mt-12 pt-6 border-t border-sand">
+        <div className="mt-12 pt-6 border-t border-white/10">
           <Button
             variant="outline"
             onClick={() => setShowArchived(!showArchived)}
-            className="text-xs font-bold text-cocoa hover:text-espresso flex items-center gap-1.5 px-3 py-1 cursor-pointer"
+            className="text-xs font-bold text-[#F7F7F4]/60 hover:text-[#F7F7F4] border-white/20 hover:bg-white/5 flex items-center gap-1.5 px-3 py-1 cursor-pointer"
           >
             <Archive size={14} />
             다 마신 원두 히스토리 ({archivedItems.length}) {showArchived ? "접기" : "보기"}
@@ -608,17 +624,17 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0 }: Co
               {archivedItems.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-[#faf9f5]/50 border border-sand/70 rounded-xl p-4 flex justify-between items-center text-xs opacity-75 hover:opacity-100 transition-opacity"
+                  className="glass-card p-4 flex justify-between items-center text-xs opacity-75 hover:opacity-100 transition-opacity"
                 >
                   <div className="space-y-1">
-                    <p className="text-[9px] uppercase font-bold text-cocoa/70 tracking-wider">
+                    <p className="text-[9px] uppercase font-bold text-primary-amber/70 tracking-wider">
                       {item.roaster_name}
                     </p>
-                    <h4 className="font-bold text-espresso font-serif">
+                    <h4 className="font-bold text-foreground font-serif">
                       {item.bean_name}
                     </h4>
                     {item.opened_date && (
-                      <p className="text-[10px] text-cocoa/60 font-semibold">
+                      <p className="text-[10px] text-muted-foreground font-semibold">
                         개봉일: {item.opened_date}
                       </p>
                     )}
@@ -629,7 +645,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0 }: Co
                       size="sm"
                       variant="outline"
                       onClick={() => handleToggleFinished(item.id, false)}
-                      className="rounded-lg h-7 text-[10px] hover:bg-white px-2 cursor-pointer"
+                      className="rounded-lg h-7 text-[10px] border-white/20 text-muted-foreground hover:bg-white/10 hover:text-foreground px-2 cursor-pointer"
                     >
                       되살리기
                     </Button>
@@ -638,7 +654,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0 }: Co
                         e.stopPropagation();
                         handleDeleteItem(item.id);
                       }}
-                      className="w-7 h-7 text-cocoa hover:text-cinnamon hover:bg-cinnamon/5 rounded-lg flex items-center justify-center transition-colors border-none bg-transparent cursor-pointer"
+                      className="w-7 h-7 text-muted-foreground hover:text-red-400 hover:bg-red-400/10 rounded-lg flex items-center justify-center transition-colors border-none bg-transparent cursor-pointer"
                     >
                       <Trash2 size={13} />
                     </button>

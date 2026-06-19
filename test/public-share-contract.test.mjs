@@ -28,5 +28,18 @@ test("public card sharing has a privacy-safe database and route contract", () =>
   assert.doesNotMatch(publicRoute, /user_id/);
   assert.match(shareRoute, /\.eq\("user_id", user\.id\)/);
   assert.match(shareRoute, /is_public: true/);
+  assert.match(shareRoute, /export async function DELETE/);
+  assert.match(shareRoute, /randomUUID\(\)/);
+  assert.match(shareRoute, /is_public: false/);
+  assert.match(shareRoute, /public_share_token:/);
+  assert.match(shareRoute, /\.eq\("user_id", user\.id\)/);
+  assert.match(shareRoute, /status: 404/);
   assert.match(publicPage, /PublicCardPage/);
+});
+
+test("story sharing exposes a secondary owner revoke action", () => {
+  const storyExportModal = read("components/StoryExportModal.tsx");
+
+  assert.match(storyExportModal, /method: "DELETE"/);
+  assert.match(storyExportModal, /공개 링크 해제/);
 });

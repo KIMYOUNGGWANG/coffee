@@ -93,19 +93,32 @@ export async function createServerSupabase() {
   );
 }
 
+function writeGuestScanModule(tempDirectory) {
+  const guestScanPath = path.join(projectRoot, "lib/guest-scan.ts");
+  const zodModuleUrl = pathToFileURL(path.join(projectRoot, "node_modules/zod/index.js")).href;
+  const guestScanSource = read("lib/guest-scan.ts")
+    .replaceAll('"zod"', `"${zodModuleUrl}"`);
+  writeFileSync(
+    path.join(tempDirectory, "guest-scan.mjs"),
+    transpileTypescript(guestScanSource, guestScanPath),
+  );
+}
+
 async function loadScanRoute() {
   const tempDirectory = mkdtempSync(path.join(tmpdir(), "hyangmi-scan-route-"));
   const zodModuleUrl = pathToFileURL(path.join(projectRoot, "node_modules/zod/index.js")).href;
   writeNextResponseMock(tempDirectory);
   writeEnvMock(tempDirectory);
   writeSupabaseMock(tempDirectory);
+  writeGuestScanModule(tempDirectory);
 
   const routePath = path.join(projectRoot, "app/api/v1/cards/scan/route.ts");
   const routeSource = read("app/api/v1/cards/scan/route.ts")
     .replaceAll('"next/server"', '"./next-server.mjs"')
     .replaceAll('"zod"', `"${zodModuleUrl}"`)
     .replaceAll('"@/lib/supabase/server"', '"./mock-supabase.mjs"')
-    .replaceAll('"@/lib/env"', '"./mock-env.mjs"');
+    .replaceAll('"@/lib/env"', '"./mock-env.mjs"')
+    .replaceAll('"@/lib/guest-scan"', '"./guest-scan.mjs"');
 
   writeFileSync(
     path.join(tempDirectory, "route.mjs"),
@@ -122,7 +135,7 @@ function scanRequest() {
   return new Request("http://localhost/api/v1/cards/scan", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ image: "data:image/jpeg;base64,ZmFrZS1pbWFnZQ==" }),
+    body: JSON.stringify({ image: "data:image/jpeg;base64,/9j/" }),
   });
 }
 

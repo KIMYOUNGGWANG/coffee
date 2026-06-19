@@ -116,7 +116,7 @@ async function captureEvidenceScreenshot(page: Page, path: string): Promise<void
   console.log(`screenshot=${path}`);
 }
 
-test.describe("Hyangmi product copy", () => {
+test.describe("CoffeeDex product copy", () => {
   test("positions the home page as Korean specialty coffee memory", async ({ page }) => {
     // Given / When
     await page.goto("/");
@@ -153,7 +153,7 @@ test.describe("Hyangmi product copy", () => {
 
     // Then
     await expect(page.getByText("한국 스페셜티 커피 아카이브")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Hyangmi Taste Archive" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "CoffeeDex Taste Archive" })).toBeVisible();
     await expect(page.getByText("취향 지도와 리캡")).toBeVisible();
     await expect(page.getByText("기록 기반 AI 취향 리캡")).toBeVisible();
     await expect(page.getByText("공유 카드 내보내기")).toBeVisible();
@@ -167,7 +167,7 @@ test.describe("Hyangmi product copy", () => {
     await page.goto("/onboarding");
 
     // Then
-    await expect(page.getByText("Hyangmi Korea-first Onboarding")).toBeVisible();
+    await expect(page.getByText("CoffeeDex Korea-first Onboarding")).toBeVisible();
     await expect(page.getByRole("heading", { name: "첫 한국 스페셜티 커피 기억을 기록할 준비" })).toBeVisible();
     await expect(page.getByText("한국어 향미 단어")).toBeVisible();
     await expect(page.getByText("패키지 스캔 초안")).toBeVisible();

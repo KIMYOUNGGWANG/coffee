@@ -6,7 +6,7 @@ import {
   buildFirstCardActivationIntent,
   readOnboardingContextFromRecord,
 } from "@/lib/activation-intent";
-import { hyangmiBrand } from "@/lib/brand";
+import { coffeeDexBrand } from "@/lib/brand";
 
 const onboardingFlow = [
   {
@@ -53,7 +53,7 @@ function activationHeadline(contextKind: "default" | "public_card"): string {
 function activationCopy(contextKind: "default" | "public_card"): string {
   switch (contextKind) {
     case "default":
-      return `${hyangmiBrand.name}는 카페와 홈카페에서 마신 스페셜티 커피를 개인 테이스팅 아카이브로 남기고, AI가 라벨 초안과 SCA 스타일 노트 작성을 보조하는 기록 공간입니다.`;
+      return `${coffeeDexBrand.name}는 카페와 홈카페에서 마신 스페셜티 커피를 개인 테이스팅 아카이브로 남기고, AI가 라벨 초안과 SCA 스타일 노트 작성을 보조하는 기록 공간입니다.`;
     case "public_card":
       return "공유 받은 커피 기록을 보고 끝내지 말고, 오늘 마신 원두도 같은 Taste Card 흐름으로 저장해보세요.";
     default:
@@ -71,25 +71,25 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
   const dashboardHref = buildDashboardActivationHref(activationIntent);
 
   return (
-    <main className="hyangmi-paper min-h-screen overflow-hidden text-espresso">
+    <main className="hyangmi-paper min-h-screen overflow-hidden text-foreground">
       <div className="mx-auto max-w-7xl px-4 py-5 md:px-8 md:py-8">
-        <header className="flex items-center justify-between border-b border-espresso/15 pb-4">
+        <header className="flex items-center justify-between border-b border-white/10 pb-4">
           <Link href="/" className="group flex items-center gap-3">
-            <span className="grid size-10 place-items-center border border-espresso bg-espresso text-cream shadow-[4px_4px_0_rgba(47,37,31,0.12)] transition-transform group-hover:-translate-y-0.5">
+            <span className="grid size-10 place-items-center border border-[var(--paper-border)] bg-white/50 text-[var(--paper-foreground)] shadow-[4px_4px_0_rgba(47,37,31,0.12)] transition-transform group-hover:-translate-y-0.5">
               <Coffee size={18} />
             </span>
             <span>
-              <span className="block font-serif text-xl font-black leading-none">{hyangmiBrand.name}</span>
-              <span className="mt-1 block text-[10px] font-extrabold uppercase tracking-[0.26em] text-espresso/45">
+              <span className="block font-serif text-xl font-black leading-none">{coffeeDexBrand.name}</span>
+              <span className="mt-1 block text-[10px] font-extrabold uppercase tracking-[0.26em] text-muted-foreground/60">
                 Taste Onboarding
               </span>
             </span>
           </Link>
           <Link
             href="/dashboard"
-            className="hidden border-b border-espresso/30 px-1 py-2 text-xs font-black text-espresso/62 transition hover:border-espresso hover:text-espresso sm:inline-flex"
+            className="hidden border-b border-white/10/30 px-1 py-2 text-xs font-black text-muted-foreground transition hover:border-white/10 hover:text-foreground sm:inline-flex"
           >
-            샘플 Hyangmi 기록 보기
+            샘플 CoffeeDex 기록 보기
           </Link>
         </header>
 
@@ -97,20 +97,20 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
           <div className="max-w-2xl">
             <div className="issue-marker mb-6 text-[10px] font-black uppercase tracking-[0.22em] text-[#7b4d34]">
               <Sparkles size={12} />
-              Hyangmi Korea-first Onboarding
+              CoffeeDex Korea-first Onboarding
             </div>
-            <h1 className="break-keep font-serif text-4xl font-black leading-tight text-espresso md:text-6xl">
+            <h1 className="break-keep font-serif text-4xl font-black leading-tight text-foreground md:text-6xl">
               {activationHeadline(onboardingContext.kind)}
             </h1>
-            <p className="mt-6 max-w-xl text-sm font-semibold leading-7 text-espresso/64 md:text-base">
+            <p className="mt-6 max-w-xl text-sm font-semibold leading-7 text-foreground/64 md:text-base">
               {activationCopy(onboardingContext.kind)}
             </p>
 
-            <div className="mt-7 border-l border-espresso/20 pl-5">
+            <div className="mt-7 border-l border-white/10 pl-5">
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#9f6a4a]">
                 30-second Taste Finder
               </p>
-              <p className="mt-2 break-keep font-serif text-2xl font-black leading-tight text-espresso">
+              <p className="mt-2 break-keep font-serif text-2xl font-black leading-tight text-foreground">
                 먼저 취향을 고르고, 봉투 사진으로 첫 카드를 완성하세요.
               </p>
             </div>
@@ -122,7 +122,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
               <OnboardingTasteFinder dashboardHref={dashboardHref} />
             </div>
 
-            <div className="grid grid-cols-1 gap-px border border-espresso/18 bg-espresso/18 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-px border border-white/10/18 glass-card border border-white/10/18 md:grid-cols-2">
               {onboardingFlow.map(({ eyebrow, title, copy, icon: Icon }) => (
                 <article key={title} className="bg-[#2f251f] p-5 text-cream">
                   <div className="flex items-start justify-between gap-4">

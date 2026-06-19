@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page, Route } from "@playwright/test";
+import { analyticsEventNames } from "../lib/analytics-events";
 
 const emptyCardsResponse = { data: [] } as const;
 const profileResponse = {
@@ -33,6 +34,41 @@ const subscriptionResponse = {
     updatedAt: null,
   },
 } as const;
+
+const legacyEventNames = [
+  "landing_view",
+  "pricing_viewed",
+  "pricing_cta_clicked",
+  "dashboard_view",
+  "first_card_cta_clicked",
+  "paywall_opened",
+  "checkout_started",
+  "checkout_failed",
+  "subscription_status_viewed",
+  "billing_support_started",
+  "support_request_submitted",
+  "story_downloaded",
+  "story_share_started",
+  "public_share_link_copied",
+  "public_card_view",
+] as const;
+
+const memoryEventNames = [
+  "scan_started",
+  "scan_result_returned",
+  "scan_failed",
+  "scan_field_edited",
+  "draft_confirmed",
+  "card_saved",
+  "archive_viewed",
+  "archive_searched",
+  "second_bag_recorded",
+  "third_bag_recorded",
+] as const;
+
+test("pins legacy commerce/share and validated-memory event names", () => {
+  expect(analyticsEventNames).toEqual([...legacyEventNames, ...memoryEventNames]);
+});
 
 async function fulfillJson(route: Route, body: unknown): Promise<void> {
   await route.fulfill({
@@ -77,7 +113,7 @@ async function mockDashboardRoutes(page: Page, eventNames: string[]): Promise<vo
   });
 }
 
-test.describe("Hyangmi analytics events", () => {
+test.describe("CoffeeDex analytics events", () => {
   test("tracks dashboard view and first-card CTA intent", async ({ page }) => {
     // Given
     const eventNames: string[] = [];
@@ -86,7 +122,7 @@ test.describe("Hyangmi analytics events", () => {
     // When
     await page.goto("/dashboard");
     await expect(page.getByTestId("dashboard-ready")).toBeVisible();
-    await page.getByRole("button", { name: "봉투 사진으로 첫 카드 만들기" }).click();
+    await page.getByRole("button", { name: "원두 패키지 스캔하기" }).click();
 
     // Then
     await expect.poll(() => eventNames).toContain("dashboard_view");

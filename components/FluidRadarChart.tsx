@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 interface FluidRadarChartProps {
   acidity: number;
@@ -67,7 +67,7 @@ export default function FluidRadarChart({ acidity, sweetness, body, size = 180, 
               key={level}
               points={gridPointsStr}
               fill="none"
-              stroke="#e4e2db"
+              stroke="rgba(255,255,255,0.1)"
               strokeWidth={level === 5 ? "1.5" : "0.75"}
               strokeDasharray={level === 5 ? "none" : "2,2"}
             />
@@ -84,7 +84,7 @@ export default function FluidRadarChart({ acidity, sweetness, body, size = 180, 
               y1={center}
               x2={outerCoords.x}
               y2={outerCoords.y}
-              stroke="#d0cebf"
+              stroke="rgba(255,255,255,0.15)"
               strokeWidth="1"
             />
           );
@@ -94,8 +94,8 @@ export default function FluidRadarChart({ acidity, sweetness, body, size = 180, 
         <motion.polygon
           animate={{ points: breathedPolyString }}
           transition={{ duration: 2, ease: "easeInOut", repeat: Infinity, repeatType: "mirror" }}
-          fill="rgba(197, 137, 72, 0.28)" // Caramel transparent fill
-          stroke="hsl(28, 45%, 35%)" // Caramel stroke
+          fill="rgba(217, 160, 91, 0.28)" // primary-amber transparent fill
+          stroke="#D9A05B" // primary-amber stroke
           strokeWidth="2"
         />
 
@@ -106,8 +106,8 @@ export default function FluidRadarChart({ acidity, sweetness, body, size = 180, 
             animate={{ cx: p.x, cy: p.y }}
             transition={{ duration: 2, ease: "easeInOut", repeat: Infinity, repeatType: "mirror" }}
             r="4"
-            fill="hsl(28, 45%, 35%)"
-            stroke="#ffffff"
+            fill="#D9A05B"
+            stroke="#0D0A07"
             strokeWidth="1.5"
             className="shadow-sm"
           />
@@ -136,7 +136,7 @@ export default function FluidRadarChart({ acidity, sweetness, body, size = 180, 
               y={labelCoords.y}
               textAnchor={textAnchor}
               dy={dy}
-              className="text-[10px] font-extrabold fill-espresso/60 tracking-wider font-sans transition-opacity duration-300 group-hover:fill-espresso"
+              className="text-[10px] font-extrabold fill-muted-foreground tracking-wider font-sans transition-opacity duration-300 group-hover:fill-foreground"
             >
               {labels[i]}
             </text>

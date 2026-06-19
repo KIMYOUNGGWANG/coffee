@@ -1,17 +1,27 @@
 "use client";
 
-import React from "react";
-import { Coffee, Trash2, Calendar, MapPin, Thermometer, Share2 } from "lucide-react";
-import { TastingCardData } from "@/hooks/useTastingCards";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { ImageOff, Share2, Star, Trash2 } from "lucide-react";
+import type { TastingCardData } from "@/hooks/useTastingCards";
+import type { RepurchaseIntent } from "@/lib/coffee-memory";
 
-interface TastingCardProps {
-  card: TastingCardData;
-  onDelete?: (id: string) => void;
-  isDeleting?: boolean;
-  onSelect?: (card: TastingCardData) => void;
-  onShare?: (card: TastingCardData) => void;
+type TastingCardProps = {
+  readonly card: TastingCardData;
+  readonly onDelete?: (id: string) => void;
+  readonly isDeleting?: boolean;
+  readonly onSelect?: (card: TastingCardData) => void;
+  readonly onShare?: (card: TastingCardData) => void;
+};
+
+function cardRating(card: TastingCardData): string {
+  return ((card.metric1 + card.metric2 + card.metric3) / 3).toFixed(1);
 }
+
+const repurchaseLabels: Readonly<Record<RepurchaseIntent, string>> = {
+  again: "다시 살래요",
+  maybe: "재구매 고민 중",
+  no: "다시 안 사요",
+  undecided: "재구매 미정",
+};
 
 export default function TastingCard({
   card,
@@ -20,204 +30,87 @@ export default function TastingCard({
   onSelect,
   onShare,
 }: TastingCardProps) {
-  // Motion values for 3D tilt
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
-  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
-
-  const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ["100%", "-100%"]);
-  const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ["100%", "-100%"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  // Safe parsing for nested properties
-  const footerMeta = card.footer_meta || {};
-  const badges = card.badges || [];
-  const tags = card.tags || [];
-
-  // Helper to render metric dots/gauge
-  const renderMetricGauge = (value: number, label: string) => {
-    return (
-      <div className="flex flex-col gap-1">
-        <div className="flex justify-between items-center text-xs">
-          <span className="text-espresso/60 font-medium">{label}</span>
-          <span className="font-semibold text-espresso">{value} / 5</span>
-        </div>
-        <div className="flex gap-1">
-          {[1, 2, 3, 4, 5].map((index) => (
-            <div
-              key={index}
-              className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                index <= value ? "bg-caramel" : "bg-warm-gray"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  };
+  const origin = card.package_origin || card.footer_meta?.origin || "원산지 미기록";
+  const tastingNotes = card.tags.slice(0, 3);
 
   return (
-    <div style={{ perspective: "1200px" }} className="w-full max-w-[420px] mx-auto">
-      <motion.div
-        onClick={() => onSelect && onSelect(card)}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-        }}
-        className="relative aspect-[4/5] w-full h-full bg-cream border border-warm-gray rounded-3xl p-6 shadow-sm hover:shadow-[0_20px_50px_rgba(25,20,15,0.06)] transition-shadow duration-300 ease-out flex flex-col justify-between overflow-hidden group select-none text-espresso cursor-pointer"
+    <article className="coffee-shelf-item group min-w-0">
+      <button
+        type="button"
+        onClick={() => onSelect?.(card)}
+        className="block w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber focus-visible:ring-offset-4 focus-visible:ring-offset-background-dark"
+        aria-label={`${card.title} 상세 보기`}
       >
-        {/* Glare Effect */}
-        <motion.div
-          style={{ x: glareX, y: glareY }}
-          className="absolute inset-0 z-50 pointer-events-none rounded-3xl bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        />
-      {/* Decorative Top Accent line */}
-      <div className="absolute top-0 left-0 w-full h-1.5 bg-caramel/20 group-hover:bg-caramel transition-colors duration-300" />
+        <div className="coffee-package-stage">
+          {card.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={card.image_url}
+              alt={`${card.title} 원두 패키지`}
+              className="coffee-package-image"
+              loading="lazy"
+            />
+          ) : (
+            <span className="coffee-package-missing">
+              <ImageOff aria-hidden="true" size={28} />
+              <span>패키지 사진 없음</span>
+            </span>
+          )}
+        </div>
 
-      {/* Card Header */}
-      <div className="flex justify-between items-center border-b border-warm-gray pb-3">
-        <span className="text-xs uppercase tracking-wider font-semibold text-espresso/50">
-          Hyangmi | #{card.id.slice(0, 4).toUpperCase()}
+        <div className="mt-3 min-w-0">
+          <p className="truncate text-[11px] font-bold text-primary-amber">{origin}</p>
+          <h2 className="mt-1 line-clamp-2 break-keep font-serif text-lg font-black leading-tight tracking-[-0.03em] text-foreground sm:text-xl">
+            {card.title}
+          </h2>
+          <p className="mt-1 truncate text-xs font-semibold text-muted-foreground">{card.subtitle}</p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <span className="rounded-full border border-primary-amber/40 bg-primary-amber/10 px-2 py-1 text-[10px] font-black text-primary-amber">
+              {repurchaseLabels[card.repurchase_intent]}
+            </span>
+            {card.package_process && (
+              <span className="rounded-full border border-white/10 px-2 py-1 text-[10px] font-bold text-muted-foreground">
+                {card.package_process}
+              </span>
+            )}
+          </div>
+          {tastingNotes.length > 0 && (
+            <p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">
+              {tastingNotes.join(" · ")}
+            </p>
+          )}
+        </div>
+      </button>
+
+      <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-2.5">
+        <span className="inline-flex items-center gap-1 text-xs font-bold text-primary-amber">
+          <Star aria-hidden="true" size={13} fill="currentColor" />
+          {cardRating(card)}
         </span>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           {onShare && (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onShare(card);
-              }}
-              className="p-1.5 rounded-full hover:bg-warm-gray/30 text-espresso/45 hover:text-caramel transition-colors"
-              title="인스타그램 스토리 공유"
+              type="button"
+              onClick={() => onShare(card)}
+              className="grid size-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-white/5 hover:text-primary-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
+              aria-label={`${card.title} 공유`}
             >
-              <Share2 size={14} />
+              <Share2 aria-hidden="true" size={15} />
             </button>
           )}
           {onDelete && (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(card.id);
-              }}
+              type="button"
+              onClick={() => onDelete(card.id)}
               disabled={isDeleting}
-              className="p-1.5 rounded-full hover:bg-red-50 text-espresso/40 hover:text-red-500 transition-colors duration-200"
-              title="카드 삭제"
+              className="grid size-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 disabled:opacity-40"
+              aria-label={`${card.title} 삭제`}
             >
-              <Trash2 size={15} className={isDeleting ? "animate-pulse" : ""} />
+              <Trash2 aria-hidden="true" size={15} />
             </button>
           )}
         </div>
       </div>
-
-      {/* Columns Grid */}
-      <div className="grid grid-cols-12 gap-4 my-auto items-stretch py-2">
-        {/* Left Column: Image with high-end frame */}
-        <div className="col-span-5 flex items-center justify-center">
-          <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden bg-white/50 border border-warm-gray shadow-inner flex flex-col items-center justify-center relative group-hover:scale-102 transition-transform duration-300">
-            {card.image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={card.image_url}
-                alt={card.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="flex flex-col items-center gap-1 text-espresso/20">
-                <Coffee size={32} strokeWidth={1.5} />
-                <span className="text-[10px]">Bean Photo</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Column: Tasting details */}
-        <div className="col-span-7 flex flex-col justify-between py-1 gap-3">
-          <div>
-            {badges.length > 0 && (
-              <span className="text-[10px] uppercase font-bold text-caramel tracking-wider bg-caramel/10 px-2 py-0.5 rounded-full">
-                {badges[0]}
-              </span>
-            )}
-            <h3 className="font-serif text-lg leading-tight font-bold mt-1 text-ellipsis overflow-hidden whitespace-nowrap">
-              {card.title}
-            </h3>
-            <p className="text-xs text-espresso/60 font-medium leading-none mt-0.5 text-ellipsis overflow-hidden whitespace-nowrap">
-              {card.subtitle}
-            </p>
-          </div>
-
-          {/* Gauges */}
-          <div className="flex flex-col gap-2">
-            {renderMetricGauge(card.metric1, "산미 (Acidity)")}
-            {renderMetricGauge(card.metric2, "단맛 (Sweetness)")}
-            {renderMetricGauge(card.metric3, "바디 (Body)")}
-          </div>
-
-          {/* Method Tag */}
-          <div className="flex flex-wrap gap-1 mt-1">
-            {badges.slice(1, 3).map((badge, idx) => (
-              <span
-                key={idx}
-                className="text-[9px] font-semibold text-espresso/70 bg-warm-gray/40 border border-warm-gray/60 px-1.5 py-0.5 rounded"
-              >
-                {badge}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* AI Cup Note Summary Card */}
-      <div className="bg-white/40 border border-warm-gray/40 backdrop-blur-sm rounded-2xl p-3 shadow-inner my-2 flex items-start gap-2 min-h-[56px] text-xs leading-relaxed italic text-espresso/80">
-        <span className="text-lg leading-none text-caramel/40 select-none">“</span>
-        <p className="text-[11px] font-serif pr-2">
-          {card.ai_description || "느껴지는 아로마 노트를 기록하고 AI 감성 한줄평을 생성해보세요."}
-        </p>
-      </div>
-
-      {/* Footer Info */}
-      <div className="border-t border-warm-gray pt-2.5 flex justify-between items-center text-[10px] text-espresso/50 font-medium">
-        <div className="flex items-center gap-1">
-          <Calendar size={11} />
-          <span>{footerMeta.date || card.created_at.slice(0, 10).replace(/-/g, ".")}</span>
-        </div>
-        {footerMeta.origin && (
-          <div className="flex items-center gap-1 max-w-[80px] truncate">
-            <MapPin size={11} />
-            <span className="truncate">{footerMeta.origin}</span>
-          </div>
-        )}
-        {footerMeta.extraInfo && (
-          <div className="flex items-center gap-1">
-            <Thermometer size={11} />
-            <span>{footerMeta.extraInfo.split(",")[0]}</span>
-          </div>
-        )}
-      </div>
-    </motion.div>
-  </div>
+    </article>
   );
 }

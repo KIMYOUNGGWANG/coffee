@@ -135,7 +135,7 @@ test.describe("Viral activation loop", () => {
 
     // When
     await page.goto("/cards/public-token-001");
-    const publicCardCta = page.getByRole("link", { name: "내 Hyangmi Taste Card 만들기" });
+    const publicCardCta = page.getByRole("link", { name: "내 CoffeeDex Taste Card 만들기" });
     await expect(publicCardCta).toHaveAttribute("href", "/onboarding?source=public_card&token=public-token-001");
     await publicCardCta.click();
 

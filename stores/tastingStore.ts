@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { GuestDraft } from "@/lib/guest-draft";
 
 export interface TastingCardFormState {
   category: "coffee" | "beer" | "whiskey" | "wine";
@@ -39,6 +40,7 @@ interface TastingStore {
   step: number;
   form: TastingCardFormState;
   isGeneratingAiNote: boolean;
+  guestDraft: GuestDraft | null;
 
   // Actions
   setStep: (step: number) => void;
@@ -47,6 +49,8 @@ interface TastingStore {
   updateForm: (fields: Partial<TastingCardFormState>) => void;
   resetForm: () => void;
   setIsGeneratingAiNote: (isGenerating: boolean) => void;
+  setGuestDraft: (draft: GuestDraft) => void;
+  clearGuestDraft: () => void;
   addTag: (tag: string) => void;
   removeTag: (tag: string) => void;
   addBadge: (badge: string) => void;
@@ -57,6 +61,7 @@ export const useTastingStore = create<TastingStore>((set) => ({
   step: 1,
   form: initialFormState,
   isGeneratingAiNote: false,
+  guestDraft: null,
 
   setStep: (step) => set({ step }),
   nextStep: () => set((state) => ({ step: Math.min(state.step + 1, 4) })),
@@ -78,6 +83,8 @@ export const useTastingStore = create<TastingStore>((set) => ({
     }),
 
   setIsGeneratingAiNote: (isGeneratingAiNote) => set({ isGeneratingAiNote }),
+  setGuestDraft: (guestDraft) => set({ guestDraft }),
+  clearGuestDraft: () => set({ guestDraft: null }),
 
   addTag: (tag) =>
     set((state) => {

@@ -48,7 +48,7 @@ export const revenueOffers = [
   },
   {
     id: "premium",
-    label: "Hyangmi Premium",
+    label: "CoffeeDex Premium",
     price: "$3.99/mo",
     description: "월간 한도 없는 AI 원두 스캔과 취향 리캡",
   },
@@ -128,7 +128,7 @@ function stateCopy(stage: RevenueFunnelStage): Pick<RevenueFunnelState, "headlin
         headline: "스캔 한도를 없애고 기록 루틴을 유지하세요",
         primaryAction: "open_payment",
         primaryLabel: "Premium으로 계속 기록하기",
-        monetizationHint: "Hyangmi Premium은 월 $3.99로 원두 패키지 스캔과 취향 리캡을 계속 이어갑니다.",
+        monetizationHint: "CoffeeDex Premium은 월 $3.99로 원두 패키지 스캔과 취향 리캡을 계속 이어갑니다.",
       };
   }
 }

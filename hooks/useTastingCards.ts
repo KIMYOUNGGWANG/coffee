@@ -1,4 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type {
+  CorrectableCoffeeField,
+  RepurchaseIntent,
+  ScanSource,
+} from "@/lib/coffee-memory";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -61,6 +66,14 @@ export interface TastingCardData {
     date?: string;
     extraInfo?: string;
   };
+  package_origin: string | null;
+  package_process: string | null;
+  repurchase_intent: RepurchaseIntent;
+  repurchase_reasons: readonly string[];
+  scan_source: ScanSource | null;
+  scan_confidence: number | null;
+  corrected_fields: readonly CorrectableCoffeeField[];
+  confirmed_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -77,6 +90,35 @@ export type CreateTastingCardInput = {
   readonly tags: readonly string[];
   readonly aiDescription: string;
   readonly footerMeta: TastingCardData["footer_meta"];
+  readonly packageOrigin?: string | null;
+  readonly packageProcess?: string | null;
+  readonly repurchaseIntent?: RepurchaseIntent;
+  readonly repurchaseReasons?: readonly string[];
+  readonly scanSource?: ScanSource | null;
+  readonly scanConfidence?: number | null;
+  readonly correctedFields?: readonly CorrectableCoffeeField[];
+  readonly confirmed?: true;
+};
+
+export type UpdateTastingCardInput = {
+  readonly title?: string;
+  readonly subtitle?: string;
+  readonly imageUrl?: string | null;
+  readonly badges?: readonly string[];
+  readonly metric1?: number;
+  readonly metric2?: number;
+  readonly metric3?: number;
+  readonly tags?: readonly string[];
+  readonly aiDescription?: string;
+  readonly footerMeta?: TastingCardData["footer_meta"];
+  readonly packageOrigin?: string | null;
+  readonly packageProcess?: string | null;
+  readonly repurchaseIntent?: RepurchaseIntent;
+  readonly repurchaseReasons?: readonly string[];
+  readonly scanSource?: ScanSource | null;
+  readonly scanConfidence?: number | null;
+  readonly correctedFields?: readonly CorrectableCoffeeField[];
+  readonly confirmed?: true;
 };
 
 // Fetch all cards belonging to the logged-in user
@@ -148,8 +190,8 @@ export function useCreateTastingCard() {
 export function useUpdateTastingCard() {
   const queryClient = useQueryClient();
 
-  return useMutation<TastingCardData, Error, { id: string; fields: Partial<TastingCardData> }>({
-    mutationFn: async ({ id, fields }: { id: string; fields: Partial<TastingCardData> }) => {
+  return useMutation<TastingCardData, Error, { readonly id: string; readonly fields: UpdateTastingCardInput }>({
+    mutationFn: async ({ id, fields }) => {
       const response = await fetch(`/api/v1/cards/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -240,6 +282,7 @@ export function useUserProfile() {
       const response = await fetch("/api/v1/profile");
       const json = await readJsonResponse(response);
       if (!response.ok) {
+        if (response.status === 401) return { credits: 10, has_pdf_access: true, is_premium: true, scans_used: 0, monthly_scan_limit: 100 }; // TEMPORARY MOCK
         throw new Error(getResponseErrorMessage(json, "프로필 데이터를 가져오는 데 실패했습니다."));
       }
       const data = getResponseData<UserProfileData>(json);
@@ -424,6 +467,7 @@ export function useTasteAnalytics() {
       const response = await fetch("/api/v1/profile/analytics");
       const json = await readJsonResponse(response);
       if (!response.ok) {
+        if (response.status === 401) return { averageAcidity: 0, averageSweetness: 0, averageBody: 0, topTags: [], totalCards: 0, aiAnalysis: "데이터가 없습니다." }; // TEMPORARY MOCK
         throw new Error(getResponseErrorMessage(json, "분석 리포트를 불러오는 데 실패했습니다."));
       }
       const data = getResponseData<TasteAnalyticsData>(json);

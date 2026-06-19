@@ -50,7 +50,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
 
   const runAuthAction = async (action: AuthAction): Promise<void> => {
     if (!authClient) {
-      setFormError("Supabase 공개 환경 변수가 없어 Hyangmi 로그인이 비활성화되었습니다.");
+      setFormError("Supabase 공개 환경 변수가 없어 CoffeeDex 로그인이 비활성화되었습니다.");
       return;
     }
 
@@ -85,7 +85,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
             return;
           }
           setStatusMessage(
-            `가입 확인 메일을 보냈습니다. 메일 인증 후 Hyangmi에 로그인해주세요. 로그인 후 이동: ${redirectTo}`,
+            `가입 확인 메일을 보냈습니다. 메일 인증 후 CoffeeDex에 로그인해주세요. 로그인 후 이동: ${redirectTo}`,
           );
           return;
         }
@@ -102,17 +102,17 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
   return (
     <main
       data-testid={isClientReady ? "auth-gate-ready" : undefined}
-      className="starter-shell min-h-screen text-espresso bg-[#f7f7f4]"
+      className="starter-shell min-h-screen text-foreground bg-[#0D0A07]"
     >
-      <section className="surface-panel mx-auto max-w-md border border-warm-gray bg-white/80 p-6 shadow-sm md:p-8">
+      <section className="surface-panel mx-auto max-w-md border border-white/10 glass-card p-6 shadow-sm md:p-8">
         <div className="space-y-2 text-center">
-          <div className="mx-auto flex size-11 items-center justify-center rounded-full bg-espresso text-white">
+          <div className="mx-auto flex size-11 items-center justify-center rounded-full bg-primary-amber text-[#0D0A07]">
             <Coffee size={20} aria-hidden="true" />
           </div>
-          <p className="hero-kicker text-caramel">Hyangmi Auth Gate</p>
-          <h1 className="font-serif text-2xl font-bold text-espresso">Hyangmi 계정으로 계속하기</h1>
-          <p className="text-sm leading-6 text-espresso/65">로그인하거나 회원가입하면 내 Taste Archive로 돌아갑니다.</p>
-          <p className="rounded-md border border-warm-gray bg-[#f7f7f4] px-3 py-2 text-xs font-semibold text-espresso/70">
+          <p className="hero-kicker text-primary-amber">CoffeeDex Auth Gate</p>
+          <h1 className="font-serif text-2xl font-bold text-foreground">CoffeeDex 계정으로 계속하기</h1>
+          <p className="text-sm leading-6 text-foreground/65">로그인하거나 회원가입하면 내 Taste Archive로 돌아갑니다.</p>
+          <p className="rounded-md border border-white/10 bg-black/40 px-3 py-2 text-xs font-semibold text-foreground/70">
             로그인 후 이동: {redirectTo}
           </p>
         </div>
@@ -125,7 +125,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
         )}
 
         <form className="mt-6 space-y-4" onSubmit={(event) => event.preventDefault()}>
-          <label className="block space-y-1.5 text-sm font-semibold text-espresso" htmlFor="auth-email">
+          <label className="block space-y-1.5 text-sm font-semibold text-foreground" htmlFor="auth-email">
             이메일
             <input
               id="auth-email"
@@ -134,12 +134,12 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
               value={email}
               disabled={!isConfigured || isSubmitting}
               onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-md border border-warm-gray bg-white px-3 py-2 text-sm font-normal text-espresso outline-none transition focus:border-caramel focus:ring-4 focus:ring-caramel/20 disabled:bg-warm-gray/20"
+              className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm font-normal text-foreground outline-none transition focus:border-primary-amber focus:ring-4 focus:ring-caramel/20 disabled:bg-white/5"
               required
             />
           </label>
 
-          <label className="block space-y-1.5 text-sm font-semibold text-espresso" htmlFor="auth-password">
+          <label className="block space-y-1.5 text-sm font-semibold text-foreground" htmlFor="auth-password">
             비밀번호
             <input
               id="auth-password"
@@ -148,7 +148,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
               value={password}
               disabled={!isConfigured || isSubmitting}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-md border border-warm-gray bg-white px-3 py-2 text-sm font-normal text-espresso outline-none transition focus:border-caramel focus:ring-4 focus:ring-caramel/20 disabled:bg-warm-gray/20"
+              className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm font-normal text-foreground outline-none transition focus:border-primary-amber focus:ring-4 focus:ring-caramel/20 disabled:bg-white/5"
               required
             />
           </label>
@@ -170,7 +170,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
               type="button"
               disabled={!isConfigured || isSubmitting}
               onClick={() => void runAuthAction("signin")}
-              className="bg-espresso text-white hover:bg-espresso/90"
+              className="bg-primary-amber text-[#0D0A07] hover:opacity-90"
             >
               <LogIn size={16} aria-hidden="true" />
               로그인
@@ -180,7 +180,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
               variant="outline"
               disabled={!isConfigured || isSubmitting}
               onClick={() => void runAuthAction("signup")}
-              className="border-espresso/25 bg-white text-espresso hover:bg-[#f7f7f4]"
+              className="border-white/10/25 bg-white text-foreground hover:bg-[#0D0A07]"
             >
               <UserPlus size={16} aria-hidden="true" />
               회원가입

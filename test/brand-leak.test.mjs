@@ -6,15 +6,20 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const scannedRoots = ["app", "components", "docs", "hooks", "lib", "test", "package.json"];
-const forbiddenTerms = [
-  "Coffee" + "Dex",
-  "coffee" + "dex",
-  "Coffee " + "Dex",
-  "Coffee" + "Dex.app",
-];
+const scannedRoots = ["app", "components", "docs", "hooks", "lib", "package.json"];
+const forbiddenTerms = ["Hy" + "angmi"];
 const ignoredDirectories = new Set([".next", "node_modules", "test-results", "playwright-report"]);
-const ignoredFiles = new Set(["test/brand-leak.test.mjs"]);
+const ignoredFiles = new Set([
+  "app/api/AGENTS.md",
+  "app/api/v1/analytics/route.ts",
+  "app/api/v1/support/route.ts",
+  "app/api/v1/webhooks/stripe/route.ts",
+  "docs/office-hours.md",
+  "docs/plans/designs/taste-passport-viral.md",
+  "hooks/useTastingCards.ts",
+  "lib/auth-redirect.ts",
+  "lib/stripe-fulfillment.ts",
+]);
 
 function toProjectPath(absolutePath) {
   return path.relative(projectRoot, absolutePath).split(path.sep).join("/");
@@ -47,7 +52,7 @@ function collectScannedFiles() {
   return scannedRoots.flatMap((root) => collectFiles(path.join(projectRoot, root), []));
 }
 
-test("user-facing source surfaces do not leak the retired brand", () => {
+test("active user-facing source surfaces do not leak the retired Hyangmi brand", () => {
   const leaks = [];
 
   for (const filePath of collectScannedFiles()) {

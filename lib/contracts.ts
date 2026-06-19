@@ -1,4 +1,4 @@
-import { hyangmiBrand } from "@/lib/brand";
+import { coffeeDexBrand } from "@/lib/brand";
 
 export type MembershipRole = "owner" | "admin" | "member";
 export type SubscriptionPlan = "free" | "premium";
@@ -56,12 +56,12 @@ export type StarterSurface = {
   status: StarterStatus;
 };
 
-export const starterServiceName = hyangmiBrand.filenameSlug;
+export const starterServiceName = coffeeDexBrand.filenameSlug;
 
 export const starterSurfaces: StarterSurface[] = [
   {
     id: "account",
-    title: "Hyangmi Account",
+    title: "CoffeeDex Account",
     summary: "Supabase-backed account access for a private tasting archive.",
     status: "healthy",
   },

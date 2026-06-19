@@ -1,69 +1,59 @@
-# Hyangmi Golden Flows
+# CoffeeDex Golden Flows
 
-These are the executable product truths the smoke suite protects for T2. They describe Hyangmi as a Korea-first specialty coffee memory and artifact product, not a generic project template or expanded commerce/community platform.
+These are the executable product truths protected by the smoke suite. CoffeeDex leads with recall and repurchase; artifact, payment, and public-sharing behavior remains secondary compatibility.
 
-## Flow 1. Record First Coffee Card
+## Flow 1. Capture and Confirm a Coffee Memory
 
-Given a logged-in coffee drinker opens the dashboard, when they choose `새로운 카드 기록하기`, then Hyangmi collects bean/roaster identity, acidity, sweetness, body, flavor tags, image, and footer metadata for a private `tasting_cards` row.
+Given a coffee drinker has a bag photo or knows the coffee details, when they review the editable draft, separate package claims from user-perceived taste, choose whether they would buy again, and confirm the record, then CoffeeDex can persist a private owner-scoped `tasting_cards` memory.
 
-Evidence surfaces:
-- `/dashboard`
-- `hooks/useTastingCards.ts`
-- `POST /api/v1/cards`
+Evidence surfaces: `/onboarding`, `/dashboard`, `POST /api/v1/cards`
 
-## Flow 2. Scan Bean Package To Draft Card
+## Flow 2. Scan a Package into an Editable Draft
 
-Given the user has a coffee package image, when they scan it, then Hyangmi extracts a draft title, roaster, origin, process, flavor tags, acidity, sweetness, and body for user review before saving.
+Given a user selects a package image, when scanning succeeds, then CoffeeDex returns extracted package claims with provenance and uncertainty for review. Unknown values remain unknown; the user may correct the draft or use manual entry before saving.
 
-Evidence surfaces:
-- `POST /api/v1/cards/scan`
-- `useScanCoffeePackage`
-- Fallback sample beans and Korean roaster cues such as Fritz Ethiopia Sidama, Terarosa Colombia Huila, and Momos Kenya Nyeri
+For a guest, the image is processed without raw-image persistence and the text draft remains in local browser storage for less than 24 hours. JPEG, PNG, and WebP inputs must pass the 5 MiB decoded-size, MIME, and file-signature checks. The one-trial limit is process-local only, not distributed production rate limiting.
 
-## Flow 3. Generate SCA Tasting Note
+Evidence surfaces: `POST /api/v1/cards/scan`, `useScanCoffeePackage`
 
-Given the user has tags and an optional raw note, when they request an AI note, then Hyangmi returns a concise SCA-style tasting sentence and keeps a local fallback available if the AI provider is not configured.
+## Flow 3. Retrieve a Coffee Worth Buying Again
 
-Evidence surfaces:
-- `POST /api/v1/cards/ai-note`
-- `useGenerateAiNote`
-- `aiDescription`
+Given a user has confirmed memories, when they search or filter by coffee, roaster, origin, process, note, tag, or repurchase intent, then CoffeeDex returns the matching memory and its recorded reason.
 
-## Flow 4. Review Taste Analytics Dashboard
+Evidence surfaces: `/dashboard`, `GET /api/v1/cards`
 
-Given the user has saved tasting cards, when they open the dashboard, then Hyangmi summarizes average acidity, sweetness, body, top flavor tags, and a saved-record taste recap.
+## Flow 4. Review a Progressive Taste Snapshot
 
-Evidence surfaces:
-- `/dashboard`
-- `GET /api/v1/profile/analytics`
-- `useTasteAnalytics`
+Given a user has confirmed memories, when they open the snapshot, then CoffeeDex displays literal sample count and coverage. One to two records form a collage, three to four show first signals, five to nine show an early preview, and ten or more sufficiently varied records show a current snapshot. Sparse data never appears complete.
 
-## Flow 5. Share Story Card
+Evidence surfaces: `/dashboard`, `GET /api/v1/profile/analytics`
 
-Given the user selects a saved card, when they open the share/export experience, then Hyangmi presents a digital story card using the recorded bean identity and tasting metadata.
+## Flow 5. Export or Delete Owned Data
 
-Evidence surfaces:
-- `StoryExportModal`
-- `TastingCard`
-- Hyangmi card details
+Given an authenticated user opens trust settings, when they export or confirm account deletion, then CoffeeDex provides free JSON and CSV downloads covering `tasting_cards`, `brewing_notes`, `coffee_shelf_items`, and `brewing_logs`, or performs owner-scoped deletion that stops on the first failure.
 
-## Flow 6. Export Home Cafe PDF
+Deletion first removes public exposure and detaches retained audit/analytics records, then deletes owned product rows and the profile, and deletes the Auth identity last. Redacted Stripe audit data and anonymized product events may remain; storage-object cleanup is not promised by the current implementation.
 
-Given a user has PDF access, when they request the archive export, then Hyangmi returns their card bundle for a digital home-cafe tasting book.
+Evidence surfaces: `GET /api/v1/export?format=json|csv`, `DELETE /api/v1/account`
 
-Evidence surfaces:
-- `GET /api/v1/pdf`
-- `has_pdf_access`
-- `Hyangmi 홈카페 도서관`
+## Secondary Compatibility Flow. Share a Story Card
+
+Given a user deliberately opens a saved card's secondary share action, when they export or publish it, then CoffeeDex uses the confirmed coffee memory. Sharing is optional and does not replace capture or retrieval as the primary action.
+
+Evidence surfaces: `StoryExportModal`, `TastingCard`, public card routes
+
+## Secondary Compatibility Flow. Export PDF or Purchase an Entitlement
+
+Given an eligible user deliberately opens a secondary offer, when they request PDF export or Stripe checkout, then the existing PDF, checkout, webhook, and entitlement contracts remain available. These routes are compatibility surfaces, not the core wedge.
+
+Evidence surfaces: `GET /api/v1/pdf`, `POST /api/v1/checkout`, `POST /api/v1/webhooks/stripe`
 
 ## Future Boundary
 
-Roaster partnership, referral, and community layers are future product layers only. They are not part of the current golden flows and must not be represented as current capabilities until separate contracts and verification exist.
+Roaster partnership, referral, marketplace, and community layers are future product layers only. They are not part of the current golden flows and must not be represented as current capabilities until separate contracts and verification exist.
 
 ## Smoke Verification
 
-Run the T2 smoke assignment with:
-
 ```bash
-/Users/kim-young-gwang/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test test/smoke.test.mjs
+node --test test/brand-contract.test.mjs test/brand-leak.test.mjs test/product-copy.test.mjs test/smoke.test.mjs
 ```

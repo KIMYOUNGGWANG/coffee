@@ -1,78 +1,139 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
-import FluidRadarChart from "@/components/FluidRadarChart";
+import { BookOpen, Coffee, RefreshCcw, Sparkles } from "lucide-react";
 import type { TasteAnalyticsData } from "@/hooks/useTastingCards";
+import type { PassportCoverage, PassportState } from "@/lib/passport-state";
+
+type TopNote = {
+  readonly note: string;
+  readonly count: number;
+};
+
+type PassportAnalytics = TasteAnalyticsData & {
+  readonly passport?: PassportState;
+  readonly topNotes?: readonly TopNote[];
+  readonly repurchaseBreakdown?: {
+    readonly again: number;
+    readonly maybe: number;
+    readonly no: number;
+    readonly undecided: number;
+  };
+};
 
 type DashboardAnalyticsPanelProps = {
-  readonly analytics: TasteAnalyticsData | undefined;
+  readonly analytics: PassportAnalytics | undefined;
   readonly isLoading: boolean;
 };
 
-export default function DashboardAnalyticsPanel({ analytics, isLoading }: DashboardAnalyticsPanelProps) {
+const stateLabels: Readonly<Record<PassportState["kind"], string>> = {
+  empty: "패스포트 시작 전",
+  collage: "커피 기억 콜라주",
+  first_signals: "취향의 첫 신호",
+  early_snapshot: "초기 취향 스냅샷",
+  current_snapshot: "현재 취향 스냅샷",
+};
+
+const coverageLabels: Readonly<Record<PassportCoverage, string>> = {
+  narrow: "좁은 범위",
+  mixed: "혼합 범위",
+  broad: "넓은 범위",
+};
+
+function AnalyticsSkeleton() {
   return (
-    <div className="bg-white border border-warm-gray rounded-3xl p-5 shadow-sm space-y-4">
-      <div className="flex items-center gap-2 pb-2 border-b border-warm-gray">
-        <Sparkles size={14} className="text-caramel" />
-        <h3 className="font-serif font-bold text-sm">취향 지도와 리캡</h3>
+    <div className="space-y-3 py-3 animate-pulse" aria-label="패스포트 불러오는 중">
+      <div className="h-20 rounded-2xl bg-white/10" />
+      <div className="grid grid-cols-3 gap-2">
+        <div className="h-16 rounded-xl bg-white/10" />
+        <div className="h-16 rounded-xl bg-white/10" />
+        <div className="h-16 rounded-xl bg-white/10" />
+      </div>
+    </div>
+  );
+}
+
+export default function DashboardAnalyticsPanel({ analytics, isLoading }: DashboardAnalyticsPanelProps) {
+  const passport = analytics?.passport;
+
+  return (
+    <section className="glass-card space-y-4 rounded-3xl p-5 shadow-sm" aria-labelledby="passport-heading">
+      <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+        <BookOpen aria-hidden="true" size={15} className="text-primary-amber" />
+        <div>
+          <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-primary-amber">CoffeeDex Passport</p>
+          <h2 id="passport-heading" className="font-serif text-sm font-bold text-foreground">기록으로 갱신되는 패스포트</h2>
+        </div>
       </div>
 
-      {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-8 space-y-3 animate-pulse">
-          <div className="w-24 h-24 rounded-full bg-warm-gray/30" />
-          <div className="h-3 bg-warm-gray/30 rounded w-2/3" />
-          <div className="h-3 bg-warm-gray/20 rounded w-full" />
-        </div>
-      ) : analytics && analytics.totalCards > 0 ? (
+      {isLoading ? <AnalyticsSkeleton /> : passport ? (
         <div className="space-y-4">
-          <div className="py-2">
-            <FluidRadarChart
-              acidity={analytics.averageAcidity}
-              sweetness={analytics.averageSweetness}
-              body={analytics.averageBody}
-              size={160}
-            />
-          </div>
-          <div className="bg-cream/40 border border-warm-gray/55 rounded-2xl p-3 text-xs leading-relaxed text-espresso/85 font-serif italic relative">
-            <span className="absolute -top-2 left-3 bg-[#f7f7f4] px-1.5 text-[8px] uppercase tracking-wider font-extrabold text-caramel">
-              AI 한줄평
-            </span>
-            “{analytics.aiAnalysis}”
-          </div>
-          {analytics && analytics.brewingStats && analytics.brewingStats.totalNotes > 0 && (
-            <div className="bg-[#f7f6f2] border border-warm-gray/40 rounded-2xl p-3.5 space-y-2.5 text-xs text-espresso">
-              <span className="text-[9px] uppercase font-bold text-caramel tracking-wider">
-                Brewing Insights
+          <div className="rounded-2xl border border-primary-amber/20 bg-primary-amber/5 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold text-primary-amber">확정 기록 {passport.sampleCount}개</p>
+                <h3 className="mt-1 font-serif text-xl font-black text-foreground">{stateLabels[passport.kind]}</h3>
+              </div>
+              <span className="shrink-0 rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[10px] font-bold text-muted-foreground">
+                {coverageLabels[passport.coverage]}
               </span>
-              <div className="grid grid-cols-2 gap-2 text-[11px] font-medium text-espresso/75">
-                <div className="bg-white/80 p-2 rounded-xl border border-warm-gray/30 flex flex-col justify-between">
-                  <span className="text-[10px] text-espresso/40">최애 추출 도구</span>
-                  <span className="font-bold text-espresso">{analytics.brewingStats.favoriteMethod}</span>
-                </div>
-                <div className="bg-white/80 p-2 rounded-xl border border-warm-gray/30 flex flex-col justify-between">
-                  <span className="text-[10px] text-espresso/40">평균 만족도</span>
-                  <span className="font-bold text-espresso">{analytics.brewingStats.averageRating} / 5</span>
-                </div>
-                {analytics.brewingStats.bestTemp && (
-                  <div className="bg-white/80 p-2 rounded-xl border border-warm-gray/30 flex flex-col justify-between col-span-2">
-                    <span className="text-[10px] text-espresso/40">최상의 맛을 낸 평균 물 온도</span>
-                    <span className="font-bold text-caramel">{analytics.brewingStats.bestTemp}°C</span>
-                  </div>
-                )}
+            </div>
+            <p className="mt-3 break-keep text-xs leading-5 text-muted-foreground">{analytics.aiAnalysis}</p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2" aria-label="패스포트 기록 범위">
+            {[
+              ["원산지", passport.distinctOriginCount],
+              ["가공 방식", passport.distinctProcessCount],
+              ["향미 노트", passport.distinctTagCount],
+            ].map(([label, count]) => (
+              <div key={label} className="rounded-xl border border-white/10 bg-white/5 p-2.5 text-center">
+                <p className="text-lg font-black text-foreground">{count}</p>
+                <p className="mt-0.5 text-[9px] font-bold text-muted-foreground">{label}</p>
+              </div>
+            ))}
+          </div>
+
+          {(analytics.topNotes?.length ?? 0) > 0 && (
+            <div>
+              <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground">
+                <Sparkles aria-hidden="true" size={12} className="text-primary-amber" />
+                내가 직접 남긴 향미
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {analytics.topNotes?.map(({ note, count }) => (
+                  <span key={note} className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold text-foreground">
+                    {note} {count}회
+                  </span>
+                ))}
               </div>
             </div>
           )}
 
-          <div className="flex justify-between items-center text-[10px] text-espresso/45 font-semibold pt-1 border-t border-warm-gray/50">
-            <span>아카이빙 완료 원두</span>
-            <span className="text-caramel font-bold">{analytics.totalCards}개</span>
-          </div>
+          {analytics.repurchaseBreakdown && (
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-3.5">
+              <div className="mb-2.5 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground">
+                <RefreshCcw aria-hidden="true" size={12} className="text-primary-amber" />
+                다시 마실 의향
+              </div>
+              <div className="grid grid-cols-4 gap-1 text-center text-[10px]">
+                <span>또 마셔요 <b className="block text-sm text-foreground">{analytics.repurchaseBreakdown.again}</b></span>
+                <span>고민 중 <b className="block text-sm text-foreground">{analytics.repurchaseBreakdown.maybe}</b></span>
+                <span>아니요 <b className="block text-sm text-foreground">{analytics.repurchaseBreakdown.no}</b></span>
+                <span>미정 <b className="block text-sm text-foreground">{analytics.repurchaseBreakdown.undecided}</b></span>
+              </div>
+            </div>
+          )}
+
+          <p className="flex items-center justify-between border-t border-white/10 pt-3 text-[10px] font-semibold text-muted-foreground">
+            <span className="flex items-center gap-1.5"><Coffee aria-hidden="true" size={12} />전체 저장 기록</span>
+            <span className="font-bold text-primary-amber">{analytics.totalCards}개</span>
+          </p>
         </div>
       ) : (
-        <div className="py-8 text-center text-xs text-espresso/50 leading-relaxed">
-          카드를 1개 이상 작성하시면 저장된 기록 기반의 맛 성향 요약과 AI 보조 리캡이 여기에 제공됩니다.
+        <div className="py-7 text-center text-xs leading-5 text-muted-foreground">
+          첫 커피 기억을 확정하면 패스포트가 콜라주부터 시작됩니다.
         </div>
       )}
-    </div>
+    </section>
   );
 }

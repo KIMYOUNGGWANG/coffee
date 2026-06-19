@@ -63,7 +63,7 @@ test("revenue funnel starts free users on the first Taste Card", async () => {
     assert.equal(state.progressLabel, "0 / 4");
     assert.deepEqual(
       module.revenueOffers.map((offer) => offer.label),
-      ["무료 Taste Card", "Hyangmi Premium", "테이스팅 10팩", "Taste Passport"],
+      ["무료 Taste Card", "CoffeeDex Premium", "테이스팅 10팩", "Taste Passport"],
     );
   } finally {
     rmSync(tempDirectory, { force: true, recursive: true });

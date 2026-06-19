@@ -1,6 +1,6 @@
 {
-  "name": "hyangmi",
-  "description": "Hyangmi AI specialty coffee taste archive.",
+  "name": "coffeedex",
+  "description": "CoffeeDex coffee memory and repurchase companion.",
   "private": true,
   "version": "0.1.0",
   "scripts": {

@@ -30,24 +30,24 @@ export default function DashboardRoasterMemoryPanel({ cards }: DashboardRoasterM
   const roasters = countRoasters(cards);
 
   return (
-    <div className="bg-white border border-warm-gray rounded-3xl p-5 shadow-sm space-y-4">
-      <div className="flex items-center gap-2 pb-2 border-b border-warm-gray">
-        <Store size={14} className="text-caramel" />
+    <div className="glass-card border border-white/10 rounded-3xl p-5 shadow-sm space-y-4">
+      <div className="flex items-center gap-2 pb-2 border-b border-white/10">
+        <Store size={14} className="text-primary-amber" />
         <h3 className="font-serif font-bold text-sm">로스터 메모리</h3>
       </div>
 
       {roasters.length > 0 ? (
         <div className="space-y-2">
-          <p className="text-[11px] text-espresso/55 leading-relaxed">자주 마신 로스터를 작은 재구매 단서로 남깁니다.</p>
+          <p className="text-[11px] text-muted-foreground/80 leading-relaxed">자주 마신 로스터를 작은 재구매 단서로 남깁니다.</p>
           {roasters.map((roaster) => (
-            <div key={roaster.name} className="flex items-center justify-between rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2 text-xs">
-              <span className="font-bold text-espresso">{roaster.name}</span>
-              <span className="text-caramel font-extrabold">{roaster.count}회</span>
+            <div key={roaster.name} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5/40 px-3 py-2 text-xs">
+              <span className="font-bold text-foreground">{roaster.name}</span>
+              <span className="text-primary-amber font-extrabold">{roaster.count}회</span>
             </div>
           ))}
         </div>
       ) : (
-        <div className="py-4 text-xs text-espresso/55 leading-relaxed">
+        <div className="py-4 text-xs text-muted-foreground/80 leading-relaxed">
           아직 로스터 기록 없음. 첫 카드를 저장하면 자주 마신 로스터와 재구매 후보가 이곳에 쌓입니다.
         </div>
       )}

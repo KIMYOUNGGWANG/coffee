@@ -77,8 +77,8 @@ export default class Stripe {
 function writeBrandMock(tempDirectory) {
   writeFileSync(
     path.join(tempDirectory, "brand.mjs"),
-    `export const hyangmiBrand = {
-  filenameSlug: "hyangmi",
+    `export const coffeeDexBrand = {
+  filenameSlug: "coffeedex",
 };`,
   );
 }

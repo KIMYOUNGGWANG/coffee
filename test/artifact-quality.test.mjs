@@ -16,7 +16,7 @@ test("paid artifacts include visible recap and public-card quality cues", () => 
 
   assert.match(pdfGenerator, /Taste Map/);
   assert.match(pdfGenerator, /Roaster Memory/);
-  assert.match(pdfGenerator, /Hyangmi Recap/);
-  assert.match(storyAssets, /PUBLIC HYANGMI CARD/);
+  assert.match(pdfGenerator, /CoffeeDex Taste Recap/);
+  assert.match(storyAssets, /PUBLIC COFFEEDEX CARD/);
   assert.match(storyAssets, /createPublicCardUrl/);
 });

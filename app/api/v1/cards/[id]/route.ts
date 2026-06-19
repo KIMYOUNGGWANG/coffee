@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/api-errors";
+import {
+  coffeeMemorySchema,
+  correctableCoffeeFieldSchema,
+  repurchaseIntentSchema,
+  repurchaseReasonSchema,
+  scanSourceSchema,
+} from "@/lib/coffee-memory";
 import { z } from "zod";
 
-// Zod schema for card updates (all fields optional)
+const packageClaimSchema = z.string().trim().min(1).max(160).nullable();
+const cardRowSchema = z.record(z.unknown());
+
 const updateCardSchema = z.object({
   title: z.string().min(1, "이름을 입력해주세요.").optional(),
   subtitle: z.string().min(1, "로스터리/브랜드를 입력해주세요.").optional(),
@@ -19,6 +28,29 @@ const updateCardSchema = z.object({
     date: z.string().optional(),
     extraInfo: z.string().optional(),
   }).optional(),
+  packageOrigin: packageClaimSchema.optional(),
+  packageProcess: packageClaimSchema.optional(),
+  repurchaseIntent: repurchaseIntentSchema.optional(),
+  repurchaseReasons: z.array(repurchaseReasonSchema).max(8).optional(),
+  scanSource: scanSourceSchema.nullable().optional(),
+  scanConfidence: z.number().min(0).max(1).nullable().optional(),
+  correctedFields: z.array(correctableCoffeeFieldSchema).max(5).optional(),
+  confirmed: z.literal(true).optional(),
+}).strict().superRefine((value, context) => {
+  const hasMemoryInput = value.packageOrigin !== undefined
+    || value.packageProcess !== undefined
+    || value.repurchaseIntent !== undefined
+    || value.repurchaseReasons !== undefined
+    || value.scanSource !== undefined
+    || value.scanConfidence !== undefined
+    || value.correctedFields !== undefined;
+  if (hasMemoryInput && value.confirmed !== true) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["confirmed"],
+      message: "커피 메모리를 저장하려면 명시적인 확인이 필요합니다.",
+    });
+  }
 });
 
 interface RouteParams {
@@ -44,7 +76,30 @@ type UpdateCardPayload = {
   tags?: string[];
   ai_description?: string;
   footer_meta?: CardFooterMeta;
+  package_origin?: string | null;
+  package_process?: string | null;
+  repurchase_intent?: "again" | "maybe" | "no" | "undecided";
+  repurchase_reasons?: string[];
+  scan_source?: "gemini" | "manual" | null;
+  scan_confidence?: number | null;
+  corrected_fields?: ("title" | "subtitle" | "package_origin" | "package_process" | "tags")[];
+  confirmed_at?: string;
 };
+
+function withMemoryDefaults(row: unknown) {
+  const parsedRow = cardRowSchema.parse(row);
+  const memory = coffeeMemorySchema.parse({
+    package_origin: parsedRow.package_origin,
+    package_process: parsedRow.package_process,
+    repurchase_intent: parsedRow.repurchase_intent,
+    repurchase_reasons: parsedRow.repurchase_reasons,
+    scan_source: parsedRow.scan_source,
+    scan_confidence: parsedRow.scan_confidence,
+    corrected_fields: parsedRow.corrected_fields,
+    confirmed_at: parsedRow.confirmed_at,
+  });
+  return { ...parsedRow, ...memory };
+}
 
 // GET /api/v1/cards/:id - Retrieve a single tasting card
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -66,6 +121,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .from("tasting_cards")
       .select("*")
       .eq("id", id)
+      .eq("user_id", user.id)
       .single();
 
     if (error || !data) {
@@ -75,7 +131,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    return NextResponse.json({ data });
+    return NextResponse.json({ data: withMemoryDefaults(data) });
   } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: 500, message: "서버 내부 오류가 발생했습니다.", details: getErrorMessage(error) } },
@@ -123,6 +179,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (validatedData.tags !== undefined) updatePayload.tags = validatedData.tags;
     if (validatedData.aiDescription !== undefined) updatePayload.ai_description = validatedData.aiDescription;
     if (validatedData.footerMeta !== undefined) updatePayload.footer_meta = validatedData.footerMeta;
+    if (validatedData.packageOrigin !== undefined) updatePayload.package_origin = validatedData.packageOrigin;
+    if (validatedData.packageProcess !== undefined) updatePayload.package_process = validatedData.packageProcess;
+    if (validatedData.repurchaseIntent !== undefined) updatePayload.repurchase_intent = validatedData.repurchaseIntent;
+    if (validatedData.repurchaseReasons !== undefined) updatePayload.repurchase_reasons = [...validatedData.repurchaseReasons];
+    if (validatedData.scanSource !== undefined) updatePayload.scan_source = validatedData.scanSource;
+    if (validatedData.scanConfidence !== undefined) updatePayload.scan_confidence = validatedData.scanConfidence;
+    if (validatedData.correctedFields !== undefined) updatePayload.corrected_fields = [...validatedData.correctedFields];
+    if (validatedData.confirmed) updatePayload.confirmed_at = new Date().toISOString();
 
     // Perform update. RLS ensures only owner updates.
     const { data, error } = await supabase
@@ -140,7 +204,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    return NextResponse.json({ data });
+    return NextResponse.json({ data: withMemoryDefaults(data) });
   } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: 500, message: "서버 내부 오류가 발생했습니다.", details: getErrorMessage(error) } },

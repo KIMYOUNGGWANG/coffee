@@ -56,7 +56,7 @@ async function readCapturedAnalyticsEvents(page: Page): Promise<readonly string[
   });
 }
 
-test.describe("Hyangmi product operations UX", () => {
+test.describe("CoffeeDex product operations UX", () => {
   test("tracks landing pricing intent and routes premium CTA into checkout intent", async ({ page }) => {
     await installAnalyticsCapture(page);
 

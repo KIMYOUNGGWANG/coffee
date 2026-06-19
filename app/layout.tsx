@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Providers } from "@/components/providers";
-import { hyangmiBrand } from "@/lib/brand";
+import { coffeeDexBrand } from "@/lib/brand";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: `${hyangmiBrand.name} — ${hyangmiBrand.category}`,
-  description: `${hyangmiBrand.englishTagline} Save coffee memories, review your taste map, and download digital artifacts.`,
+  title: `${coffeeDexBrand.name} — ${coffeeDexBrand.category}`,
+  description: `${coffeeDexBrand.englishTagline} Save coffee memories, review your taste map, and download digital artifacts.`,
 };
 
 export default function RootLayout({

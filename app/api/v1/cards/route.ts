@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/api-errors";
+import {
+  coffeeMemorySchema,
+  correctableCoffeeFieldSchema,
+  repurchaseIntentSchema,
+  repurchaseReasonSchema,
+  scanSourceSchema,
+} from "@/lib/coffee-memory";
 import { z } from "zod";
 
-// Zod schema to validate tasting card creation requests
+const packageClaimSchema = z.string().trim().min(1).max(160).nullable();
+const cardRowSchema = z.record(z.unknown());
+
 const createCardSchema = z.object({
   category: z.enum(["coffee", "beer", "whiskey", "wine"]),
   title: z.string().min(1, "이름을 입력해주세요."),
@@ -20,7 +29,45 @@ const createCardSchema = z.object({
     date: z.string().optional(),
     extraInfo: z.string().optional(),
   }).default({}),
+  packageOrigin: packageClaimSchema.optional(),
+  packageProcess: packageClaimSchema.optional(),
+  repurchaseIntent: repurchaseIntentSchema.optional(),
+  repurchaseReasons: z.array(repurchaseReasonSchema).max(8).optional(),
+  scanSource: scanSourceSchema.nullable().optional(),
+  scanConfidence: z.number().min(0).max(1).nullable().optional(),
+  correctedFields: z.array(correctableCoffeeFieldSchema).max(5).optional(),
+  confirmed: z.literal(true).optional(),
+}).strict().superRefine((value, context) => {
+  const hasMemoryInput = value.packageOrigin !== undefined
+    || value.packageProcess !== undefined
+    || value.repurchaseIntent !== undefined
+    || value.repurchaseReasons !== undefined
+    || value.scanSource !== undefined
+    || value.scanConfidence !== undefined
+    || value.correctedFields !== undefined;
+  if (hasMemoryInput && value.confirmed !== true) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["confirmed"],
+      message: "커피 메모리를 저장하려면 명시적인 확인이 필요합니다.",
+    });
+  }
 });
+
+function withMemoryDefaults(row: unknown) {
+  const parsedRow = cardRowSchema.parse(row);
+  const memory = coffeeMemorySchema.parse({
+    package_origin: parsedRow.package_origin,
+    package_process: parsedRow.package_process,
+    repurchase_intent: parsedRow.repurchase_intent,
+    repurchase_reasons: parsedRow.repurchase_reasons,
+    scan_source: parsedRow.scan_source,
+    scan_confidence: parsedRow.scan_confidence,
+    corrected_fields: parsedRow.corrected_fields,
+    confirmed_at: parsedRow.confirmed_at,
+  });
+  return { ...parsedRow, ...memory };
+}
 
 // GET /api/v1/cards - Retrieve tasting cards for authenticated user
 export async function GET(request: NextRequest) {
@@ -50,7 +97,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ data });
+    return NextResponse.json({ data: (data ?? []).map(withMemoryDefaults) });
   } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: 500, message: "서버 내부 오류가 발생했습니다.", details: getErrorMessage(error) } },
@@ -102,6 +149,14 @@ export async function POST(request: NextRequest) {
         tags: validatedData.tags,
         ai_description: validatedData.aiDescription,
         footer_meta: validatedData.footerMeta,
+        package_origin: validatedData.packageOrigin ?? null,
+        package_process: validatedData.packageProcess ?? null,
+        repurchase_intent: validatedData.repurchaseIntent ?? "undecided",
+        repurchase_reasons: validatedData.repurchaseReasons ?? [],
+        scan_source: validatedData.scanSource ?? null,
+        scan_confidence: validatedData.scanConfidence ?? null,
+        corrected_fields: validatedData.correctedFields ?? [],
+        confirmed_at: validatedData.confirmed ? new Date().toISOString() : null,
       })
       .select()
       .single();
@@ -113,7 +168,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ data }, { status: 201 });
+    return NextResponse.json({ data: withMemoryDefaults(data) }, { status: 201 });
   } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: 500, message: "서버 내부 오류가 발생했습니다.", details: getErrorMessage(error) } },

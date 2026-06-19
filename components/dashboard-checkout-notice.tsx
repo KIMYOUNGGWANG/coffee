@@ -18,16 +18,16 @@ const successNoticeContentByItemType = {
   pdf_book: {
     tone: "success",
     title: "PDF 테이스팅북 구매가 완료되었습니다",
-    description: "프로필과 카드 정보를 새로 확인했어요. Hyangmi Taste Passport 권한 반영을 준비했습니다.",
+    description: "프로필과 카드 정보를 새로 확인했어요. CoffeeDex Taste Passport 권한 반영을 준비했습니다.",
   },
   premium_subscription: {
     tone: "success",
-    title: "Hyangmi Premium 구독이 완료되었습니다",
+    title: "CoffeeDex Premium 구독이 완료되었습니다",
     description: "프로필과 카드 정보를 새로 확인했어요. 프리미엄 혜택 상태를 대시보드에 반영했습니다.",
   },
   credits_10: {
     tone: "success",
-    title: "Hyangmi 테이스팅 10팩 충전이 완료되었습니다",
+    title: "CoffeeDex 테이스팅 10팩 충전이 완료되었습니다",
     description: "프로필과 카드 정보를 새로 확인했어요. 추가 AI 스캔 크레딧을 대시보드에 반영했습니다.",
   },
   checkout: {

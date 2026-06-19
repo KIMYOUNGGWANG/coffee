@@ -265,21 +265,21 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
   };
 
   return (
-    <div className="fixed inset-0 bg-espresso/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-warm-gray rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-[620px] animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="glass-card border border-white/10 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-[620px] animate-in fade-in zoom-in-95 duration-200">
 
         {/* Left pane: Stepper tracker & inputs */}
-        <div className="flex-1 p-6 md:p-8 flex flex-col justify-between overflow-y-auto border-r border-warm-gray">
+        <div className="flex-1 p-6 md:p-8 flex flex-col justify-between overflow-y-auto border-r border-white/10">
 
           {/* Header */}
-          <div className="flex justify-between items-center pb-4 border-b border-warm-gray">
+          <div className="flex justify-between items-center pb-4 border-b border-white/10">
             <div>
-              <h2 className="text-xl font-bold font-serif text-espresso">새로운 테이스팅 카드</h2>
-              <p className="text-xs text-espresso/50 mt-0.5">내 커피 기록을 예쁜 카드로 아카이빙합니다.</p>
+              <h2 className="text-xl font-bold font-serif text-foreground">새로운 테이스팅 카드</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">내 커피 기록을 예쁜 카드로 아카이빙합니다.</p>
             </div>
             <button
               onClick={() => { clearWizardMessages(); resetForm(); onClose(); }}
-              className="p-1.5 rounded-full hover:bg-warm-gray/30 text-espresso/60 transition-colors"
+              className="p-1.5 rounded-full hover:bg-white/10 text-muted-foreground transition-colors"
             >
               <X size={18} />
             </button>
@@ -291,12 +291,12 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             {/* STEP 1: Basic Metadata */}
             {step === 1 && (
               <div className="space-y-4 animate-in slide-in-from-right-5 duration-200">
-                <h3 className="font-serif font-bold text-espresso text-base mb-2">1단계: 원두 및 추출 정보</h3>
+                <h3 className="font-serif font-bold text-foreground text-base mb-2">1단계: 원두 및 추출 정보</h3>
 
                 {initialTasteProfilePreset && (
                   <div
                     data-testid="taste-profile-prefill"
-                    className="border border-[#1f4651]/25 bg-[#e8f2f1] p-4 text-[#1f4651]"
+                    className="border border-white/10 bg-white/5 p-4 text-foreground"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -311,13 +311,13 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                       <Sparkles size={18} className="shrink-0" />
                     </div>
                     <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[11px] font-black">
-                      <span className="border border-[#1f4651]/20 bg-white/55 px-2 py-1">
+                      <span className="border border-white/10 bg-white/5 px-2 py-1">
                         산미 {form.metric1}
                       </span>
-                      <span data-testid="taste-profile-prefill-sweetness" className="border border-[#1f4651]/20 bg-white/55 px-2 py-1">
+                      <span data-testid="taste-profile-prefill-sweetness" className="border border-white/10 bg-white/5 px-2 py-1">
                         단맛 {form.metric2}
                       </span>
-                      <span className="border border-[#1f4651]/20 bg-white/55 px-2 py-1">
+                      <span className="border border-white/10 bg-white/5 px-2 py-1">
                         바디 {form.metric3}
                       </span>
                     </div>
@@ -325,20 +325,20 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                 )}
 
                 {/* AI Photo Scan Upload Panel */}
-                <div className="bg-[#faf9f6] border border-dashed border-caramel/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2">
+                <div className="bg-white/5 border border-dashed border-primary-amber/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2">
                   <div className="flex items-center gap-2">
-                    <Sparkles size={15} className="text-caramel animate-pulse" />
-                    <span className="text-xs font-bold text-espresso">AI 원두 패키지 사진 판독 (OCR)</span>
+                    <Sparkles size={15} className="text-primary-amber animate-pulse" />
+                    <span className="text-xs font-bold text-foreground">AI 원두 패키지 사진 판독 (OCR)</span>
                   </div>
-                  <p className="text-[10px] text-espresso/60 text-center leading-relaxed max-w-sm">
+                  <p className="text-[10px] text-muted-foreground text-center leading-relaxed max-w-sm">
                     패키지 뒷면이나 라벨 사진을 올리면 로스터리, 원산지, 프로세싱, 테이스팅 노트를 카드 초안으로 채웁니다. 저장 전 모든 항목을 검토하고 수정할 수 있어요.
                     {profile && (
-                      <span className="block mt-0.5 text-caramel font-semibold">
+                      <span className="block mt-0.5 text-primary-amber font-semibold">
                         {getScanAllowanceLabel()}
                       </span>
                     )}
                   </p>
-                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-caramel hover:bg-caramel/90 text-white rounded-xl text-[11px] font-bold cursor-pointer transition-all shadow-sm mt-1">
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-amber hover:bg-primary-amber/90 text-white rounded-xl text-[11px] font-bold cursor-pointer transition-all shadow-sm mt-1">
                     <ImageIcon size={13} />
                     <span>패키지 사진 촬영 / 업로드</span>
                     <input
@@ -350,7 +350,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                     />
                   </label>
                   {isScanning && (
-                    <div className="flex items-center gap-1.5 text-[10px] text-caramel font-semibold animate-pulse mt-1">
+                    <div className="flex items-center gap-1.5 text-[10px] text-primary-amber font-semibold animate-pulse mt-1">
                       <Loader2 size={12} className="animate-spin" />
                       <span>Gemini AI가 원두 라벨을 판독 중입니다...</span>
                     </div>
@@ -371,44 +371,44 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-espresso/70">원두 이름</label>
+                    <label className="text-xs font-semibold text-muted-foreground">원두 이름</label>
                     <input
                       type="text"
                       placeholder="예: 에티오피아 예가체프"
                       value={form.title}
                       onChange={(e) => updateForm({ title: e.target.value })}
-                      className="border border-warm-gray rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-caramel"
+                      className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-espresso/70">로스터리 브랜드</label>
+                    <label className="text-xs font-semibold text-muted-foreground">로스터리 브랜드</label>
                     <input
                       type="text"
                       placeholder="예: 블루보틀 커피"
                       value={form.subtitle}
                       onChange={(e) => updateForm({ subtitle: e.target.value })}
-                      className="border border-warm-gray rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-caramel"
+                      className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-espresso/70">원산지 (Origin)</label>
+                    <label className="text-xs font-semibold text-muted-foreground">원산지 (Origin)</label>
                     <input
                       type="text"
                       placeholder="예: 에티오피아"
                       value={form.origin}
                       onChange={(e) => updateForm({ origin: e.target.value })}
-                      className="border border-warm-gray rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-caramel"
+                      className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-espresso/70">추출 도구 (Method)</label>
+                    <label className="text-xs font-semibold text-muted-foreground">추출 도구 (Method)</label>
                     <select
                       value={form.extraInfo}
                       onChange={(e) => updateForm({ extraInfo: e.target.value })}
-                      className="border border-warm-gray rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-caramel bg-white"
+                      className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground bg-white"
                     >
                       <option value="">도구 선택</option>
                       {COFFEE_METHODS.map((m) => (
@@ -419,18 +419,18 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-espresso/70">원두 이미지 주소 (선택)</label>
+                  <label className="text-xs font-semibold text-muted-foreground">원두 이미지 주소 (선택)</label>
                   <div className="relative">
                     <input
                       type="text"
                       placeholder="https://example.com/image.jpg"
                       value={form.imageUrl || ""}
                       onChange={(e) => updateForm({ imageUrl: e.target.value || null })}
-                      className="border border-warm-gray rounded-xl pl-9 pr-3 py-2 text-sm w-full focus:outline-none focus:ring-1 focus:ring-caramel"
+                      className="border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm w-full focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground"
                     />
-                    <ImageIcon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-espresso/40" />
+                    <ImageIcon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
                   </div>
-                  <p className="text-[10px] text-espresso/45">배경이 깔끔한 사진의 URL을 입력하면 카드에 표시됩니다.</p>
+                  <p className="text-[10px] text-muted-foreground/60">배경이 깔끔한 사진의 URL을 입력하면 카드에 표시됩니다.</p>
                 </div>
               </div>
             )}
@@ -439,16 +439,16 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             {step === 2 && (
               <div className="space-y-6 animate-in slide-in-from-right-5 duration-200">
                 <div>
-                  <h3 className="font-serif font-bold text-espresso text-base">2단계: 핵심 테이스팅 수치</h3>
-                  <p className="text-[11px] text-espresso/50">원두 고유의 산미, 단맛, 바디감을 1~5점으로 표현해보세요.</p>
+                  <h3 className="font-serif font-bold text-foreground text-base">2단계: 핵심 테이스팅 수치</h3>
+                  <p className="text-[11px] text-muted-foreground">원두 고유의 산미, 단맛, 바디감을 1~5점으로 표현해보세요.</p>
                 </div>
 
                 <div className="space-y-5">
                   {/* Acidity */}
-                  <div className="flex flex-col gap-2 bg-cream/30 border border-warm-gray/40 p-3 rounded-2xl">
+                  <div className="flex flex-col gap-2 bg-white/5/30 border border-white/10/40 p-3 rounded-2xl">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-espresso">산미 (Acidity)</span>
-                      <span data-testid="metric1-value" className="text-xs font-bold text-caramel bg-caramel/10 px-2 py-0.5 rounded-full">{form.metric1}점</span>
+                      <span className="text-xs font-bold text-foreground">산미 (Acidity)</span>
+                      <span data-testid="metric1-value" className="text-xs font-bold text-primary-amber bg-primary-amber/10 px-2 py-0.5 rounded-full">{form.metric1}점</span>
                     </div>
                     <input
                       type="range"
@@ -457,19 +457,19 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                       step="1"
                       value={form.metric1}
                       onChange={(e) => updateForm({ metric1: parseInt(e.target.value) })}
-                      className="w-full accent-caramel cursor-pointer h-2 bg-warm-gray rounded-lg"
+                      className="w-full accent-primary-amber cursor-pointer h-2 bg-white/10 rounded-lg"
                     />
-                    <div className="flex justify-between text-[10px] text-espresso/40">
+                    <div className="flex justify-between text-[10px] text-muted-foreground/60">
                       <span>거의 없음 (고소함)</span>
                       <span>화사함 (과일 신맛)</span>
                     </div>
                   </div>
 
                   {/* Sweetness */}
-                  <div className="flex flex-col gap-2 bg-cream/30 border border-warm-gray/40 p-3 rounded-2xl">
+                  <div className="flex flex-col gap-2 bg-white/5/30 border border-white/10/40 p-3 rounded-2xl">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-espresso">단맛 (Sweetness)</span>
-                      <span data-testid="metric2-value" className="text-xs font-bold text-caramel bg-caramel/10 px-2 py-0.5 rounded-full">{form.metric2}점</span>
+                      <span className="text-xs font-bold text-foreground">단맛 (Sweetness)</span>
+                      <span data-testid="metric2-value" className="text-xs font-bold text-primary-amber bg-primary-amber/10 px-2 py-0.5 rounded-full">{form.metric2}점</span>
                     </div>
                     <input
                       type="range"
@@ -478,19 +478,19 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                       step="1"
                       value={form.metric2}
                       onChange={(e) => updateForm({ metric2: parseInt(e.target.value) })}
-                      className="w-full accent-caramel cursor-pointer h-2 bg-warm-gray rounded-lg"
+                      className="w-full accent-primary-amber cursor-pointer h-2 bg-white/10 rounded-lg"
                     />
-                    <div className="flex justify-between text-[10px] text-espresso/40">
+                    <div className="flex justify-between text-[10px] text-muted-foreground/60">
                       <span>드라이함 (쌉싸름)</span>
                       <span>설탕/캐러멜 단맛</span>
                     </div>
                   </div>
 
                   {/* Body */}
-                  <div className="flex flex-col gap-2 bg-cream/30 border border-warm-gray/40 p-3 rounded-2xl">
+                  <div className="flex flex-col gap-2 bg-white/5/30 border border-white/10/40 p-3 rounded-2xl">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-espresso">바디감 (Body)</span>
-                      <span data-testid="metric3-value" className="text-xs font-bold text-caramel bg-caramel/10 px-2 py-0.5 rounded-full">{form.metric3}점</span>
+                      <span className="text-xs font-bold text-foreground">바디감 (Body)</span>
+                      <span data-testid="metric3-value" className="text-xs font-bold text-primary-amber bg-primary-amber/10 px-2 py-0.5 rounded-full">{form.metric3}점</span>
                     </div>
                     <input
                       type="range"
@@ -499,9 +499,9 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                       step="1"
                       value={form.metric3}
                       onChange={(e) => updateForm({ metric3: parseInt(e.target.value) })}
-                      className="w-full accent-caramel cursor-pointer h-2 bg-warm-gray rounded-lg"
+                      className="w-full accent-primary-amber cursor-pointer h-2 bg-white/10 rounded-lg"
                     />
-                    <div className="flex justify-between text-[10px] text-espresso/40">
+                    <div className="flex justify-between text-[10px] text-muted-foreground/60">
                       <span>차처럼 가벼움</span>
                       <span>시럽처럼 묵직함</span>
                     </div>
@@ -514,15 +514,15 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             {step === 3 && (
               <div className="space-y-4 max-h-[380px] overflow-y-auto pr-1 animate-in slide-in-from-right-5 duration-200">
                 <div>
-                  <h3 className="font-serif font-bold text-espresso text-base">3단계: 향미 노트 태그 & 메모</h3>
-                  <p className="text-[11px] text-espresso/50">커피에서 느껴지는 향들을 고르고 감성적인 추가 메모를 남겨주세요.</p>
+                  <h3 className="font-serif font-bold text-foreground text-base">3단계: 향미 노트 태그 & 메모</h3>
+                  <p className="text-[11px] text-muted-foreground">커피에서 느껴지는 향들을 고르고 감성적인 추가 메모를 남겨주세요.</p>
                 </div>
 
                 {/* Preset Chips */}
                 <div className="space-y-3">
                   {PRESET_TAGS.map((group) => (
                     <div key={group.category} className="space-y-1.5">
-                      <h4 className="text-[10px] font-bold text-espresso/60 uppercase tracking-wider">{group.category}</h4>
+                      <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{group.category}</h4>
                       <div className="flex flex-wrap gap-1.5">
                         {group.items.map((tag) => {
                           const isSelected = form.tags.includes(tag);
@@ -533,8 +533,8 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                               onClick={() => isSelected ? removeTag(tag) : addTag(tag)}
                               className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-200 ${
                                 isSelected
-                                  ? "bg-caramel text-white border-caramel shadow-sm"
-                                  : "bg-white text-espresso/70 border-warm-gray hover:bg-warm-gray/20"
+                                  ? "bg-primary-amber text-white border-primary-amber shadow-sm"
+                                  : "bg-white text-muted-foreground border-white/10 hover:bg-white/10/20"
                               }`}
                             >
                               {tag}
@@ -548,12 +548,12 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
 
                 {/* Raw Memo input */}
                 <div className="flex flex-col gap-1.5 pt-2">
-                  <label className="text-xs font-semibold text-espresso/70">나만의 한 줄 짧은 일기 / 메모</label>
+                  <label className="text-xs font-semibold text-muted-foreground">나만의 한 줄 짧은 일기 / 메모</label>
                   <textarea
                     placeholder="예: 입안 가득 감귤 주스 같은 산뜻함이 가득함, 약간 식었을 때 홍차 느낌이 남."
                     value={form.rawNote}
                     onChange={(e) => updateForm({ rawNote: e.target.value })}
-                    className="border border-warm-gray rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-caramel h-16 resize-none"
+                    className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground h-16 resize-none"
                   />
                 </div>
               </div>
@@ -562,14 +562,14 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             {/* STEP 4: Review and Generate AI Note */}
             {step === 4 && (
               <div className="space-y-4 animate-in slide-in-from-right-5 duration-200">
-                <h3 className="font-serif font-bold text-espresso text-base">4단계: AI 컵노트 확인 & 발행</h3>
-                <p className="text-xs text-espresso/60 leading-relaxed">
+                <h3 className="font-serif font-bold text-foreground text-base">4단계: AI 컵노트 확인 & 발행</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   내가 기록한 커피 데이터와 일기를 바탕으로 AI가 SCA 전문 향미 휠 용어와 매칭하여 감성적인 컵 노트를 요약했습니다. 최종 결과를 확인하고 발행해주세요.
                 </p>
 
-                <div className="p-4 bg-cream/40 border border-warm-gray rounded-2xl">
-                  <span className="text-[10px] uppercase font-bold text-caramel tracking-wider">AI Cup Note Summary</span>
-                  <p className="font-serif text-sm italic text-espresso mt-1 leading-relaxed">
+                <div className="p-4 bg-white/5/40 border border-white/10 rounded-2xl">
+                  <span className="text-[10px] uppercase font-bold text-primary-amber tracking-wider">AI Cup Note Summary</span>
+                  <p className="font-serif text-sm italic text-foreground mt-1 leading-relaxed">
                     “{form.aiDescription || "향미 분석이 이루어지지 않았습니다. AI 재생성을 눌러주세요."}”
                   </p>
                 </div>
@@ -578,7 +578,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                   type="button"
                   onClick={handleGenerateAiNote}
                   disabled={isGeneratingAiNote}
-                  className="flex items-center justify-center gap-2 w-full py-2 bg-white hover:bg-warm-gray/10 text-caramel border border-caramel/40 rounded-xl text-xs font-bold transition-all"
+                  className="flex items-center justify-center gap-2 w-full py-2 bg-white hover:bg-white/10/10 text-primary-amber border border-primary-amber/40 rounded-xl text-xs font-bold transition-all"
                 >
                   {isGeneratingAiNote ? (
                     <>
@@ -614,21 +614,21 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
           )}
 
           {/* Stepper Footer actions */}
-          <div className="flex justify-between items-center border-t border-warm-gray pt-4">
+          <div className="flex justify-between items-center border-t border-white/10 pt-4">
             <div className="flex items-center gap-4">
               <button
                 type="button"
                 disabled={step === 1 || isGeneratingAiNote}
                 onClick={prevStep}
-                className="flex items-center gap-1.5 text-xs font-bold text-espresso/50 hover:text-espresso disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
               >
                 <ArrowLeft size={14} />
                 이전
               </button>
-              <div className="h-4 w-[1px] bg-warm-gray" />
+              <div className="h-4 w-[1px] bg-white/10" />
               <div className="flex flex-col text-left">
-                <span className="text-[9px] text-espresso/40 leading-none">AI 스캔 한도</span>
-                <span className="text-xs font-extrabold text-caramel leading-tight">
+                <span className="text-[9px] text-muted-foreground/60 leading-none">AI 스캔 한도</span>
+                <span className="text-xs font-extrabold text-primary-amber leading-tight">
                   {getCompactScanAllowanceLabel()}
                 </span>
               </div>
@@ -639,7 +639,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                 type="button"
                 onClick={nextStep}
                 disabled={step === 1 && (!form.title || !form.subtitle)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-espresso text-white rounded-xl text-xs font-bold hover:bg-espresso/80 disabled:opacity-40 transition-all shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 bg-white text-black rounded-xl text-xs font-bold hover:bg-white/90 disabled:opacity-40 transition-all shadow-sm"
               >
                 다음
                 <ArrowRight size={14} />
@@ -649,7 +649,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                 type="button"
                 onClick={handleGenerateAiNote}
                 disabled={form.tags.length === 0 || isGeneratingAiNote}
-                className="flex items-center gap-1.5 px-5 py-2.5 bg-caramel text-white rounded-xl text-xs font-bold hover:bg-caramel/80 disabled:opacity-40 transition-all shadow-md"
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-primary-amber text-white rounded-xl text-xs font-bold hover:bg-primary-amber/80 disabled:opacity-40 transition-all shadow-md"
               >
                 {isGeneratingAiNote ? (
                   <>
@@ -668,7 +668,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                 type="button"
                 onClick={handleSubmit}
                 disabled={createCardMutation.isPending}
-                className="flex items-center gap-1.5 px-6 py-2.5 bg-espresso hover:bg-espresso/90 text-white rounded-xl text-xs font-bold transition-all shadow-md"
+                className="flex items-center gap-1.5 px-6 py-2.5 bg-primary-amber hover:opacity-90 text-[#0D0A07] rounded-xl text-xs font-bold transition-all shadow-md"
               >
                 {createCardMutation.isPending ? (
                   <>
@@ -687,8 +687,8 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
         </div>
 
         {/* Right pane: Tasting Card Preview */}
-        <div className="flex-1 bg-warm-gray/20 p-6 md:p-8 flex items-center justify-center relative overflow-hidden">
-          <div className="absolute top-4 left-4 z-10 bg-white/75 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-espresso/60 border border-warm-gray">
+        <div className="flex-1 bg-white/10/20 p-6 md:p-8 flex items-center justify-center relative overflow-hidden">
+          <div className="absolute top-4 left-4 z-10 bg-white/75 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-muted-foreground border border-white/10">
             실시간 카드 프리뷰
           </div>
 
@@ -716,6 +716,14 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                   date: form.date,
                   extraInfo: form.extraInfo || "Brew Method",
                 },
+                package_origin: null,
+                package_process: null,
+                repurchase_intent: "undecided",
+                repurchase_reasons: [],
+                scan_source: null,
+                scan_confidence: null,
+                corrected_fields: [],
+                confirmed_at: null,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
               }}

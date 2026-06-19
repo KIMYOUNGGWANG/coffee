@@ -14,6 +14,14 @@ const cardsResponse = {
       metric1: 4,
       metric2: 5,
       metric3: 3,
+      package_origin: "Ethiopia Guji",
+      package_process: "Washed",
+      repurchase_intent: "again",
+      repurchase_reasons: ["향이 오래감"],
+      scan_source: "manual",
+      scan_confidence: null,
+      corrected_fields: [],
+      confirmed_at: "2026-06-14T01:23:45.000Z",
       subtitle: "Light Roast",
       tags: ["peach", "honey", "jasmine"],
       title: "Ethiopia Guji",
@@ -78,7 +86,7 @@ test.describe("Story image export", () => {
 
     await page.goto("/dashboard");
     await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();
-    await page.getByTitle("인스타그램 스토리 공유").click();
+    await page.getByRole("button", { name: "Ethiopia Guji 공유" }).click();
 
     const downloadPromise = page.waitForEvent("download", { timeout: 5_000 });
     await page.getByRole("button", { name: "Story 이미지 다운로드" }).click();
@@ -92,7 +100,7 @@ test.describe("Story image export", () => {
     });
 
     expect(dialogMessages).toEqual([]);
-    expect(download.suggestedFilename()).toBe("hyangmi-story-ethiopia-guji.svg");
+    expect(download.suggestedFilename()).toBe("coffeedex-story-ethiopia-guji.svg");
 
     const savedFile = await stat(downloadPath);
     expect(savedFile.size).toBeGreaterThan(0);

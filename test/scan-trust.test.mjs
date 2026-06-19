@@ -58,14 +58,21 @@ export function readStarterEnv() {
 function writeSupabaseMock(tempDirectory) {
   writeFileSync(
     path.join(tempDirectory, "mock-supabase.mjs"),
-    `export async function createServerSupabase() {
+    `const rpcCalls = [];
+
+export function getRpcCalls() {
+  return rpcCalls.map((call) => ({ ...call }));
+}
+
+export async function createServerSupabase() {
   return {
     auth: {
       getUser() {
         return Promise.resolve({ data: { user: { id: "user-1" } }, error: null });
       },
     },
-    rpc() {
+    rpc(functionName, args) {
+      rpcCalls.push({ functionName, args });
       return Promise.resolve({
         data: {
           allowed: true,
@@ -84,27 +91,30 @@ function writeSupabaseMock(tempDirectory) {
 }
 
 async function loadScanRoute() {
-  const tempDirectory = mkdtempSync(path.join(tmpdir(), "hyangmi-scan-trust-"));
+  const tempDirectory = mkdtempSync(path.join(tmpdir(), "coffeedex-scan-trust-"));
   const zodModuleUrl = pathToFileURL(path.join(projectRoot, "node_modules/zod/index.js")).href;
   writeNextResponseMock(tempDirectory);
   writeEnvMock(tempDirectory);
   writeSupabaseMock(tempDirectory);
+
+  const helperPath = path.join(projectRoot, "lib/guest-scan.ts");
+  const helperSource = read("lib/guest-scan.ts").replaceAll('"zod"', `"${zodModuleUrl}"`);
+  writeFileSync(path.join(tempDirectory, "guest-scan.mjs"), transpileTypescript(helperSource, helperPath));
 
   const routePath = path.join(projectRoot, "app/api/v1/cards/scan/route.ts");
   const routeSource = read("app/api/v1/cards/scan/route.ts")
     .replaceAll('"next/server"', '"./next-server.mjs"')
     .replaceAll('"zod"', `"${zodModuleUrl}"`)
     .replaceAll('"@/lib/supabase/server"', '"./mock-supabase.mjs"')
-    .replaceAll('"@/lib/env"', '"./mock-env.mjs"');
+    .replaceAll('"@/lib/env"', '"./mock-env.mjs"')
+    .replaceAll('"@/lib/guest-scan"', '"./guest-scan.mjs"');
 
-  writeFileSync(
-    path.join(tempDirectory, "route.mjs"),
-    transpileTypescript(routeSource, routePath),
-  );
+  writeFileSync(path.join(tempDirectory, "route.mjs"), transpileTypescript(routeSource, routePath));
 
   return {
     envMock: await import(pathToFileURL(path.join(tempDirectory, "mock-env.mjs"))),
     routeModule: await import(pathToFileURL(path.join(tempDirectory, "route.mjs"))),
+    supabaseMock: await import(pathToFileURL(path.join(tempDirectory, "mock-supabase.mjs"))),
   };
 }
 
@@ -112,14 +122,13 @@ function scanRequest() {
   return new Request("http://localhost/api/v1/cards/scan", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ image: "data:image/jpeg;base64,ZmFrZS1pbWFnZQ==" }),
+    body: JSON.stringify({ image: "data:image/jpeg;base64,/9j/" }),
   });
 }
 
 async function withFetchMock(fetchMock, action) {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = fetchMock;
-
   try {
     return await action();
   } finally {
@@ -131,20 +140,71 @@ async function parseJson(response) {
   return JSON.parse(await response.text());
 }
 
-function assertConfidence(value) {
-  assert.equal(typeof value, "number");
-  assert.ok(value > 0);
-  assert.ok(value <= 1);
-}
+test("Given an authenticated allowance, When scanning, Then the existing entitlement RPC remains pinned", async () => {
+  // Given
+  const { routeModule, supabaseMock } = await loadScanRoute();
 
-test("Given no AI key, When scanning, Then the mock fallback includes confidence and source", async () => {
+  // When
+  const response = await withFetchMock(
+    () => { throw new Error("provider must not run without a key"); },
+    () => routeModule.POST(scanRequest()),
+  );
+
+  // Then
+  assert.equal(response.status, 200);
+  const body = await parseJson(response);
+  assert.equal(body.entitlement.source, "monthly_allowance");
+  assert.deepEqual(supabaseMock.getRpcCalls(), [
+    { functionName: "increment_user_scan", args: { target_user_id: "user-1" } },
+  ]);
+});
+
+test("Given no provider key, When scanning, Then CoffeeDex returns an explicit manual unavailable state", async () => {
   // Given
   const { routeModule } = await loadScanRoute();
 
   // When
   const response = await withFetchMock(
-    () => {
-      throw new Error("fetch should not be called for no-key fallback scans");
+    () => { throw new Error("provider must not run without a key"); },
+    () => routeModule.POST(scanRequest()),
+  );
+
+  // Then
+  assert.equal(response.status, 200);
+  const body = await parseJson(response);
+  assert.deepEqual(body.data, {
+    kind: "unavailable",
+    reason: "provider_unconfigured",
+    manual_entry: true,
+  });
+});
+
+test("Given only a visible coffee title, When Gemini responds, Then unknown package claims stay null", async () => {
+  // Given
+  const { envMock, routeModule } = await loadScanRoute();
+  envMock.setAiApiKey("test-ai-key");
+  let providerRequestBody;
+
+  // When
+  const response = await withFetchMock(
+    (_url, init) => {
+      providerRequestBody = JSON.parse(init.body);
+      return Promise.resolve(Response.json({
+        candidates: [{ content: { parts: [{ text: JSON.stringify({
+          title: "Colombia La Esperanza",
+          subtitle: null,
+          origin: null,
+          process: null,
+          tags: null,
+          uncertainty: {
+            title: 0.08,
+            subtitle: null,
+            origin: null,
+            process: null,
+            tags: null,
+          },
+        }) }] } }],
+      }));
     },
     () => routeModule.POST(scanRequest()),
   );
@@ -152,38 +212,42 @@ test("Given no AI key, When scanning, Then the mock fallback includes confidence
   // Then
   assert.equal(response.status, 200);
   const body = await parseJson(response);
-  assert.equal(body.data.source, "fallback_mock");
-  assertConfidence(body.data.confidence);
-  assert.match(body.warning, /내장|fallback|mock/i);
+  assert.equal(body.data.kind, "success");
+  assert.equal(body.data.title, "Colombia La Esperanza");
+  assert.equal(body.data.subtitle, null);
+  assert.equal(body.data.origin, null);
+  assert.equal(body.data.process, null);
+  assert.equal(body.data.tags, null);
+  assert.deepEqual(body.data.uncertainty, {
+    title: 0.08,
+    subtitle: null,
+    origin: null,
+    process: null,
+    tags: null,
+  });
+  assert.equal("metric1_acidity" in body.data, false);
+  assert.equal("metric2_sweetness" in body.data, false);
+  assert.equal("metric3_body" in body.data, false);
+  assert.doesNotMatch(JSON.stringify(providerRequestBody), /educated estimates|metric[123]/i);
 });
 
-test("Given Gemini omits trust fields, When scanning, Then confidence and source are normalized", async () => {
+test("Given the provider fails, When scanning, Then no sample coffee is fabricated", async () => {
   // Given
   const { envMock, routeModule } = await loadScanRoute();
   envMock.setAiApiKey("test-ai-key");
-  const geminiPayload = {
-    title: "Colombia Huila Monteblanco Purple Caturra",
-    subtitle: "프릳츠 커피",
-    origin: "Colombia",
-    process: "Anaerobic",
-    tags: ["Berry", "Chocolate"],
-    metric1_acidity: 3,
-    metric2_sweetness: 5,
-    metric3_body: 4,
-  };
 
   // When
   const response = await withFetchMock(
-    () => Promise.resolve(Response.json({
-      candidates: [{ content: { parts: [{ text: JSON.stringify(geminiPayload) }] } }],
-    })),
+    () => Promise.resolve(new Response("outage", { status: 503 })),
     () => routeModule.POST(scanRequest()),
   );
 
   // Then
   assert.equal(response.status, 200);
   const body = await parseJson(response);
-  assert.equal(body.data.title, geminiPayload.title);
-  assert.equal(body.data.source, "gemini_vision");
-  assertConfidence(body.data.confidence);
+  assert.deepEqual(body.data, {
+    kind: "unavailable",
+    reason: "provider_error",
+    manual_entry: true,
+  });
 });

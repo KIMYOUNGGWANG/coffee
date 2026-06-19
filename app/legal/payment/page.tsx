@@ -5,7 +5,7 @@ export default function PaymentNoticePage() {
     <LegalDocument
       title="결제 및 환불 고지"
       updatedAt="2026년 6월 15일"
-      summary="Hyangmi의 유료 기능은 Stripe Checkout을 통해 결제되며, 결제 전 상품명·금액·구독 여부를 다시 확인할 수 있습니다."
+      summary="CoffeeDex의 유료 기능은 Stripe Checkout을 통해 결제되며, 결제 전 상품명·금액·구독 여부를 다시 확인할 수 있습니다."
       sections={[
         {
           title: "가격",

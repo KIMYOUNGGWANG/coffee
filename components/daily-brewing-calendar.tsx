@@ -236,16 +236,16 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
           className={cn(
             "aspect-[7/6] p-1.5 md:p-2 border-r border-b border-sand/40 flex flex-col justify-between items-start transition-all",
             isCurrentMonthDay
-              ? "bg-white hover:bg-canvas/50 cursor-pointer"
-              : "bg-canvas/20 text-espresso/20",
-            isToday && "bg-[#b87d4b]/5 border-2 border-caramel/40"
+              ? "glass-card hover:bg-white/5 cursor-pointer"
+              : "bg-black/20 text-muted-foreground/30",
+            isToday && "bg-primary-amber/5 border-2 border-primary-amber/50"
           )}
         >
           {isCurrentMonthDay ? (
             <>
               <span className={cn(
                 "text-xs font-bold font-mono",
-                isToday ? "text-caramel" : "text-espresso/60"
+                isToday ? "text-primary-amber" : "text-muted-foreground"
               )}>
                 {dayNumber}
               </span>
@@ -256,7 +256,7 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                     <div
                       key={log.id}
                       title={`${log.coffee_shelf_items?.bean_name || "원두"} (${log.method})`}
-                      className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#b87d4b] text-white flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+                      className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-primary-amber text-[#0D0A07] flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
                     >
                       <Coffee size={10} className="md:scale-110" />
                     </div>
@@ -276,31 +276,31 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
   return (
     <div className="space-y-6">
       {/* Header with navigation */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-sand pb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border pb-4">
         <div>
-          <h2 className="text-xl font-bold font-serif text-espresso flex items-center gap-2">
-            <CalendarIcon className="text-caramel" size={20} />
+          <h2 className="text-xl font-bold font-serif text-foreground flex items-center gap-2">
+            <CalendarIcon className="text-primary-amber" size={20} />
             데일리 드링킹 다이어리 (Brewing Diary)
           </h2>
-          <p className="text-xs text-cocoa mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             캘린더를 통해 하루 동안 마신 스페셜티 커피의 기록을 수집하고, 바리스타 스탬프를 가꿔보세요.
           </p>
         </div>
 
         {/* Date Selector */}
-        <div className="flex items-center gap-2 bg-white border border-sand px-3 py-1.5 rounded-xl shadow-sm self-stretch sm:self-auto justify-between">
+        <div className="flex items-center gap-2 bg-black/20 border border-white/10 px-3 py-1.5 rounded-xl shadow-sm self-stretch sm:self-auto justify-between">
           <button
             onClick={handlePrevMonth}
-            className="w-8 h-8 rounded-lg hover:bg-canvas flex items-center justify-center border-none bg-transparent cursor-pointer"
+            className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center border-none bg-transparent cursor-pointer text-muted-foreground hover:text-foreground"
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-xs font-bold font-serif text-espresso px-4 min-w-[80px] text-center">
+          <span className="text-xs font-bold font-serif text-foreground px-4 min-w-[80px] text-center">
             {currentDate.getFullYear()}년 {monthNames[currentDate.getMonth()]}
           </span>
           <button
             onClick={handleNextMonth}
-            className="w-8 h-8 rounded-lg hover:bg-canvas flex items-center justify-center border-none bg-transparent cursor-pointer"
+            className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center border-none bg-transparent cursor-pointer text-muted-foreground hover:text-foreground"
           >
             <ChevronRight size={16} />
           </button>
@@ -308,21 +308,21 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-24 space-y-3 bg-white border border-sand rounded-3xl">
-          <Loader2 className="animate-spin text-caramel" size={32} />
-          <p className="text-xs text-cocoa font-medium">드링킹 캘린더를 로드하는 중입니다...</p>
+        <div className="flex flex-col items-center justify-center py-24 space-y-3 glass-card rounded-3xl">
+          <Loader2 className="animate-spin text-primary-amber" size={32} />
+          <p className="text-xs text-muted-foreground font-medium">드링킹 캘린더를 로드하는 중입니다...</p>
         </div>
       ) : (
         /* Calendar Grid */
-        <div className="bg-white border border-sand/70 rounded-3xl overflow-hidden shadow-sm">
+        <div className="glass-card rounded-3xl overflow-hidden shadow-sm">
           {/* Days of Week Header */}
-          <div className="grid grid-cols-7 bg-canvas/30 border-b border-sand/40 text-center py-2 text-[10px] uppercase font-bold text-cocoa tracking-wider">
+          <div className="grid grid-cols-7 bg-black/40 border-b border-white/10 text-center py-2 text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
             {["일", "월", "화", "수", "목", "금", "토"].map((dayName, idx) => (
               <div
                 key={idx}
                 className={cn(
-                  idx === 0 && "text-[#d9463e]",
-                  idx === 6 && "text-espresso/60"
+                  idx === 0 && "text-red-400",
+                  idx === 6 && "text-muted-foreground"
                 )}
               >
                 {dayName}
@@ -331,7 +331,7 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
           </div>
 
           {/* Calendar Day Grid Cells */}
-          <div className="grid grid-cols-7 border-l border-t border-sand/20">
+          <div className="grid grid-cols-7 border-l border-t border-white/10">
             {renderCalendarCells()}
           </div>
         </div>
@@ -339,29 +339,29 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
 
       {/* dialog for CREATING brewing log */}
       {isLogDialogOpen && (
-        <div className="fixed inset-0 bg-[#2c1d11]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-sand rounded-3xl max-w-md w-full p-6 shadow-[0_20px_50px_rgba(44,29,17,0.12)] space-y-4 relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass-card max-w-md w-full p-6 shadow-2xl space-y-4 relative animate-in fade-in zoom-in-95 duration-200">
             <button
               onClick={() => setIsLogDialogOpen(false)}
-              className="absolute top-4 right-4 p-1 rounded-lg text-cocoa hover:text-espresso hover:bg-canvas transition-colors border-none bg-transparent cursor-pointer"
+              className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors border-none bg-transparent cursor-pointer"
             >
               <X size={18} />
             </button>
 
             <div className="space-y-1">
-              <h3 className="font-serif font-bold text-espresso text-lg">
+              <h3 className="font-serif font-bold text-foreground text-lg">
                 {selectedDate && `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`} 브루잉 기록
               </h3>
-              <p className="text-[11px] text-cocoa">선택한 날짜에 추출한 커피 레시피와 노트를 저장합니다.</p>
+              <p className="text-[11px] text-muted-foreground">선택한 날짜에 추출한 커피 레시피와 노트를 저장합니다.</p>
             </div>
 
             <form onSubmit={handleCreateLog} className="space-y-4 pt-2">
               <div className="space-y-1">
-                <label htmlFor="bean-select" className="text-xs font-bold text-espresso">사용 원두 *</label>
+                <label htmlFor="bean-select" className="text-xs font-bold text-foreground">사용 원두 *</label>
                 {activeShelfItems.length > 0 ? (
                   <select
                     id="bean-select"
-                    className="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber"
                     value={shelfItemId}
                     onChange={(e) => setShelfItemId(e.target.value)}
                     required
@@ -373,7 +373,7 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                     ))}
                   </select>
                 ) : (
-                  <div className="text-xs text-[#d9463e] border border-[#d9463e]/20 bg-[#d9463e]/5 p-2 rounded-lg font-semibold">
+                  <div className="text-xs text-red-400 border border-red-500/20 bg-red-500/10 p-2 rounded-lg font-semibold">
                     보관함에 등록된 활성 원두가 없습니다. 원두를 먼저 등록해 주세요!
                   </div>
                 )}
@@ -381,10 +381,10 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label htmlFor="brew-method" className="text-xs font-semibold text-cocoa">추출 방식 *</label>
+                  <label htmlFor="brew-method" className="text-xs font-semibold text-muted-foreground">추출 방식 *</label>
                   <select
                     id="brew-method"
-                    className="w-full bg-white border border-sand rounded-lg px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber"
                     value={method}
                     onChange={(e) => setMethod(e.target.value)}
                   >
@@ -395,16 +395,16 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                 </div>
                 
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-cocoa block">별점 (만족도)</span>
+                  <span className="text-xs font-semibold text-muted-foreground block">별점 (만족도)</span>
                   <div className="flex gap-1 items-center h-9">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
                         type="button"
                         onClick={() => setRating(star)}
-                        className="text-caramel hover:scale-115 transition-transform border-none bg-transparent cursor-pointer"
+                        className="text-primary-amber hover:scale-110 transition-transform border-none bg-transparent cursor-pointer"
                       >
-                        <Star size={18} fill={rating >= star ? "#b87d4b" : "none"} strokeWidth={1.5} />
+                        <Star size={18} fill={rating >= star ? "#d9a05b" : "none"} strokeWidth={1.5} />
                       </button>
                     ))}
                   </div>
@@ -412,14 +412,14 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
               </div>
 
               {/* Brewing Parameters Grid */}
-              <div className="bg-[#f7f7f4] p-3.5 rounded-xl border border-sand/50 space-y-3">
-                <h4 className="text-[10px] uppercase font-bold text-caramel tracking-wider flex items-center gap-1">
+              <div className="bg-white/5 p-3.5 rounded-xl border border-white/10 space-y-3">
+                <h4 className="text-[10px] uppercase font-bold text-primary-amber tracking-wider flex items-center gap-1">
                   <Clock size={12} />
                   세부 추출 파라미터 (선택)
                 </h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label htmlFor="temp" className="text-[10px] text-cocoa font-medium flex items-center gap-1">
+                    <label htmlFor="temp" className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
                       <Thermometer size={11} /> 물 온도 (°C)
                     </label>
                     <input
@@ -428,11 +428,11 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                       placeholder="예: 92"
                       value={waterTemp}
                       onChange={e => setWaterTemp(e.target.value)}
-                      className="w-full bg-white border border-sand rounded-xl px-3 py-1.5 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/30"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="water" className="text-[10px] text-cocoa font-medium flex items-center gap-1">
+                    <label htmlFor="water" className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
                       <Droplet size={11} /> 추출 양 (g / ml)
                     </label>
                     <input
@@ -441,11 +441,11 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                       placeholder="예: 300"
                       value={waterAmount}
                       onChange={e => setWaterAmount(e.target.value)}
-                      className="w-full bg-white border border-sand rounded-xl px-3 py-1.5 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/30"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="coffee-weight" className="text-[10px] text-cocoa font-medium flex items-center gap-1">
+                    <label htmlFor="coffee-weight" className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
                       <Layers size={11} /> 원두 무게 (g)
                     </label>
                     <input
@@ -454,11 +454,11 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                       placeholder="예: 20"
                       value={coffeeAmount}
                       onChange={e => setCoffeeAmount(e.target.value)}
-                      className="w-full bg-white border border-sand rounded-xl px-3 py-1.5 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/30"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="grind" className="text-[10px] text-cocoa font-medium flex items-center gap-1">
+                    <label htmlFor="grind" className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
                       🎚️ 분쇄도 (Grind)
                     </label>
                     <input
@@ -466,36 +466,36 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                       placeholder="예: Medium"
                       value={grindSize}
                       onChange={e => setGrindSize(e.target.value)}
-                      className="w-full bg-white border border-sand rounded-xl px-3 py-1.5 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                      className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/30"
                     />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="note" className="text-xs font-semibold text-cocoa">한 줄 감상 메모</label>
+                <label htmlFor="note" className="text-xs font-semibold text-muted-foreground">한 줄 감상 메모</label>
                 <input
                   id="note"
                   placeholder="예: 화사한 자스민 아로마, 깔끔한 후미가 돋보였습니다."
                   value={simpleNote}
                   onChange={e => setSimpleNote(e.target.value)}
-                  className="w-full bg-white border border-sand rounded-xl px-3 py-2 text-xs text-espresso focus:outline-none focus:ring-2 focus:ring-caramel/20 focus:border-caramel"
+                  className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/30"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-sand/40">
+              <div className="flex justify-end gap-2 pt-4 border-t border-white/10">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setIsLogDialogOpen(false)}
-                  className="rounded-xl text-xs h-9 cursor-pointer"
+                  className="rounded-xl text-xs h-9 cursor-pointer border-white/20 text-muted-foreground hover:bg-white/10 hover:text-foreground"
                 >
                   취소
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting || activeShelfItems.length === 0}
-                  className="bg-espresso text-white rounded-xl text-xs h-9 font-bold cursor-pointer"
+                  className="bg-primary-amber hover:opacity-90 text-[#0D0A07] rounded-xl text-xs h-9 font-bold cursor-pointer border-none"
                 >
                   {isSubmitting ? (
                     <>
@@ -512,71 +512,71 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
 
       {/* dialog for viewing DETAIL and DELETING brewing log */}
       {isDetailDialogOpen && (
-        <div className="fixed inset-0 bg-[#2c1d11]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-sand rounded-3xl max-w-md w-full p-6 shadow-[0_20px_50px_rgba(44,29,17,0.12)] space-y-4 relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass-card max-w-md w-full p-6 shadow-2xl space-y-4 relative animate-in fade-in zoom-in-95 duration-200">
             <button
               onClick={() => setIsDetailDialogOpen(false)}
-              className="absolute top-4 right-4 p-1 rounded-lg text-cocoa hover:text-espresso hover:bg-canvas transition-colors border-none bg-transparent cursor-pointer"
+              className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors border-none bg-transparent cursor-pointer"
             >
               <X size={18} />
             </button>
 
             <div className="space-y-1">
-              <h3 className="font-serif font-bold text-espresso text-lg">
+              <h3 className="font-serif font-bold text-foreground text-lg">
                 {selectedDate && `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`} 커피 로그
               </h3>
-              <p className="text-[11px] text-cocoa">선택한 날짜에 기록된 추출 정보 목록입니다.</p>
+              <p className="text-[11px] text-muted-foreground">선택한 날짜에 기록된 추출 정보 목록입니다.</p>
             </div>
             
             <div className="space-y-4 py-2 max-h-[300px] overflow-y-auto scrollbar-none">
               {selectedDayLogs.map((log) => (
-                <div key={log.id} className="border border-sand rounded-xl p-4 bg-[#f7f7f4]/40 space-y-3">
+                <div key={log.id} className="border border-white/10 rounded-xl p-4 bg-white/5 space-y-3">
                   <div className="flex justify-between items-start">
                     <div>
                       {log.coffee_shelf_items && (
-                        <p className="text-[10px] uppercase font-bold text-caramel tracking-wider">
+                        <p className="text-[10px] uppercase font-bold text-primary-amber tracking-wider">
                           {log.coffee_shelf_items.roaster_name}
                         </p>
                       )}
-                      <h4 className="font-bold text-espresso font-serif text-sm">
+                      <h4 className="font-bold text-foreground font-serif text-sm">
                         {log.coffee_shelf_items ? log.coffee_shelf_items.bean_name : "삭제된 원두"}
                       </h4>
                     </div>
-                    <span className="text-[10px] bg-espresso text-white font-bold px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] bg-primary-amber text-[#0D0A07] font-bold px-2 py-0.5 rounded-full">
                       {log.method}
                     </span>
                   </div>
 
                   {log.rating && (
-                    <div className="flex gap-0.5 items-center">
+                     <div className="flex gap-0.5 items-center">
                       {Array.from({ length: 5 }).map((_, idx) => (
                         <Star
                           key={idx}
                           size={12}
-                          className="text-caramel"
-                          fill={log.rating! > idx ? "#b87d4b" : "none"}
+                          className="text-primary-amber"
+                          fill={log.rating! > idx ? "#d9a05b" : "none"}
                         />
                       ))}
                     </div>
                   )}
 
-                  <div className="grid grid-cols-3 gap-2 text-[10px] text-cocoa bg-white p-2 rounded-lg border border-sand/40 font-mono">
+                  <div className="grid grid-cols-3 gap-2 text-[10px] text-foreground bg-black/20 p-2 rounded-lg border border-white/5 font-mono">
                     <div className="flex items-center gap-1">
-                      <Thermometer size={10} className="text-caramel/70" />
+                      <Thermometer size={10} className="text-primary-amber" />
                       <span>온도: {log.parameters?.waterTemp ? `${log.parameters.waterTemp}°C` : "-"}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Droplet size={10} className="text-caramel/70" />
+                      <Droplet size={10} className="text-primary-amber" />
                       <span>추출: {log.parameters?.waterAmount ? `${log.parameters.waterAmount}g` : "-"}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Layers size={10} className="text-caramel/70" />
+                      <Layers size={10} className="text-primary-amber" />
                       <span>원두: {log.parameters?.coffeeAmount ? `${log.parameters.coffeeAmount}g` : "-"}</span>
                     </div>
                   </div>
 
                   {log.simple_note && (
-                    <p className="text-xs text-espresso/80 leading-relaxed italic border-l-2 border-caramel/30 pl-2">
+                    <p className="text-xs text-muted-foreground leading-relaxed italic border-l-2 border-primary-amber/30 pl-2">
                       "{log.simple_note}"
                     </p>
                   )}
@@ -584,7 +584,7 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                   <div className="flex justify-end pt-2">
                     <button
                       onClick={() => handleDeleteLog(log.id)}
-                      className="text-cocoa hover:text-[#d9463e] hover:bg-[#d9463e]/5 rounded-lg h-8 px-2 text-[11px] font-bold flex items-center gap-1 transition-colors border-none bg-transparent cursor-pointer"
+                      className="text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg h-8 px-2 text-[11px] font-bold flex items-center gap-1 transition-colors border-none bg-transparent cursor-pointer"
                     >
                       <Trash2 size={12} />
                       로그 삭제
@@ -594,11 +594,11 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
               ))}
             </div>
 
-            <div className="flex justify-end gap-2 pt-4 border-t border-sand/40">
+            <div className="flex justify-end gap-2 pt-4 border-t border-white/10">
               <Button
                 variant="outline"
                 onClick={() => setIsDetailDialogOpen(false)}
-                className="rounded-xl text-xs h-9 cursor-pointer"
+                className="rounded-xl text-xs h-9 cursor-pointer border-white/20 text-muted-foreground hover:bg-white/10 hover:text-foreground"
               >
                 닫기
               </Button>
@@ -611,7 +611,7 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                   }
                   setIsLogDialogOpen(true);
                 }}
-                className="bg-espresso text-white rounded-xl text-xs h-9 font-bold cursor-pointer"
+                className="bg-primary-amber hover:opacity-90 text-[#0D0A07] rounded-xl text-xs h-9 font-bold cursor-pointer border-none"
               >
                 추가 추출 기록하기
               </Button>

@@ -3,8 +3,8 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { promises as fs } from "fs";
 import path from "path";
-import { hyangmiBrand } from "@/lib/brand";
-import { generateHyangmiTastePassportPdf } from "@/lib/pdf-generator";
+import { coffeeDexBrand } from "@/lib/brand";
+import { generateCoffeeDexTastePassportPdf } from "@/lib/pdf-generator";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 const profileSchema = z.object({
@@ -97,15 +97,15 @@ export async function GET(request: NextRequest) {
     }
 
     const exportedAt = new Date().toISOString();
-    const ownerLabel = user.email?.split("@")[0] ?? "Hyangmi user";
-    const pdfUint8Array = await generateHyangmiTastePassportPdf({
+    const ownerLabel = user.email?.split("@")[0] ?? "CoffeeDex user";
+    const pdfUint8Array = await generateCoffeeDexTastePassportPdf({
       ownerLabel,
       exportedAt,
       cards: cardsResult.data,
     }, fontBuffer);
     
     const pdfBuffer = Buffer.from(pdfUint8Array);
-    const filename = `${hyangmiBrand.filenameSlug}-taste-passport-${exportedAt.slice(0, 10)}.pdf`;
+    const filename = `${coffeeDexBrand.filenameSlug}-taste-passport-${exportedAt.slice(0, 10)}.pdf`;
 
     return new NextResponse(pdfBuffer, {
       status: 200,

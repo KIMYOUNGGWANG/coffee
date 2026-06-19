@@ -30,6 +30,14 @@ const cardsResponse = {
     {
       ...publicCardResponse.data,
       is_public: false,
+      package_origin: "Ethiopia Guji",
+      package_process: "Washed",
+      repurchase_intent: "again",
+      repurchase_reasons: ["공유하고 싶은 컵"],
+      scan_source: "manual",
+      scan_confidence: null,
+      corrected_fields: [],
+      confirmed_at: "2026-06-14T01:23:45.000Z",
       user_id: "private-user-id",
     },
   ],
@@ -91,6 +99,10 @@ async function mockDashboardApiRoutes(page: Page): Promise<void> {
         await fulfillJson(route, subscriptionResponse);
         return;
       case "/api/v1/cards/public-card-001/share":
+        if (route.request().method() === "DELETE") {
+          await fulfillJson(route, { data: { revoked: true } });
+          return;
+        }
         await fulfillJson(route, {
           data: {
             publicShareToken: "public-token-001",
@@ -131,20 +143,17 @@ test.describe("public card sharing", () => {
     await page.goto("/cards/public-token-001");
 
     // Then
-    await expect(page.getByText("Hyangmi 공개 테이스팅 카드")).toBeVisible();
+    await expect(page.getByText("CoffeeDex 공개 테이스팅 카드")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();
     await expect(page.getByText("프릳츠 커피")).toBeVisible();
     await expect(page.getByText("복숭아와 꿀의 단맛")).toBeVisible();
-    await expect(page.getByRole("link", { name: "내 Hyangmi Taste Card 만들기" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "내 CoffeeDex Taste Card 만들기" })).toBeVisible();
     await expect(page.locator("body")).not.toContainText("private-user-id");
     await captureEvidenceScreenshot(page, publicShareScreenshotPath);
   });
 
   test("publishes and copies a public card link from the story modal", async ({ page }) => {
     // Given
-    await page.context().grantPermissions(["clipboard-read", "clipboard-write"], {
-      origin: "http://127.0.0.1:3000",
-    });
     await mockDashboardApiRoutes(page);
 
     // When
@@ -153,11 +162,39 @@ test.describe("public card sharing", () => {
     });
     await page.goto("/dashboard");
     await cardsResponse;
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"], {
+      origin: new URL(page.url()).origin,
+    });
     await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();
-    await page.getByTitle("인스타그램 스토리 공유").click();
+    await page.getByRole("button", { name: "Ethiopia Guji 공유" }).click();
     await page.getByRole("button", { name: "공개 카드 링크 복사" }).click();
 
     // Then
     await expect(page.getByText("공개 링크 복사 완료")).toBeVisible();
+  });
+
+  test("revokes a public card link from the story modal", async ({ page }) => {
+    // Given
+    await mockDashboardApiRoutes(page);
+    await page.goto("/dashboard");
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"], {
+      origin: new URL(page.url()).origin,
+    });
+    await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();
+    await page.getByRole("button", { name: "Ethiopia Guji 공유" }).click();
+    await page.getByRole("button", { name: "공개 카드 링크 복사" }).click();
+    await expect(page.getByRole("button", { name: "공개 링크 해제" })).toBeVisible();
+
+    // When
+    const revokeResponse = page.waitForResponse((response) => {
+      return response.url().includes("/api/v1/cards/public-card-001/share")
+        && response.request().method() === "DELETE";
+    });
+    await page.getByRole("button", { name: "공개 링크 해제" }).click();
+    await revokeResponse;
+
+    // Then
+    await expect(page.getByRole("status")).toHaveText("공개 링크가 해제되었습니다.");
+    await expect(page.getByRole("button", { name: "공개 링크 해제" })).toBeHidden();
   });
 });

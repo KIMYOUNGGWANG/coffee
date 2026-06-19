@@ -83,33 +83,33 @@ export default function BillingSupportForm() {
   return (
     <form
       onSubmit={submitSupportRequest}
-      className="rounded-3xl border border-warm-gray bg-white p-6 shadow-sm"
+      className="rounded-3xl border border-white/10 glass-card p-6 shadow-sm"
     >
       <div className="space-y-1">
-        <p className="text-[11px] font-extrabold tracking-wide text-caramel">고객지원 접수</p>
+        <p className="text-[11px] font-extrabold tracking-wide text-primary-amber">고객지원 접수</p>
         <h2 className="font-serif text-2xl font-bold">문의 접수</h2>
-        <p className="text-xs leading-relaxed text-espresso/55">
+        <p className="text-xs leading-relaxed text-muted-foreground">
           결제 기록 확인에 필요한 정보를 남겨주세요. 카드 전체 번호는 입력하지 마세요.
         </p>
       </div>
 
       <div className="mt-5 grid gap-4">
-        <label className="grid gap-1.5 text-xs font-bold text-espresso/70">
+        <label className="grid gap-1.5 text-xs font-bold text-muted-foreground">
           이메일
           <input
             name="email"
             type="email"
             required
-            className="rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2.5 text-sm text-espresso outline-none focus:border-caramel"
+            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary-amber"
             placeholder="minji@example.com"
           />
         </label>
 
-        <label className="grid gap-1.5 text-xs font-bold text-espresso/70">
+        <label className="grid gap-1.5 text-xs font-bold text-muted-foreground">
           문의 유형
           <select
             name="category"
-            className="rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2.5 text-sm text-espresso outline-none focus:border-caramel"
+            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary-amber"
           >
             {supportCategoryOrder.map((category) => (
               <option key={category} value={category}>
@@ -119,42 +119,42 @@ export default function BillingSupportForm() {
           </select>
         </label>
 
-        <label className="grid gap-1.5 text-xs font-bold text-espresso/70">
+        <label className="grid gap-1.5 text-xs font-bold text-muted-foreground">
           문의 내용
           <textarea
             name="message"
             required
             minLength={10}
-            className="min-h-32 rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2.5 text-sm text-espresso outline-none focus:border-caramel"
+            className="min-h-32 rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary-amber"
             placeholder="결제 실패 화면, 구독 취소 희망일, 환불 요청 사유를 적어주세요."
           />
         </label>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <label className="grid gap-1.5 text-xs font-bold text-espresso/70">
-            체크아웃 세션 ID <span className="font-medium text-espresso/45">선택</span>
+          <label className="grid gap-1.5 text-xs font-bold text-muted-foreground">
+            체크아웃 세션 ID <span className="font-medium text-muted-foreground/60">선택</span>
             <input
               name="checkoutSessionId"
-              className="rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2.5 text-sm outline-none focus:border-caramel"
+              className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm outline-none focus:border-primary-amber text-foreground"
               placeholder="cs_test_..."
             />
           </label>
-          <label className="grid gap-1.5 text-xs font-bold text-espresso/70">
-            구독 ID <span className="font-medium text-espresso/45">선택</span>
+          <label className="grid gap-1.5 text-xs font-bold text-muted-foreground">
+            구독 ID <span className="font-medium text-muted-foreground/60">선택</span>
             <input
               name="subscriptionId"
-              className="rounded-2xl border border-warm-gray bg-cream/40 px-3 py-2.5 text-sm outline-none focus:border-caramel"
+              className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm outline-none focus:border-primary-amber text-foreground"
               placeholder="sub_..."
             />
           </label>
         </div>
-        <p className="rounded-2xl border border-caramel/15 bg-caramel/10 px-3 py-2 text-xs leading-relaxed text-espresso/60">
-          <span className="font-extrabold text-espresso/75">Stripe ID는 선택 입력입니다.</span> 영수증의 cs_ 또는 sub_ 값을 남기면 영업일 1일 내 확인이 빨라집니다.
+        <p className="rounded-2xl border border-primary-amber/30 bg-primary-amber/10 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+          <span className="font-extrabold text-foreground/80">Stripe ID는 선택 입력입니다.</span> 영수증의 cs_ 또는 sub_ 값을 남기면 영업일 1일 내 확인이 빨라집니다.
         </p>
       </div>
 
       {status.kind === "success" && (
-        <p className="mt-4 rounded-2xl border border-caramel/25 bg-caramel/10 px-4 py-3 text-sm font-bold text-espresso">
+        <p className="mt-4 rounded-2xl border border-primary-amber/30 bg-primary-amber/10 px-4 py-3 text-sm font-bold text-foreground">
           접수번호 {status.ticketId}
         </p>
       )}
@@ -167,7 +167,7 @@ export default function BillingSupportForm() {
       <button
         type="submit"
         disabled={status.kind === "submitting"}
-        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-espresso px-4 py-3 text-sm font-extrabold text-white transition-all hover:bg-espresso/90 disabled:opacity-60"
+        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary-amber px-4 py-3 text-sm font-extrabold text-[#0D0A07] transition-all hover:opacity-90 disabled:opacity-60"
       >
         {status.kind === "submitting" ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
         문의 접수

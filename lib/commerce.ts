@@ -22,7 +22,7 @@ export type CheckoutProduct = {
 export const checkoutProductCatalog = {
   premium_subscription: {
     itemType: "premium_subscription",
-    name: "Hyangmi Premium 구독 (월간)",
+    name: "CoffeeDex Premium 구독 (월간)",
     shortName: "Premium",
     description: "월간 한도 없는 AI 원두 패키지 사진 스캔과 기록 기반 AI 취향 리포트",
     amountCents: 399,
@@ -39,7 +39,7 @@ export const checkoutProductCatalog = {
   },
   credits_10: {
     itemType: "credits_10",
-    name: "Hyangmi 테이스팅 10팩 충전",
+    name: "CoffeeDex 테이스팅 10팩 충전",
     shortName: "Scan 10 Pack",
     description: "무료 월간 스캔을 모두 사용한 뒤 원두 패키지 사진 10장을 추가 분석",
     amountCents: 499,

@@ -1,7 +1,7 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
-export type HyangmiPdfCard = {
+export type CoffeeDexPdfCard = {
   readonly title?: string | null;
   readonly subtitle?: string | null;
   readonly metric1?: number | null;
@@ -11,10 +11,10 @@ export type HyangmiPdfCard = {
   readonly ai_description?: string | null;
 };
 
-export type HyangmiPdfDocument = {
+export type CoffeeDexPdfDocument = {
   readonly ownerLabel: string;
   readonly exportedAt: string;
-  readonly cards: readonly HyangmiPdfCard[];
+  readonly cards: readonly CoffeeDexPdfCard[];
 };
 
 function metricText(value: number | null | undefined): string {
@@ -28,7 +28,7 @@ function tagsText(tags: readonly string[] | null | undefined): string {
   return `태그: ${tags.slice(0, 5).join(", ")}`;
 }
 
-function averageMetric(cards: readonly HyangmiPdfCard[], field: "metric1" | "metric2" | "metric3"): string {
+function averageMetric(cards: readonly CoffeeDexPdfCard[], field: "metric1" | "metric2" | "metric3"): string {
   const values = cards
     .map((card) => card[field])
     .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
@@ -39,7 +39,7 @@ function averageMetric(cards: readonly HyangmiPdfCard[], field: "metric1" | "met
   return average.toFixed(1);
 }
 
-function topRoaster(cards: readonly HyangmiPdfCard[]): string {
+function topRoaster(cards: readonly CoffeeDexPdfCard[]): string {
   const counts = new Map<string, number>();
   for (const card of cards) {
     const roaster = (card.subtitle ?? "").trim();
@@ -53,8 +53,8 @@ function topRoaster(cards: readonly HyangmiPdfCard[]): string {
   return winner ? `${winner[0]} (${winner[1]}개)` : "-";
 }
 
-export async function generateHyangmiTastePassportPdf(
-  document: HyangmiPdfDocument,
+export async function generateCoffeeDexTastePassportPdf(
+  document: CoffeeDexPdfDocument,
   fontBuffer: ArrayBuffer | Uint8Array
 ): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
@@ -78,7 +78,7 @@ export async function generateHyangmiTastePassportPdf(
   let yOffset = height - 80;
 
   // Header Title
-  page.drawText("Hyangmi Taste Passport", {
+  page.drawText("CoffeeDex Taste Passport", {
     x: 60,
     y: yOffset,
     size: 20,
@@ -88,7 +88,7 @@ export async function generateHyangmiTastePassportPdf(
   yOffset -= 24;
 
   // Meta Info
-  const owner = document.ownerLabel || "Hyangmi User";
+  const owner = document.ownerLabel || "CoffeeDex User";
   page.drawText(`소유자 (Owner): ${owner}`, { x: 60, y: yOffset, size: 10, font: customFont, color: rgb(0.3, 0.25, 0.2) });
   yOffset -= 14;
   page.drawText(`내보낸 날짜 (Exported): ${document.exportedAt.slice(0, 10)}`, { x: 60, y: yOffset, size: 10, font: customFont, color: rgb(0.3, 0.25, 0.2) });
@@ -97,7 +97,7 @@ export async function generateHyangmiTastePassportPdf(
   yOffset -= 24;
 
   // Recap Section
-  page.drawText("Hyangmi Taste Recap (취향 리캡 요약)", {
+  page.drawText("CoffeeDex Taste Recap (취향 리캡 요약)", {
     x: 60,
     y: yOffset,
     size: 14,

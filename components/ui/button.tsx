@@ -8,8 +8,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-[var(--accent)] text-[var(--accent-foreground)] hover:opacity-90",
-        secondary: "bg-[var(--surface-muted)] text-[var(--foreground)] hover:bg-white",
-        outline: "border border-[var(--border)] bg-transparent text-[var(--foreground)] hover:bg-white",
+        secondary: "bg-[var(--surface-muted)] text-[var(--foreground)] hover:bg-[var(--surface)]",
+        outline: "border border-[var(--border)] bg-transparent text-[var(--foreground)] hover:bg-[var(--surface)]",
       },
       size: {
         default: "h-10 px-4 py-2",

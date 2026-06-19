@@ -40,7 +40,21 @@ const loginRequiredResponse = {
 } as const;
 
 test.describe("PaymentDialog checkout honesty", () => {
-  test("shows only lifecycle-safe products from the dashboard payment entry", async ({ page }) => {
+  test("keeps paid offers behind a secondary pricing disclosure on the landing page", async ({ page }) => {
+    await page.route("**/api/v1/analytics", async (route) => {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify({ received: true }) });
+    });
+
+    await page.goto("/");
+
+    const pricingDisclosure = page.getByTestId("landing-pricing-section").getByRole("group");
+    await expect(pricingDisclosure).not.toHaveAttribute("open", "");
+    await expect(page.getByRole("link", { name: "Premium으로 시작", exact: true })).toBeHidden();
+    await page.getByText("추가 기능 및 가격 보기").click();
+    await expect(page.getByRole("link", { name: "Premium으로 시작", exact: true })).toBeVisible();
+  });
+
+  test("shows only lifecycle-safe products from the settings payment entry", async ({ page }) => {
     await page.route("**/api/v1/cards", async (route) => {
       await route.fulfill({
         contentType: "application/json",
@@ -72,13 +86,13 @@ test.describe("PaymentDialog checkout honesty", () => {
       });
     });
 
-    await page.goto("/dashboard");
-    await page.getByRole("button", { name: "월 $3.99로 구독하기" }).click();
+    await page.goto("/settings");
+    await page.getByRole("link", { name: "추가 기능 및 결제 보기" }).click();
 
-    const dialog = page.getByRole("dialog", { name: "프리미엄 커피 도서관 패키지" });
-    await expect(dialog.getByText("Hyangmi Premium 구독 (월간)")).toBeVisible();
+    const dialog = page.getByRole("dialog", { name: "추가 기능 및 결제" });
+    await expect(dialog.getByRole("heading", { name: "CoffeeDex Premium 구독 (월간)" })).toBeVisible();
     await expect(dialog.getByText("$3.99")).toBeVisible();
-    await expect(dialog.getByText("Hyangmi 테이스팅 10팩 충전")).toBeVisible();
+    await expect(dialog.getByText("CoffeeDex 테이스팅 10팩 충전")).toBeVisible();
     await expect(dialog.getByText("$4.99")).toBeVisible();
     await expect(dialog.getByText("홈카페 테이스팅북 PDF")).toBeVisible();
     await expect(dialog.getByText("$9.99")).toBeVisible();
@@ -144,8 +158,8 @@ test.describe("PaymentDialog checkout honesty", () => {
     });
 
     await page.goto("/dashboard?checkout_intent=premium_subscription");
-    await expect(page.getByRole("dialog", { name: "프리미엄 커피 도서관 패키지" })).toBeVisible();
-    await expect(page.getByText("로그인 후 이어서 결제할 상품: Hyangmi Premium 구독 (월간)")).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "추가 기능 및 결제" })).toBeVisible();
+    await expect(page.getByText("로그인 후 이어서 결제할 상품: CoffeeDex Premium 구독 (월간)")).toBeVisible();
     expect(checkoutCalls).toBe(0);
 
     await page.getByRole("button", { name: "구독하기", exact: true }).click();
@@ -221,17 +235,17 @@ test.describe("PaymentDialog checkout honesty", () => {
       }
     });
 
-    await page.goto("/dashboard");
-    await page.getByRole("button", { name: "월 $3.99로 구독하기" }).click();
+    await page.goto("/settings");
+    await page.getByRole("link", { name: "추가 기능 및 결제 보기" }).click();
 
-    const dialog = page.getByRole("dialog", { name: "프리미엄 커피 도서관 패키지" });
+    const dialog = page.getByRole("dialog", { name: "추가 기능 및 결제" });
     await expect(dialog).toBeVisible();
 
     await dialog.getByRole("button", { name: "구독하기", exact: true }).click();
 
     expect(nativeDialogMessage).toBeNull();
     const inlineError = dialog.getByRole("alert");
-    await expect(inlineError).toContainText("Hyangmi 결제 연결을 열지 못했어요.");
+    await expect(inlineError).toContainText("CoffeeDex 결제 연결을 열지 못했어요.");
     await expect(inlineError).toContainText("Stripe 결제창을 열 수 없습니다. 잠시 후 다시 시도해주세요.");
     await expect(inlineError).toContainText("다시 시도");
 

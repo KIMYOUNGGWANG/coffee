@@ -23,7 +23,7 @@ function transpileTypescript(source, fileName) {
 
 async function loadBrandModule() {
   const brandPath = path.join(projectRoot, "lib/brand.ts");
-  const tempDirectory = mkdtempSync(path.join(tmpdir(), "hyangmi-brand-"));
+  const tempDirectory = mkdtempSync(path.join(tmpdir(), "coffeedex-brand-"));
   const compiledPath = path.join(tempDirectory, "brand.mjs");
 
   try {
@@ -39,21 +39,21 @@ async function loadBrandModule() {
   }
 }
 
-test("Hyangmi brand constants expose approved tokens when loaded by Node", async () => {
+test("CoffeeDex brand constants expose the recall and repurchase contract when loaded by Node", async () => {
   // Given
   const approvedBrand = {
-    name: "Hyangmi",
-    koreanDisplay: "향미",
-    category: "Coffee Taste Archive",
-    tagline: "마신 원두가 취향의 기록이 되는 곳",
-    englishTagline: "Your coffee taste, beautifully remembered.",
+    name: "CoffeeDex",
+    koreanDisplay: "커피덱스",
+    category: "Coffee Memory & Repurchase",
+    tagline: "좋았던 원두를 잊지 않고, 다시 찾는 가장 빠른 방법",
+    englishTagline: "Remember coffee worth buying again.",
     artifacts: {
       free: "Taste Card",
       paid: "Taste Passport",
     },
-    analytics: "Taste Map",
-    dashboard: "Archive",
-    filenameSlug: "hyangmi",
+    analytics: "Taste Snapshot",
+    dashboard: "Memory Shelf",
+    filenameSlug: "coffeedex",
   };
 
   // When
@@ -62,7 +62,8 @@ test("Hyangmi brand constants expose approved tokens when loaded by Node", async
   // Then
   try {
     assert.equal("default" in brandModule, false);
-    assert.deepEqual(brandModule.hyangmiBrand, approvedBrand);
+    assert.deepEqual(brandModule.coffeeDexBrand, approvedBrand);
+    assert.equal(brandModule.hyangmiBrand, brandModule.coffeeDexBrand);
   } finally {
     rmSync(tempDirectory, { force: true, recursive: true });
   }

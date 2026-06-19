@@ -1,5 +1,5 @@
 import type { TastingCardData } from "@/hooks/useTastingCards";
-import { hyangmiBrand } from "@/lib/brand";
+import { coffeeDexBrand } from "@/lib/brand";
 import { createPublicCardUrl } from "@/lib/public-card";
 
 export const STORY_SKIN_KEYS = ["dark", "cream", "copper", "forest"] as const;
@@ -48,7 +48,7 @@ export const STORY_SKINS: Record<SkinType, StorySkin> = {
   cream: {
     name: "에디토리얼 크림",
     bg: "bg-gradient-to-b from-[#FAF8F5] via-[#F4F1EA] to-[#EAE6DB]",
-    cardBg: "bg-white/95 border-[#E2DFD5] shadow-md",
+    cardBg: "bg-black/90 border-[#E2DFD5] shadow-md",
     textColor: "text-[#28221D]",
     subColor: "text-[#A0703B]",
     accentBg: "bg-[#A0703B]/10 text-[#A0703B]",
@@ -89,7 +89,7 @@ function escapeSvg(value: string): string {
 
 export function createStoryFilename(title: string): string {
   const slug = title.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48);
-  return `${hyangmiBrand.filenameSlug}-story-${slug || "card"}.svg`;
+  return `${coffeeDexBrand.filenameSlug}-story-${slug || "card"}.svg`;
 }
 
 function clampMetric(value: number): number {
@@ -124,7 +124,7 @@ export function storySvg(card: TastingCardData, skin: StorySkin, dateText: strin
   const quote = wrapStoryText(card.ai_description || "조화롭고 밸런스가 돋보이는 컵.");
   const quoteSvg = quote.map((line, index) => `<text x="180" y="${1250 + index * 44}" font-size="32" font-style="italic" font-family="${storySerifFont}" fill="${skin.svg.text}" opacity="0.86">${index === 0 ? "“" : ""}${escapeSvg(line)}${index === quote.length - 1 ? "”" : ""}</text>`).join("");
   const tags = card.tags.slice(0, 3).map((tag, index) => tagSvg(tag, index, skin)).join("");
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920"><rect width="1080" height="1920" fill="${skin.svg.background}"/><path d="M96 220H984M96 330H984M96 1510H984" stroke="${skin.svg.border}" stroke-width="3" opacity="0.58"/><text x="96" y="140" font-size="26" font-weight="800" letter-spacing="8" font-family="${storySansFont}" fill="${skin.svg.accent}">HYANGMI ARCHIVE</text><text x="984" y="140" text-anchor="end" font-size="24" font-family="${storySansFont}" fill="${skin.svg.muted}">${escapeSvg(dateText)}</text><rect x="96" y="390" width="888" height="900" fill="${skin.svg.panel}" stroke="${skin.svg.border}" stroke-width="3"/><rect x="160" y="470" width="230" height="54" fill="${skin.svg.badge}" stroke="${skin.svg.border}"/><text x="275" y="506" text-anchor="middle" font-size="24" font-weight="800" font-family="${storySansFont}" fill="${skin.svg.accent}">${escapeSvg(card.badges[0] || "Single Origin")}</text><rect x="762" y="470" width="134" height="134" fill="${skin.svg.badge}" stroke="${skin.svg.border}" stroke-width="3"/><text x="829" y="552" text-anchor="middle" font-size="60" font-family="${storySerifFont}" fill="${skin.svg.accent}">${escapeSvg(card.title.slice(0, 1).toUpperCase())}</text><text x="160" y="615" font-size="56" font-weight="800" font-family="${storySerifFont}" fill="${skin.svg.text}">${escapeSvg(truncateText(card.title, 22))}</text><text x="160" y="674" font-size="32" font-family="${storySansFont}" fill="${skin.svg.muted}">${escapeSvg(truncateText(card.subtitle, 34))}</text>${metricSvg("산미 (Acidity)", card.metric1, 790, skin)}${metricSvg("단맛 (Sweetness)", card.metric2, 900, skin)}${metricSvg("바디감 (Body)", card.metric3, 1010, skin)}${tags}<line x1="160" x2="920" y1="1208" y2="1208" stroke="${skin.svg.border}" stroke-width="3"/>${quoteSvg}<text x="540" y="1580" text-anchor="middle" font-size="28" font-family="${storySansFont}" fill="${skin.svg.muted}">Origin: ${escapeSvg(originText)}</text><line x1="500" x2="580" y1="1625" y2="1625" stroke="${skin.svg.border}" stroke-width="3"/><text x="540" y="1688" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="6" font-family="${storySansFont}" fill="${skin.svg.muted}">PUBLIC HYANGMI CARD</text><text x="540" y="1730" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="6" font-family="${storySansFont}" fill="${skin.svg.muted}">SHARED VIA HYANGMI</text></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920"><rect width="1080" height="1920" fill="${skin.svg.background}"/><path d="M96 220H984M96 330H984M96 1510H984" stroke="${skin.svg.border}" stroke-width="3" opacity="0.58"/><text x="96" y="140" font-size="26" font-weight="800" letter-spacing="8" font-family="${storySansFont}" fill="${skin.svg.accent}">COFFEEDEX ARCHIVE</text><text x="984" y="140" text-anchor="end" font-size="24" font-family="${storySansFont}" fill="${skin.svg.muted}">${escapeSvg(dateText)}</text><rect x="96" y="390" width="888" height="900" fill="${skin.svg.panel}" stroke="${skin.svg.border}" stroke-width="3"/><rect x="160" y="470" width="230" height="54" fill="${skin.svg.badge}" stroke="${skin.svg.border}"/><text x="275" y="506" text-anchor="middle" font-size="24" font-weight="800" font-family="${storySansFont}" fill="${skin.svg.accent}">${escapeSvg(card.badges[0] || "Single Origin")}</text><rect x="762" y="470" width="134" height="134" fill="${skin.svg.badge}" stroke="${skin.svg.border}" stroke-width="3"/><text x="829" y="552" text-anchor="middle" font-size="60" font-family="${storySerifFont}" fill="${skin.svg.accent}">${escapeSvg(card.title.slice(0, 1).toUpperCase())}</text><text x="160" y="615" font-size="56" font-weight="800" font-family="${storySerifFont}" fill="${skin.svg.text}">${escapeSvg(truncateText(card.title, 22))}</text><text x="160" y="674" font-size="32" font-family="${storySansFont}" fill="${skin.svg.muted}">${escapeSvg(truncateText(card.subtitle, 34))}</text>${metricSvg("산미 (Acidity)", card.metric1, 790, skin)}${metricSvg("단맛 (Sweetness)", card.metric2, 900, skin)}${metricSvg("바디감 (Body)", card.metric3, 1010, skin)}${tags}<line x1="160" x2="920" y1="1208" y2="1208" stroke="${skin.svg.border}" stroke-width="3"/>${quoteSvg}<text x="540" y="1580" text-anchor="middle" font-size="28" font-family="${storySansFont}" fill="${skin.svg.muted}">Origin: ${escapeSvg(originText)}</text><line x1="500" x2="580" y1="1625" y2="1625" stroke="${skin.svg.border}" stroke-width="3"/><text x="540" y="1688" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="6" font-family="${storySansFont}" fill="${skin.svg.muted}">PUBLIC COFFEEDEX CARD</text><text x="540" y="1730" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="6" font-family="${storySansFont}" fill="${skin.svg.muted}">SHARED VIA COFFEEDEX</text></svg>`;
 }
 
 export { createPublicCardUrl };

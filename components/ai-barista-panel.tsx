@@ -112,7 +112,7 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: idx * 0.03, ease: "easeOut" }}
-            className="font-serif font-bold text-espresso text-sm mt-5 mb-2 flex items-center gap-1.5 border-l-2 border-caramel pl-2"
+            className="font-serif font-bold text-foreground text-sm mt-5 mb-2 flex items-center gap-1.5 border-l-2 border-primary-amber pl-2"
           >
             {line.replace("### ", "")}
           </motion.h4>
@@ -125,7 +125,7 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: idx * 0.03, ease: "easeOut" }}
-            className="font-serif font-extrabold text-espresso text-base mt-6 mb-3 border-b border-sand pb-1"
+            className="font-serif font-extrabold text-foreground text-base mt-6 mb-3 border-b border-white/10 pb-1"
           >
             {line.replace("## ", "")}
           </motion.h3>
@@ -141,7 +141,7 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
             initial={{ opacity: 0, x: -5 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3, delay: idx * 0.03, ease: "easeOut" }}
-            className="text-xs text-cocoa leading-relaxed ml-4 list-disc mb-1 font-medium"
+            className="text-xs text-muted-foreground leading-relaxed ml-4 list-disc mb-1 font-medium"
           >
             {parseBoldText(content)}
           </motion.li>
@@ -156,9 +156,9 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: idx * 0.03, ease: "easeOut" }}
-            className="my-4 p-4 bg-[#f7f7f4] border-l-4 border-caramel/40 rounded-r-xl italic text-xs text-espresso/90 flex gap-2"
+            className="my-4 p-4 bg-white/5 border-l-4 border-primary-amber/40 rounded-r-xl italic text-xs text-foreground/90 flex gap-2"
           >
-            <Quote size={14} className="text-caramel/50 shrink-0" />
+            <Quote size={14} className="text-primary-amber/50 shrink-0" />
             <p className="leading-relaxed">{parseBoldText(line.replace("> ", ""))}</p>
           </motion.div>
         );
@@ -176,7 +176,7 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: idx * 0.03, ease: "easeOut" }}
-          className="text-xs text-cocoa leading-relaxed mb-2 font-medium"
+          className="text-xs text-muted-foreground leading-relaxed mb-2 font-medium"
         >
           {parseBoldText(line)}
         </motion.p>
@@ -188,9 +188,8 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
   const parseBoldText = (text: string) => {
     const parts = text.split(/\*\*([^*]+)\*\*/g);
     return parts.map((part, index) => {
-      // Every odd element was inside **
       if (index % 2 === 1) {
-        return <strong key={index} className="font-extrabold text-espresso">{part}</strong>;
+        return <strong key={index} className="font-extrabold text-foreground">{part}</strong>;
       }
       return part;
     });
@@ -199,19 +198,19 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-sand pb-4">
-        <h2 className="text-xl font-bold font-serif text-espresso flex items-center gap-2">
-          <Sparkles className="text-caramel animate-pulse" size={20} />
+      <div className="border-b border-border pb-4">
+        <h2 className="text-xl font-bold font-serif text-foreground flex items-center gap-2">
+          <Sparkles className="text-primary-amber animate-pulse" size={20} />
           AI 바리스타 추천 (AI Barista Engine)
         </h2>
-        <p className="text-xs text-cocoa mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           현재 원두 보관함(Coffee Shelf)에 남아 있는 원두 정보와 귀하의 취향 태그를 종합 분석하여 최적의 핸드드립 레시피와 스페셜 블렌딩 컵을 디자인해 드립니다.
         </p>
       </div>
 
       {/* Grid selector for situations */}
       <div className="space-y-3">
-        <label className="text-xs font-bold text-espresso">오늘 커피를 내리는 순간은 언제인가요?</label>
+        <label className="text-xs font-bold text-foreground">오늘 커피를 내리는 순간은 언제인가요?</label>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           {situations.map((sit) => {
             const Icon = sit.icon;
@@ -225,13 +224,13 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
                 className={cn(
                   "flex flex-col items-center justify-center p-3.5 rounded-xl border text-center transition-all duration-200 cursor-pointer h-24 border-none",
                   isSelected
-                    ? "bg-espresso border-espresso text-white shadow-md"
-                    : "bg-white border-sand text-cocoa hover:border-caramel hover:bg-canvas/35"
+                    ? "bg-primary-amber text-[#0D0A07] shadow-md shadow-primary-amber/20"
+                    : "bg-white/5 border-white/10 text-muted-foreground hover:border-primary-amber/50 hover:bg-white/10"
                 )}
               >
-                <Icon size={18} className={cn("mb-2", isSelected ? "text-caramel" : "text-cocoa/70")} />
+                <Icon size={18} className={cn("mb-2", isSelected ? "text-[#0D0A07]" : "text-muted-foreground")} />
                 <span className="text-[11px] font-bold tracking-tight">{sit.label}</span>
-                <span className={cn("text-[9px] mt-1 line-clamp-1 opacity-70 scale-90", isSelected ? "text-cream" : "text-cocoa/50")}>
+                <span className={cn("text-[9px] mt-1 line-clamp-1 opacity-70 scale-90", isSelected ? "text-[#0D0A07]" : "text-muted-foreground/70")}>
                   {sit.desc.split(",")[0]}
                 </span>
               </motion.button>
@@ -241,18 +240,18 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
       </div>
 
       {/* Active Beans Preview Alert */}
-      <div className="bg-canvas/50 p-4 border border-sand rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5">
+      <div className="glass-card p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5">
         <div className="space-y-1">
-          <h4 className="text-[10px] uppercase font-bold text-caramel tracking-wider flex items-center gap-1.5">
+          <h4 className="text-[10px] uppercase font-bold text-primary-amber tracking-wider flex items-center gap-1.5">
             <Coffee size={12} />
             선반의 활성 원두 상황
           </h4>
           {shelfItems.length > 0 ? (
-            <p className="text-xs text-espresso font-semibold">
-              현재 보관함에 <span className="text-caramel font-extrabold">{shelfItems.length}종</span>의 원두가 대기 중입니다.
+            <p className="text-xs text-foreground font-semibold">
+              현재 보관함에 <span className="text-primary-amber font-extrabold">{shelfItems.length}종</span>의 원두가 대기 중입니다.
             </p>
           ) : (
-            <p className="text-xs text-cinnamon font-bold flex items-center gap-1">
+            <p className="text-xs text-red-400 font-bold flex items-center gap-1">
               <AlertCircle size={12} />
               보관 중인 활성 원두가 없습니다. AI 추천 진행 시 샘플 원두가 사용됩니다.
             </p>
@@ -262,7 +261,7 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
         <Button
           onClick={handleGetRecommendation}
           disabled={isLoading}
-          className="bg-espresso hover:bg-caramel text-white rounded-xl text-xs font-bold px-6 py-2 h-10 shadow-sm cursor-pointer shrink-0"
+          className="bg-primary-amber hover:opacity-90 text-[#0D0A07] rounded-xl text-xs font-bold px-6 py-2 h-10 shadow-sm cursor-pointer shrink-0 border-none"
         >
           {isLoading ? (
             <>
@@ -280,16 +279,16 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
 
       {/* Loading state rendering */}
       {isLoading && (
-        <div className="bg-white border border-sand rounded-3xl p-16 flex flex-col items-center justify-center text-center space-y-4 shadow-sm min-h-[300px]">
+        <div className="glass-card p-16 flex flex-col items-center justify-center text-center space-y-4 shadow-sm min-h-[300px]">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full border-4 border-sand border-t-caramel animate-spin" />
-            <div className="absolute inset-0 flex items-center justify-center text-caramel">
+            <div className="w-16 h-16 rounded-full border-4 border-white/10 border-t-primary-amber animate-spin" />
+            <div className="absolute inset-0 flex items-center justify-center text-primary-amber">
               <Coffee size={20} className="animate-pulse" />
             </div>
           </div>
           <div className="space-y-2 max-w-sm">
-            <p className="text-xs font-extrabold text-espresso tracking-tight">AI 바리스타 가이드 추출 중</p>
-            <p className="text-[11px] text-cocoa leading-relaxed font-semibold transition-all duration-500 animate-pulse">
+            <p className="text-xs font-extrabold text-foreground tracking-tight">AI 바리스타 가이드 추출 중</p>
+            <p className="text-[11px] text-muted-foreground leading-relaxed font-semibold transition-all duration-500 animate-pulse">
               {loadingMessages[loadingStep]}
             </p>
           </div>
@@ -298,28 +297,28 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
 
       {/* Recommendation Results */}
       {!isLoading && recommendation && (
-        <div className="bg-white border border-sand rounded-3xl p-6 md:p-8 shadow-[0_6px_25px_rgba(44,29,17,0.03)] space-y-5 relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="glass-card p-6 md:p-8 shadow-2xl space-y-5 relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
           
           {/* Subtle paper layout glow */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-caramel/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-amber/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Warning Flag */}
           {warningMsg && (
-            <div className="bg-sand/10 border border-sand text-cocoa px-3.5 py-2 rounded-xl text-[10px] flex items-center gap-1.5 font-semibold">
-              <AlertCircle size={13} className="text-caramel/80" />
+            <div className="bg-red-500/10 border border-red-500/20 text-red-200 px-3.5 py-2 rounded-xl text-[10px] flex items-center gap-1.5 font-semibold">
+              <AlertCircle size={13} className="text-red-400" />
               <span>{warningMsg}</span>
             </div>
           )}
 
           {/* Recommendations Render Area */}
-          <div className="prose prose-sm max-w-none text-left">
+          <div className="prose prose-invert prose-sm max-w-none text-left prose-p:text-muted-foreground prose-headings:text-foreground prose-strong:text-foreground">
             {renderMarkdown(recommendation)}
           </div>
 
           {/* Footer ritual badge */}
-          <div className="border-t border-sand/50 pt-4 flex justify-between items-center text-[10px] text-cocoa font-bold">
+          <div className="border-t border-white/10 pt-4 flex justify-between items-center text-[10px] text-muted-foreground font-bold">
             <span className="flex items-center gap-1">
-              ☕ Hyangmi AI Sommelier System
+              ☕ CoffeeDex AI Sommelier System
             </span>
             <span>
               기분: {situation}
