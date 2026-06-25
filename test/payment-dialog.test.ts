@@ -50,7 +50,7 @@ test.describe("PaymentDialog checkout honesty", () => {
     const pricingDisclosure = page.getByTestId("landing-pricing-section").getByRole("group");
     await expect(pricingDisclosure).not.toHaveAttribute("open", "");
     await expect(page.getByRole("link", { name: "Premium으로 시작", exact: true })).toBeHidden();
-    await page.getByText("추가 기능 및 가격 보기").click();
+    await page.getByText("추가 기능 및 가격 안내").click();
     await expect(page.getByRole("link", { name: "Premium으로 시작", exact: true })).toBeVisible();
   });
 

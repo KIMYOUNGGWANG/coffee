@@ -62,6 +62,13 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(apiSpec, /confidence/);
   assert.match(apiSpec, /source/);
   assert.match(apiSpec, /\/api\/v1\/profile\/analytics/);
+  assert.match(apiSpec, /\/api\/v1\/shelf/);
+  assert.match(apiSpec, /\/api\/v1\/ai-barista/);
+  assert.match(apiSpec, /\/api\/v1\/brewing-logs/);
+  assert.match(apiSpec, /brewing_logs/);
+  assert.match(apiSpec, /too_sour \| too_bitter/);
+  assert.match(apiSpec, /CoffeeShelfItem/);
+  assert.match(apiSpec, /Fresh Shelf guidance is advisory product copy/);
   assert.match(apiSpec, /tasting_cards/);
   assert.match(apiSpec, /profiles/);
   assert.match(apiSpec, /`GET` \| `\/api\/v1\/export\?format=json\\\|csv`/);
@@ -74,8 +81,10 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(goldenFlows, /Flow 1\. Capture and Confirm a Coffee Memory/);
   assert.match(goldenFlows, /Flow 2\. Scan a Package into an Editable Draft/);
   assert.match(goldenFlows, /Flow 3\. Retrieve a Coffee Worth Buying Again/);
-  assert.match(goldenFlows, /Flow 4\. Review a Progressive Taste Snapshot/);
-  assert.match(goldenFlows, /Flow 5\. Export or Delete Owned Data/);
+  assert.match(goldenFlows, /Flow 4\. Use Fresh Shelf Rebuy Timing/);
+  assert.match(goldenFlows, /wait, drink now, finish soon, or rebuy/);
+  assert.match(goldenFlows, /Flow 5\. Review a Progressive Taste Snapshot/);
+  assert.match(goldenFlows, /Flow 6\. Export or Delete Owned Data/);
   assert.match(goldenFlows, /Secondary Compatibility Flow\. Share a Story Card/);
   assert.match(goldenFlows, /Secondary Compatibility Flow\. Export PDF or Purchase an Entitlement/);
   assert.match(goldenFlows, /node --test test\/brand-contract\.test\.mjs/);
@@ -124,6 +133,8 @@ test("dashboard uses a mobile-first CoffeeDex app shell", () => {
   const dashboardHeader = read("components/dashboard-header.tsx");
   const dashboardNavigation = read("components/dashboard-navigation.tsx");
   const dashboardScanAction = read("components/dashboard-scan-action.tsx");
+  const dashboardShelfView = read("components/dashboard-shelf-view.tsx");
+  const coffeeShelfGrid = read("components/coffee-shelf-grid.tsx");
   const tastingCard = read("components/TastingCard.tsx");
   const globalStyles = read("app/globals.css");
 
@@ -134,6 +145,12 @@ test("dashboard uses a mobile-first CoffeeDex app shell", () => {
   assert.match(dashboardNavigation, /선반/);
   assert.match(dashboardNavigation, /패스포트/);
   assert.match(dashboardNavigation, /설정/);
+  assert.match(dashboardShelfView, /CoffeeShelfGrid/);
+  assert.match(coffeeShelfGrid, /evaluateFreshShelfStatus/);
+  assert.match(coffeeShelfGrid, /freshShelfStatus\.label/);
+  assert.match(coffeeShelfGrid, /freshShelfStatus\.reason/);
+  assert.match(coffeeShelfGrid, /getFreshShelfToneClasses/);
+  assert.match(read("lib/fresh-shelf.ts"), /다시 살 타이밍/);
   assert.match(dashboardScanAction, /새 원두 스캔/);
   assert.match(tastingCard, /coffee-shelf-item/);
   assert.doesNotMatch(dashboardClient, /RevenueFunnelPanel/);

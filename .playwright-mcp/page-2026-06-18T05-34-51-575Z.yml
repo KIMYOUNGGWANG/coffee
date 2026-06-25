@@ -1,0 +1,218 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - img [ref=e7]
+          - generic [ref=e9]: Hyangmi
+        - generic [ref=e10]:
+          - link "온보딩 가이드" [ref=e11] [cursor=pointer]:
+            - /url: /onboarding
+          - link "Taste Finder 시작" [ref=e12] [cursor=pointer]:
+            - /url: /onboarding
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - img [ref=e16]
+            - text: Korea-first Specialty Coffee Memory
+          - heading "한국 스페셜티 커피를 나만의 맛 여권(Taste Passport)으로, Hyangmi." [level=1] [ref=e18]:
+            - text: 한국 스페셜티 커피를
+            - text: 나만의 맛 여권(Taste Passport)으로,
+            - text: Hyangmi.
+          - paragraph [ref=e19]: 마신 원두의 라벨을 AI로 간편하게 스캔하여 나의 Taste Passport에 스탬프를 적립해 보세요. 내 커피 취향을 정밀 분석하고 매주 신선한 마이크로 로스터리의 원두를 추천합니다.
+          - generic [ref=e20]:
+            - link "첫 테이스팅 기록 시작" [ref=e21] [cursor=pointer]:
+              - /url: /dashboard
+              - text: 첫 테이스팅 기록 시작
+              - img [ref=e22]
+            - link "30초 Taste Finder로 시작" [ref=e24] [cursor=pointer]:
+              - /url: /onboarding
+        - generic [ref=e26]:
+          - img "Aesthetic coffee brewing setup" [ref=e28]
+          - generic [ref=e29]:
+            - img [ref=e31]
+            - generic [ref=e36]:
+              - paragraph [ref=e37]: 오늘의 원두
+              - paragraph [ref=e38]: Fritz Ethiopia Sidama
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - text: 기록 범위
+          - heading "한국 홈카페 기록이 쌓이는 4가지 경험" [level=2] [ref=e41]
+          - paragraph [ref=e42]: 오늘 제공하는 것은 개인 테이스팅 아카이브, AI 보조 초안, 공유/내보내기 결과물입니다.
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - img [ref=e46]
+            - generic [ref=e48]:
+              - heading "01. 한국 카페 테이스팅 카드 (맛 여권)" [level=3] [ref=e49]
+              - paragraph [ref=e50]: 마신 원두의 정보를 수집하여 에티오피아, 콜롬비아 등 나만의 디지털 맛 여권(Taste Passport) 스탬프로 채워나갑니다.
+          - generic [ref=e51]:
+            - img [ref=e53]
+            - generic [ref=e57]:
+              - heading "02. AI 보조 테이스팅 초안" [level=3] [ref=e58]
+              - paragraph [ref=e59]: "\"귤 같은 산미, 꿀 단맛, 깨끗한 후미\"처럼 짧게 적은 메모를 바탕으로 SCA 스타일 컵 노트 초안을 제안합니다."
+          - generic [ref=e60]:
+            - img [ref=e62]
+            - generic [ref=e64]:
+              - heading "03. 취향 분석과 로스터리 매칭" [level=3] [ref=e65]
+              - paragraph [ref=e66]: 내가 기록한 카드들의 산미, 단맛, 바디감 점수를 기반으로 내 커피 스타일을 분석하고 최적의 로컬 원두 상품을 연결합니다.
+          - generic [ref=e67]:
+            - img [ref=e69]
+            - generic [ref=e75]:
+              - heading "04. 소셜 스토리 공유 및 여권 내보내기" [level=3] [ref=e76]
+              - paragraph [ref=e77]: 기록을 소셜 피드용 이미지나 나만의 커피 포트폴리오 PDF로 내려받을 수 있으며, 오늘의 결과물은 멋진 디지털 아티팩트입니다.
+      - generic [ref=e79]:
+        - generic [ref=e80]:
+          - img [ref=e81]
+          - generic [ref=e83]: AI 즉석 체험 플레이그라운드
+        - generic [ref=e84]:
+          - heading "향미 AI 컵 노트를 지금 직접 테스트해 보세요" [level=3] [ref=e85]
+          - paragraph [ref=e86]: 아래 샘플 원두 패키지 중 하나를 클릭하면, 향미만의 Gemini Vision 기술이 원두 라벨을 인식하고 SCA 표준 아로마 휠에 맞춘 분석 결과 카드를 3초 안에 가상 시뮬레이션으로 완성합니다.
+        - generic [ref=e87]:
+          - 'button "모모스 커피 (Momos Coffee) 에티오피아 예가체프 아리차 내추럴 #Peach #Jasmine #Honey #Citrus 스캔 분석 시작하기" [ref=e88]':
+            - generic [ref=e89]:
+              - generic [ref=e90]: 모모스 커피 (Momos Coffee)
+              - heading "에티오피아 예가체프 아리차 내추럴" [level=4] [ref=e91]
+              - generic [ref=e92]:
+                - generic [ref=e93]: "#Peach"
+                - generic [ref=e94]: "#Jasmine"
+                - generic [ref=e95]: "#Honey"
+                - generic [ref=e96]: "#Citrus"
+            - generic [ref=e97]:
+              - generic [ref=e98]: 스캔 분석 시작하기
+              - img [ref=e99]
+          - 'button "프릳츠 커피 (Fritz Coffee) 콜롬비아 몬테블랑코 퍼플 카투라 무산소 #Berry #Chocolate #Caramel #Apple 스캔 분석 시작하기" [ref=e101]':
+            - generic [ref=e102]:
+              - generic [ref=e103]: 프릳츠 커피 (Fritz Coffee)
+              - heading "콜롬비아 몬테블랑코 퍼플 카투라 무산소" [level=4] [ref=e104]
+              - generic [ref=e105]:
+                - generic [ref=e106]: "#Berry"
+                - generic [ref=e107]: "#Chocolate"
+                - generic [ref=e108]: "#Caramel"
+                - generic [ref=e109]: "#Apple"
+            - generic [ref=e110]:
+              - generic [ref=e111]: 스캔 분석 시작하기
+              - img [ref=e112]
+      - generic [ref=e115]:
+        - generic [ref=e116]:
+          - generic [ref=e117]:
+            - img [ref=e118]
+            - text: 가격 안내
+          - heading "가격은 기능표가 아니라 기록물의 단계입니다." [level=2] [ref=e120]:
+            - text: 가격은 기능표가 아니라
+            - generic [ref=e121]: 기록물의 단계입니다.
+          - paragraph [ref=e122]: 무료 Taste Card로 시작하고, 더 많은 스캔과 리캡이 필요할 때 Premium으로 확장합니다. PDF는 쌓인 기록을 보관 가능한 디지털 기록북으로 꺼내는 별도 결과물입니다.
+          - link "결제 및 환불 고지" [ref=e123] [cursor=pointer]:
+            - /url: /legal/payment
+        - generic [ref=e124]:
+          - article [ref=e125]:
+            - generic [ref=e126]: "01"
+            - generic [ref=e127]:
+              - generic [ref=e128]:
+                - paragraph [ref=e129]: 월간 Premium · subscription / taste map
+                - heading "Hyangmi Premium 구독 (월간)" [level=3] [ref=e130]
+                - paragraph [ref=e131]: 월간 한도 없는 AI 원두 패키지 사진 스캔과 기록 기반 AI 취향 리포트
+                - list [ref=e132]:
+                  - listitem [ref=e133]:
+                    - img [ref=e134]
+                    - generic [ref=e137]: 월간 AI 라벨 스캔 한도 해제
+                  - listitem [ref=e138]:
+                    - img [ref=e139]
+                    - generic [ref=e142]: 기록 기반 AI 취향 리포트
+                  - listitem [ref=e143]:
+                    - img [ref=e144]
+                    - generic [ref=e147]: 구독 취소 후 현재 결제 기간까지 이용
+              - generic [ref=e148]:
+                - paragraph [ref=e149]: monthly archive pass
+                - generic [ref=e150]:
+                  - generic [ref=e151]: $3.99
+                  - generic [ref=e152]: 월간 구독
+                - generic [ref=e153]:
+                  - paragraph [ref=e154]: AI 원두 스캔 한도 해제
+                  - paragraph [ref=e155]: 기록 기반 취향 리포트
+                  - paragraph [ref=e156]: 구독 취소 후 현재 결제 기간까지 이용
+                - link "Premium으로 시작" [ref=e157] [cursor=pointer]:
+                  - /url: /dashboard?checkout_intent=premium_subscription
+                  - text: Premium으로 시작
+                  - img [ref=e158]
+          - generic [ref=e160]:
+            - article [ref=e161]:
+              - generic [ref=e162]:
+                - generic [ref=e163]:
+                  - paragraph [ref=e164]: 02 · 스캔 10팩
+                  - heading "Hyangmi 테이스팅 10팩 충전" [level=3] [ref=e165]
+                - img [ref=e167]
+              - paragraph [ref=e169]: scan credits / label reader
+              - generic [ref=e170]:
+                - generic [ref=e171]: $4.99
+                - generic [ref=e172]: 일회성 충전
+              - paragraph [ref=e173]: 무료 월간 스캔을 모두 사용한 뒤 원두 패키지 사진 10장을 추가 분석
+              - link "스캔 10팩 충전" [ref=e174] [cursor=pointer]:
+                - /url: /dashboard?checkout_intent=credits_10
+                - text: 스캔 10팩 충전
+                - img [ref=e175]
+            - article [ref=e177]:
+              - generic [ref=e178]:
+                - generic [ref=e179]:
+                  - paragraph [ref=e180]: 03 · PDF 기록북
+                  - heading "홈카페 테이스팅북 PDF" [level=3] [ref=e181]
+                - img [ref=e183]
+              - paragraph [ref=e185]: artifact / home archive
+              - generic [ref=e186]:
+                - generic [ref=e187]: $9.99
+                - generic [ref=e188]: 일회성 구매
+              - paragraph [ref=e189]: 내가 수집한 카드와 취향 분석을 묶은 디지털 홈카페 기록북
+              - link "PDF 기록북 구매" [ref=e190] [cursor=pointer]:
+                - /url: /dashboard?checkout_intent=pdf_book
+                - text: PDF 기록북 구매
+                - img [ref=e191]
+      - generic [ref=e193]:
+        - generic [ref=e194]:
+          - generic [ref=e195]:
+            - heading "오늘 제공하는 Hyangmi 결과물" [level=2] [ref=e196]
+            - paragraph [ref=e197]: 현재 범위는 개인 기록, AI 보조 스캔/노트, 디지털 공유와 PDF 내보내기입니다.
+          - generic [ref=e198]:
+            - img [ref=e199]
+            - text: Tasting archive
+        - generic [ref=e201]:
+          - generic [ref=e202]:
+            - generic [ref=e203]:
+              - generic [ref=e204]: Taste Passport
+              - heading "맛 여권 스탬프 적립" [level=4] [ref=e205]
+              - paragraph [ref=e206]: 원두명, 로스터리, 산지, 가공 방식, 그리고 컵 노트를 디지털 여권 스탬프로 기록 및 소장
+            - generic [ref=e207]: 현재 제공
+          - generic [ref=e208]:
+            - generic [ref=e209]:
+              - generic [ref=e210]: AI Draft
+              - heading "원두 라벨 스캔 초안" [level=4] [ref=e211]
+              - paragraph [ref=e212]: 패키지 사진에서 읽은 정보를 자동 완성 후보로 제안하고 저장 전 사용자가 수정
+            - generic [ref=e213]: 확인 후 저장
+          - generic [ref=e214]:
+            - generic [ref=e215]:
+              - generic [ref=e216]: Roaster Network
+              - heading "취향 분석 & 원두 추천" [level=4] [ref=e217]
+              - paragraph [ref=e218]: 내 취향 분석 결과에 맞추어 다양한 마이크로 로스터리의 원두 추천 및 편리한 앱 내 구매 제공
+            - generic [ref=e219]: 매칭 연동
+          - generic [ref=e220]:
+            - generic [ref=e221]:
+              - generic [ref=e222]: Story Export
+              - heading "공유용 스토리 카드" [level=4] [ref=e223]
+              - paragraph [ref=e224]: 내가 저장한 원두와 컵 노트를 SNS에 올리기 좋은 이미지 아티팩트로 다운로드
+            - generic [ref=e225]: 이미지 파일
+      - generic [ref=e226]:
+        - generic [ref=e227]:
+          - img [ref=e228]
+          - generic [ref=e232]: Hyangmi Korean Specialty Coffee Archive
+        - generic [ref=e233]:
+          - link "내 대시보드" [ref=e234] [cursor=pointer]:
+            - /url: /dashboard
+          - generic [ref=e235]: "|"
+          - link "고객지원" [ref=e236] [cursor=pointer]:
+            - /url: /support/billing
+          - generic [ref=e237]: "|"
+          - link "약관" [ref=e238] [cursor=pointer]:
+            - /url: /legal/terms
+          - link "개인정보" [ref=e239] [cursor=pointer]:
+            - /url: /legal/privacy
+          - link "결제고지" [ref=e240] [cursor=pointer]:
+            - /url: /legal/payment
+  - alert [ref=e241]

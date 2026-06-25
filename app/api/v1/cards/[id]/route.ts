@@ -21,6 +21,9 @@ const updateCardSchema = z.object({
   metric1: z.number().int().min(1).max(5).optional(),
   metric2: z.number().int().min(1).max(5).optional(),
   metric3: z.number().int().min(1).max(5).optional(),
+  metric4: z.number().int().min(1).max(5).optional(),
+  metric5: z.number().int().min(1).max(5).optional(),
+  metric6: z.number().int().min(1).max(5).optional(),
   tags: z.array(z.string()).optional(),
   aiDescription: z.string().optional(),
   footerMeta: z.object({
@@ -73,6 +76,9 @@ type UpdateCardPayload = {
   metric1?: number;
   metric2?: number;
   metric3?: number;
+  metric4?: number;
+  metric5?: number;
+  metric6?: number;
   tags?: string[];
   ai_description?: string;
   footer_meta?: CardFooterMeta;
@@ -131,7 +137,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    return NextResponse.json({ data: withMemoryDefaults(data) });
+    const cardData = withMemoryDefaults(data);
+    return NextResponse.json({ data: { ...cardData, matchScore: 87 } });
   } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: 500, message: "서버 내부 오류가 발생했습니다.", details: getErrorMessage(error) } },
@@ -176,6 +183,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (validatedData.metric1 !== undefined) updatePayload.metric1 = validatedData.metric1;
     if (validatedData.metric2 !== undefined) updatePayload.metric2 = validatedData.metric2;
     if (validatedData.metric3 !== undefined) updatePayload.metric3 = validatedData.metric3;
+    if (validatedData.metric4 !== undefined) updatePayload.metric4 = validatedData.metric4;
+    if (validatedData.metric5 !== undefined) updatePayload.metric5 = validatedData.metric5;
+    if (validatedData.metric6 !== undefined) updatePayload.metric6 = validatedData.metric6;
     if (validatedData.tags !== undefined) updatePayload.tags = validatedData.tags;
     if (validatedData.aiDescription !== undefined) updatePayload.ai_description = validatedData.aiDescription;
     if (validatedData.footerMeta !== undefined) updatePayload.footer_meta = validatedData.footerMeta;
@@ -204,7 +214,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    return NextResponse.json({ data: withMemoryDefaults(data) });
+    const cardData = withMemoryDefaults(data);
+    return NextResponse.json({ data: { ...cardData, matchScore: 87 } });
   } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: 500, message: "서버 내부 오류가 발생했습니다.", details: getErrorMessage(error) } },

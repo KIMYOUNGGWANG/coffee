@@ -29,9 +29,16 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `DELETE` | `/api/v1/account` | Permanently delete the authenticated account after explicit confirmation. |
 | `GET` | `/api/v1/profile` | Read credits, PDF access, premium status, and scan limits. |
 | `GET` | `/api/v1/profile/analytics` | Return taste averages, top flavor tags, and an AI taste profile summary. |
+| `GET` | `/api/v1/shelf?include_finished=true\|false` | List owned coffee shelf items for freshness and rebuy timing. |
+| `POST` | `/api/v1/shelf` | Add a bean to the current user's private coffee shelf. |
+| `PATCH` | `/api/v1/shelf/:id` | Update one owned shelf item, including fill level or finished state. |
+| `DELETE` | `/api/v1/shelf/:id` | Delete one owned shelf item. |
 | `POST` | `/api/v1/checkout` | Create a Stripe Checkout session for premium, card credits, or PDF export. |
 | `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive data for export. |
 | `POST` | `/api/v1/webhooks/stripe` | Receive Stripe entitlement events for premium, scan credits, and PDF access. |
+| `POST` | `/api/v1/ai-barista` | Get AI Barista custom brewing advice based on mood situation or extraction feedback (sour, bitter, watery, perfect). |
+| `POST` | `/api/v1/brewing-logs` | Record a new brewing log with extraction parameters and notes for a shelf item. |
+| `GET` | `/api/v1/brewing-logs` | Fetch the current user's history of brewing logs. |
 
 The historical `tasting_cards` table, generic metric columns, route paths, and applied migrations remain unchanged for compatibility. They are implementation identifiers, not the canonical brand.
 
@@ -44,6 +51,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - personal tasting cards for cafes, home brews, and roasters such as Fritz, Terarosa, Momos, and Anthracite;
 - AI-assisted scan and note drafts that the user reviews before saving;
 - explicit repurchase memory and retrieval based on confirmed saved records;
+- private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
 - package claims kept distinct from user-perceived taste;
 - evidence-labeled taste snapshots based on sample count and coverage.
 
@@ -96,6 +104,30 @@ For coffee cards, the generic metrics are currently interpreted as:
 | `metric1` | Acidity | 1-5 |
 | `metric2` | Sweetness | 1-5 |
 | `metric3` | Body | 1-5 |
+
+### `CoffeeShelfItem`
+
+Owned shelf rows are private operational memory for beans the user currently has or has finished. The app may derive Fresh Shelf action labels from these fields, but the derived label is not persisted.
+
+```typescript
+interface CoffeeShelfItem {
+  id: string;
+  user_id: string;
+  roaster_name: string;
+  bean_name: string;
+  origin: string | null;
+  roast_date: string | null;
+  opened_date: string | null;
+  total_weight: number;
+  fill_level: number;
+  is_finished: boolean;
+  tasting_card_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+```
+
+Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. They do not create reminders, roaster orders, partner offers, or marketplace transactions.
 
 ### `POST /api/v1/cards`
 
@@ -272,6 +304,91 @@ The profile surface preserves CoffeeDex paid and rate-limited compatibility feat
 | `is_premium` | Whether premium scan and theme privileges are active. |
 | `scans_used` | Monthly scan usage counter. |
 | `monthly_scan_limit` | Free monthly package-scan allowance. |
+
+### `coffee_shelf_items`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | `uuid` | Primary key. |
+| `user_id` | `uuid` | Owner user reference. |
+| `roaster_name` | `text` | Roaster name (e.g. Fritz Coffee Company). |
+| `bean_name` | `text` | Coffee bean name. |
+| `origin` | `text` | Nullable origin description. |
+| `roast_date` | `date` | Nullable roasting date. |
+| `opened_date` | `date` | Nullable opened date. |
+| `total_weight` | `integer` | Total bag size in grams. |
+| `fill_level` | `integer` | Current level check (0-100). |
+| `is_finished` | `boolean` | Set true if fill level is 0. |
+| `tasting_card_id` | `uuid` | Optional linked tasting card ID. |
+
+### `brewing_logs`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | `uuid` | Primary key. |
+| `user_id` | `uuid` | Owner user reference. |
+| `shelf_item_id` | `uuid` | Optional linked shelf item ID. |
+| `brewed_at` | `timestamptz` | Date when brewed. |
+| `method` | `text` | Brewing method used. |
+| `parameters` | `jsonb` | Nested variables (waterTemp, waterAmount, coffeeAmount, grindSize, brewTime). |
+| `rating` | `integer` | Taste rating (1-5). |
+| `simple_note` | `text` | Optional brewing note or recipe tuning details. |
+
+## AI Barista & Brewing Feedback API Specification
+
+### `POST /api/v1/ai-barista`
+
+- **Request Headers**: `Content-Type: application/json`
+- **Request Body**:
+  ```json
+  {
+    "situation": "아침 깨어남 (optional)",
+    "beanId": "uuid-string (optional)",
+    "feedback": "too_sour | too_bitter | too_watery | perfect (optional)"
+  }
+  ```
+- **Response Payload**:
+  ```json
+  {
+    "recommendation": "### 🍋 너무 신맛이 강할 때의 바리스타 처방전...",
+    "warning": "Optional API limit fallback warning text (optional)"
+  }
+  ```
+
+### `POST /api/v1/brewing-logs`
+
+- **Request Headers**: `Content-Type: application/json`
+- **Request Body**:
+  ```json
+  {
+    "shelfItemId": "uuid-string (optional, nullable)",
+    "method": "추출 기구 (e.g. Hario V60)",
+    "parameters": {
+      "waterTemp": 94,
+      "waterAmount": 225,
+      "coffeeAmount": 15,
+      "grindSize": "Medium Fine",
+      "brewTime": "165"
+    },
+    "rating": 3,
+    "simpleNote": "AI Barista Tuning: too_sour recommendation applied."
+  }
+  ```
+- **Response Payload**:
+  ```json
+  {
+    "data": {
+      "id": "uuid-string",
+      "user_id": "uuid-string",
+      "shelf_item_id": "uuid-string",
+      "brewed_at": "timestamp",
+      "method": "Hario V60",
+      "parameters": { ... },
+      "rating": 3,
+      "simple_note": "AI Barista Tuning:..."
+    }
+  }
+  ```
 
 ## Verification
 

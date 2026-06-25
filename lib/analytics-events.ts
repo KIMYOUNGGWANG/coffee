@@ -26,6 +26,8 @@ export const analyticsEventNames = [
   "archive_searched",
   "second_bag_recorded",
   "third_bag_recorded",
+  "share_card_clicked",
+  "ai_scan_success",
 ] as const;
 
 export type AnalyticsEventName = (typeof analyticsEventNames)[number];

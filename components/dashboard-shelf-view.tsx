@@ -4,8 +4,10 @@ import DashboardCardsSection from "@/components/dashboard-cards-section";
 import { DashboardFeaturedArchiveCard } from "@/components/dashboard-featured-archive-card";
 import { DashboardPassportSidebar } from "@/components/dashboard-passport-sidebar";
 import { DashboardShelfFilters } from "@/components/dashboard-shelf-filters";
+import CoffeeShelfGrid from "@/components/coffee-shelf-grid";
 import type { TasteAnalyticsData, TastingCardData } from "@/hooks/useTastingCards";
 import type { RepurchaseFilter } from "@/lib/dashboard-card-filter";
+import CoffeeDNACard, { type CoffeeDNAData } from "@/components/coffee-dna/CoffeeDNACard";
 
 type DashboardShelfViewProps = {
   readonly cards: readonly TastingCardData[];
@@ -40,6 +42,10 @@ type DashboardShelfViewProps = {
   readonly onShareCard: (card: TastingCardData) => void;
   readonly analytics: TasteAnalyticsData | undefined;
   readonly onOpenPassport: () => void;
+  readonly dnaData: CoffeeDNAData | null;
+  readonly isDnaLoading: boolean;
+  readonly onShareDNA: () => void;
+  readonly onShelfDataChange: () => void;
 };
 
 export function DashboardShelfView({
@@ -75,6 +81,10 @@ export function DashboardShelfView({
   onShareCard,
   analytics,
   onOpenPassport,
+  dnaData,
+  isDnaLoading,
+  onShareDNA,
+  onShelfDataChange,
 }: DashboardShelfViewProps) {
   return (
     <>
@@ -100,8 +110,25 @@ export function DashboardShelfView({
           onReset={onResetFilters}
         />
       )}
+      <CoffeeShelfGrid onDataChange={onShelfDataChange} />
       <div className="coffee-archive-layout">
-        <DashboardPassportSidebar analytics={analytics} cards={cards} onOpenPassport={onOpenPassport} />
+        <aside className="coffee-passport-sidebar space-y-6 flex flex-col">
+          {isDnaLoading ? (
+            <div className="rounded-2xl border border-white/10 bg-[#111] p-6 h-[340px] animate-pulse flex flex-col justify-between">
+              <div className="h-4 bg-white/10 rounded w-1/3" />
+              <div className="size-36 rounded-full bg-white/5 mx-auto" />
+              <div className="h-10 bg-white/10 rounded w-full" />
+            </div>
+          ) : (
+            dnaData && (
+              <CoffeeDNACard
+                dna={dnaData}
+                onShareClick={onShareDNA}
+              />
+            )
+          )}
+          <DashboardPassportSidebar analytics={analytics} cards={cards} onOpenPassport={onOpenPassport} />
+        </aside>
         <div className="coffee-archive-cabinet">
           <DashboardCardsSection
             cards={cards}

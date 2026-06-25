@@ -57,6 +57,9 @@ export interface TastingCardData {
   metric1: number;
   metric2: number;
   metric3: number;
+  metric4: number;
+  metric5: number;
+  metric6: number;
   tags: string[];
   ai_description: string;
   is_public?: boolean;
@@ -87,6 +90,9 @@ export type CreateTastingCardInput = {
   readonly metric1: number;
   readonly metric2: number;
   readonly metric3: number;
+  readonly metric4: number;
+  readonly metric5: number;
+  readonly metric6: number;
   readonly tags: readonly string[];
   readonly aiDescription: string;
   readonly footerMeta: TastingCardData["footer_meta"];
@@ -108,6 +114,9 @@ export type UpdateTastingCardInput = {
   readonly metric1?: number;
   readonly metric2?: number;
   readonly metric3?: number;
+  readonly metric4?: number;
+  readonly metric5?: number;
+  readonly metric6?: number;
   readonly tags?: readonly string[];
   readonly aiDescription?: string;
   readonly footerMeta?: TastingCardData["footer_meta"];
@@ -488,6 +497,9 @@ export interface ScannedCoffeeData {
   metric1_acidity: number;
   metric2_sweetness: number;
   metric3_body: number;
+  metric4_bitterness?: number;
+  metric5_aroma?: number;
+  metric6_aftertaste?: number;
 }
 
 // Mutation to scan coffee package image

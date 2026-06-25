@@ -5,6 +5,7 @@ import { X, ArrowRight, ArrowLeft, Coffee, Sparkles, Loader2, Image as ImageIcon
 import { useTastingStore } from "@/stores/tastingStore";
 import { useCreateTastingCard, useGenerateAiNote, useUserProfile, useScanCoffeePackage } from "@/hooks/useTastingCards";
 import { tasteProfilePresetByKey, type TasteProfileKey } from "@/lib/taste-profile";
+import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import TastingCard from "./TastingCard";
 import PaymentDialog from "./PaymentDialog";
 
@@ -57,10 +58,13 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
   const [isScanning, setIsScanning] = React.useState(false);
   const [scanError, setScanError] = React.useState<string | null>(null);
   const [scanSuccessMessage, setScanSuccessMessage] = React.useState<string | null>(null);
+  const [scanWarningMessage, setScanWarningMessage] = React.useState<string | null>(null);
   const [aiNoteError, setAiNoteError] = React.useState<string | null>(null);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
+  const [lastScannedData, setLastScannedData] = React.useState<any>(null);
   const appliedTasteProfileRef = React.useRef<TasteProfileKey | null>(null);
   const { data: profile } = useUserProfile();
+  const { trackEvent } = useAnalyticsEvents();
   const initialTasteProfilePreset = initialTasteProfile ? tasteProfilePresetByKey[initialTasteProfile] : null;
 
   const [loadingMessageIdx, setLoadingMessageIdx] = React.useState(0);
@@ -72,15 +76,28 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
   ];
 
   React.useEffect(() => {
-    let interval: NodeJS.Timeout;
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  React.useEffect(() => {
+    let interval: number | undefined;
     if (isGeneratingAiNote) {
-      interval = setInterval(() => {
+      interval = window.setInterval(() => {
         setLoadingMessageIdx((prev) => (prev + 1) % loadingMessages.length);
       }, 1400);
     } else {
       setLoadingMessageIdx(0);
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (interval !== undefined) clearInterval(interval);
+    };
   }, [isGeneratingAiNote]);
 
   React.useEffect(() => {
@@ -108,8 +125,10 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
   const clearWizardMessages = () => {
     setScanError(null);
     setScanSuccessMessage(null);
+    setScanWarningMessage(null);
     setAiNoteError(null);
     setSubmitError(null);
+    setLastScannedData(null);
   };
 
   const getScanAllowanceLabel = () => {
@@ -147,6 +166,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
 
     setScanError(null);
     setScanSuccessMessage(null);
+    setScanWarningMessage(null);
     const hasNoAvailableScan =
       !profile?.is_premium &&
       profile &&
@@ -177,7 +197,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
           const confidencePercent = "confidence" in data && typeof data.confidence === "number" ? Math.round(data.confidence * 100) : null;
           const scanLabel = isFallbackScan ? "내장 샘플 분석(실제 AI 판독 아님)" : "AI 판독";
 
-          updateForm({
+          const scannedFormValues = {
             title: data.title || "",
             subtitle: data.subtitle || "",
             origin: data.origin || "",
@@ -186,10 +206,25 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             metric1: data.metric1_acidity || 3,
             metric2: data.metric2_sweetness || 3,
             metric3: data.metric3_body || 3,
+            metric4: data.metric4_bitterness || 3,
+            metric5: data.metric5_aroma || 3,
+            metric6: data.metric6_aftertaste || 3,
+          };
+          updateForm(scannedFormValues);
+          setLastScannedData(scannedFormValues);
+          trackEvent("ai_scan_success", { 
+            is_fallback: isFallbackScan,
+            confidence: confidencePercent
           });
 
           setScanError(null);
-          setScanSuccessMessage(`${scanLabel} 초안입니다${confidencePercent ? ` (신뢰도 ${confidencePercent}%)` : ""}. 저장 전 자동 입력값을 확인하고 수정해주세요.`);
+          if (confidencePercent !== null && confidencePercent < 80) {
+            setScanWarningMessage(`AI 인식이 모호한 부분이 있습니다 (신뢰도 ${confidencePercent}%). 내용을 직접 확인하고 수정해주세요.`);
+            setScanSuccessMessage(null);
+          } else {
+            setScanSuccessMessage(`${scanLabel} 초안입니다${confidencePercent ? ` (신뢰도 ${confidencePercent}%)` : ""}. 저장 전 자동 입력값을 확인하고 수정해주세요.`);
+            setScanWarningMessage(null);
+          }
         } catch (error) {
           setScanError(getErrorMessage(error, "원두 패키지 판독에 실패했습니다. 사진을 확인하고 다시 시도해주세요."));
         } finally {
@@ -230,6 +265,22 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
   const handleSubmit = async () => {
     setSubmitError(null);
     try {
+      if (lastScannedData) {
+        const isEdited =
+          form.title !== lastScannedData.title ||
+          form.subtitle !== lastScannedData.subtitle ||
+          form.origin !== lastScannedData.origin ||
+          form.extraInfo !== lastScannedData.extraInfo ||
+          form.metric1 !== lastScannedData.metric1 ||
+          form.metric2 !== lastScannedData.metric2 ||
+          form.metric3 !== lastScannedData.metric3 ||
+          form.metric4 !== lastScannedData.metric4 ||
+          form.metric5 !== lastScannedData.metric5 ||
+          form.metric6 !== lastScannedData.metric6 ||
+          JSON.stringify([...form.tags].sort()) !== JSON.stringify([...lastScannedData.tags].sort());
+        trackEvent("scan_field_edited", { wasEdited: isEdited });
+      }
+
       const badgesArray = [
         form.category === "coffee" ? "Single Origin" : "Craft Beer",
         form.extraInfo || "Hario V60",
@@ -247,6 +298,9 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
         metric1: form.metric1,
         metric2: form.metric2,
         metric3: form.metric3,
+        metric4: form.metric4,
+        metric5: form.metric5,
+        metric6: form.metric6,
         tags: form.tags,
         aiDescription: form.aiDescription || "무난하고 균형 잡힌 데일리 커피.",
         footerMeta: {
@@ -359,6 +413,12 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                     <div role="alert" className="w-full flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] leading-relaxed text-red-700">
                       <AlertCircle size={13} className="mt-0.5 shrink-0" />
                       <span>{scanError}</span>
+                    </div>
+                  )}
+                  {scanWarningMessage && (
+                    <div role="alert" className="w-full flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-700">
+                      <AlertCircle size={13} className="mt-0.5 shrink-0" />
+                      <span>{scanWarningMessage}</span>
                     </div>
                   )}
                   {scanSuccessMessage && (
@@ -504,6 +564,69 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                     <div className="flex justify-between text-[10px] text-muted-foreground/60">
                       <span>차처럼 가벼움</span>
                       <span>시럽처럼 묵직함</span>
+                    </div>
+                  </div>
+
+                  {/* Bitterness */}
+                  <div className="flex flex-col gap-2 bg-white/5/30 border border-white/10/40 p-3 rounded-2xl">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-foreground">쓴맛 (Bitterness)</span>
+                      <span data-testid="metric4-value" className="text-xs font-bold text-primary-amber bg-primary-amber/10 px-2 py-0.5 rounded-full">{form.metric4}점</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      step="1"
+                      value={form.metric4}
+                      onChange={(e) => updateForm({ metric4: parseInt(e.target.value) })}
+                      className="w-full accent-primary-amber cursor-pointer h-2 bg-white/10 rounded-lg"
+                    />
+                    <div className="flex justify-between text-[10px] text-muted-foreground/60">
+                      <span>거의 없음 (깔끔함)</span>
+                      <span>쌉싸름함 (다크초콜릿/허브)</span>
+                    </div>
+                  </div>
+
+                  {/* Aroma */}
+                  <div className="flex flex-col gap-2 bg-white/5/30 border border-white/10/40 p-3 rounded-2xl">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-foreground">향 (Aroma)</span>
+                      <span data-testid="metric5-value" className="text-xs font-bold text-primary-amber bg-primary-amber/10 px-2 py-0.5 rounded-full">{form.metric5}점</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      step="1"
+                      value={form.metric5}
+                      onChange={(e) => updateForm({ metric5: parseInt(e.target.value) })}
+                      className="w-full accent-primary-amber cursor-pointer h-2 bg-white/10 rounded-lg"
+                    />
+                    <div className="flex justify-between text-[10px] text-muted-foreground/60">
+                      <span>은은함</span>
+                      <span>풍부하고 강렬함</span>
+                    </div>
+                  </div>
+
+                  {/* Aftertaste */}
+                  <div className="flex flex-col gap-2 bg-white/5/30 border border-white/10/40 p-3 rounded-2xl">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-foreground">여운 (Aftertaste)</span>
+                      <span data-testid="metric6-value" className="text-xs font-bold text-primary-amber bg-primary-amber/10 px-2 py-0.5 rounded-full">{form.metric6}점</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      step="1"
+                      value={form.metric6}
+                      onChange={(e) => updateForm({ metric6: parseInt(e.target.value) })}
+                      className="w-full accent-primary-amber cursor-pointer h-2 bg-white/10 rounded-lg"
+                    />
+                    <div className="flex justify-between text-[10px] text-muted-foreground/60">
+                      <span>짧고 깔끔함</span>
+                      <span>길게 지속됨</span>
                     </div>
                   </div>
                 </div>
@@ -709,6 +832,9 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                 metric1: form.metric1,
                 metric2: form.metric2,
                 metric3: form.metric3,
+                metric4: form.metric4,
+                metric5: form.metric5,
+                metric6: form.metric6,
                 tags: form.tags,
                 ai_description: form.aiDescription || "오른쪽에서 AI 맛 분석 생성 버튼을 누르면 이 자리에 감성적인 한줄평이 기입됩니다.",
                 footer_meta: {

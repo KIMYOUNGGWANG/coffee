@@ -26,6 +26,9 @@ export const coffeeDexExportMemorySchema = ownedRowSchema.extend({
   metric1: z.number().int().min(1).max(5),
   metric2: z.number().int().min(1).max(5),
   metric3: z.number().int().min(1).max(5),
+  metric4: z.number().int().min(1).max(5).optional(),
+  metric5: z.number().int().min(1).max(5).optional(),
+  metric6: z.number().int().min(1).max(5).optional(),
   tags: z.array(z.string()).readonly(),
   ai_description: z.string(),
   footer_meta: footerMetaSchema,
@@ -116,7 +119,7 @@ function parseArchive(input: unknown) {
 
 export const coffeeDexExportHeaders = [
   "export_version", "exported_at", "record_type", "id", "user_id",
-  "category", "title", "subtitle", "image_url", "badges", "metric1", "metric2", "metric3",
+  "category", "title", "subtitle", "image_url", "badges", "metric1", "metric2", "metric3", "metric4", "metric5", "metric6",
   "tags", "ai_description", "footer_origin", "footer_date", "footer_extra_info",
   "package_origin", "package_process", "repurchase_intent", "repurchase_reasons",
   "scan_source", "scan_confidence", "corrected_fields", "confirmed_at", "is_public",

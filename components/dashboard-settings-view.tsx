@@ -11,7 +11,7 @@ type DashboardSettingsViewProps = {
 
 export function DashboardSettingsView({ profile, onOpenPayment }: DashboardSettingsViewProps) {
   return (
-    <div className="mx-auto grid max-w-3xl gap-4 md:grid-cols-2">
+    <div className="mx-auto grid max-w-4xl gap-4 sm:gap-5 lg:grid-cols-2">
       <DashboardUsagePanel profile={profile} onOpenPayment={onOpenPayment} />
       <DashboardBillingStatusPanel onOpenPayment={onOpenPayment} />
     </div>

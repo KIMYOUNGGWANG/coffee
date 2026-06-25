@@ -48,8 +48,42 @@ export function sanitizeAuthRedirect(value: string | null): string {
   return `${parsedUrl.pathname}${parsedUrl.search}`;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object";
+}
+
+function isAuthRequiredMessage(message: string): boolean {
+  const normalizedMessage = message.toLowerCase();
+
+  return (
+    normalizedMessage.includes("401")
+    || normalizedMessage.includes("unauthorized")
+    || normalizedMessage.includes("authapierror")
+    || message.includes("로그인이 필요")
+    || message.includes("인증되지 않은")
+  );
+}
+
 export function isAuthRequiredError(error: unknown): boolean {
-  return false; // TEMPORARY BYPASS
+  if (error instanceof Error) {
+    return isAuthRequiredMessage(error.message);
+  }
+
+  if (typeof error === "string") {
+    return isAuthRequiredMessage(error);
+  }
+
+  if (!isRecord(error)) {
+    return false;
+  }
+
+  const status = error.status ?? error.statusCode ?? error.code;
+  if (status === 401 || status === "401") {
+    return true;
+  }
+
+  const message = error.message;
+  return typeof message === "string" && isAuthRequiredMessage(message);
 }
 
 export function buildAuthGateHref(redirectValue: string): string {

@@ -35,9 +35,9 @@ function NavigationItems({ activeTab, onTabChange }: DashboardNavigationProps) {
             aria-pressed={isActive}
             onClick={() => onTabChange(item.id)}
             className={cn(
-              "flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-bold transition-[color,background-color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95 md:min-h-10 md:flex-none md:flex-row md:gap-2 md:px-4 md:text-xs",
+              "flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-bold transition-[color,background-color,transform,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95 md:min-h-10 md:flex-none md:flex-row md:gap-2 md:px-4 md:text-xs",
               isActive
-                ? "bg-primary-amber/10 text-primary-amber"
+                ? "bg-primary-amber text-background-dark shadow-[0_10px_24px_rgba(217,160,91,0.22)]"
                 : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
             )}
           >
@@ -69,9 +69,9 @@ export function DashboardMobileNavigation(props: DashboardNavigationProps) {
   return (
     <nav
       aria-label="대시보드 주요 메뉴"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-background-dark/96 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-primary-amber/15 bg-[#120c08]/95 px-3 pb-[calc(0.55rem+env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-18px_38px_rgba(0,0,0,0.42)] backdrop-blur-xl md:hidden"
     >
-      <div className="mx-auto flex max-w-md items-center gap-1">
+      <div className="mx-auto flex max-w-md items-center gap-1 rounded-[1.25rem] border border-white/10 bg-white/[0.035] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <NavigationItems {...props} />
       </div>
     </nav>

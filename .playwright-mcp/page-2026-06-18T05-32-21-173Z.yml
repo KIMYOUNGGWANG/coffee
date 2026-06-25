@@ -1,0 +1,156 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - paragraph [ref=e6]: CoffeeDex
+          - paragraph [ref=e7]: Korea-first coffee archive
+        - button "원두 기록하기" [ref=e76]:
+          - img [ref=e9]
+          - generic [ref=e77]: 원두 기록하기
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - img [ref=e14]
+            - text: 첫 기록을 시작해 보세요
+          - heading "나의 커피 선반" [level=1] [ref=e16]
+          - paragraph [ref=e17]: 원두 패키지를 작품처럼 모으고, 마실수록 선명해지는 취향을 기록합니다.
+        - generic "테이스트 패스포트 진행도 0/5" [ref=e18]:
+          - generic [ref=e19]:
+            - img [ref=e21]
+            - generic [ref=e24]:
+              - generic [ref=e25]: 패스포트까지 5잔
+              - generic [ref=e26]: 0 / 5
+      - navigation "대시보드 주요 메뉴" [ref=e78]:
+        - button "선반" [pressed] [ref=e79]:
+          - img [ref=e80]
+          - generic [ref=e83]: 선반
+        - button "원두" [ref=e84]:
+          - img [ref=e85]
+          - generic [ref=e87]: 원두
+        - button "기록" [ref=e88]:
+          - img [ref=e89]
+          - generic [ref=e91]: 기록
+        - button "AI 추천" [ref=e92]:
+          - img [ref=e93]
+          - generic [ref=e95]: AI 추천
+    - generic [ref=e29]:
+      - complementary [ref=e96]:
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - img [ref=e99]
+            - heading "테이스팅 필터" [level=3] [ref=e100]
+          - generic [ref=e101]:
+            - textbox "원두명, 로스터리, 향미 검색..." [ref=e102]
+            - img [ref=e103]
+          - generic [ref=e106]:
+            - generic [ref=e107]: 추출 도구
+            - combobox [ref=e108]:
+              - option "전체 도구" [selected]
+              - option "Hario V60"
+              - option "Kalita Wave"
+              - option "Espresso"
+              - option "AeroPress"
+              - option "Origami Dripper"
+              - option "French Press"
+              - option "Cold Brew"
+          - generic [ref=e109]:
+            - generic [ref=e110]: 로스팅 포인트
+            - combobox [ref=e111]:
+              - option "전체 로스팅" [selected]
+              - option "Light (약배전)"
+              - option "Medium (중배전)"
+              - option "Dark (강배전)"
+          - generic [ref=e112]:
+            - generic [ref=e113]: 최소 맛 스펙트럼
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: 산미 (Acidity)
+                - generic [ref=e117]: 1 이상
+              - slider [ref=e118] [cursor=pointer]: "1"
+            - generic [ref=e119]:
+              - generic [ref=e120]:
+                - generic [ref=e121]: 단맛 (Sweetness)
+                - generic [ref=e122]: 1 이상
+              - slider [ref=e123] [cursor=pointer]: "1"
+            - generic [ref=e124]:
+              - generic [ref=e125]:
+                - generic [ref=e126]: 바디감 (Body)
+                - generic [ref=e127]: 1 이상
+              - slider [ref=e128] [cursor=pointer]: "1"
+          - generic [ref=e129]:
+            - generic [ref=e130]: 정렬 기준
+            - combobox [ref=e131]:
+              - option "최신 등록순" [selected]
+              - option "산미 높은순"
+              - option "단맛 높은순"
+              - option "바디감 높은순"
+              - option "이름 가나다순"
+        - generic [ref=e132]:
+          - generic [ref=e133]:
+            - img [ref=e134]
+            - heading "취향 지도와 리캡" [level=3] [ref=e136]
+          - generic [ref=e137]: 카드를 1개 이상 작성하시면 저장된 기록 기반의 맛 성향 요약과 AI 보조 리캡이 여기에 제공됩니다.
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - img [ref=e140]
+            - heading "로스터 메모리" [level=3] [ref=e145]
+          - generic [ref=e146]: 아직 로스터 기록 없음. 첫 카드를 저장하면 자주 마신 로스터와 재구매 후보가 이곳에 쌓입니다.
+        - generic [ref=e147]:
+          - generic [ref=e148]:
+            - img [ref=e149]
+            - generic [ref=e152]: Usage & Upgrade
+          - generic [ref=e153]:
+            - heading "사용량과 유료 가치" [level=3] [ref=e154]
+            - paragraph [ref=e155]: 무료 스캔을 먼저 쓰고, 이후에는 충전 크레딧 또는 Premium으로 원두 패키지 분석을 이어갑니다.
+          - generic [ref=e157]:
+            - generic [ref=e158]:
+              - img [ref=e159]
+              - text: 무료 AI 스캔 0 / 5
+            - generic [ref=e162]: 5회 남음
+          - generic [ref=e164]:
+            - generic [ref=e165]:
+              - paragraph [ref=e166]: 보유 크레딧
+              - paragraph [ref=e167]: 보유 크레딧 0개
+            - generic [ref=e168]:
+              - paragraph [ref=e169]: PDF 기록북
+              - paragraph [ref=e170]: PDF 기록북 미보유
+          - generic [ref=e171]:
+            - generic [ref=e172]:
+              - generic [ref=e173]: AI 라벨 스캔 보조
+              - generic [ref=e174]: 크레딧/Premium
+            - generic [ref=e175]:
+              - generic [ref=e176]: 기록 기반 AI 취향 리캡
+              - generic [ref=e177]: 포함
+            - generic [ref=e178]:
+              - generic [ref=e179]: 공유 카드 내보내기
+              - generic [ref=e180]: 포함
+          - button "월 $3.99로 구독하기" [ref=e181] [cursor=pointer]:
+            - img [ref=e182]
+            - text: 월 $3.99로 구독하기
+        - generic [ref=e184]: 구독 상태를 불러오지 못했습니다.
+      - region "서랍 속 원두 봉투를 디지털 선반에 올려보세요." [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - img [ref=e34]
+            - text: 20초 안에 첫 기록
+          - heading "서랍 속 원두 봉투를 디지털 선반에 올려보세요." [level=2] [ref=e36]:
+            - text: 서랍 속 원두 봉투를
+            - text: 디지털 선반에 올려보세요.
+          - paragraph [ref=e37]: 패키지 사진을 스캔하면 로스터리, 원산지, 가공 방식과 향미가 자동으로 채워집니다. 틀린 정보만 확인하고 저장하세요.
+          - list [ref=e38]:
+            - listitem [ref=e39]:
+              - img [ref=e40]
+              - text: 사진 한 장
+            - listitem [ref=e42]:
+              - img [ref=e43]
+              - text: AI 초안 확인
+            - listitem [ref=e45]:
+              - img [ref=e46]
+              - text: 내 선반에 저장
+        - button "원두 패키지 스캔하기 카메라 또는 앨범에서 선택" [ref=e48]:
+          - img [ref=e50]
+          - generic [ref=e53]:
+            - generic [ref=e54]: 원두 패키지 스캔하기
+            - generic [ref=e55]: 카메라 또는 앨범에서 선택
+  - alert [ref=e75]

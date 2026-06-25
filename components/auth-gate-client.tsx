@@ -165,7 +165,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
             </p>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 mb-4">
             <Button
               type="button"
               disabled={!isConfigured || isSubmitting}
@@ -180,10 +180,24 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
               variant="outline"
               disabled={!isConfigured || isSubmitting}
               onClick={() => void runAuthAction("signup")}
-              className="border-white/10/25 bg-white text-foreground hover:bg-[#0D0A07]"
+              className="border border-white/20 bg-transparent text-foreground hover:bg-white/5 hover:text-primary-amber"
             >
               <UserPlus size={16} aria-hidden="true" />
               회원가입
+            </Button>
+          </div>
+          
+          <div className="pt-4 border-t border-white/10 mt-4">
+            <Button
+              type="button"
+              onClick={() => {
+                // Mock test mode bypass
+                localStorage.setItem("mock_test_mode", "true");
+                globalThis.location.assign(redirectTo);
+              }}
+              className="w-full bg-surface border border-white/20 text-white hover:bg-white/10"
+            >
+              🚀 테스트 계정으로 바로 입장하기 (Mock)
             </Button>
           </div>
         </form>

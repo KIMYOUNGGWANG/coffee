@@ -17,6 +17,7 @@ type DashboardRuntimeOverlaysProps = {
   readonly isCardsLoading: boolean;
   readonly cardsError: unknown;
   readonly cardsFailureReason: unknown;
+  readonly showScanAction: boolean;
   readonly isWizardOpen: boolean;
   readonly wizardTasteProfile: TasteProfileKey | null;
   readonly isPaymentOpen: boolean;
@@ -41,6 +42,7 @@ export function DashboardRuntimeOverlays({
   isCardsLoading,
   cardsError,
   cardsFailureReason,
+  showScanAction,
   isWizardOpen,
   wizardTasteProfile,
   isPaymentOpen,
@@ -60,7 +62,7 @@ export function DashboardRuntimeOverlays({
   return (
     <>
       <DashboardMobileNavigation activeTab={activeTab} onTabChange={onTabChange} />
-      <DashboardScanAction onScan={onScan} />
+      {activeTab === "shelf" && showScanAction && <DashboardScanAction onScan={onScan} />}
       <DashboardIntentEffects
         initialActivationIntent={initialActivationIntent}
         initialCheckoutIntent={initialCheckoutIntent}

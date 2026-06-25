@@ -10,6 +10,9 @@ export interface TastingCardFormState {
   metric1: number; // Coffee: Acidity (1-5)
   metric2: number; // Coffee: Sweetness (1-5)
   metric3: number; // Coffee: Body (1-5)
+  metric4: number; // Coffee: Bitterness (1-5)
+  metric5: number; // Coffee: Aroma (1-5)
+  metric6: number; // Coffee: Aftertaste (1-5)
   tags: string[];
   rawNote: string;
   aiDescription: string;
@@ -27,6 +30,9 @@ const initialFormState: TastingCardFormState = {
   metric1: 3,
   metric2: 3,
   metric3: 3,
+  metric4: 3,
+  metric5: 3,
+  metric6: 3,
   tags: [],
   rawNote: "",
   aiDescription: "",

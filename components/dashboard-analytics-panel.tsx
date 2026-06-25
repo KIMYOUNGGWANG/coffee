@@ -3,6 +3,7 @@
 import { BookOpen, Coffee, RefreshCcw, Sparkles } from "lucide-react";
 import type { TasteAnalyticsData } from "@/hooks/useTastingCards";
 import type { PassportCoverage, PassportState } from "@/lib/passport-state";
+import FluidRadarChart from "@/components/FluidRadarChart";
 
 type TopNote = {
   readonly note: string;
@@ -42,7 +43,7 @@ const coverageLabels: Readonly<Record<PassportCoverage, string>> = {
 function AnalyticsSkeleton() {
   return (
     <div className="space-y-3 py-3 animate-pulse" aria-label="패스포트 불러오는 중">
-      <div className="h-20 rounded-2xl bg-white/10" />
+      <div className="h-64 rounded-2xl bg-white/10" />
       <div className="grid grid-cols-3 gap-2">
         <div className="h-16 rounded-xl bg-white/10" />
         <div className="h-16 rounded-xl bg-white/10" />
@@ -77,7 +78,51 @@ export default function DashboardAnalyticsPanel({ analytics, isLoading }: Dashbo
                 {coverageLabels[passport.coverage]}
               </span>
             </div>
-            <p className="mt-3 break-keep text-xs leading-5 text-muted-foreground">{analytics.aiAnalysis}</p>
+            
+            {passport.sampleCount >= 5 ? (
+              <>
+                {/* Visual Radar Chart Spotlight */}
+                <div className="flex flex-col items-center">
+                  <div className="flex justify-center py-6 relative w-full">
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-[200px] h-[200px] bg-primary-amber/10 blur-[60px] rounded-full" />
+                    </div>
+                    <FluidRadarChart 
+                      acidity={analytics.averageAcidity ?? 5} 
+                      sweetness={analytics.averageSweetness ?? 5} 
+                      body={analytics.averageBody ?? 5} 
+                      size={260} 
+                    />
+                  </div>
+                  
+                  {/* Top 3 Notes Spotlight */}
+                  {(analytics.topNotes?.length ?? 0) > 0 && (
+                    <div className="flex flex-col items-center mt-2 mb-6 w-full relative z-10">
+                      <div className="flex flex-wrap justify-center gap-2">
+                        {analytics.topNotes?.slice(0, 3).map(({ note, count }) => (
+                          <span key={note} className="rounded-full border border-primary-amber/40 bg-primary-amber/10 px-4 py-1.5 text-xs font-black tracking-wide text-primary-amber shadow-[0_4px_24px_rgba(217,160,91,0.2)] backdrop-blur-md">
+                            {note} <span className="opacity-60 text-[10px] ml-1 font-semibold">{count}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="mt-4 border-t border-white/10 pt-4">
+                  <p className="break-keep text-[11px] leading-relaxed text-muted-foreground/90 italic font-serif text-center">“{analytics.aiAnalysis}”</p>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <Coffee className="mb-3 h-8 w-8 text-white/20" aria-hidden="true" />
+                <p className="text-sm font-bold text-foreground">취향 분석을 위한 데이터가 부족합니다</p>
+                <p className="mt-1.5 break-keep text-[11px] leading-5 text-muted-foreground">
+                  방사형 차트와 AI 취향 요약을 보려면 최소 5개의 확정된 기록이 필요합니다.<br/>
+                  (현재 {passport.sampleCount}개 / 5개)
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-2" aria-label="패스포트 기록 범위">
@@ -93,21 +138,7 @@ export default function DashboardAnalyticsPanel({ analytics, isLoading }: Dashbo
             ))}
           </div>
 
-          {(analytics.topNotes?.length ?? 0) > 0 && (
-            <div>
-              <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground">
-                <Sparkles aria-hidden="true" size={12} className="text-primary-amber" />
-                내가 직접 남긴 향미
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {analytics.topNotes?.map(({ note, count }) => (
-                  <span key={note} className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold text-foreground">
-                    {note} {count}회
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+
 
           {analytics.repurchaseBreakdown && (
             <div className="rounded-2xl border border-white/10 bg-white/5 p-3.5">

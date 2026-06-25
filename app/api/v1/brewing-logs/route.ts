@@ -13,7 +13,8 @@ const createBrewingLogSchema = z.object({
     coffeeAmount: z.number().optional().nullable(),
     grindSize: z.string().optional().nullable(),
     brewTime: z.string().optional().nullable(),
-  }).default({}),
+  }).optional().nullable(),
+  autoRecipe: z.boolean().optional(),
   rating: z.number().int().min(1).max(5).optional().nullable(),
   simpleNote: z.string().optional().nullable(),
 });
@@ -95,6 +96,17 @@ export async function POST(request: NextRequest) {
 
     const validatedData = result.data;
 
+    let finalParameters = validatedData.parameters || {};
+    if (validatedData.autoRecipe && (!validatedData.parameters || Object.keys(validatedData.parameters).length === 0)) {
+      finalParameters = {
+        waterTemp: 92,
+        grindSize: "Medium",
+        coffeeAmount: 18,
+        waterAmount: 250,
+        brewTime: "2:30",
+      };
+    }
+
     const { data, error } = await supabase
       .from("brewing_logs")
       .insert({
@@ -102,7 +114,7 @@ export async function POST(request: NextRequest) {
         shelf_item_id: validatedData.shelfItemId || null,
         brewed_at: validatedData.brewedAt || new Date().toISOString(),
         method: validatedData.method,
-        parameters: validatedData.parameters,
+        parameters: finalParameters,
         rating: validatedData.rating || null,
         simple_note: validatedData.simpleNote || null,
       })

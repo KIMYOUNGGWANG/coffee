@@ -59,13 +59,15 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
 
   // Loading message rotator
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: number | undefined;
     if (isLoading) {
-      interval = setInterval(() => {
+      interval = window.setInterval(() => {
         setLoadingStep((prev) => (prev + 1) % loadingMessages.length);
       }, 3000);
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (interval !== undefined) clearInterval(interval);
+    };
   }, [isLoading]);
 
   const handleGetRecommendation = async () => {

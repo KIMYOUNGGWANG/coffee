@@ -22,7 +22,7 @@ export default function DashboardUsagePanel({ profile, onOpenPayment }: Dashboar
   const scanProgress = scanLimit > 0 ? Math.min(100, Math.round((scansUsed / scanLimit) * 100)) : 0;
 
   return (
-    <div className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-5 text-foreground shadow-sm">
+    <div className="space-y-4 rounded-3xl border border-white/10 bg-white/[0.04] p-5 text-foreground shadow-sm sm:p-6">
       <div className="flex items-center gap-1.5">
         <CheckCircle size={16} className="text-primary-amber" />
         <span className="inline-block rounded-full bg-white/5 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -31,15 +31,15 @@ export default function DashboardUsagePanel({ profile, onOpenPayment }: Dashboar
       </div>
 
       <div>
-        <h3 className="mt-2 font-serif text-base font-bold">사용량</h3>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+        <h3 className="mt-2 break-keep font-serif text-xl font-bold leading-tight">사용량</h3>
+        <p className="mt-2 break-keep text-sm leading-6 text-muted-foreground">
           커피 기록과 다시 찾기는 무료입니다. 라벨 스캔 보조와 PDF 기록북은 필요할 때 추가할 수 있습니다.
         </p>
       </div>
 
-      <div className="space-y-2.5 rounded-2xl border border-white/10 bg-black/20 p-3">
-        <div className="flex items-center justify-between text-xs">
-          <span className="flex items-center gap-1.5 text-muted-foreground">
+      <div className="space-y-2.5 rounded-2xl border border-white/10 bg-black/20 p-3.5">
+        <div className="grid gap-2 text-xs sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+          <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
             <Camera size={13} />
             무료 AI 스캔 {scansUsed} / {scanLimit}
           </span>
@@ -50,7 +50,7 @@ export default function DashboardUsagePanel({ profile, onOpenPayment }: Dashboar
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-xs">
+      <div className="grid gap-2 text-xs sm:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
           <p className="text-muted-foreground">보유 크레딧</p>
           <p className="mt-1 font-bold text-foreground">보유 크레딧 {profile?.credits ?? 0}개</p>
@@ -62,15 +62,15 @@ export default function DashboardUsagePanel({ profile, onOpenPayment }: Dashboar
       </div>
 
       <div className="space-y-2 text-xs">
-        <div className="flex justify-between border-b border-white/10 pb-1.5 text-muted-foreground">
+        <div className="grid gap-1 border-b border-white/10 pb-2 text-muted-foreground sm:grid-cols-[minmax(0,1fr)_auto]">
           <span>AI 라벨 스캔 보조</span>
           <span className="font-bold text-foreground">크레딧/Premium</span>
         </div>
-        <div className="flex justify-between border-b border-white/10 pb-1.5 text-muted-foreground">
+        <div className="grid gap-1 border-b border-white/10 pb-2 text-muted-foreground sm:grid-cols-[minmax(0,1fr)_auto]">
           <span>기록 기반 AI 취향 리캡</span>
           <span className="font-bold text-foreground">포함</span>
         </div>
-        <div className="flex justify-between pb-1.5 text-muted-foreground">
+        <div className="grid gap-1 pb-1 text-muted-foreground sm:grid-cols-[minmax(0,1fr)_auto]">
           <span>공유 카드 내보내기</span>
           <span className="font-bold text-foreground">포함</span>
         </div>
@@ -79,7 +79,7 @@ export default function DashboardUsagePanel({ profile, onOpenPayment }: Dashboar
       <Button
         onClick={onOpenPayment}
         variant="outline"
-        className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border-white/10 bg-transparent py-2.5 text-xs font-bold text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
+        className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border-white/10 bg-transparent px-4 py-2.5 text-xs font-bold text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
       >
         <BookOpen size={13} strokeWidth={2.5} />
         추가 기능 및 결제 보기

@@ -3,7 +3,7 @@ import type { Page, Route } from "@playwright/test";
 
 const guestDraft = {
   version: 1,
-  created_at: "2026-06-18T12:00:00.000Z",
+  created_at: new Date().toISOString(),
   extracted: {
     title: "Colombia Huila",
     subtitle: "Local Roaster",
@@ -51,6 +51,10 @@ test("resumed save retains the draft on failure and clears it only after a 201 r
     }
   }, guestDraft);
   await page.route("**/api/v1/cards", async (route) => {
+    if (route.request().method() !== "POST") {
+      await fulfillJson(route, { data: [] });
+      return;
+    }
     attempts += 1;
     if (attempts === 1) {
       await fulfillJson(route, { error: { code: 500, message: "잠시 저장할 수 없습니다." } }, 500);

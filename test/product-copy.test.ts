@@ -84,6 +84,20 @@ async function mockDashboardApiRoutes(page: Page): Promise<void> {
       case "/api/v1/cards":
         await fulfillJson(route, emptyCardsResponse);
         return;
+      case "/api/v1/coffee-dna":
+        console.log("MOCK HIT: /api/v1/coffee-dna");
+        await fulfillJson(route, {
+          data: {
+            totalBeans: 0,
+            averageRating: null,
+            wantAgainRate: 0,
+            topOrigins: [],
+            topRoasters: [],
+            tasteProfile: null,
+            typeLabel: "기록이 부족합니다",
+          },
+        });
+        return;
       case "/api/v1/profile":
         await fulfillJson(route, profileResponse);
         return;
@@ -96,6 +110,9 @@ async function mockDashboardApiRoutes(page: Page): Promise<void> {
       case "/api/v1/analytics":
         await fulfillJson(route, { received: true });
         return;
+      case "/api/v1/shelf":
+        await fulfillJson(route, { data: [] });
+        return;
       default:
         await route.fulfill({
           status: 404,
@@ -104,6 +121,24 @@ async function mockDashboardApiRoutes(page: Page): Promise<void> {
         });
     }
   });
+
+  await page.route("**/auth/v1/user*", async (route) => {
+    await fulfillJson(route, { id: "test-user-id", aud: "authenticated", role: "authenticated" });
+  });
+
+  await page.route("**/rest/v1/tasting_cards*", async (route) => {
+    await fulfillJson(route, []);
+  });
+
+  await page.addInitScript(() => {
+    const originalGetItem = window.localStorage.getItem;
+    window.localStorage.getItem = function(key) {
+      if (key === 'mock_test_mode') return 'true';
+      return originalGetItem.call(window.localStorage, key);
+    };
+  });
+
+  page.on('console', msg => console.log('BROWSER CONSOLE:', msg.text()));
 }
 
 async function expectNoUnsupportedVisibleCopy(page: Page): Promise<void> {
@@ -124,8 +159,8 @@ test.describe("CoffeeDex product copy", () => {
     // Then
     await expect(page.getByText("Korea-first Specialty Coffee Memory")).toBeVisible();
     await expect(page.getByRole("heading", { name: /한국 스페셜티 커피를/ })).toBeVisible();
-    await expect(page.getByText("AI 보조 테이스팅 초안")).toBeVisible();
-    await expect(page.getByText("디지털 아티팩트")).toBeVisible();
+    await expect(page.getByText("원두 라벨 스캔 초안")).toBeVisible();
+    await expect(page.getByText("디지털 진열장에 쌓이는 미각 아카이브")).toBeVisible();
     await expect(page.getByRole("link", { name: "Taste Finder 시작" })).toHaveAttribute("href", "/onboarding");
     await expect(page.getByRole("link", { name: /30초 Taste Finder로 시작/ })).toHaveAttribute("href", "/onboarding");
     await expectNoUnsupportedVisibleCopy(page);
@@ -139,8 +174,9 @@ test.describe("CoffeeDex product copy", () => {
 
     // Then
     await expect(page).toHaveURL("/onboarding");
-    await expect(page.getByText("Taste profile cards")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "커피 추천은 첫 기록에서 시작됩니다." })).toBeVisible();
+    await expect(page.getByText("30-second Taste Finder")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "오늘의 취향은 어떤 방향인가요?" })).toBeVisible();
+    await expect(page.getByText("첫 Taste Card 미리보기")).toBeVisible();
     await expect(page).not.toHaveURL(/\/auth|\/dashboard/);
   });
 
@@ -152,11 +188,12 @@ test.describe("CoffeeDex product copy", () => {
     await page.goto("/dashboard");
 
     // Then
-    await expect(page.getByText("한국 스페셜티 커피 아카이브")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "CoffeeDex Taste Archive" })).toBeVisible();
-    await expect(page.getByText("취향 지도와 리캡")).toBeVisible();
-    await expect(page.getByText("기록 기반 AI 취향 리캡")).toBeVisible();
-    await expect(page.getByText("공유 카드 내보내기")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "향미 선반" })).toBeVisible();
+    await expect(page.getByText("내 원두 아카이브")).toBeVisible();
+    await expect(page.getByText("기록한 원두들을 찬장에 진열해 보세요")).toBeVisible();
+    await expect(page.getByText("Taste Passport", { exact: true })).toBeVisible();
+    await expect(page.getByText("오늘의 향미 프로필")).toBeVisible();
+    await expect(page.getByText("나의 커피 DNA")).toBeVisible();
     await expect(page.getByText("PDF 테이스팅북 내보내기 혜택")).toHaveCount(0);
     await expectNoUnsupportedVisibleCopy(page);
     await captureEvidenceScreenshot(page, screenshotPaths.dashboard);
@@ -167,10 +204,12 @@ test.describe("CoffeeDex product copy", () => {
     await page.goto("/onboarding");
 
     // Then
-    await expect(page.getByText("CoffeeDex Korea-first Onboarding")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "첫 한국 스페셜티 커피 기억을 기록할 준비" })).toBeVisible();
-    await expect(page.getByText("한국어 향미 단어")).toBeVisible();
-    await expect(page.getByText("패키지 스캔 초안")).toBeVisible();
+    await expect(page.getByText("Private espresso concierge")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "오늘의 취향으로 첫 기록을 시작해요" })).toBeVisible();
+    await expect(page.getByText("밝은 산미")).toBeVisible();
+    await expect(page.getByText("달콤한 균형")).toBeVisible();
+    await expect(page.getByText("묵직한 바디")).toBeVisible();
+    await expect(page.getByText("첫 Taste Card 미리보기")).toBeVisible();
     await expectNoUnsupportedVisibleCopy(page);
     await captureEvidenceScreenshot(page, screenshotPaths.onboarding);
   });

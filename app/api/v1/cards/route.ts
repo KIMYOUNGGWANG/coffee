@@ -22,6 +22,9 @@ const createCardSchema = z.object({
   metric1: z.number().int().min(1).max(5), // Coffee: Acidity
   metric2: z.number().int().min(1).max(5), // Coffee: Sweetness
   metric3: z.number().int().min(1).max(5), // Coffee: Body
+  metric4: z.number().int().min(1).max(5).default(3), // Coffee: Bitterness
+  metric5: z.number().int().min(1).max(5).default(3), // Coffee: Aroma
+  metric6: z.number().int().min(1).max(5).default(3), // Coffee: Aftertaste
   tags: z.array(z.string()).default([]),
   aiDescription: z.string().default(""),
   footerMeta: z.object({
@@ -146,6 +149,9 @@ export async function POST(request: NextRequest) {
         metric1: validatedData.metric1,
         metric2: validatedData.metric2,
         metric3: validatedData.metric3,
+        metric4: validatedData.metric4,
+        metric5: validatedData.metric5,
+        metric6: validatedData.metric6,
         tags: validatedData.tags,
         ai_description: validatedData.aiDescription,
         footer_meta: validatedData.footerMeta,

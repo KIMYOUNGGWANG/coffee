@@ -12,6 +12,8 @@ const createShelfItemSchema = z.object({
   totalWeight: z.number().int().min(1, "무게는 1g 이상이어야 합니다.").default(200),
   fillLevel: z.number().int().min(0).max(100).default(100),
   tastingCardId: z.string().uuid().optional().nullable(),
+  rating: z.number().int().min(1).max(5).optional().nullable(),
+  wantAgain: z.boolean().optional().nullable(),
 });
 
 // GET /api/v1/shelf - Get active or archived shelf items
@@ -97,6 +99,8 @@ export async function POST(request: NextRequest) {
         fill_level: validatedData.fillLevel,
         is_finished: validatedData.fillLevel === 0,
         tasting_card_id: validatedData.tastingCardId || null,
+        rating: validatedData.rating || null,
+        want_again: validatedData.wantAgain ?? false,
       })
       .select()
       .single();

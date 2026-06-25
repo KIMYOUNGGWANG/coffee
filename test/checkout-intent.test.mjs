@@ -138,3 +138,16 @@ test("Given external checkout-intent redirects, When sanitizing auth redirects, 
     assert.equal(buildAuthGateHref(redirect), "/auth?redirect=%2Fdashboard");
   }
 });
+
+test("Given API auth failure shapes, When checking auth-required errors, Then they are recognized", async () => {
+  // Given
+  const { isAuthRequiredError } = await loadAuthRedirectModule();
+
+  // When / Then
+  assert.equal(isAuthRequiredError(new Error("인증되지 않은 사용자입니다. 로그인이 필요합니다.")), true);
+  assert.equal(isAuthRequiredError(new Error("로그인이 필요한 서비스입니다.")), true);
+  assert.equal(isAuthRequiredError({ status: 401 }), true);
+  assert.equal(isAuthRequiredError({ code: 401, message: "Unauthorized" }), true);
+  assert.equal(isAuthRequiredError(new Error("데이터베이스 조회 중 오류가 발생했습니다.")), false);
+  assert.equal(isAuthRequiredError(null), false);
+});

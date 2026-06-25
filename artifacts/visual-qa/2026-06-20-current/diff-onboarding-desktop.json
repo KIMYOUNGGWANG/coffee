@@ -1,0 +1,119 @@
+{
+  "command": "image-diff",
+  "dimensionsMatch": true,
+  "reference": {
+    "width": 1280,
+    "height": 1050
+  },
+  "actual": {
+    "width": 1280,
+    "height": 1050
+  },
+  "totalPixels": 1344000,
+  "diffPixels": 18840,
+  "diffRatio": 0.014,
+  "similarityScore": 99,
+  "alphaChannelIntact": true,
+  "hotspots": [
+    {
+      "gridX": 7,
+      "gridY": 3,
+      "x": 1120,
+      "y": 393,
+      "width": 160,
+      "height": 132,
+      "diffRatio": 0.3173
+    },
+    {
+      "gridX": 7,
+      "gridY": 4,
+      "x": 1120,
+      "y": 525,
+      "width": 160,
+      "height": 131,
+      "diffRatio": 0.1985
+    },
+    {
+      "gridX": 7,
+      "gridY": 2,
+      "x": 1120,
+      "y": 262,
+      "width": 160,
+      "height": 131,
+      "diffRatio": 0.1556
+    },
+    {
+      "gridX": 0,
+      "gridY": 6,
+      "x": 0,
+      "y": 787,
+      "width": 160,
+      "height": 131,
+      "diffRatio": 0.0584
+    },
+    {
+      "gridX": 5,
+      "gridY": 3,
+      "x": 800,
+      "y": 393,
+      "width": 160,
+      "height": 132,
+      "diffRatio": 0.0377
+    },
+    {
+      "gridX": 6,
+      "gridY": 3,
+      "x": 960,
+      "y": 393,
+      "width": 160,
+      "height": 132,
+      "diffRatio": 0.0337
+    },
+    {
+      "gridX": 4,
+      "gridY": 3,
+      "x": 640,
+      "y": 393,
+      "width": 160,
+      "height": 132,
+      "diffRatio": 0.0269
+    },
+    {
+      "gridX": 4,
+      "gridY": 2,
+      "x": 640,
+      "y": 262,
+      "width": 160,
+      "height": 131,
+      "diffRatio": 0.0244
+    },
+    {
+      "gridX": 6,
+      "gridY": 4,
+      "x": 960,
+      "y": 525,
+      "width": 160,
+      "height": 131,
+      "diffRatio": 0.0164
+    },
+    {
+      "gridX": 5,
+      "gridY": 2,
+      "x": 800,
+      "y": 262,
+      "width": 160,
+      "height": 131,
+      "diffRatio": 0.0146
+    },
+    {
+      "gridX": 6,
+      "gridY": 2,
+      "x": 960,
+      "y": 262,
+      "width": 160,
+      "height": 131,
+      "diffRatio": 0.0137
+    }
+  ],
+  "summary": "99/100 similarity; 18840/1344000 pixels differ; 11 hotspot region(s)."
+}

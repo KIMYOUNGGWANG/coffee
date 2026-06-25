@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { AlertCircle, ChevronRight, Coffee, Home, Sparkles } from "lucide-react";
 import { z } from "zod";
 import confetti from "canvas-confetti";
-import FluidRadarChart from "@/components/FluidRadarChart";
+import { FlavorRadarChart } from "@/components/flavor-radar-chart";
 import { publicTastingCardSchema, type PublicTastingCard } from "@/lib/public-card";
 
 type QuizClientProps = {
@@ -127,12 +127,13 @@ export default function QuizClient({ token }: QuizClientProps) {
             </p>
 
             <div className="relative w-full aspect-square bg-white/5 rounded-[2rem] flex flex-col items-center justify-center shadow-inner mb-8 overflow-hidden">
-              <FluidRadarChart 
-                acidity={state.card.metric1} 
-                sweetness={state.card.metric2} 
-                body={state.card.metric3} 
-                size={220}
-                hideLabels={!hasGuessed}
+              <FlavorRadarChart 
+                metric1={state.card.metric1} 
+                metric2={state.card.metric2} 
+                metric3={state.card.metric3} 
+                metric4={state.card.metric4 ?? 3}
+                metric5={state.card.metric5 ?? 3}
+                metric6={state.card.metric6 ?? 3}
               />
               {!hasGuessed && (
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] pointer-events-none flex items-center justify-center">

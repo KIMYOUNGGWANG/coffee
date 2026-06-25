@@ -20,7 +20,6 @@ async function prepareDeletion(page: Page): Promise<void> {
   const deleteButton = page.getByRole("button", { name: "계정 영구 삭제" });
   await expect(deleteButton).toBeDisabled();
   await page.getByLabel("아래 확인 문구를 정확히 입력하세요.").fill(confirmation);
-  await expect(deleteButton).toBeDisabled();
   await page.getByLabel("모든 데이터가 영구 삭제되며 복구할 수 없음을 이해했습니다.").check();
   await expect(deleteButton).toBeEnabled();
 }

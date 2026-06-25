@@ -234,7 +234,7 @@ test.describe("CoffeeDex auth resume conversion", () => {
 
     // Then
     await expect(page).toHaveURL(/\/dashboard(?:\?|$)/);
-    await expect(page.getByRole("dialog", { name: "프리미엄 커피 도서관 패키지" })).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "추가 기능 및 결제" })).toBeVisible();
     await expect(page.getByText("로그인 후 이어서 결제할 상품: CoffeeDex Premium 구독 (월간)")).toBeVisible();
     await expect(page.getByText(/401|AuthApiError|로그인이 필요|인증되지 않은/)).toHaveCount(0);
     await page.screenshot({ path: ".omo/evidence/auth-resume-c002.png", fullPage: true });

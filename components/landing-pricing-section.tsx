@@ -48,7 +48,7 @@ export default function LandingPricingSection() {
       <details className="group mx-auto max-w-7xl px-4 md:px-8">
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-left marker:content-none">
           <span>
-            <span className="block text-xs font-black text-foreground">추가 기능 및 가격 보기</span>
+            <span className="block text-xs font-black text-foreground">추가 기능 및 가격 안내</span>
             <span className="mt-1 block text-xs text-muted-foreground">더 많은 스캔, PDF 기록북, Premium은 필요할 때 선택할 수 있습니다.</span>
           </span>
           <ChevronDown size={18} className="shrink-0 text-primary-amber transition-transform group-open:rotate-180" />

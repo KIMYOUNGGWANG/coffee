@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "active_work_id": null,
+  "works": {
+    "mobile-first-fresh-shelf-visual-fix": {
+      "work_id": "mobile-first-fresh-shelf-visual-fix",
+      "active_plan": ".omo/plans/mobile-first-fresh-shelf-visual-fix.md",
+      "plan_name": "mobile-first-fresh-shelf-visual-fix",
+      "session_ids": ["codex:019ee29f-e7f7-77a1-9044-52ae5a7cdd46"],
+      "status": "completed",
+      "worktree_path": null
+    }
+  }
+}

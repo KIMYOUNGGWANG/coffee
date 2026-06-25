@@ -234,29 +234,29 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
           key={i}
           onClick={() => isCurrentMonthDay && handleDayClick(dayNumber)}
           className={cn(
-            "aspect-[7/6] p-1.5 md:p-2 border-r border-b border-sand/40 flex flex-col justify-between items-start transition-all",
+            "min-h-[3.75rem] border-b border-r border-white/10 p-1.5 transition-colors sm:min-h-[5rem] sm:p-2",
             isCurrentMonthDay
-              ? "glass-card hover:bg-white/5 cursor-pointer"
-              : "bg-black/20 text-muted-foreground/30",
-            isToday && "bg-primary-amber/5 border-2 border-primary-amber/50"
+              ? "flex cursor-pointer flex-col items-start justify-between bg-[#17120e] hover:bg-[#211a14]"
+              : "bg-[#0f0b08] text-muted-foreground/18",
+            isToday && "bg-primary-amber/10 shadow-[inset_0_0_0_1px_rgba(217,160,91,0.55)]"
           )}
         >
           {isCurrentMonthDay ? (
             <>
               <span className={cn(
-                "text-xs font-bold font-mono",
+                "text-xs font-bold font-mono leading-none",
                 isToday ? "text-primary-amber" : "text-muted-foreground"
               )}>
                 {dayNumber}
               </span>
 
               {hasLogs && (
-                <div className="w-full flex flex-wrap gap-1 justify-center pb-1">
+                <div className="flex w-full flex-wrap justify-center gap-1 pb-1">
                   {dayLogs.map((log) => (
                     <div
                       key={log.id}
                       title={`${log.coffee_shelf_items?.bean_name || "원두"} (${log.method})`}
-                      className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-primary-amber text-[#0D0A07] flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+                      className="flex size-5 items-center justify-center rounded-full bg-primary-amber text-[#0D0A07] shadow-sm transition-transform hover:scale-110 md:size-6"
                     >
                       <Coffee size={10} className="md:scale-110" />
                     </div>
@@ -314,9 +314,9 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
         </div>
       ) : (
         /* Calendar Grid */
-        <div className="glass-card rounded-3xl overflow-hidden shadow-sm">
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0d0a07] shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
           {/* Days of Week Header */}
-          <div className="grid grid-cols-7 bg-black/40 border-b border-white/10 text-center py-2 text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+          <div className="grid grid-cols-7 border-b border-white/10 bg-[#17120e] py-2.5 text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             {["일", "월", "화", "수", "목", "금", "토"].map((dayName, idx) => (
               <div
                 key={idx}
@@ -331,7 +331,7 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
           </div>
 
           {/* Calendar Day Grid Cells */}
-          <div className="grid grid-cols-7 border-l border-t border-white/10">
+          <div className="grid grid-cols-7">
             {renderCalendarCells()}
           </div>
         </div>

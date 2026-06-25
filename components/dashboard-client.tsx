@@ -208,6 +208,10 @@ export default function DashboardClient({
             onShareCard={setSelectedShareCard}
             analytics={analytics}
             onOpenPassport={() => setActiveTab("passport")}
+            dnaData={null}
+            isDnaLoading={false}
+            onShareDNA={() => {}}
+            onShelfDataChange={() => {}}
           />
         )}
 
@@ -235,6 +239,7 @@ export default function DashboardClient({
         resumedCheckoutItemType={resumedCheckoutItemType}
         selectedDetailCard={selectedDetailCard}
         selectedShareCard={selectedShareCard}
+        showScanAction={true}
         onTabChange={setActiveTab}
         onScan={() => openWizard("mobile_scan_action")}
         onOpenWizard={openActivationWizard}

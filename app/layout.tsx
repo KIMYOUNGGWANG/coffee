@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
+import { Playfair_Display } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { coffeeDexBrand } from "@/lib/brand";
 import "./globals.css";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: `${coffeeDexBrand.name} — ${coffeeDexBrand.category}`,
@@ -15,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="font-sans antialiased">
+      <body className={`${playfair.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

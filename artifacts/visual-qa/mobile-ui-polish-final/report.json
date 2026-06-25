@@ -1,0 +1,137 @@
+[
+  {
+    "viewport": "mobile",
+    "page": "landing",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "page": "onboarding",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "page": "dashboard-shelf",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": false
+    }
+  },
+  {
+    "viewport": "mobile",
+    "page": "settings",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "page": "dashboard-calendar",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": false
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "landing",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": true
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "onboarding",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": true
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "dashboard-shelf",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": false
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "settings",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": true
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "dashboard-calendar",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": false
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "landing",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "onboarding",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "dashboard-shelf",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": false
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "settings",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "dashboard-calendar",
+    "checks": {
+      "overflowing": [],
+      "clippedText": [],
+      "nextDevIndicatorText": false
+    }
+  }
+]

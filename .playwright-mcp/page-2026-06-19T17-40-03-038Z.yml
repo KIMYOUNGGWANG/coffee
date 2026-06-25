@@ -1,0 +1,36 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: CoffeeDex
+      - img [ref=e8]
+    - generic "패스포트 다음 단계 0/3" [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]: 3개까지 3개
+        - generic [ref=e14]: 0 / 3
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - heading "나의 커피 선반" [level=1] [ref=e18]
+        - paragraph [ref=e19]: 기록한 원두 0봉
+      - button "정렬" [ref=e20]:
+        - img [ref=e21]
+        - text: 정렬
+  - generic "원두 선반 불러오는 중" [ref=e25]
+  - navigation "대시보드 주요 메뉴" [ref=e46]:
+    - generic [ref=e47]:
+      - button "선반" [pressed] [ref=e48]:
+        - img [ref=e49]
+        - generic [ref=e51]: 선반
+      - button "기록" [ref=e52]:
+        - img [ref=e53]
+        - generic [ref=e55]: 기록
+      - button "패스포트" [ref=e56]:
+        - img [ref=e57]
+        - generic [ref=e59]: 패스포트
+      - link "설정" [ref=e60] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e61]
+        - generic [ref=e64]: 설정
+  - button "새 원두 스캔" [ref=e65]:
+    - generic [ref=e66]:
+      - img [ref=e67]
+      - text: 스캔

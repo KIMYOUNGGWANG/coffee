@@ -67,15 +67,15 @@ export function AccountDataControls() {
   }
 
   return (
-    <div className="grid items-start gap-5 lg:grid-cols-2">
-      <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.22)] sm:p-7">
-        <div className="flex items-start gap-3">
+    <div className="mx-auto grid max-w-4xl items-start gap-5 lg:grid-cols-2">
+      <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.22)] sm:p-6">
+        <div className="grid gap-3 sm:grid-cols-[2.75rem_minmax(0,1fr)]">
           <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-primary-amber/10 text-primary-amber">
             <Download aria-hidden="true" size={20} />
           </span>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-primary-amber">내 데이터</p>
-            <h2 className="mt-1 font-serif text-2xl font-black">커피 기억 내려받기</h2>
+            <h2 className="mt-1 break-keep font-serif text-2xl font-black leading-tight">커피 기억 내려받기</h2>
           </div>
         </div>
 
@@ -83,7 +83,7 @@ export function AccountDataControls() {
           요금제와 관계없이 저장한 커피 기억을 언제든 내려받을 수 있습니다.
         </p>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="mt-6 grid gap-3">
           <a
             href="/api/v1/export?format=json"
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary-amber px-4 text-sm font-extrabold text-background-dark transition-[opacity,transform] hover:opacity-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring)] active:scale-[0.98]"
@@ -101,14 +101,14 @@ export function AccountDataControls() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-[color:var(--danger)]/40 bg-[color:var(--danger)]/[0.06] p-5 sm:p-7" aria-labelledby="delete-account-title">
-        <div className="flex items-start gap-3">
+      <section className="rounded-3xl border border-[color:var(--danger)]/40 bg-[color:var(--danger)]/[0.06] p-5 sm:p-6" aria-labelledby="delete-account-title">
+        <div className="grid gap-3 sm:grid-cols-[2.75rem_minmax(0,1fr)]">
           <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[color:var(--danger)]/15 text-[color:var(--danger)]">
             <ShieldAlert aria-hidden="true" size={20} />
           </span>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[color:var(--danger)]">위험 영역</p>
-            <h2 id="delete-account-title" className="mt-1 font-serif text-2xl font-black">계정 영구 삭제</h2>
+            <h2 id="delete-account-title" className="mt-1 break-keep font-serif text-2xl font-black leading-tight">계정 영구 삭제</h2>
           </div>
         </div>
 

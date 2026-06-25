@@ -4,6 +4,7 @@ import { ArrowLeft, CreditCard, Settings } from "lucide-react";
 
 import { AccountDataControls } from "@/components/account-data-controls";
 import { SettingsBottomNavigation } from "@/components/settings-bottom-navigation";
+import { SettingsUsageBilling } from "@/components/settings-usage-billing";
 
 export const metadata: Metadata = {
   title: "계정 및 데이터 설정 | CoffeeDex",
@@ -37,7 +38,9 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <section className="coffee-workspace">
+      <section className="coffee-workspace space-y-6">
+        <SettingsUsageBilling />
+
         <div className="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <span className="grid size-10 shrink-0 place-items-center rounded-2xl border border-primary-amber/30 bg-primary-amber/10 text-primary-amber">

@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [
+    "../../app/api/v1/export/route.ts",
+    "../../lib/data-export.ts"
+  ],
+  "exclude": [
+    "../../node_modules"
+  ]
+}

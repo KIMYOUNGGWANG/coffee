@@ -78,7 +78,7 @@ export default function LandingPlaygroundClient() {
   }, [isScanning, selectedSample]);
 
   return (
-    <div className="border border-white/10 bg-transparent p-6 md:p-8 shadow-2xl rounded-none space-y-6">
+    <div className="rounded-3xl border border-white/10 bg-[#120f0c]/78 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.3)] space-y-6 sm:p-6 md:p-8">
       <div className="flex items-center gap-2">
         <Sparkles size={14} className="text-primary-amber" />
         <span className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
@@ -87,10 +87,10 @@ export default function LandingPlaygroundClient() {
       </div>
 
       <div className="space-y-2">
-        <h3 className="font-serif text-2xl font-black text-foreground">
+        <h3 className="break-keep font-serif text-2xl font-black leading-tight text-foreground sm:text-3xl">
           향미 AI 컵 노트를 지금 직접 테스트해 보세요
         </h3>
-        <p className="text-xs text-foreground/60 font-semibold leading-relaxed">
+        <p className="max-w-3xl break-keep text-sm text-foreground/68 font-semibold leading-6">
           아래 샘플 원두 패키지 중 하나를 클릭하면, 향미만의 Gemini Vision 기술이 원두 라벨을 인식하고
           SCA 표준 아로마 휠에 맞춘 분석 결과 카드를 3초 안에 가상 시뮬레이션으로 완성합니다.
         </p>
@@ -103,29 +103,29 @@ export default function LandingPlaygroundClient() {
             key={sample.id}
             onClick={() => startScan(sample)}
             disabled={isScanning}
-            className={`text-left p-4 border rounded-none transition-all flex flex-col justify-between h-40 ${
+            className={`group flex min-h-44 flex-col justify-between rounded-2xl border p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber disabled:cursor-wait disabled:opacity-80 ${
               selectedSample?.id === sample.id && (isScanning || resultCard)
-                ? "border-primary-amber bg-primary-amber/5 ring-1 ring-caramel"
-                : "border-white/10/20 bg-white/5 hover:border-white/10 hover:bg-white"
+                ? "border-primary-amber/70 bg-[#f6efe3] text-[#241a14] shadow-[0_18px_42px_rgba(217,160,91,0.18)]"
+                : "border-white/10 bg-white/[0.035] text-foreground hover:border-primary-amber/42 hover:bg-[#211b16]"
             }`}
           >
             <div>
-              <span className="text-[10px] font-bold text-primary-amber uppercase tracking-widest block mb-1">
+              <span className={`text-[10px] font-bold uppercase tracking-widest block mb-1 ${selectedSample?.id === sample.id && (isScanning || resultCard) ? "text-[#9f6a4a]" : "text-primary-amber"}`}>
                 {sample.roaster}
               </span>
-              <h4 className="font-serif font-black text-sm text-foreground leading-snug">
+              <h4 className="break-keep font-serif font-black text-base leading-snug">
                 {sample.title}
               </h4>
               <div className="flex flex-wrap gap-1 mt-2.5">
                 {sample.tags.map((t) => (
-                  <span key={t} className="text-[9px] glass-card border border-white/10/15 px-1.5 py-0.5 font-semibold">
+                  <span key={t} className={`rounded-full border px-2 py-1 text-[10px] font-bold ${selectedSample?.id === sample.id && (isScanning || resultCard) ? "border-[#9f6a4a]/24 bg-[#9f6a4a]/10 text-[#6d442f]" : "border-white/10 bg-white/[0.06] text-foreground/78 group-hover:text-foreground"}`}>
                     #{t}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="flex justify-between items-center mt-3 pt-2 border-t border-white/10/10 w-full text-[10px] font-black uppercase text-foreground/60">
+            <div className={`mt-4 flex w-full items-center justify-between border-t pt-3 text-[10px] font-black uppercase ${selectedSample?.id === sample.id && (isScanning || resultCard) ? "border-[#9f6a4a]/18 text-[#6d442f]" : "border-white/10 text-foreground/62"}`}>
               <span>스캔 분석 시작하기</span>
               <ArrowRight size={12} className="text-primary-amber" />
             </div>
@@ -135,7 +135,7 @@ export default function LandingPlaygroundClient() {
 
       {/* 분석 중 화면 */}
       {isScanning && (
-        <div className="bg-black/80 text-foreground p-6 border border-white/10 text-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
+        <div className="rounded-2xl bg-black/80 text-foreground p-6 border border-white/10 text-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
           <div className="flex justify-center">
             <span className="animate-spin grid size-10 place-items-center border-t border-r border-primary-amber rounded-full">
               <Coffee size={18} className="text-primary-amber" />
@@ -160,13 +160,13 @@ export default function LandingPlaygroundClient() {
 
       {/* 분석 완료 카드 결과 화면 */}
       {resultCard && !isScanning && (
-        <div className="border border-primary-amber/30 glass-card p-5 shadow-xl space-y-4 animate-in slide-in-from-bottom-4 duration-300">
-          <div className="flex justify-between items-start border-b border-white/10/10 pb-3">
-            <div>
+        <div className="rounded-2xl border border-primary-amber/30 bg-white/[0.04] p-5 shadow-xl space-y-4 animate-in slide-in-from-bottom-4 duration-300">
+          <div className="flex flex-col gap-3 border-b border-white/10 pb-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
               <span className="text-[10px] font-bold text-primary-amber uppercase tracking-widest">
                 AI SCAN RESULT CARD
               </span>
-              <h4 className="font-serif font-black text-lg text-foreground mt-1">
+              <h4 className="break-keep font-serif font-black text-lg leading-tight text-foreground mt-1">
                 {resultCard.title}
               </h4>
               <p className="text-xs font-semibold text-foreground/60">{resultCard.roaster}</p>
@@ -178,15 +178,15 @@ export default function LandingPlaygroundClient() {
 
           {/* 슬라이더 점수 */}
           <div className="grid grid-cols-3 gap-2">
-            <div className="bg-transparent border border-white/10/10 p-2.5 text-center">
+            <div className="rounded-xl bg-black/20 border border-white/10 p-2.5 text-center">
               <span className="text-[9px] font-bold text-foreground/45 uppercase tracking-wider block">Acidity</span>
               <span className="font-serif text-xl font-black text-foreground mt-1 block">{resultCard.metrics.acidity} / 5</span>
             </div>
-            <div className="bg-transparent border border-white/10/10 p-2.5 text-center">
+            <div className="rounded-xl bg-black/20 border border-white/10 p-2.5 text-center">
               <span className="text-[9px] font-bold text-foreground/45 uppercase tracking-wider block">Sweetness</span>
               <span className="font-serif text-xl font-black text-foreground mt-1 block">{resultCard.metrics.sweetness} / 5</span>
             </div>
-            <div className="bg-transparent border border-white/10/10 p-2.5 text-center">
+            <div className="rounded-xl bg-black/20 border border-white/10 p-2.5 text-center">
               <span className="text-[9px] font-bold text-foreground/45 uppercase tracking-wider block">Body</span>
               <span className="font-serif text-xl font-black text-foreground mt-1 block">{resultCard.metrics.body} / 5</span>
             </div>
@@ -204,13 +204,13 @@ export default function LandingPlaygroundClient() {
           </div>
 
           {/* CTA Link */}
-          <div className="flex justify-between items-center pt-2">
-            <span className="text-[10px] text-foreground/50 font-semibold">
+          <div className="grid gap-3 pt-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+            <span className="break-keep text-[11px] text-foreground/58 font-semibold leading-5">
               지금 바로 회원가입하고 나만의 홈카페를 기록해 보세요.
             </span>
             <Link
               href="/onboarding"
-              className="px-3.5 py-2 bg-primary-amber hover:opacity-90 text-[#0D0A07] font-bold text-xs flex items-center gap-1.5 transition-all"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-primary-amber px-3.5 py-2 text-xs font-bold text-[#0D0A07] transition-all hover:opacity-90"
             >
               <span>Taste Finder로 가입하기</span>
               <ArrowRight size={11} />

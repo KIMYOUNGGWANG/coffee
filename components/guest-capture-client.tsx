@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Camera, Coffee, Keyboard, LoaderCircle } from "lucide-react";
 import { z } from "zod";
 import { CoffeeMemoryEditor } from "@/components/coffee-memory-editor";
@@ -122,6 +122,7 @@ export function GuestCaptureClient() {
         return;
       }
       clearGuestDraft(globalThis.localStorage);
+      globalThis.sessionStorage.removeItem("coffeedex.guest-resume-submitted");
       globalThis.location.assign("/dashboard");
     } catch (error) {
       if (error instanceof Error) {
@@ -137,11 +138,13 @@ export function GuestCaptureClient() {
 
   useEffect(() => {
     if (new URLSearchParams(globalThis.location.search).get("resume") !== "1") return;
+    if (globalThis.sessionStorage.getItem("coffeedex.guest-resume-submitted") === "1") return;
     const draft = loadGuestDraft(globalThis.localStorage);
     if (!draft) {
       setMessage("이어갈 초안을 찾지 못했습니다. 새 기록을 시작해주세요.");
       return;
     }
+    globalThis.sessionStorage.setItem("coffeedex.guest-resume-submitted", "1");
     setExtracted(draft.extracted);
     setCorrections(draft.corrections);
     setEditing(true);

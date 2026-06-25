@@ -64,6 +64,8 @@ const memoryEventNames = [
   "archive_searched",
   "second_bag_recorded",
   "third_bag_recorded",
+  "share_card_clicked",
+  "ai_scan_success",
 ] as const;
 
 test("pins legacy commerce/share and validated-memory event names", () => {

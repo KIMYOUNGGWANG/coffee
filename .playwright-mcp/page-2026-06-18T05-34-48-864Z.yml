@@ -1,0 +1,91 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - link "Hyangmi Taste Onboarding" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e7]
+          - generic [ref=e9]:
+            - generic [ref=e10]: Hyangmi
+            - generic [ref=e11]: Taste Onboarding
+        - link "샘플 Hyangmi 기록 보기" [ref=e110] [cursor=pointer]:
+          - /url: /dashboard
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]:
+            - img [ref=e15]
+            - text: Hyangmi Korea-first Onboarding
+          - heading "첫 한국 스페셜티 커피 기억을 기록할 준비" [level=1] [ref=e17]
+          - paragraph [ref=e18]: Hyangmi는 카페와 홈카페에서 마신 스페셜티 커피를 개인 테이스팅 아카이브로 남기고, AI가 라벨 초안과 SCA 스타일 노트 작성을 보조하는 기록 공간입니다.
+          - generic [ref=e19]:
+            - paragraph [ref=e20]: 30-second Taste Finder
+            - paragraph [ref=e21]: 먼저 취향을 고르고, 봉투 사진으로 첫 카드를 완성하세요.
+        - generic [ref=e22]:
+          - generic [ref=e24]:
+            - generic [ref=e25]:
+              - generic [ref=e26]:
+                - generic [ref=e27]:
+                  - paragraph [ref=e28]: Taste profile cards
+                  - heading "커피 추천은 첫 기록에서 시작됩니다." [level=2] [ref=e29]
+                - img [ref=e31]
+              - group "Taste Finder profile" [ref=e33]:
+                - button "밝고 과일 같은 컵 귤, 복숭아, 재스민 산미 5.0 산미 5 / 단맛 4 / 바디 2" [ref=e34]:
+                  - generic [ref=e36]: 밝고 과일 같은 컵
+                  - generic [ref=e37]: 귤, 복숭아, 재스민
+                  - generic [ref=e38]: 산미 5.0
+                  - generic [ref=e39]: 산미 5 / 단맛 4 / 바디 2
+                - button "달고 고소한 컵 꿀, 견과, 카카오 단맛 5.0 산미 3 / 단맛 5 / 바디 3" [ref=e40]:
+                  - generic [ref=e42]: 달고 고소한 컵
+                  - generic [ref=e43]: 꿀, 견과, 카카오
+                  - generic [ref=e44]: 단맛 5.0
+                  - generic [ref=e45]: 산미 3 / 단맛 5 / 바디 3
+                - button "깨끗하고 균형 잡힌 컵 브라운슈가, 차, 긴 여운 바디 4.0 산미 3 / 단맛 4 / 바디 4" [ref=e46]:
+                  - generic [ref=e48]: 깨끗하고 균형 잡힌 컵
+                  - generic [ref=e49]: 브라운슈가, 차, 긴 여운
+                  - generic [ref=e50]: 바디 4.0
+                  - generic [ref=e51]: 산미 3 / 단맛 4 / 바디 4
+              - generic [ref=e52]:
+                - paragraph [ref=e53]: Taste Finder 준비
+                - paragraph [ref=e54]: 프로필을 고르면 첫 Taste Card의 산미, 단맛, 바디와 향미 태그가 미리 채워집니다.
+            - generic [ref=e55]:
+              - link "첫 Taste Card 시작하기" [ref=e56] [cursor=pointer]:
+                - /url: /dashboard?intent=first_card&source=onboarding
+                - text: 첫 Taste Card 시작하기
+                - img [ref=e57]
+              - link "샘플 Hyangmi 기록 보기" [ref=e59] [cursor=pointer]:
+                - /url: /dashboard
+          - generic [ref=e60]:
+            - article [ref=e61]:
+              - generic [ref=e62]:
+                - generic [ref=e63]:
+                  - paragraph [ref=e64]: 01 / Taste profile
+                  - heading "오늘 취향의 시작점 선택" [level=3] [ref=e65]
+                - img [ref=e67]
+              - paragraph [ref=e70]: 처음부터 정답을 쓰지 않아도 됩니다. 밝음, 단맛, 균형 중 가까운 컵을 고르면 첫 취향 지도가 열립니다.
+            - article [ref=e71]:
+              - generic [ref=e72]:
+                - generic [ref=e73]:
+                  - paragraph [ref=e74]: 02 / AI label scan
+                  - heading "패키지 스캔 초안 확인" [level=3] [ref=e75]
+                - img [ref=e77]
+              - paragraph [ref=e82]: 라벨 초안은 원두명, 로스터리, 산지, 가공 방식을 빠르게 채우고 저장 전 사용자가 직접 고칩니다.
+            - article [ref=e83]:
+              - generic [ref=e84]:
+                - generic [ref=e85]:
+                  - paragraph [ref=e86]: 03 / Korean flavor words
+                  - heading "한국어 향미 단어로 기억" [level=3] [ref=e87]
+                - img [ref=e89]
+              - paragraph [ref=e91]: 귤, 꿀, 재스민, 고소함처럼 내가 말하는 맛을 기록하고 SCA 스타일 컵 노트로 다듬습니다.
+            - article [ref=e92]:
+              - generic [ref=e93]:
+                - generic [ref=e94]:
+                  - paragraph [ref=e95]: 04 / Archive output
+                  - heading "추천과 리캡의 재료 만들기" [level=3] [ref=e96]
+                - img [ref=e98]
+              - paragraph [ref=e101]: 쌓인 카드는 취향 지도, 공유 카드, PDF 기록북, 다음 원두 추천의 근거가 됩니다.
+          - generic [ref=e102]:
+            - img [ref=e104]
+            - generic [ref=e107]:
+              - paragraph [ref=e108]: next useful hook
+              - paragraph [ref=e109]: 원두 봉투를 찍으면 기록이 쉬워지고, 쌓인 기록은 다음 원두 추천의 이유가 됩니다.
+  - alert [ref=e111]

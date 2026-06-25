@@ -1,0 +1,206 @@
+[
+  {
+    "name": "onboarding-mobile-375",
+    "path": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/visual-qa/2026-06-20-current/onboarding-mobile-375.png",
+    "consoleMessages": [],
+    "pageErrors": [],
+    "metrics": {
+      "url": "/onboarding",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "scroll": {
+        "width": 375,
+        "height": 1891,
+        "bodyWidth": 375
+      },
+      "hasHorizontalOverflow": false,
+      "overflowing": [],
+      "headings": [
+        "오늘의 취향으로 첫 기록을 시작해요",
+        "오늘의 취향은 어떤 방향인가요?"
+      ],
+      "visibleTextSample": "CoffeeDex\nKOREA-FIRST SPECIALTY COFFEE\n1 / 3\nPRIVATE ESPRESSO CONCIERGE\n오늘의 취향으로 첫 기록을 시작해요\n\n당신에게 맞는 커피를 다시 찾기 위한 첫 Taste Card입니다. 취향을 하나 고르면 기록 초안과 한국어 향미 단어가 먼저 정리됩니다.\n\n선택은 언제든 바꿀 수 있어요.\n취향 선택 후 봉투 스캔 또는 직접 입력으로 이어집니다.\n\n30-SECOND TASTE FINDER\n\n오늘의 취향은 어떤 방향인가요?\n밝은 산미\n산뜻하고 가벼운 느낌의 커피\n귤, 복숭아, 재스민\n달콤한 균형\n단맛과 산미의 균형이 좋은 커피\n꿀, 견과, 카카오\n묵직한 바디\n진하고 묵직한 느낌의 커피\n브라운슈가, 차, 긴 여운\n\n첫 Taste Card 미리보기\n\nREADY\n커피 이름\n기록을 시작하면 여기에 표시돼요\n맛의 방향\n달고 고소한 컵\n향미 태그\nHoney\nCaramel\nCacao\n\nTASTE BALANCE\n\n산미 3 / 단맛 5 / 바디 3\n\n단맛과 고소함을 중심으로 첫 Taste Card를 시작합니다.\n\n첫 Taste Card 시작하기\n샘플 CoffeeDex 기록 보기\n\n한국 스페셜티 커피를 내 취향 언어로 남기고, 다음에 다시 살 커피를 쉽게 찾습니다."
+    }
+  },
+  {
+    "name": "onboarding-desktop-1280",
+    "path": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/visual-qa/2026-06-20-current/onboarding-desktop-1280.png",
+    "consoleMessages": [],
+    "pageErrors": [],
+    "metrics": {
+      "url": "/onboarding",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scroll": {
+        "width": 1280,
+        "height": 1050,
+        "bodyWidth": 1280
+      },
+      "hasHorizontalOverflow": false,
+      "overflowing": [
+        {
+          "tag": "DIV",
+          "text": "",
+          "className": "absolute -right-10 top-48 hidden w-48 lg:block xl:w-56",
+          "rect": {
+            "x": 1064,
+            "y": 329,
+            "width": 224,
+            "height": 298.65625,
+            "top": 329,
+            "right": 1288,
+            "bottom": 627.65625,
+            "left": 1064
+          }
+        },
+        {
+          "tag": "IMG",
+          "text": "",
+          "className": "h-auto w-full rounded-[2rem] object-contain shadow-[0_32px_80px_rgba(0,0,0,0.42)]",
+          "rect": {
+            "x": 1064,
+            "y": 329,
+            "width": 224,
+            "height": 298.65625,
+            "top": 329,
+            "right": 1288,
+            "bottom": 627.65625,
+            "left": 1064
+          }
+        }
+      ],
+      "headings": [
+        "오늘의 취향으로 첫 기록을 시작해요",
+        "오늘의 취향은 어떤 방향인가요?"
+      ],
+      "visibleTextSample": "CoffeeDex\nKOREA-FIRST SPECIALTY COFFEE\n1 / 3\n샘플 CoffeeDex 기록 보기\nPRIVATE ESPRESSO CONCIERGE\n오늘의 취향으로 첫 기록을 시작해요\n\n당신에게 맞는 커피를 다시 찾기 위한 첫 Taste Card입니다. 취향을 하나 고르면 기록 초안과 한국어 향미 단어가 먼저 정리됩니다.\n\n선택은 언제든 바꿀 수 있어요.\n취향 선택 후 봉투 스캔 또는 직접 입력으로 이어집니다.\n\n30-SECOND TASTE FINDER\n\n오늘의 취향은 어떤 방향인가요?\n선택 1개\n밝은 산미\n산뜻하고 가벼운 느낌의 커피\n귤, 복숭아, 재스민\n달콤한 균형\n단맛과 산미의 균형이 좋은 커피\n꿀, 견과, 카카오\n묵직한 바디\n진하고 묵직한 느낌의 커피\n브라운슈가, 차, 긴 여운\n\n첫 Taste Card 미리보기\n\nREADY\n커피 이름\n기록을 시작하면 여기에 표시돼요\n맛의 방향\n달고 고소한 컵\n향미 태그\nHoney\nCaramel\nCacao\n\nTASTE BALANCE\n\n산미 3 / 단맛 5 / 바디 3\n\n단맛과 고소함을 중심으로 첫 Taste Card를 시작합니다.\n\n첫 Taste Card 시작하기\n샘플 CoffeeDex 기록 보기"
+    }
+  },
+  {
+    "name": "dashboard-mobile-392",
+    "path": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/visual-qa/2026-06-20-current/dashboard-mobile-392.png",
+    "consoleMessages": [],
+    "pageErrors": [],
+    "metrics": {
+      "url": "/dashboard",
+      "viewport": {
+        "width": 392,
+        "height": 844
+      },
+      "scroll": {
+        "width": 394,
+        "height": 2413,
+        "bodyWidth": 394
+      },
+      "hasHorizontalOverflow": true,
+      "overflowing": [
+        {
+          "tag": "DIV",
+          "text": "",
+          "className": "absolute -bottom-4 left-[-5%] w-[110%] h-6 bg-black/40 blur-md rounded-full -z-10 group-hover:h-8 transition-all duration-300 opacity-60",
+          "rect": {
+            "x": -2,
+            "y": 862.078125,
+            "width": 396,
+            "height": 24,
+            "top": 862.078125,
+            "right": 394,
+            "bottom": 886.078125,
+            "left": -2
+          }
+        }
+      ],
+      "headings": [
+        "내 원두 아카이브",
+        "원두 보관함 (Coffee Shelf)",
+        "에티오피아 시다마",
+        "프로필 탐험가",
+        "취향 미리보기",
+        "최근 기록 요약",
+        "첫 원두를 선반에 올려보세요."
+      ],
+      "visibleTextSample": "CoffeeDex\n\n3개까지 3개\n0 / 3\n\n나의 TASTE PASSPORT\n\n내 원두 아카이브\n\n기록한 원두들을 찬장에 진열해 보세요. 기록한 원두 0봉\n\n정렬\n원두 보관함 (Coffee Shelf)\n\n현재 개봉하여 드시고 계시는 원두들의 남은 분량을 시각적으로 관리하고 추출에 활용해 보세요.\n\n새 원두 등록하기\n프릳츠 커피\n에티오피아 시다마\n\nEthiopia Sidama Washed\n\n다시 살 타이밍\n\n거의 비었어요. 다시 살지 판단할 타이밍입니다.\n\n로스팅: 2026-06-01\n개봉: 2026-06-10\n남은 잔량: 8%\n총 200g\n100%\n75%\n50%\n25%\nEmpty\n\n나의 Taste Passport\n\n프로필 탐험가\n등급 안내\n0 / 5\n스탬프\n\n다음 등급까지 5개 남았어요.\n\n스탬프 혜택 보기\n취향 미리보기\n향미\n복합성\n단맛\n\n바디감\n쓴맛\n산미\n최근 기록 요약\n\n기록한 원두\n0개\n\n방문한 카페\n0곳\n\n완료한 테이스팅\n0회\n\n내 기록 전체 보기\n20초 안에 첫 기록\n첫 원두를 선반에 올려보세요.\n\n패키지 사진을 찍으면 로스터리, 원산지, 가공 방식과 향미를 읽어 편집 가능한 기록 초안을 만듭니다.\n\n원두 패키지 스캔하기\n선반\n기록\n패스포트\n설정\n스캔"
+    }
+  },
+  {
+    "name": "dashboard-desktop-1280",
+    "path": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/visual-qa/2026-06-20-current/dashboard-desktop-1280.png",
+    "consoleMessages": [],
+    "pageErrors": [],
+    "metrics": {
+      "url": "/dashboard",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "scroll": {
+        "width": 1280,
+        "height": 1752,
+        "bodyWidth": 1280
+      },
+      "hasHorizontalOverflow": false,
+      "overflowing": [],
+      "headings": [
+        "내 원두 아카이브",
+        "원두 보관함 (Coffee Shelf)",
+        "에티오피아 시다마",
+        "프로필 탐험가",
+        "취향 미리보기",
+        "최근 기록 요약",
+        "첫 원두를 선반에 올려보세요."
+      ],
+      "visibleTextSample": "CoffeeDex\n\n3개까지 3개\n0 / 3\n원두 스캔\n\n나의 TASTE PASSPORT\n\n내 원두 아카이브\n\n기록한 원두들을 찬장에 진열해 보세요. 기록한 원두 0봉\n\n정렬\n선반\n기록\n패스포트\n설정\n원두 보관함 (Coffee Shelf)\n\n현재 개봉하여 드시고 계시는 원두들의 남은 분량을 시각적으로 관리하고 추출에 활용해 보세요.\n\n새 원두 등록하기\n프릳츠 커피\n에티오피아 시다마\n\nEthiopia Sidama Washed\n\n다시 살 타이밍\n\n거의 비었어요. 다시 살지 판단할 타이밍입니다.\n\n로스팅: 2026-06-01\n개봉: 2026-06-10\n남은 잔량: 8%\n총 200g\n100%\n75%\n50%\n25%\nEmpty\n\n나의 Taste Passport\n\n프로필 탐험가\n등급 안내\n0 / 5\n스탬프\n\n다음 등급까지 5개 남았어요.\n\n스탬프 혜택 보기\n취향 미리보기\n향미\n복합성\n단맛\n\n바디감\n쓴맛\n산미\n최근 기록 요약\n\n기록한 원두\n0개\n\n방문한 카페\n0곳\n\n완료한 테이스팅\n0회\n\n내 기록 전체 보기\n20초 안에 첫 기록\n첫 원두를 선반에 올려보세요.\n\n패키지 사진을 찍으면 로스터리, 원산지, 가공 방식과 향미를 읽어 편집 가능한 기록 초안을 만듭니다.\n\n원두 패키지 스캔하기"
+    }
+  },
+  {
+    "name": "dashboard-modal-mobile-392",
+    "path": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/visual-qa/2026-06-20-current/dashboard-modal-mobile-392.png",
+    "consoleMessages": [],
+    "pageErrors": [],
+    "metrics": {
+      "url": "/dashboard",
+      "viewport": {
+        "width": 392,
+        "height": 844
+      },
+      "scroll": {
+        "width": 394,
+        "height": 2413,
+        "bodyWidth": 394
+      },
+      "hasHorizontalOverflow": true,
+      "overflowing": [
+        {
+          "tag": "DIV",
+          "text": "",
+          "className": "absolute -bottom-4 left-[-5%] w-[110%] h-6 bg-black/40 blur-md rounded-full -z-10 group-hover:h-8 transition-all duration-300 opacity-60",
+          "rect": {
+            "x": -2,
+            "y": 862.078125,
+            "width": 396,
+            "height": 24,
+            "top": 862.078125,
+            "right": 394,
+            "bottom": 886.078125,
+            "left": -2
+          }
+        }
+      ],
+      "headings": [
+        "내 원두 아카이브",
+        "원두 보관함 (Coffee Shelf)",
+        "새 원두 보관함에 추가",
+        "에티오피아 시다마",
+        "프로필 탐험가",
+        "취향 미리보기",
+        "최근 기록 요약",
+        "첫 원두를 선반에 올려보세요."
+      ],
+      "visibleTextSample": "CoffeeDex\n\n3개까지 3개\n0 / 3\n\n나의 TASTE PASSPORT\n\n내 원두 아카이브\n\n기록한 원두들을 찬장에 진열해 보세요. 기록한 원두 0봉\n\n정렬\n원두 보관함 (Coffee Shelf)\n\n현재 개봉하여 드시고 계시는 원두들의 남은 분량을 시각적으로 관리하고 추출에 활용해 보세요.\n\n새 원두 등록하기\n새 원두 보관함에 추가\n\n선반 위에 올릴 스페셜티 원두의 세부 정보를 입력하세요.\n\n로스터리 이름 *\n원두 이름 *\n가공방식 및 원산지 정보\n용량(g)\n로스팅 일자\n개봉 일자\n취소\n등록\n프릳츠 커피\n에티오피아 시다마\n\nEthiopia Sidama Washed\n\n다시 살 타이밍\n\n거의 비었어요. 다시 살지 판단할 타이밍입니다.\n\n로스팅: 2026-06-01\n개봉: 2026-06-10\n남은 잔량: 8%\n총 200g\n100%\n75%\n50%\n25%\nEmpty\n\n나의 Taste Passport\n\n프로필 탐험가\n등급 안내\n0 / 5\n스탬프\n\n다음 등급까지 5개 남았어요.\n\n스탬프 혜택 보기\n취향 미리보기\n향미\n복합성\n단맛\n\n바디감\n쓴맛\n산미\n최근 기록 요약\n\n기록한 원두\n0개\n\n방문한 카페\n0곳\n\n완료한 테이스팅\n0회\n\n내 기록 전체 보기\n20초 안에 첫 기록\n첫 원두를 선반에 올려보세요.\n\n패키지 사진을 찍으면 로스터리, 원산지, 가공 방식과 향미를 읽어 편집 가능한 기록 초안을 만듭니다.\n\n원두 패키지 스캔하기\n선반\n기록\n패스포트\n설정\n스캔"
+    }
+  }
+]

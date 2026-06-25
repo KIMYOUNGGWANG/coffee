@@ -1,0 +1,36 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - paragraph [ref=e6]: CoffeeDex
+        - paragraph [ref=e7]: Korea-first coffee archive
+      - button "기록" [ref=e8]:
+        - img [ref=e9]
+        - generic [ref=e10]: 기록
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - img [ref=e14]
+          - text: 첫 기록을 시작해 보세요
+        - heading "나의 커피 선반" [level=1] [ref=e16]
+        - paragraph [ref=e17]: 원두 패키지를 작품처럼 모으고, 마실수록 선명해지는 취향을 기록합니다.
+      - generic "테이스트 패스포트 진행도 0/5" [ref=e18]:
+        - generic [ref=e19]:
+          - img [ref=e21]
+          - generic [ref=e24]:
+            - generic [ref=e25]: 패스포트까지 5잔
+            - generic [ref=e26]: 0 / 5
+  - navigation "대시보드 주요 메뉴" [ref=e68]:
+    - generic [ref=e69]:
+      - button "선반" [pressed] [ref=e70]:
+        - img [ref=e71]
+        - generic [ref=e74]: 선반
+      - button "원두" [ref=e75]:
+        - img [ref=e76]
+        - generic [ref=e78]: 원두
+      - button "기록" [ref=e79]:
+        - img [ref=e80]
+        - generic [ref=e82]: 기록
+      - button "AI 추천" [ref=e83]:
+        - img [ref=e84]
+        - generic [ref=e86]: AI 추천

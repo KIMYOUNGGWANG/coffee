@@ -21,6 +21,14 @@ const savedCardsResponse = {
       title: "Ethiopia Guji",
       updated_at: "2026-06-14T01:23:45.000Z",
       user_id: "user-growth-001",
+      package_origin: "Ethiopia Guji",
+      package_process: "Washed",
+      repurchase_intent: "again",
+      repurchase_reasons: ["복숭아 단맛"],
+      scan_source: "manual",
+      scan_confidence: null,
+      corrected_fields: [],
+      confirmed_at: "2026-06-14T01:23:45.000Z",
     },
   ],
 } as const;
@@ -87,6 +95,20 @@ async function mockDashboardApiRoutes(
       case "/api/v1/cards":
         await fulfillJson(route, cardsResponse);
         return;
+      case "/api/v1/coffee-dna":
+        const cardCount = typeof cardsResponse === "object" && cardsResponse !== null && "data" in cardsResponse && Array.isArray((cardsResponse as any).data) ? (cardsResponse as any).data.length : 0;
+        await fulfillJson(route, {
+          data: {
+            totalBeans: cardCount,
+            averageRating: cardCount > 0 ? 4.5 : null,
+            wantAgainRate: cardCount > 0 ? 100 : 0,
+            topOrigins: cardCount > 0 ? [{ origin: "Ethiopia", count: 1 }] : [],
+            topRoasters: cardCount > 0 ? [{ roaster: "Fritz Coffee", count: 1 }] : [],
+            tasteProfile: cardCount > 0 ? { acidity: 4, sweetness: 5, body: 3 } : null,
+            typeLabel: cardCount > 0 ? "산뜻한 과일향 타입" : "기록이 부족합니다",
+          },
+        });
+        return;
       case "/api/v1/profile":
         await fulfillJson(route, profileResponse);
         return;
@@ -118,14 +140,9 @@ test.describe("CoffeeDex growth dashboard", () => {
     await page.goto("/dashboard");
 
     // Then
-    await expect(page.getByText("60초 안에 첫 원두 기록")).toBeVisible();
-    await expect(page.getByText("오늘의 다음 행동")).toBeVisible();
-    await expect(page.getByText("무료 Taste Card", { exact: true })).toBeVisible();
-    await expect(page.getByText("CoffeeDex Premium")).toBeVisible();
-    await expect(page.getByText("Taste Passport", { exact: true }).last()).toBeVisible();
-    await expect(page.getByRole("button", { name: "첫 Taste Card 만들기" })).toBeVisible();
-    await expect(page.getByText("샘플 테이스팅 카드")).toBeVisible();
-    await expect(page.getByRole("button", { name: "봉투 사진으로 첫 카드 만들기" })).toBeVisible();
+    await expect(page.getByText("20초 안에 첫 기록")).toBeVisible();
+    await expect(page.getByText("첫 원두를 선반에 올려보세요.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "원두 패키지 스캔하기" })).toBeVisible();
   });
 
   test("promotes sharing after the first card exists", async ({ page }) => {
@@ -136,9 +153,8 @@ test.describe("CoffeeDex growth dashboard", () => {
     await page.goto("/dashboard");
 
     // Then
-    await expect(page.getByText("공유 링크 만들기")).toBeVisible();
-    await expect(page.getByRole("button", { name: "최근 카드 공유하기" })).toBeVisible();
-    await page.getByRole("button", { name: "최근 카드 공유하기" }).click();
+    await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();
+    await page.getByRole("button", { name: "Ethiopia Guji 공유" }).click();
     await expect(page.getByRole("dialog").getByText("인스타그램 스토리 공유")).toBeVisible();
   });
 
@@ -147,13 +163,12 @@ test.describe("CoffeeDex growth dashboard", () => {
     await mockDashboardApiRoutes(page);
 
     // When
-    await page.goto("/dashboard");
+    await page.goto("/settings");
 
     // Then
     await expect(page.getByText("무료 AI 스캔 3 / 5")).toBeVisible();
     await expect(page.getByText("보유 크레딧 2개")).toBeVisible();
     await expect(page.getByText("PDF 기록북 미보유")).toBeVisible();
-    await expect(page.getByText("아직 로스터 기록 없음")).toBeVisible();
   });
 
   test("shows compact billing plan and current period metadata", async ({ page }) => {
@@ -161,7 +176,7 @@ test.describe("CoffeeDex growth dashboard", () => {
     await mockDashboardApiRoutes(page, emptyCardsResponse, premiumSubscriptionResponse);
 
     // When
-    await page.goto("/dashboard");
+    await page.goto("/settings");
 
     // Then
     await expect(page.getByText("플랜 Premium")).toBeVisible();

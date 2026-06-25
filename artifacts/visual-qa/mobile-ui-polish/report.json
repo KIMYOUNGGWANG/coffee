@@ -1,0 +1,137 @@
+[
+  {
+    "viewport": "mobile",
+    "page": "landing",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    },
+    "landingSample": {
+      "background": "oklab(0.22747 0.00629159 0.0117599 / 0.998374)",
+      "color": "rgb(247, 247, 244)",
+      "headingColor": "rgb(247, 247, 244)"
+    }
+  },
+  {
+    "viewport": "mobile",
+    "page": "onboarding",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "mobile",
+    "page": "dashboard-shelf",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "mobile",
+    "page": "dashboard-calendar",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "mobile",
+    "page": "settings",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "landing",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    },
+    "landingSample": {
+      "background": "oklab(0.228293 0.00628494 0.0117474 / 0.96994)",
+      "color": "rgb(247, 247, 244)",
+      "headingColor": "rgb(247, 247, 244)"
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "onboarding",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "dashboard-shelf",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "dashboard-calendar",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "tablet",
+    "page": "settings",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "landing",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    },
+    "landingSample": {
+      "background": "rgb(33, 27, 22)",
+      "color": "rgb(247, 247, 244)",
+      "headingColor": "rgb(247, 247, 244)"
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "onboarding",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "dashboard-shelf",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "dashboard-calendar",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  },
+  {
+    "viewport": "desktop",
+    "page": "settings",
+    "checks": {
+      "overflowing": [],
+      "clippedText": []
+    }
+  }
+]

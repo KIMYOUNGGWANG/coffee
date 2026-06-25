@@ -1,0 +1,61 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - paragraph [ref=e6]: CoffeeDex
+          - paragraph [ref=e7]: Korea-first coffee archive
+        - button "원두 기록하기" [ref=e76]:
+          - img [ref=e9]
+          - generic [ref=e77]: 원두 기록하기
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - img [ref=e14]
+            - text: 첫 기록을 시작해 보세요
+          - heading "나의 커피 선반" [level=1] [ref=e16]
+          - paragraph [ref=e17]: 원두 패키지를 작품처럼 모으고, 마실수록 선명해지는 취향을 기록합니다.
+        - generic "테이스트 패스포트 진행도 0/5" [ref=e18]:
+          - generic [ref=e19]:
+            - img [ref=e21]
+            - generic [ref=e24]:
+              - generic [ref=e25]: 패스포트까지 5잔
+              - generic [ref=e26]: 0 / 5
+      - navigation "대시보드 주요 메뉴" [ref=e78]:
+        - button "선반" [pressed] [ref=e79]:
+          - img [ref=e80]
+          - generic [ref=e83]: 선반
+        - button "원두" [ref=e84]:
+          - img [ref=e85]
+          - generic [ref=e87]: 원두
+        - button "기록" [ref=e88]:
+          - img [ref=e89]
+          - generic [ref=e91]: 기록
+        - button "AI 추천" [ref=e92]:
+          - img [ref=e93]
+          - generic [ref=e95]: AI 추천
+    - region "서랍 속 원두 봉투를 디지털 선반에 올려보세요." [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - img [ref=e34]
+          - text: 20초 안에 첫 기록
+        - heading "서랍 속 원두 봉투를 디지털 선반에 올려보세요." [level=2] [ref=e36]:
+          - text: 서랍 속 원두 봉투를
+          - text: 디지털 선반에 올려보세요.
+        - paragraph [ref=e37]: 패키지 사진을 스캔하면 로스터리, 원산지, 가공 방식과 향미가 자동으로 채워집니다. 틀린 정보만 확인하고 저장하세요.
+        - list [ref=e38]:
+          - listitem [ref=e39]:
+            - img [ref=e40]
+            - text: 사진 한 장
+          - listitem [ref=e42]:
+            - img [ref=e43]
+            - text: AI 초안 확인
+          - listitem [ref=e45]:
+            - img [ref=e46]
+            - text: 내 선반에 저장
+      - button "원두 패키지 스캔하기 카메라 또는 앨범에서 선택" [ref=e48]:
+        - img [ref=e50]
+        - generic [ref=e53]:
+          - generic [ref=e54]: 원두 패키지 스캔하기
+          - generic [ref=e55]: 카메라 또는 앨범에서 선택
+  - alert [ref=e75]

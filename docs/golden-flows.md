@@ -22,13 +22,19 @@ Given a user has confirmed memories, when they search or filter by coffee, roast
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/cards`
 
-## Flow 4. Review a Progressive Taste Snapshot
+## Flow 4. Use Fresh Shelf Rebuy Timing
+
+Given a user has beans on the private shelf, when CoffeeDex renders the shelf card, then it derives a Korean next-action signal from roast date, opened date, fill level, and finished state: wait, drink now, finish soon, or rebuy. This guidance is local product memory, not a roaster order, marketplace listing, or partner referral.
+
+Evidence surfaces: `/dashboard`, `GET /api/v1/shelf`, `PATCH /api/v1/shelf/:id`, `evaluateFreshShelfStatus`
+
+## Flow 5. Review a Progressive Taste Snapshot
 
 Given a user has confirmed memories, when they open the snapshot, then CoffeeDex displays literal sample count and coverage. One to two records form a collage, three to four show first signals, five to nine show an early preview, and ten or more sufficiently varied records show a current snapshot. Sparse data never appears complete.
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/profile/analytics`
 
-## Flow 5. Export or Delete Owned Data
+## Flow 6. Export or Delete Owned Data
 
 Given an authenticated user opens trust settings, when they export or confirm account deletion, then CoffeeDex provides free JSON and CSV downloads covering `tasting_cards`, `brewing_notes`, `coffee_shelf_items`, and `brewing_logs`, or performs owner-scoped deletion that stops on the first failure.
 
