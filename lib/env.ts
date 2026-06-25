@@ -7,9 +7,9 @@ const starterEnvSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   STRIPE_SECRET_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
-  RESEND_API_KEY: z.string().min(1),
-  NEXT_PUBLIC_POSTHOG_KEY: z.string().min(1),
-  NEXT_PUBLIC_SENTRY_DSN: z.string().min(1),
+  RESEND_API_KEY: z.string().optional(),
+  NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
   STORAGE_BUCKET_UPLOADS: z.string().min(1),
   AI_API_KEY: z.string().optional(),
 });
