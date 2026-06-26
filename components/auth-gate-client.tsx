@@ -133,19 +133,21 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
             </p>
           )}
 
-          <div className="pt-4 border-t border-white/10 mt-6">
-            <Button
-              type="button"
-              onClick={() => {
-                // Mock test mode bypass
-                localStorage.setItem("mock_test_mode", "true");
-                globalThis.location.assign(redirectTo);
-              }}
-              className="w-full bg-surface border border-white/20 text-white hover:bg-white/10"
-            >
-              🚀 테스트 계정으로 바로 입장하기 (Mock)
-            </Button>
-          </div>
+          {process.env.NODE_ENV === "development" && (
+            <div className="pt-4 border-t border-white/10 mt-6">
+              <Button
+                type="button"
+                onClick={() => {
+                  // Mock test mode bypass
+                  localStorage.setItem("mock_test_mode", "true");
+                  globalThis.location.assign(redirectTo);
+                }}
+                className="w-full bg-surface border border-white/20 text-white hover:bg-white/10"
+              >
+                🚀 테스트 계정으로 바로 입장하기 (Mock)
+              </Button>
+            </div>
+          )}
         </div>
       </section>
     </main>
