@@ -41,6 +41,9 @@ const unsupportedVisibleCopyPattern = new RegExp(
   unsupportedVisibleCopyTerms.map(escapeRegExp).join("|"),
   "i",
 );
+const unsupportedCommunityClaimPattern = new RegExp(
+  "Discover brewing recipes and tasting notes from the CoffeeDex " + "comm" + "unity",
+);
 
 test("CoffeeDex pages lead with recall and repurchase within the scoped product boundary", () => {
   // Given
@@ -49,8 +52,23 @@ test("CoffeeDex pages lead with recall and repurchase within the scoped product 
   const dashboardClient = read("components/dashboard-client.tsx");
   const dashboardAnalyticsPanel = read("components/dashboard-analytics-panel.tsx");
   const dashboardUsagePanel = read("components/dashboard-usage-panel.tsx");
+  const quickAddMemoryForm = read("components/quick-add-memory-form.tsx");
+  const tastingCard = read("components/TastingCard.tsx");
+  const cardDetailModal = read("components/CardDetailModal.tsx");
+  const feedPage = read("app/feed/page.tsx");
   const onboardingPage = read("app/onboarding/page.tsx");
-  const combinedPages = [homePage, dashboardPage, dashboardClient, dashboardAnalyticsPanel, dashboardUsagePanel, onboardingPage].join("\n");
+  const combinedPages = [
+    homePage,
+    dashboardPage,
+    dashboardClient,
+    dashboardAnalyticsPanel,
+    dashboardUsagePanel,
+    quickAddMemoryForm,
+    tastingCard,
+    cardDetailModal,
+    feedPage,
+    onboardingPage,
+  ].join("\n");
 
   // When / Then
   assertDoesNotShow(combinedPages, unsupportedVisibleCopyPattern, "visible pages");
@@ -58,6 +76,13 @@ test("CoffeeDex pages lead with recall and repurchase within the scoped product 
   assert.match(homePage, /CoffeeDex/);
   assert.match(homePage, /다시 사고 싶은 커피/);
   assert.match(dashboardClient, /DashboardShelfView/);
+  assert.match(quickAddMemoryForm, /빠른 기록/);
+  assert.match(quickAddMemoryForm, /한국어 향미 단어/);
+  assert.match(quickAddMemoryForm, /다시 살래요/);
+  assert.match(tastingCard, /다시 살 이유/);
+  assert.match(cardDetailModal, /마지막 좋았던 추출/);
+  assert.match(feedPage, /커뮤니티 기능은 아직 현재 제품 기능이 아닙니다/);
+  assert.doesNotMatch(feedPage, unsupportedCommunityClaimPattern);
   assert.match(dashboardAnalyticsPanel, /기록|스냅샷/);
   assert.match(dashboardUsagePanel, /기록|스냅샷/);
   assert.match(onboardingPage, /CoffeeDex/);
@@ -69,6 +94,7 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
   const apiSpec = read("docs/api-spec.md");
   const goldenFlows = read("docs/golden-flows.md");
   const deployGuide = read("docs/deploy.md");
+  const marketOpportunities = read("docs/market-opportunities-2026-06-26.md");
 
   // When / Then
   assert.match(apiSpec, /recall and repurchase/i);
@@ -87,6 +113,11 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
   assert.match(apiSpec, /tasting_cards.*brewing_notes.*coffee_shelf_items.*brewing_logs/is);
   assert.match(apiSpec, /confirmed records/i);
   assert.match(apiSpec, /repurchaseBreakdown/);
+  assert.match(apiSpec, /Quick Add Memory Mode/);
+  assert.match(apiSpec, /Korean flavor helper chips/);
+  assert.match(apiSpec, /private rebuy recall from `repurchase_intent` and `repurchase_reasons`/);
+  assert.match(apiSpec, /last-good-brew recall requires brew-like metadata/);
+  assert.doesNotMatch(apiSpec, /optional brew summary|brew summary|추출 요약/i);
 
   assert.match(goldenFlows, /recall and repurchase/i);
   assert.match(goldenFlows, /would buy again/i);
@@ -95,12 +126,21 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
   assert.match(goldenFlows, /not part of the current golden flows/);
   assert.match(goldenFlows, /JSON and CSV/);
   assert.match(goldenFlows, /`DELETE \/api\/v1\/account`/);
+  assert.match(goldenFlows, /Quick Add Memory Mode/);
+  assert.match(goldenFlows, /Korean flavor helper chips/);
+  assert.match(goldenFlows, /private rebuy recall from the user's own `repurchase_reasons`/);
+  assert.match(goldenFlows, /Last-good-brew recall is shown only when `footer_meta.extraInfo` contains actual brew-like metadata/);
+  assert.doesNotMatch(goldenFlows, /optional brew summary|brew summary|추출 요약/i);
 
   assert.match(deployGuide, /Korea-first AI specialty coffee memory and artifact product/);
   assert.match(deployGuide, /future work, not deploy-time capabilities/);
   assert.doesNotMatch(deployGuide, /npm run validate:full/);
   assert.match(deployGuide, /process-local/i);
   assert.match(deployGuide, /not distributed/i);
+
+  assert.match(marketOpportunities, /One-line quick notes remain card memory copy, not brew recall/);
+  assert.match(marketOpportunities, /Private rebuy recall surfaces the user's own repurchase reason/);
+  assert.match(marketOpportunities, /Last-good-brew recall stays distinct/);
 });
 
 test("CoffeeDex legal copy states guest, analytics, export, and deletion boundaries", () => {

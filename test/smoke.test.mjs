@@ -22,6 +22,10 @@ function assertDependency(packageJson, dependencyName) {
   );
 }
 
+const unsupportedCommunityClaimPattern = new RegExp(
+  "Discover brewing recipes and tasting notes from the CoffeeDex " + "comm" + "unity",
+);
+
 test("CoffeeDex package identity exposes the real app stack", () => {
   const packageJson = readJson("package.json");
   const providersSource = read("components/providers.tsx");
@@ -69,6 +73,12 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(apiSpec, /too_sour \| too_bitter/);
   assert.match(apiSpec, /CoffeeShelfItem/);
   assert.match(apiSpec, /Fresh Shelf guidance is advisory product copy/);
+  assert.match(apiSpec, /Quick Add Memory Mode/);
+  assert.match(apiSpec, /Korean flavor helper chips/);
+  assert.match(apiSpec, /private rebuy recall from `repurchase_intent` and `repurchase_reasons`/);
+  assert.match(apiSpec, /last-good-brew recall requires brew-like metadata/);
+  assert.doesNotMatch(apiSpec, /optional brew summary|brew summary|추출 요약/i);
+  assert.match(apiSpec, /confirmed: true/);
   assert.match(apiSpec, /tasting_cards/);
   assert.match(apiSpec, /profiles/);
   assert.match(apiSpec, /`GET` \| `\/api\/v1\/export\?format=json\\\|csv`/);
@@ -81,6 +91,11 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(goldenFlows, /Flow 1\. Capture and Confirm a Coffee Memory/);
   assert.match(goldenFlows, /Flow 2\. Scan a Package into an Editable Draft/);
   assert.match(goldenFlows, /Flow 3\. Retrieve a Coffee Worth Buying Again/);
+  assert.match(goldenFlows, /Quick Add Memory Mode/);
+  assert.match(goldenFlows, /Korean flavor helper chips/);
+  assert.match(goldenFlows, /private rebuy recall from the user's own `repurchase_reasons`/);
+  assert.match(goldenFlows, /Last-good-brew recall is shown only when `footer_meta.extraInfo` contains actual brew-like metadata/);
+  assert.doesNotMatch(goldenFlows, /optional brew summary|brew summary|추출 요약/i);
   assert.match(goldenFlows, /Flow 4\. Use Fresh Shelf Rebuy Timing/);
   assert.match(goldenFlows, /wait, drink now, finish soon, or rebuy/);
   assert.match(goldenFlows, /Flow 5\. Review a Progressive Taste Snapshot/);
@@ -101,6 +116,8 @@ test("CoffeeDex pages and routes present the coffee memory product", () => {
   const dashboardPage = read("app/dashboard/page.tsx");
   const dashboardClient = read("components/dashboard-client.tsx");
   const dashboardHeader = read("components/dashboard-header.tsx");
+  const quickAddMemoryForm = read("components/quick-add-memory-form.tsx");
+  const feedPage = read("app/feed/page.tsx");
   const onboardingPage = read("app/onboarding/page.tsx");
   const layoutSource = read("app/layout.tsx");
   const cardsRoute = read("app/api/v1/cards/route.ts");
@@ -116,6 +133,10 @@ test("CoffeeDex pages and routes present the coffee memory product", () => {
   assert.match(dashboardHeader, /CoffeeDex/);
   assert.match(dashboardHeader, /내 원두 아카이브/);
   assert.match(dashboardHeader, /원두 스캔/);
+  assert.match(quickAddMemoryForm, /빠른 기록/);
+  assert.match(quickAddMemoryForm, /한국어 향미 단어/);
+  assert.match(feedPage, /커뮤니티 기능은 아직 현재 제품 기능이 아닙니다/);
+  assert.doesNotMatch(feedPage, unsupportedCommunityClaimPattern);
   assert.match(onboardingPage, /CoffeeDex/);
   assert.match(onboardingPage, /한국 스페셜티 커피/);
   assert.match(cardsRoute, /tasting_cards/);

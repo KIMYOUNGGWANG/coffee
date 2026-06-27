@@ -49,8 +49,11 @@ PDF export, Stripe checkout and entitlements, story export, and public share rou
 Current capability is intentionally scoped to private coffee memory and retrieval:
 
 - personal tasting cards for cafes, home brews, and roasters such as Fritz, Terarosa, Momos, and Anthracite;
+- Quick Add Memory Mode for saving a confirmed private card from bean name, roaster, one-line note, repurchase intent, and optional Korean flavor helper chips without opening the full scan/manual wizard;
 - AI-assisted scan and note drafts that the user reviews before saving;
+- Korean flavor helper chips that let users choose approachable sensory words such as fruit, chocolate, honey, citrus, nutty, and floral notes without expert cupping vocabulary;
 - explicit repurchase memory and retrieval based on confirmed saved records;
+- private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
 - package claims kept distinct from user-perceived taste;
 - evidence-labeled taste snapshots based on sample count and coverage.
@@ -150,12 +153,19 @@ interface CreateCardRequest {
     date?: string;
     extraInfo?: string;
   };
+  repurchaseIntent?: "again" | "maybe" | "no" | "undecided";
+  repurchaseReasons?: string[];
+  scanSource?: "gemini" | "manual" | null;
+  correctedFields?: Array<"title" | "subtitle" | "package_origin" | "package_process" | "tags">;
+  confirmed?: true;
 }
 
 interface CreateCardResponse {
   data: TastingCard;
 }
 ```
+
+Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. It writes `confirmed: true`, `scanSource: "manual"`, the selected Korean flavor helper chips into `tags`, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
 
 ### `POST /api/v1/cards/ai-note`
 
