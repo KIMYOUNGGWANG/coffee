@@ -13,7 +13,7 @@ import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import { useDashboardCheckoutReturn } from "@/hooks/use-dashboard-checkout-return";
 import { useDeleteTastingCard, useTasteAnalytics, useTastingCards, useUserProfile } from "@/hooks/useTastingCards";
 import type { CardCreatorWizardMode } from "@/components/CardCreatorWizard";
-import type { DashboardActivationIntent } from "@/lib/activation-intent";
+import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import { buildAuthGateHref, isAuthRequiredError } from "@/lib/auth-redirect";
 import type { CheckoutIntent, CheckoutItemType, CheckoutNotice } from "@/lib/checkout-return";
 import { filterDashboardCards, type RepurchaseFilter } from "@/lib/dashboard-card-filter";
@@ -108,9 +108,9 @@ export default function DashboardClient({
     setIsWizardOpen(true);
   };
 
-  const openActivationWizard = (tasteProfile: TasteProfileKey | null) => {
+  const openActivationWizard = (tasteProfile: TasteProfileKey | null, mode: DashboardActivationMode = "full") => {
     setWizardTasteProfile(tasteProfile);
-    setWizardInitialMode("full");
+    setWizardInitialMode(mode);
     setIsWizardOpen(true);
   };
 

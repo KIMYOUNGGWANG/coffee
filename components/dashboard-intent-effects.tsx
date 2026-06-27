@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { AnalyticsEventName } from "@/lib/analytics-events";
-import type { DashboardActivationIntent } from "@/lib/activation-intent";
+import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import type { CheckoutIntent, CheckoutItemType } from "@/lib/checkout-return";
 import type { TasteProfileKey } from "@/lib/taste-profile";
 
@@ -15,7 +15,7 @@ type DashboardIntentEffectsProps = {
   readonly isCardsLoading: boolean;
   readonly cardsError: unknown;
   readonly cardsFailureReason: unknown;
-  readonly onOpenWizard: (tasteProfile: TasteProfileKey | null) => void;
+  readonly onOpenWizard: (tasteProfile: TasteProfileKey | null, mode: DashboardActivationMode) => void;
   readonly onOpenPayment: (itemType: CheckoutItemType) => void;
   readonly trackEvent: TrackEvent;
 };
@@ -55,10 +55,11 @@ export default function DashboardIntentEffects({
       source: initialActivationIntent.source,
       token: initialActivationIntent.token,
       tasteProfile: initialActivationIntent.tasteProfile,
+      mode: initialActivationIntent.mode,
     });
-    onOpenWizard(initialActivationIntent.tasteProfile);
+    onOpenWizard(initialActivationIntent.tasteProfile, initialActivationIntent.mode);
     setHasHandledActivationIntent(true);
-    removeDashboardSearchParams(["intent", "source", "token", "taste_profile"]);
+    removeDashboardSearchParams(["intent", "source", "token", "taste_profile", "mode"]);
   }, [hasHandledActivationIntent, initialActivationIntent, isCardsBlocked, onOpenWizard, trackEvent]);
 
   useEffect(() => {

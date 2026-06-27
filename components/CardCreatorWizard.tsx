@@ -407,6 +407,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             {wizardMode === "quick" && (
               <QuickAddMemoryForm
                 confirmed={true}
+                tasteProfileLabel={initialTasteProfilePreset?.label}
                 repurchaseIntent={quickRepurchaseIntent}
                 validationError={quickAddError}
                 onRepurchaseIntentChange={setQuickRepurchaseIntent}

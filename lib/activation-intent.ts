@@ -3,11 +3,13 @@ import { isTasteProfileKey, type TasteProfileKey } from "@/lib/taste-profile";
 
 const activationIntentKindSchema = z.enum(["first_card"]);
 const activationSourceSchema = z.enum(["public_card", "onboarding"]);
+const activationModeSchema = z.enum(["quick", "full"]);
 const dashboardActivationSearchSchema = z.object({
   intent: activationIntentKindSchema.nullable(),
   source: activationSourceSchema.nullable(),
   token: z.string().min(1).nullable(),
   taste_profile: z.string().nullable(),
+  mode: z.string().nullable(),
 });
 const onboardingActivationSearchSchema = z.object({
   source: z.enum(["public_card"]).nullable(),
@@ -15,12 +17,14 @@ const onboardingActivationSearchSchema = z.object({
 });
 
 export type ActivationSource = z.infer<typeof activationSourceSchema>;
+export type DashboardActivationMode = z.infer<typeof activationModeSchema>;
 export type DashboardActivationIntent =
   | {
       readonly kind: "first_card";
       readonly source: ActivationSource;
       readonly token: string | null;
       readonly tasteProfile: TasteProfileKey | null;
+      readonly mode: DashboardActivationMode;
     }
   | { readonly kind: "none" };
 export type OnboardingActivationContext =
@@ -46,6 +50,7 @@ export function readActivationIntentFromRecord(searchParams: SearchParamRecord):
     source: firstSearchParam(searchParams.source),
     token: firstSearchParam(searchParams.token),
     taste_profile: firstSearchParam(searchParams.taste_profile),
+    mode: firstSearchParam(searchParams.mode),
   });
 }
 
@@ -56,6 +61,7 @@ export function readActivationIntentFromSearch(search: string): DashboardActivat
     source: searchParams.get("source"),
     token: searchParams.get("token"),
     taste_profile: searchParams.get("taste_profile"),
+    mode: searchParams.get("mode"),
   });
 }
 
@@ -85,6 +91,7 @@ export function buildDashboardActivationHref(intent: DashboardActivationIntent):
       const searchParams = new URLSearchParams();
       searchParams.set("intent", "first_card");
       searchParams.set("source", intent.source);
+      searchParams.set("mode", intent.mode);
       if (intent.token) {
         searchParams.set("token", intent.token);
       }
@@ -101,9 +108,9 @@ export function buildDashboardActivationHref(intent: DashboardActivationIntent):
 export function buildFirstCardActivationIntent(context: OnboardingActivationContext): DashboardActivationIntent {
   switch (context.kind) {
     case "default":
-      return { kind: "first_card", source: "onboarding", token: null, tasteProfile: null };
+      return { kind: "first_card", source: "onboarding", token: null, tasteProfile: null, mode: "quick" };
     case "public_card":
-      return { kind: "first_card", source: "public_card", token: context.token, tasteProfile: null };
+      return { kind: "first_card", source: "public_card", token: context.token, tasteProfile: null, mode: "quick" };
     default:
       return assertNever(context);
   }
@@ -114,16 +121,20 @@ function readActivation(input: {
   readonly source: string | null;
   readonly token: string | null;
   readonly taste_profile: string | null;
+  readonly mode: string | null;
 }): DashboardActivationIntent {
   const parsedSearch = dashboardActivationSearchSchema.safeParse(input);
   if (!parsedSearch.success || parsedSearch.data.intent !== "first_card" || !parsedSearch.data.source) {
     return { kind: "none" };
   }
 
+  const parsedMode = activationModeSchema.safeParse(parsedSearch.data.mode);
+
   return {
     kind: "first_card",
     source: parsedSearch.data.source,
     token: parsedSearch.data.token,
     tasteProfile: isTasteProfileKey(parsedSearch.data.taste_profile) ? parsedSearch.data.taste_profile : null,
+    mode: parsedMode.success ? parsedMode.data : "full",
   };
 }

@@ -4,7 +4,7 @@ import DashboardIntentEffects from "@/components/dashboard-intent-effects";
 import { DashboardModals } from "@/components/dashboard-modals";
 import { DashboardMobileNavigation, type DashboardTab } from "@/components/dashboard-navigation";
 import { DashboardScanAction } from "@/components/dashboard-scan-action";
-import type { DashboardActivationIntent } from "@/lib/activation-intent";
+import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import type { CheckoutIntent, CheckoutItemType } from "@/lib/checkout-return";
 import type { TasteProfileKey } from "@/lib/taste-profile";
 import type { TastingCardData } from "@/hooks/useTastingCards";
@@ -28,7 +28,7 @@ type DashboardRuntimeOverlaysProps = {
   readonly selectedShareCard: TastingCardData | null;
   readonly onTabChange: (tab: DashboardTab) => void;
   readonly onScan: () => void;
-  readonly onOpenWizard: (tasteProfile: TasteProfileKey | null) => void;
+  readonly onOpenWizard: (tasteProfile: TasteProfileKey | null, mode: DashboardActivationMode) => void;
   readonly onOpenPayment: (itemType: CheckoutItemType) => void;
   readonly onCloseWizard: () => void;
   readonly onClosePayment: () => void;

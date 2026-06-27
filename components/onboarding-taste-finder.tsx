@@ -146,7 +146,7 @@ export default function OnboardingTasteFinder({ dashboardHref }: OnboardingTaste
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#6f6258]">Taste balance</p>
             <p className="mt-2 text-sm font-extrabold text-[#2f251f]">{previewMetrics}</p>
             <p className="mt-2 break-keep text-xs font-semibold leading-5 text-[#6f6258]">
-              {selectedPreset ? selectedPreset.cue : "취향을 고르면 첫 카드의 산미, 단맛, 바디 기준이 먼저 잡힙니다."}
+              {selectedPreset ? selectedPreset.cue : "취향을 고르면 빠른 기록의 산미, 단맛, 바디 기준이 먼저 잡힙니다."}
             </p>
           </div>
         </div>
@@ -158,7 +158,7 @@ export default function OnboardingTasteFinder({ dashboardHref }: OnboardingTaste
           data-testid="onboarding-first-card-cta"
           className="inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-primary-amber bg-primary-amber px-5 text-center text-sm font-black leading-5 text-background-dark shadow-[0_16px_42px_rgba(217,160,91,0.2)] transition-transform hover:-translate-y-0.5 sm:text-base"
         >
-          <span className="break-keep">첫 Taste Card 시작하기</span>
+          <span className="break-keep">20초 빠른 기록 시작하기</span>
           <ArrowRight size={18} />
         </Link>
         <Link

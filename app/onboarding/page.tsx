@@ -27,7 +27,7 @@ function activationHeadline(contextKind: "default" | "public_card"): string {
 function activationCopy(contextKind: "default" | "public_card"): string {
   switch (contextKind) {
     case "default":
-      return "당신에게 맞는 커피를 다시 찾기 위한 첫 Taste Card입니다. 취향을 하나 고르면 기록 초안과 한국어 향미 단어가 먼저 정리됩니다.";
+      return "당신에게 맞는 커피를 다시 찾기 위한 첫 Taste Card입니다. 취향을 하나 고르면 20초 빠른 기록과 한국어 향미 단어가 먼저 열립니다.";
     case "public_card":
       return "공유 받은 커피 기록을 보고 끝내지 말고, 오늘 마신 원두도 같은 흐름으로 안전하게 저장해보세요.";
     default:
@@ -88,7 +88,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
               </div>
               <div className="flex items-center gap-3">
                 <ArrowRight className="text-primary-amber" size={16} />
-                <span>취향 선택 후 봉투 스캔 또는 직접 입력으로 이어집니다.</span>
+                <span>취향 선택 후 빠른 기록으로 바로 이어지고, 봉투 스캔은 대시보드에서 계속 선택할 수 있어요.</span>
               </div>
             </div>
           </div>

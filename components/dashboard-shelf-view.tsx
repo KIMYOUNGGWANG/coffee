@@ -3,6 +3,7 @@
 import DashboardCardsSection from "@/components/dashboard-cards-section";
 import { DashboardFeaturedArchiveCard } from "@/components/dashboard-featured-archive-card";
 import { DashboardPassportSidebar } from "@/components/dashboard-passport-sidebar";
+import { DashboardRetentionLoop } from "@/components/dashboard-retention-loop";
 import { DashboardShelfFilters } from "@/components/dashboard-shelf-filters";
 import CoffeeShelfGrid from "@/components/coffee-shelf-grid";
 import type { TasteAnalyticsData, TastingCardData } from "@/hooks/useTastingCards";
@@ -113,6 +114,9 @@ export function DashboardShelfView({
         />
       )}
       <CoffeeShelfGrid onDataChange={onShelfDataChange} />
+      {cards.length > 0 && (
+        <DashboardRetentionLoop cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />
+      )}
       <div className="coffee-archive-layout">
         <aside className="coffee-passport-sidebar space-y-6 flex flex-col">
           {isDnaLoading ? (

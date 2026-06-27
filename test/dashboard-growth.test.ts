@@ -168,11 +168,28 @@ test.describe("CoffeeDex growth dashboard", () => {
 
     // Then
     await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();
-    await expect(page.getByText(/다시 살 이유|재구매 이유/)).toBeVisible();
-    await expect(page.getByText("복숭아 단맛")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Ethiopia Guji 상세 보기" })).toContainText("다시 살 이유");
+    await expect(page.getByRole("button", { name: "Ethiopia Guji 상세 보기" })).toContainText("복숭아 단맛");
     await page.getByRole("button", { name: "Ethiopia Guji 상세 보기" }).click();
-    await expect(page.getByText(/마지막 좋았던 추출|좋았던 추출/)).toBeVisible();
-    await expect(page.getByText("V60 · 15g:250g · 92C")).toBeVisible();
+    await expect(page.getByRole("dialog")).toContainText("마지막 좋았던 추출");
+    await expect(page.getByRole("dialog")).toContainText("V60 · 15g:250g · 92C");
+  });
+
+  test("surfaces a return loop from saved rebuy and brew memories", async ({ page }) => {
+    // Given
+    await mockDashboardApiRoutes(page, savedCardsResponse);
+
+    // When
+    await page.goto("/dashboard");
+
+    // Then
+    await expect(page.getByRole("region", { name: "오늘 다시 찾을 기억" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "오늘 다시 찾을 기억" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /다시 살 이유/ })).toContainText("복숭아 단맛");
+    await expect(page.getByRole("button", { name: /마지막 좋았던 추출/ })).toContainText("V60 · 15g:250g · 92C");
+    await page.getByRole("button", { name: "빠른 기록 남기기" }).click();
+    await expect(page.getByRole("button", { name: "빠른 커피 기록" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText(/한국어 향미|향미 단어/)).toBeVisible();
   });
 
   test("promotes sharing after the first card exists", async ({ page }) => {

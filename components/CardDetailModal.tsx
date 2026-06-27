@@ -7,29 +7,12 @@ import { Button } from "./ui/button";
 import { FlavorRadarChart } from "./flavor-radar-chart";
 import AIBrewingGuide from "./AIBrewingGuide";
 import { useQueryClient } from "@tanstack/react-query";
+import { hasBrewRecallMetadata } from "@/lib/brew-recall";
 
 interface CardDetailModalProps {
   card: TastingCardData;
   isOpen: boolean;
   onClose: () => void;
-}
-
-const BREW_METADATA_PATTERNS = [
-  /\b(?:v60|hario|kalita|chemex|aeropress|espresso|french press|clever|origami|dripper|pour[\s-]?over)\b|(?:핸드드립|에스프레소|콜드브루)/i,
-  /(?:\d{1,2}(?:\.\d+)?\s*g\s*[:/]\s*\d{2,4}(?:\.\d+)?\s*g)|(?:\b1\s*:\s*\d{1,2}(?:\.\d+)?\b)/i,
-  /\b\d{2,3}\s*(?:°\s*)?[cC]\b/i,
-  /\b\d{1,3}(?:\.\d+)?\s*g\b/i,
-  /\b\d{1,2}:\d{2}\b/,
-] as const;
-
-export function hasBrewRecallMetadata(extraInfo: string | undefined): boolean {
-  const normalizedInfo = extraInfo?.trim();
-  if (!normalizedInfo) return false;
-
-  const matchedSignalCount = BREW_METADATA_PATTERNS.filter((pattern) =>
-    pattern.test(normalizedInfo),
-  ).length;
-  return matchedSignalCount >= 2;
 }
 
 export default function CardDetailModal({ card, isOpen, onClose }: CardDetailModalProps) {
@@ -355,7 +338,12 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-40 flex items-center justify-center p-4">
-      <div className="glass-card border border-white/10 rounded-3xl w-full max-w-4xl shadow-2xl h-[90vh] flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${card.title} 상세 기록`}
+        className="glass-card border border-white/10 rounded-3xl w-full max-w-4xl shadow-2xl h-[90vh] flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
 
         {/* Left Pane: Tasting Card Display (Physical Passport Style) */}
         <div className="w-full md:w-5/12 bg-black/40 p-6 md:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/10 overflow-y-auto relative z-10">

@@ -52,64 +52,24 @@ function loadQuickAddModule() {
   return module.exports;
 }
 
-function loadCardDetailModalModule() {
-  const modulePath = path.join(projectRoot, "components/CardDetailModal.tsx");
+function loadBrewRecallModule() {
+  const modulePath = path.join(projectRoot, "lib/brew-recall.ts");
   const source = readFileSync(modulePath, "utf8");
   const compiled = ts.transpileModule(source, {
     compilerOptions: {
       esModuleInterop: true,
-      jsx: ts.JsxEmit.ReactJSX,
       module: ts.ModuleKind.CommonJS,
       target: ts.ScriptTarget.ES2022,
     },
     fileName: modulePath,
   });
   const module = { exports: {} };
-  const noopComponent = () => null;
-  const requireStub = (specifier) => {
-    switch (specifier) {
-      case "react":
-        return { default: {}, useState: (value) => [value, () => undefined] };
-      case "lucide-react":
-        return {
-          Calendar: noopComponent,
-          Check: noopComponent,
-          Clock: noopComponent,
-          Droplet: noopComponent,
-          Edit2: noopComponent,
-          Plus: noopComponent,
-          Scale: noopComponent,
-          Sparkles: noopComponent,
-          Star: noopComponent,
-          Thermometer: noopComponent,
-          Trash2: noopComponent,
-          X: noopComponent,
-        };
-      case "@/hooks/useTastingCards":
-        return {
-          useBrewingNotes: () => ({ data: [], isLoading: false }),
-          useDeleteBrewingNote: () => ({ mutateAsync: async () => undefined }),
-          useUpdateBrewingNote: () => ({ mutateAsync: async () => undefined }),
-        };
-      case "./ui/button":
-        return { Button: noopComponent };
-      case "./flavor-radar-chart":
-        return { FlavorRadarChart: noopComponent };
-      case "./AIBrewingGuide":
-        return noopComponent;
-      case "@tanstack/react-query":
-        return { useQueryClient: () => ({ invalidateQueries: () => undefined }) };
-      case "react/jsx-runtime":
-        return { Fragment: Symbol.for("react.fragment"), jsx: () => null, jsxs: () => null };
-      default:
-        throw new Error(`Unexpected card detail test import: ${specifier}`);
-    }
-  };
-
   vm.runInNewContext(compiled.outputText, {
     exports: module.exports,
     module,
-    require: requireStub,
+    require: (specifier) => {
+      throw new Error(`Unexpected brew recall test import: ${specifier}`);
+    },
   });
   return module.exports;
 }
@@ -191,7 +151,7 @@ test("Given empty quick add title, When validation runs, Then it blocks submissi
 
 test("Given card footer metadata, When brew recall provenance is checked, Then only compound brew metadata is accepted", () => {
   // Given
-  const { hasBrewRecallMetadata } = loadCardDetailModalModule();
+  const { hasBrewRecallMetadata } = loadBrewRecallModule();
 
   // When / Then
   assert.equal(hasBrewRecallMetadata("V60 · 15g:250g · 92C"), true);

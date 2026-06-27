@@ -26,6 +26,7 @@ export type BuildQuickAddMemoryPayloadInput = {
 
 type QuickAddMemoryFormProps = {
   readonly confirmed: true;
+  readonly tasteProfileLabel?: string | null;
   readonly onSaved: () => void;
   readonly onRepurchaseIntentChange: (intent: QuickRepurchaseIntent) => void;
   readonly onSubmitError: (message: string | null) => void;
@@ -82,6 +83,7 @@ export function buildQuickAddMemoryPayload(input: BuildQuickAddMemoryPayloadInpu
 
 export function QuickAddMemoryForm({
   confirmed,
+  tasteProfileLabel = null,
   onSaved,
   onRepurchaseIntentChange,
   onSubmitError,
@@ -124,6 +126,25 @@ export function QuickAddMemoryForm({
           <h3 className="font-serif font-bold text-foreground text-base">빠른 기록</h3>
           <p className="text-[11px] text-muted-foreground">오늘 마신 커피를 한 화면에서 바로 저장합니다.</p>
         </div>
+
+        {tasteProfileLabel && (
+          <div
+            data-testid="taste-profile-prefill"
+            className="rounded-2xl border border-primary-amber/20 bg-primary-amber/10 p-3 text-foreground"
+          >
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-primary-amber">Taste Finder prefill</p>
+            <p className="mt-1 break-keep text-sm font-black leading-5">
+              {tasteProfileLabel}으로 빠른 기록을 시작합니다.
+            </p>
+            <div className="mt-2 grid grid-cols-3 gap-2 text-center text-[11px] font-black">
+              <span className="border border-white/10 bg-white/5 px-2 py-1">산미 {form.metric1}</span>
+              <span data-testid="taste-profile-prefill-sweetness" className="border border-white/10 bg-white/5 px-2 py-1">
+                단맛 {form.metric2}
+              </span>
+              <span className="border border-white/10 bg-white/5 px-2 py-1">바디 {form.metric3}</span>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
