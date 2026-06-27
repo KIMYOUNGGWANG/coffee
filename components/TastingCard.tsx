@@ -37,6 +37,9 @@ export default function TastingCard({
   
   const origin = card.package_origin || card.footer_meta?.origin || "원산지 미기록";
   const tastingNotes = card.tags.slice(0, 3);
+  const privateRebuyReason = card.repurchase_intent === "again"
+    ? card.repurchase_reasons.find((reason) => reason.trim().length > 0)?.trim()
+    : undefined;
 
   return (
     <div className="coffee-shelf-item perspective-1000 w-full h-full min-h-[380px] group">
@@ -96,6 +99,12 @@ export default function TastingCard({
             <p className="mt-3 line-clamp-2 text-xs leading-relaxed font-light text-white/50">
               {tastingNotes.join(" · ")}
             </p>
+          )}
+          {privateRebuyReason && (
+            <div className="mt-3 min-w-0 border-l border-[#D4AF37]/40 pl-3">
+              <p className="text-[10px] font-light tracking-wider text-[#D4AF37]">다시 살 이유</p>
+              <p className="mt-0.5 truncate text-xs font-light text-foreground/80">{privateRebuyReason}</p>
+            </div>
           )}
         </div>
       </button>

@@ -14,6 +14,24 @@ interface CardDetailModalProps {
   onClose: () => void;
 }
 
+const BREW_METADATA_PATTERNS = [
+  /\b(?:v60|hario|kalita|chemex|aeropress|espresso|french press|clever|origami|dripper|pour[\s-]?over)\b|(?:핸드드립|에스프레소|콜드브루)/i,
+  /(?:\d{1,2}(?:\.\d+)?\s*g\s*[:/]\s*\d{2,4}(?:\.\d+)?\s*g)|(?:\b1\s*:\s*\d{1,2}(?:\.\d+)?\b)/i,
+  /\b\d{2,3}\s*(?:°\s*)?[cC]\b/i,
+  /\b\d{1,3}(?:\.\d+)?\s*g\b/i,
+  /\b\d{1,2}:\d{2}\b/,
+] as const;
+
+export function hasBrewRecallMetadata(extraInfo: string | undefined): boolean {
+  const normalizedInfo = extraInfo?.trim();
+  if (!normalizedInfo) return false;
+
+  const matchedSignalCount = BREW_METADATA_PATTERNS.filter((pattern) =>
+    pattern.test(normalizedInfo),
+  ).length;
+  return matchedSignalCount >= 2;
+}
+
 export default function CardDetailModal({ card, isOpen, onClose }: CardDetailModalProps) {
   const queryClient = useQueryClient();
   const { data: notes, isLoading } = useBrewingNotes(card.id);
@@ -283,6 +301,12 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
 
   if (!isOpen) return null;
 
+  const privateRebuyReason = card.repurchase_intent === "again"
+    ? card.repurchase_reasons.find((reason) => reason.trim().length > 0)?.trim()
+    : undefined;
+  const footerExtraInfo = card.footer_meta.extraInfo?.trim();
+  const lastGoodBrewSummary = hasBrewRecallMetadata(footerExtraInfo) ? footerExtraInfo : undefined;
+
   const handleEditStart = (note: any) => {
     setEditingNoteId(note.id);
     setEditMethod(note.method);
@@ -358,6 +382,23 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
               </div>
               <h2 className="font-serif text-3xl font-extrabold leading-tight text-foreground">{card.title}</h2>
               <p className="text-sm font-semibold text-muted-foreground">{card.subtitle}</p>
+
+              {(privateRebuyReason || lastGoodBrewSummary) && (
+                <div className="space-y-2 pt-1 text-xs">
+                  {privateRebuyReason && (
+                    <div className="min-w-0 border-l border-primary-amber/50 pl-3">
+                      <p className="text-[10px] font-bold tracking-wider text-primary-amber">다시 살 이유</p>
+                      <p className="mt-0.5 truncate text-foreground/85">{privateRebuyReason}</p>
+                    </div>
+                  )}
+                  {lastGoodBrewSummary && (
+                    <div className="min-w-0 border-l border-white/20 pl-3">
+                      <p className="text-[10px] font-bold tracking-wider text-primary-amber">마지막 좋았던 추출</p>
+                      <p className="mt-0.5 truncate text-foreground/85">{lastGoodBrewSummary}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Image if available */}
               {card.image_url && (

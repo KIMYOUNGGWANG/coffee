@@ -12,6 +12,7 @@ import DailyBrewingCalendar from "@/components/daily-brewing-calendar";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import { useDashboardCheckoutReturn } from "@/hooks/use-dashboard-checkout-return";
 import { useDeleteTastingCard, useTasteAnalytics, useTastingCards, useUserProfile } from "@/hooks/useTastingCards";
+import type { CardCreatorWizardMode } from "@/components/CardCreatorWizard";
 import type { DashboardActivationIntent } from "@/lib/activation-intent";
 import { buildAuthGateHref, isAuthRequiredError } from "@/lib/auth-redirect";
 import type { CheckoutIntent, CheckoutItemType, CheckoutNotice } from "@/lib/checkout-return";
@@ -33,6 +34,7 @@ export default function DashboardClient({
   const { trackEvent } = useAnalyticsEvents();
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [wizardTasteProfile, setWizardTasteProfile] = useState<TasteProfileKey | null>(null);
+  const [wizardInitialMode, setWizardInitialMode] = useState<CardCreatorWizardMode>("full");
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [resumedCheckoutItemType, setResumedCheckoutItemType] = useState<CheckoutItemType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -99,18 +101,20 @@ export default function DashboardClient({
     globalThis.location.assign(buildAuthGateHref(currentPath));
   }, [isDashboardAuthRequired]);
 
-  const openWizard = (source: string) => {
-    trackEvent("first_card_cta_clicked", { source });
+  const openWizard = (source: string, mode: CardCreatorWizardMode = "full") => {
+    trackEvent("first_card_cta_clicked", { source, mode });
     setWizardTasteProfile(null);
+    setWizardInitialMode(mode);
     setIsWizardOpen(true);
   };
 
   const openActivationWizard = (tasteProfile: TasteProfileKey | null) => {
     setWizardTasteProfile(tasteProfile);
+    setWizardInitialMode("full");
     setIsWizardOpen(true);
   };
 
-  const closeWizard = () => { setIsWizardOpen(false); setWizardTasteProfile(null); };
+  const closeWizard = () => { setIsWizardOpen(false); setWizardTasteProfile(null); setWizardInitialMode("full"); };
 
   const openPayment = (source = "dashboard_usage") => {
     setResumedCheckoutItemType(null);
@@ -203,6 +207,7 @@ export default function DashboardClient({
             onSortByChange={(value) => { setSortBy(value); trackFilterChange("sort", value !== "newest"); }}
             onResetFilters={resetFilters}
             onCreateCard={() => openWizard("empty_state")}
+            onQuickAdd={() => openWizard("empty_state_quick_add", "quick")}
             onDeleteCard={handleDeleteCard}
             onSelectCard={setSelectedDetailCard}
             onShareCard={setSelectedShareCard}
@@ -222,7 +227,12 @@ export default function DashboardClient({
         {activeTab === "passport" && <DashboardPassportView analytics={analytics} cards={cards} isLoading={isAnalyticsLoading} refreshTrigger={shelfRefreshTrigger} />}
 
         {activeTab === "settings" && (
-          <DashboardSettingsView profile={profile} onOpenPayment={() => openPayment("dashboard_settings")} />
+          <DashboardSettingsView
+            profile={profile}
+            cards={cards}
+            analytics={analytics}
+            onOpenPayment={() => openPayment("dashboard_settings")}
+          />
         )}
       </section>
 
@@ -235,6 +245,7 @@ export default function DashboardClient({
         cardsFailureReason={cardsFailureReason}
         isWizardOpen={isWizardOpen}
         wizardTasteProfile={wizardTasteProfile}
+        wizardInitialMode={wizardInitialMode}
         isPaymentOpen={isPaymentOpen}
         resumedCheckoutItemType={resumedCheckoutItemType}
         selectedDetailCard={selectedDetailCard}

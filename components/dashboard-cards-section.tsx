@@ -14,6 +14,7 @@ type DashboardCardsSectionProps = {
   readonly deletingCardId: string | undefined;
   readonly isDeleting: boolean;
   readonly onCreateCard: () => void;
+  readonly onQuickAdd: () => void;
   readonly onDeleteCard: (id: string) => void;
   readonly onSelectCard: (card: TastingCardData) => void;
   readonly onShareCard: (card: TastingCardData) => void;
@@ -56,6 +57,7 @@ export default function DashboardCardsSection({
   deletingCardId,
   isDeleting,
   onCreateCard,
+  onQuickAdd,
   onDeleteCard,
   onSelectCard,
   onShareCard,
@@ -80,7 +82,7 @@ export default function DashboardCardsSection({
         </section>
       );
     }
-    return <DashboardEmptyState onCreateCard={onCreateCard} />;
+    return <DashboardEmptyState onCreateCard={onCreateCard} onQuickAdd={onQuickAdd} />;
   }
 
   return (

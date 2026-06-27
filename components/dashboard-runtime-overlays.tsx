@@ -9,6 +9,7 @@ import type { CheckoutIntent, CheckoutItemType } from "@/lib/checkout-return";
 import type { TasteProfileKey } from "@/lib/taste-profile";
 import type { TastingCardData } from "@/hooks/useTastingCards";
 import type { useAnalyticsEvents } from "@/hooks/use-analytics-events";
+import type { CardCreatorWizardMode } from "@/components/CardCreatorWizard";
 
 type DashboardRuntimeOverlaysProps = {
   readonly activeTab: DashboardTab;
@@ -20,6 +21,7 @@ type DashboardRuntimeOverlaysProps = {
   readonly showScanAction: boolean;
   readonly isWizardOpen: boolean;
   readonly wizardTasteProfile: TasteProfileKey | null;
+  readonly wizardInitialMode: CardCreatorWizardMode;
   readonly isPaymentOpen: boolean;
   readonly resumedCheckoutItemType: CheckoutItemType | null;
   readonly selectedDetailCard: TastingCardData | null;
@@ -45,6 +47,7 @@ export function DashboardRuntimeOverlays({
   showScanAction,
   isWizardOpen,
   wizardTasteProfile,
+  wizardInitialMode,
   isPaymentOpen,
   resumedCheckoutItemType,
   selectedDetailCard,
@@ -76,6 +79,7 @@ export function DashboardRuntimeOverlays({
       <DashboardModals
         isWizardOpen={isWizardOpen}
         wizardTasteProfile={wizardTasteProfile}
+        wizardInitialMode={wizardInitialMode}
         onCloseWizard={onCloseWizard}
         isPaymentOpen={isPaymentOpen}
         resumedCheckoutItemType={resumedCheckoutItemType}

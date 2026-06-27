@@ -37,6 +37,7 @@ type DashboardShelfViewProps = {
   readonly onSortByChange: (value: string) => void;
   readonly onResetFilters: () => void;
   readonly onCreateCard: () => void;
+  readonly onQuickAdd: () => void;
   readonly onDeleteCard: (id: string) => void;
   readonly onSelectCard: (card: TastingCardData) => void;
   readonly onShareCard: (card: TastingCardData) => void;
@@ -76,6 +77,7 @@ export function DashboardShelfView({
   onSortByChange,
   onResetFilters,
   onCreateCard,
+  onQuickAdd,
   onDeleteCard,
   onSelectCard,
   onShareCard,
@@ -139,6 +141,7 @@ export function DashboardShelfView({
             deletingCardId={deletingCardId}
             isDeleting={isDeleting}
             onCreateCard={onCreateCard}
+            onQuickAdd={onQuickAdd}
             onDeleteCard={onDeleteCard}
             onSelectCard={onSelectCard}
             onShareCard={onShareCard}

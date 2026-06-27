@@ -3,11 +3,14 @@
 import React from "react";
 import { X, ArrowRight, ArrowLeft, Coffee, Sparkles, Loader2, Image as ImageIcon, AlertCircle, CheckCircle } from "lucide-react";
 import { useTastingStore } from "@/stores/tastingStore";
+import type { TastingCardFormState } from "@/stores/tastingStore";
 import { useCreateTastingCard, useGenerateAiNote, useUserProfile, useScanCoffeePackage } from "@/hooks/useTastingCards";
 import { tasteProfilePresetByKey, type TasteProfileKey } from "@/lib/taste-profile";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import TastingCard from "./TastingCard";
 import PaymentDialog from "./PaymentDialog";
+import { getErrorMessage } from "./card-creator-errors";
+import { buildQuickAddMemoryPayload, QuickAddMemoryForm, type QuickRepurchaseIntent } from "./quick-add-memory-form";
 
 // Mock preset tags to make picking flavor notes easier
 const PRESET_TAGS = [
@@ -19,21 +22,23 @@ const PRESET_TAGS = [
 const COFFEE_METHODS = ["Hario V60", "Kalita Wave", "Espresso", "AeroPress", "French Press", "Moka Pot", "Cold Brew"];
 const ROASTING_POINTS = ["Light", "Medium", "Dark"];
 
+export type CardCreatorWizardMode = "quick" | "full";
+
 interface CardCreatorWizardProps {
   isOpen: boolean;
   onClose: () => void;
   initialTasteProfile?: TasteProfileKey | null;
+  initialMode?: CardCreatorWizardMode;
 }
 
-function getErrorMessage(error: unknown, fallbackMessage: string): string {
-  if (error instanceof Error) {
-    const message = error.message.trim();
-    if (message.length > 0) return message;
-  }
-  return fallbackMessage;
-}
+type ScannedFormValues = Pick<
+  TastingCardFormState,
+  "title" | "subtitle" | "origin" | "extraInfo" | "tags" | "metric1" | "metric2" | "metric3" | "metric4" | "metric5" | "metric6"
+>;
 
-export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile = null }: CardCreatorWizardProps) {
+const QUICK_ADD_INITIAL_REPURCHASE_INTENT: QuickRepurchaseIntent = "again";
+
+export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile = null, initialMode = "full" }: CardCreatorWizardProps) {
   const {
     step,
     form,
@@ -61,7 +66,10 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
   const [scanWarningMessage, setScanWarningMessage] = React.useState<string | null>(null);
   const [aiNoteError, setAiNoteError] = React.useState<string | null>(null);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
-  const [lastScannedData, setLastScannedData] = React.useState<any>(null);
+  const [quickAddError, setQuickAddError] = React.useState<string | null>(null);
+  const [wizardMode, setWizardMode] = React.useState<CardCreatorWizardMode>(initialMode);
+  const [quickRepurchaseIntent, setQuickRepurchaseIntent] = React.useState<QuickRepurchaseIntent>(QUICK_ADD_INITIAL_REPURCHASE_INTENT);
+  const [lastScannedData, setLastScannedData] = React.useState<ScannedFormValues | null>(null);
   const appliedTasteProfileRef = React.useRef<TasteProfileKey | null>(null);
   const { data: profile } = useUserProfile();
   const { trackEvent } = useAnalyticsEvents();
@@ -120,6 +128,13 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
     appliedTasteProfileRef.current = null;
   }, [isOpen]);
 
+  React.useEffect(() => {
+    if (!isOpen) return;
+    setWizardMode(initialMode);
+    setQuickAddError(null);
+    if (initialMode === "quick") setStep(1);
+  }, [initialMode, isOpen, setStep]);
+
   if (!isOpen) return null;
 
   const clearWizardMessages = () => {
@@ -128,7 +143,16 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
     setScanWarningMessage(null);
     setAiNoteError(null);
     setSubmitError(null);
+    setQuickAddError(null);
     setLastScannedData(null);
+  };
+
+  const handleCloseWizard = () => {
+    clearWizardMessages();
+    resetForm();
+    setQuickRepurchaseIntent(QUICK_ADD_INITIAL_REPURCHASE_INTENT);
+    setWizardMode(initialMode);
+    onClose();
   };
 
   const getScanAllowanceLabel = () => {
@@ -332,18 +356,72 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
               <p className="text-xs text-muted-foreground mt-0.5">내 커피 기록을 예쁜 카드로 아카이빙합니다.</p>
             </div>
             <button
-              onClick={() => { clearWizardMessages(); resetForm(); onClose(); }}
+              type="button"
+              onClick={handleCloseWizard}
+              aria-label="카드 만들기 닫기"
               className="p-1.5 rounded-full hover:bg-white/10 text-muted-foreground transition-colors"
             >
               <X size={18} />
             </button>
           </div>
 
+          <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/5 p-1">
+            <button
+              type="button"
+              aria-pressed={wizardMode === "quick"}
+              onClick={() => {
+                clearWizardMessages();
+                setWizardMode("quick");
+                setStep(1);
+                trackEvent("first_card_cta_clicked", { source: "wizard_mode_switch", mode: "quick" });
+              }}
+              className={`min-h-10 rounded-xl px-3 text-xs font-black transition-colors ${
+                wizardMode === "quick"
+                  ? "bg-primary-amber text-background-dark"
+                  : "text-muted-foreground hover:bg-white/10 hover:text-foreground"
+              }`}
+            >
+              빠른 커피 기록
+            </button>
+            <button
+              type="button"
+              aria-pressed={wizardMode === "full"}
+              onClick={() => {
+                clearWizardMessages();
+                setWizardMode("full");
+                trackEvent("first_card_cta_clicked", { source: "wizard_mode_switch", mode: "full" });
+              }}
+              className={`min-h-10 rounded-xl px-3 text-xs font-black transition-colors ${
+                wizardMode === "full"
+                  ? "bg-white text-background-dark"
+                  : "text-muted-foreground hover:bg-white/10 hover:text-foreground"
+              }`}
+            >
+              스캔/수동 전체 기록
+            </button>
+          </div>
+
           {/* Step content */}
           <div className="flex-1 py-6">
 
+            {wizardMode === "quick" && (
+              <QuickAddMemoryForm
+                confirmed={true}
+                repurchaseIntent={quickRepurchaseIntent}
+                validationError={quickAddError}
+                onRepurchaseIntentChange={setQuickRepurchaseIntent}
+                onValidationErrorChange={setQuickAddError}
+                onSubmitError={setSubmitError}
+                onSaved={() => {
+                  clearWizardMessages();
+                  setQuickRepurchaseIntent(QUICK_ADD_INITIAL_REPURCHASE_INTENT);
+                  onClose();
+                }}
+              />
+            )}
+
             {/* STEP 1: Basic Metadata */}
-            {step === 1 && (
+            {wizardMode === "full" && step === 1 && (
               <div className="space-y-4 animate-in slide-in-from-right-5 duration-200">
                 <h3 className="font-serif font-bold text-foreground text-base mb-2">1단계: 원두 및 추출 정보</h3>
 
@@ -496,7 +574,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             )}
 
             {/* STEP 2: Taste Metrics */}
-            {step === 2 && (
+            {wizardMode === "full" && step === 2 && (
               <div className="space-y-6 animate-in slide-in-from-right-5 duration-200">
                 <div>
                   <h3 className="font-serif font-bold text-foreground text-base">2단계: 핵심 테이스팅 수치</h3>
@@ -634,7 +712,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             )}
 
             {/* STEP 3: Aromatics & Notes */}
-            {step === 3 && (
+            {wizardMode === "full" && step === 3 && (
               <div className="space-y-4 max-h-[380px] overflow-y-auto pr-1 animate-in slide-in-from-right-5 duration-200">
                 <div>
                   <h3 className="font-serif font-bold text-foreground text-base">3단계: 향미 노트 태그 & 메모</h3>
@@ -683,7 +761,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             )}
 
             {/* STEP 4: Review and Generate AI Note */}
-            {step === 4 && (
+            {wizardMode === "full" && step === 4 && (
               <div className="space-y-4 animate-in slide-in-from-right-5 duration-200">
                 <h3 className="font-serif font-bold text-foreground text-base">4단계: AI 컵노트 확인 & 발행</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
@@ -741,7 +819,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
             <div className="flex items-center gap-4">
               <button
                 type="button"
-                disabled={step === 1 || isGeneratingAiNote}
+                disabled={wizardMode === "quick" || step === 1 || isGeneratingAiNote}
                 onClick={prevStep}
                 className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
               >
@@ -757,7 +835,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
               </div>
             </div>
 
-            {step < 3 ? (
+            {wizardMode === "quick" ? null : step < 3 ? (
               <button
                 type="button"
                 onClick={nextStep}
@@ -844,8 +922,10 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                 },
                 package_origin: null,
                 package_process: null,
-                repurchase_intent: "undecided",
-                repurchase_reasons: [],
+                repurchase_intent: wizardMode === "quick" ? quickRepurchaseIntent : "undecided",
+                repurchase_reasons: wizardMode === "quick"
+                  ? buildQuickAddMemoryPayload({ confirmed: true, form, repurchaseIntent: quickRepurchaseIntent }).repurchaseReasons ?? []
+                  : [],
                 scan_source: null,
                 scan_confidence: null,
                 corrected_fields: [],
