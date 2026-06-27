@@ -2,6 +2,14 @@
   "schema_version": 2,
   "active_work_id": null,
   "works": {
+    "coffeedex-market-opportunities-sprint": {
+      "work_id": "coffeedex-market-opportunities-sprint",
+      "active_plan": ".omo/plans/coffeedex-market-opportunities-sprint.md",
+      "plan_name": "coffeedex-market-opportunities-sprint",
+      "session_ids": ["codex:019f05f2-4e36-7570-af5a-24b467e68cbf"],
+      "status": "completed",
+      "worktree_path": null
+    },
     "mobile-first-fresh-shelf-visual-fix": {
       "work_id": "mobile-first-fresh-shelf-visual-fix",
       "active_plan": ".omo/plans/mobile-first-fresh-shelf-visual-fix.md",
