@@ -100,10 +100,16 @@ function writeMissingFontFsMock(tempDirectory) {
     `
 export const promises = {
   access() {
-    return Promise.reject(Object.assign(new Error("missing bundled font"), { code: "ENOENT" }));
+    return Promise.reject(Object.assign(
+      new Error("ENOENT: no such file or directory, access '/var/task/public/fonts/NanumGothic-Regular.ttf'"),
+      { code: "ENOENT" },
+    ));
   },
   readFile() {
-    return Promise.reject(Object.assign(new Error("missing bundled font"), { code: "ENOENT" }));
+    return Promise.reject(Object.assign(
+      new Error("ENOENT: no such file or directory, open '/var/task/public/fonts/NanumGothic-Regular.ttf'"),
+      { code: "ENOENT" },
+    ));
   },
 };
 `,
@@ -259,13 +265,17 @@ test("GET /api/v1/pdf returns 503 without fetching a remote font when the bundle
 
     // When
     const response = await routeModule.GET(new Request("http://localhost/api/v1/pdf"));
-    const body = JSON.parse(await response.text());
+    const responseText = await response.text();
+    const body = JSON.parse(responseText);
 
     // Then
     assert.equal(response.status, 503);
     assert.equal(fetchCalled, false);
     assert.equal(body.error.code, 503);
     assert.match(body.error.message, /PDF 글꼴 리소스/);
+    assert.equal(body.error.details, undefined);
+    assert.doesNotMatch(responseText, /ENOENT/);
+    assert.doesNotMatch(responseText, /\/var\/task|public\/fonts|NanumGothic-Regular\.ttf/);
   } finally {
     globalThis.fetch = originalFetch;
     rmSync(tempDirectory, { force: true, recursive: true });

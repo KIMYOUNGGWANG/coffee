@@ -32,9 +32,9 @@ async function readBundledKoreanFont(): Promise<Buffer | NextResponse> {
   const fontPath = path.join(process.cwd(), "public", "fonts", "NanumGothic-Regular.ttf");
   try {
     await fs.access(fontPath);
-  } catch (readError) {
-    const details = readError instanceof Error ? readError.message : "Font asset is unavailable.";
-    return jsonError(503, "PDF 글꼴 리소스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.", details);
+  } catch {
+    console.error("Bundled PDF font is unavailable.");
+    return jsonError(503, "PDF 글꼴 리소스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.");
   }
   return fs.readFile(fontPath);
 }
