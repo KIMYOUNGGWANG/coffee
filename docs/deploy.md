@@ -23,11 +23,18 @@ Set these variables in Vercel and in the local shell used for build or route ver
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-side Supabase service key for privileged route work. |
 | `STRIPE_SECRET_KEY` | Stripe server key for Checkout sessions. |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret. |
-| `RESEND_API_KEY` | Email provider key expected by the current env schema. |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Analytics key expected by the current env schema. |
-| `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN expected by the current env schema. |
 | `STORAGE_BUCKET_UPLOADS` | Supabase Storage bucket name for uploaded images. |
-| `AI_API_KEY` | Optional AI provider key for tasting notes and package scans. |
+
+## Optional / Recommended Production Environment
+
+The current runtime schema accepts these variables as optional. Configure them for production quality when the matching provider is enabled, but do not treat them as required by local validation or route-contract tests:
+
+| Variable | Purpose |
+| --- | --- |
+| `RESEND_API_KEY` | Optional email provider key for outbound support or transactional email paths when enabled. |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Optional analytics key for production product instrumentation when enabled. |
+| `NEXT_PUBLIC_SENTRY_DSN` | Optional Sentry DSN for production error reporting when enabled. |
+| `AI_API_KEY` | Optional AI provider key for tasting notes and package scans; routes must fall back or return manual-entry states when it is absent. |
 
 ## Supabase Checklist
 

@@ -88,7 +88,7 @@ Your next move: execution has been authorized by the user's OMO start-work reque
   QA scenarios (name the exact tool + invocation): `npm run validate:full > .omo/evidence/coffeedex-launch-readiness/task-4-validate-full.log 2>&1`; targeted browser rerun `npx playwright test test/guest-capture.test.ts test/dashboard-growth.test.ts test/public-share.test.ts test/checkout-return.test.ts test/account-data-controls.test.ts > .omo/evidence/coffeedex-launch-readiness/task-4-browser-golden.log 2>&1`; failure scenario: if a flow fails, save Playwright trace/error-context paths and repair with a minimal regression test.
   Commit: Y | `chore(launch): verify web golden flows`
 
-- [ ] 5. Resolve deploy readiness truth gaps
+- [x] 5. Resolve deploy readiness truth gaps
   What to do / Must NOT do: Audit `docs/deploy.md`, `lib/env.ts`, Stripe/Supabase checklist docs, and runtime env validation so launch docs classify required versus optional observability/email variables correctly. Add source-contract tests if docs and env schema disagree. Must not require live secrets in local validation and must not print env values.
   Parallelization: Wave 2 | Blocked by: 2, 3 | Blocks: final
   References (executor has NO interview context - be exhaustive): `docs/deploy.md`; `lib/env.ts`; Metis finding that `RESEND_API_KEY`, `NEXT_PUBLIC_POSTHOG_KEY`, and `NEXT_PUBLIC_SENTRY_DSN` may be optional in code but required in docs; Stripe checklist in `docs/deploy.md`; Supabase checklist in `docs/deploy.md`.

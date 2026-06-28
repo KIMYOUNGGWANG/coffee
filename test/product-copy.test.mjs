@@ -19,6 +19,28 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function markdownSection(source, heading) {
+  const marker = `## ${heading}`;
+  const start = source.indexOf(marker);
+  assert.notEqual(start, -1, `Expected markdown section: ${heading}`);
+
+  const contentStart = start + marker.length;
+  const nextHeading = source.indexOf("\n## ", contentStart);
+  return source.slice(contentStart, nextHeading === -1 ? source.length : nextHeading);
+}
+
+function readEnvSchemaVariables() {
+  const envSchema = read("lib/env.ts");
+  const entries = [...envSchema.matchAll(/^\s{2}([A-Z0-9_]+): z\.string\(\)([^\n]*),$/gm)].map(
+    ([, name, modifiers]) => ({ name, optional: modifiers.includes(".optional()") }),
+  );
+
+  return {
+    optional: entries.filter((entry) => entry.optional).map((entry) => entry.name).sort(),
+    required: entries.filter((entry) => !entry.optional).map((entry) => entry.name).sort(),
+  };
+}
+
 const unsupportedVisibleCopyTerms = [
   "Starter " + "SaaS",
   "Official " + "SaaS Layer",
@@ -142,6 +164,83 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
   assert.match(marketOpportunities, /One-line quick notes remain card memory copy, not brew recall/);
   assert.match(marketOpportunities, /Private rebuy recall surfaces the user's own repurchase reason/);
   assert.match(marketOpportunities, /Last-good-brew recall stays distinct/);
+});
+
+test("CoffeeDex deploy guide matches the runtime env schema requiredness", () => {
+  // Given
+  const deployGuide = read("docs/deploy.md");
+  const requiredSection = markdownSection(deployGuide, "Required Environment");
+  const optionalSection = markdownSection(deployGuide, "Optional / Recommended Production Environment");
+  const schemaVariables = readEnvSchemaVariables();
+  const schemaRequired = [
+    "NEXT_PUBLIC_APP_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "STORAGE_BUCKET_UPLOADS",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "SUPABASE_SERVICE_ROLE_KEY",
+  ].sort();
+  const schemaOptional = [
+    "AI_API_KEY",
+    "NEXT_PUBLIC_POSTHOG_KEY",
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "RESEND_API_KEY",
+  ].sort();
+
+  // When / Then
+  assert.deepEqual(schemaVariables.required, schemaRequired);
+  assert.deepEqual(schemaVariables.optional, schemaOptional);
+
+  for (const variable of schemaRequired) {
+    assert.match(requiredSection, new RegExp(`\\\`${escapeRegExp(variable)}\\\``));
+    assert.doesNotMatch(optionalSection, new RegExp(`\\\`${escapeRegExp(variable)}\\\``));
+  }
+
+  for (const variable of schemaOptional) {
+    assert.match(optionalSection, new RegExp(`\\\`${escapeRegExp(variable)}\\\``));
+    assert.doesNotMatch(requiredSection, new RegExp(`\\\`${escapeRegExp(variable)}\\\``));
+  }
+
+  assert.match(optionalSection, /optional/i);
+  assert.match(optionalSection, /do not treat them as required/i);
+  assert.doesNotMatch(deployGuide, /expected by the current env schema/i);
+});
+
+test("CoffeeDex docs and legal copy do not overstate deletion or guest scan guarantees", () => {
+  // Given
+  const sources = [
+    ["deploy guide", read("docs/deploy.md")],
+    ["api spec", read("docs/api-spec.md")],
+    ["golden flows", read("docs/golden-flows.md")],
+    ["privacy", read("app/legal/privacy/page.tsx")],
+    ["terms", read("app/legal/terms/page.tsx")],
+  ];
+  const overstatedDeletionClaim =
+    /automatically delete Storage objects|delete Storage objects automatically|storage-object cleanup is implemented|storage-object cleanup is promised|저장소 파일.*자동 삭제를 보장합니다/i;
+  const overstatedDistributedLimitClaim =
+    /distributed production rate limiting is implemented|production distributed rate limiting is implemented|분산된 사용량 보장입니다|분산된 보안 경계입니다/i;
+
+  // When / Then
+  for (const [label, source] of sources) {
+    assert.doesNotMatch(source, overstatedDeletionClaim, `${label} must not promise storage cleanup`);
+    assert.doesNotMatch(
+      source,
+      overstatedDistributedLimitClaim,
+      `${label} must not promise distributed guest scan limiting`,
+    );
+  }
+
+  assert.match(read("docs/deploy.md"), /does not delete Storage objects/);
+  assert.match(read("docs/api-spec.md"), /does not currently promise storage-object cleanup/);
+  assert.match(read("docs/golden-flows.md"), /storage-object cleanup is not promised/);
+  assert.match(read("app/legal/privacy/page.tsx"), /자동 삭제까지 보장하지 않습니다/);
+  assert.match(read("app/legal/terms/page.tsx"), /자동 삭제를 보장하지 않습니다/);
+  assert.match(read("docs/deploy.md"), /not distributed across Vercel instances/);
+  assert.match(read("docs/api-spec.md"), /not production distributed rate limiting/);
+  assert.match(read("docs/golden-flows.md"), /not distributed production rate limiting/);
+  assert.match(read("app/legal/privacy/page.tsx"), /여러 인스턴스 사이에서 일관되지 않을 수 있습니다/);
+  assert.match(read("app/legal/terms/page.tsx"), /분산된 사용량 보장을 의미하지 않습니다/);
 });
 
 test("CoffeeDex legal copy states guest, analytics, export, and deletion boundaries", () => {
