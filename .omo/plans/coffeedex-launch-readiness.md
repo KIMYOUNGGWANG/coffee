@@ -114,13 +114,13 @@ Your next move: execution has been authorized by the user's OMO start-work reque
 
 ## Final verification wave
 > Runs in parallel after ALL todos. ALL must APPROVE. Surface results and wait for the user's explicit okay before declaring complete.
-- [ ] F1. Plan compliance audit
+- [x] F1. Plan compliance audit
   Exact invocation: spawn `lazycodex-gate-reviewer` with this plan, `.omo/start-work/ledger.jsonl`, final diff, and evidence list. Also run `node -e "const fs=require('fs'); const p=fs.readFileSync('.omo/plans/coffeedex-launch-readiness.md','utf8'); const unchecked=[...p.matchAll(/^- \\[ \\] (?:\\d+\\.|F\\d\\.)/gm)]; if (unchecked.length) { console.error(unchecked.map(m=>m[0]).join('\\n')); process.exit(1); }"` after checkboxes are marked.
-- [ ] F2. Code quality review
+- [x] F2. Code quality review
   Exact invocation: spawn `lazycodex-code-reviewer` with changed files and verification logs. Reviewer must check auth correctness, no `as any`/suppression, dirty worktree preservation, route-test isolation, and no live secret leakage.
-- [ ] F3. Real manual QA
+- [x] F3. Real manual QA
   Exact invocation: `npm run validate:full` plus targeted Playwright golden-flow rerun after production build. Evidence must include at least one browser screenshot or Playwright artifact for auth/activation and one for a dashboard/account/share flow.
-- [ ] F4. Scope fidelity
+- [x] F4. Scope fidelity
   Exact invocation: `git diff --name-only` must not include `mobile/**`, `DESIGN.md`, `next-env.d.ts`, or `artifacts/**` unless they are pre-existing unstaged files; `git diff --cached --name-only` must contain only launch-readiness files; `git diff | rg -i 'marketplace|referral|affiliate|partner|제휴|파트너|커뮤니티|social graph|print fulfillment|배송|인쇄'` must not show new shipped claims.
 
 ## Commit strategy
