@@ -68,6 +68,8 @@ async function mockAuthGateRoutes(page: Page): Promise<void> {
 async function expectKoreanAuthGate(page: Page): Promise<void> {
   await expect(page.getByRole("heading", { name: "CoffeeDex 계정으로 계속하기" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Google로 계속하기" })).toBeVisible();
+  await expect(page.getByText("CoffeeDex Auth Gate")).toHaveCount(0);
+  await expect(page.getByText(/로그인 후 이동:/)).toHaveCount(0);
   await expect(page.getByText(/401/)).not.toBeVisible();
   await expect(page.getByText("데이터 로드 실패")).not.toBeVisible();
   await expect(page.getByText(/Supabase 연결/)).not.toBeVisible();
@@ -114,6 +116,6 @@ test.describe("CoffeeDex authenticated activation gate", () => {
 
     // Then
     await expectKoreanAuthGate(page);
-    await expect(page.getByText("로그인 후 이동: /dashboard")).toBeVisible();
+    await expect(page.getByText(/로그인 후 이동:/)).toHaveCount(0);
   });
 });

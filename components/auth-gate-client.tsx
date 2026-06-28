@@ -87,16 +87,15 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
       data-testid={isClientReady ? "auth-gate-ready" : undefined}
       className="starter-shell min-h-screen text-foreground bg-[#0D0A07]"
     >
-      <section className="surface-panel mx-auto max-w-md border border-white/10 glass-card p-6 shadow-sm md:p-8">
-        <div className="space-y-2 text-center">
+      <section className="surface-panel mx-auto w-full max-w-md border border-white/10 glass-card p-6 shadow-sm md:p-8">
+        <div className="space-y-3 text-center">
           <div className="mx-auto flex size-11 items-center justify-center rounded-full bg-primary-amber text-[#0D0A07]">
             <Coffee size={20} aria-hidden="true" />
           </div>
-          <p className="hero-kicker text-primary-amber">CoffeeDex Auth Gate</p>
+          <p className="hero-kicker text-primary-amber">CoffeeDex</p>
           <h1 className="font-serif text-2xl font-bold text-foreground">CoffeeDex 계정으로 계속하기</h1>
-          <p className="text-sm leading-6 text-foreground/65">로그인하거나 회원가입하면 내 Taste Archive로 돌아갑니다.</p>
-          <p className="rounded-md border border-white/10 bg-black/40 px-3 py-2 text-xs font-semibold text-foreground/70">
-            로그인 후 이동: {redirectTo}
+          <p className="mx-auto max-w-sm text-sm leading-6 text-foreground/65">
+            Google 계정으로 로그인하면 방금 보던 커피 기록으로 이어집니다.
           </p>
         </div>
 

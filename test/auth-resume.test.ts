@@ -53,7 +53,7 @@ test.describe("CoffeeDex auth resume conversion", () => {
 
     // Then
     await expect(page.getByRole("heading", { name: "CoffeeDex 계정으로 계속하기" })).toBeVisible();
-    await expect(page.getByText("로그인 후 이동: /dashboard", { exact: true })).toBeVisible();
+    await expect(page.getByText(/로그인 후 이동:/)).toHaveCount(0);
 
     const oAuthUrl = await captureGoogleOAuthUrl(page);
     expectOAuthNextPath(oAuthUrl, "/dashboard");
@@ -64,7 +64,7 @@ test.describe("CoffeeDex auth resume conversion", () => {
     await page.goto(`/auth?redirect=${encodeURIComponent(publicCardActivationPath)}`);
 
     // Then
-    await expect(page.getByText(`로그인 후 이동: ${publicCardActivationPath}`)).toBeVisible();
+    await expect(page.getByText(/로그인 후 이동:/)).toHaveCount(0);
 
     const oAuthUrl = await captureGoogleOAuthUrl(page);
     expectOAuthNextPath(oAuthUrl, publicCardActivationPath);
@@ -75,7 +75,7 @@ test.describe("CoffeeDex auth resume conversion", () => {
     await page.goto(`/auth?redirect=${encodeURIComponent(checkoutIntentPath)}`);
 
     // Then
-    await expect(page.getByText(`로그인 후 이동: ${checkoutIntentPath}`)).toBeVisible();
+    await expect(page.getByText(/로그인 후 이동:/)).toHaveCount(0);
 
     const oAuthUrl = await captureGoogleOAuthUrl(page);
     expectOAuthNextPath(oAuthUrl, checkoutIntentPath);
