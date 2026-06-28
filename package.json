@@ -9,8 +9,10 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test:smoke": "node --test test/smoke.test.mjs",
+    "test:product-truth": "node --test test/product-copy.test.mjs test/smoke.test.mjs test/brand-contract.test.mjs test/brand-leak.test.mjs",
+    "test:routes": "node --test test/profile-route.test.mjs test/export-route.test.mjs test/account-route.test.mjs test/checkout-api-contract.test.mjs test/pdf-route.test.mjs test/credit-lifecycle.test.mjs test/scan-trust.test.mjs test/memory-crud-contract.test.mjs test/stripe-webhook-idempotency.test.mjs test/subscription-lifecycle.test.mjs",
     "test:e2e": "playwright test",
-    "validate:full": "npm run test:smoke && npm run typecheck && npm run build && npm run test:e2e"
+    "validate:full": "npm run test:product-truth && npm run test:routes && npm run typecheck && npm run build && npm run test:e2e"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",

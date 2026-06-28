@@ -134,7 +134,8 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
 
   assert.match(deployGuide, /Korea-first AI specialty coffee memory and artifact product/);
   assert.match(deployGuide, /future work, not deploy-time capabilities/);
-  assert.doesNotMatch(deployGuide, /npm run validate:full/);
+  assert.match(deployGuide, /npm run validate:full/);
+  assert.match(deployGuide, /product-copy, brand, smoke, route-contract, typecheck, build, and Playwright E2E coverage/);
   assert.match(deployGuide, /process-local/i);
   assert.match(deployGuide, /not distributed/i);
 

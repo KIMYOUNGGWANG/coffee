@@ -193,7 +193,7 @@ test.describe("CoffeeDex product copy", () => {
     await expect(page.getByText("기록한 원두들을 찬장에 진열해 보세요")).toBeVisible();
     await expect(page.getByText("Taste Passport", { exact: true })).toBeVisible();
     await expect(page.getByText("오늘의 향미 프로필")).toBeVisible();
-    await expect(page.getByText("나의 커피 DNA")).toBeVisible();
+    await expect(page.getByText("취향 지도")).toBeVisible();
     await expect(page.getByText("PDF 테이스팅북 내보내기 혜택")).toHaveCount(0);
     await expectNoUnsupportedVisibleCopy(page);
     await captureEvidenceScreenshot(page, screenshotPaths.dashboard);

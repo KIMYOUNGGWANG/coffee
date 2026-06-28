@@ -36,7 +36,18 @@ test("CoffeeDex package identity exposes the real app stack", () => {
   assert.equal(packageJson.description, "CoffeeDex coffee memory and repurchase companion.");
   assert.equal(packageJson.private, true);
   assert.equal(packageJson.scripts["test:smoke"], "node --test test/smoke.test.mjs");
-  assert.equal(packageJson.scripts["validate:full"], "npm run test:smoke && npm run typecheck && npm run build && npm run test:e2e");
+  assert.equal(
+    packageJson.scripts["test:product-truth"],
+    "node --test test/product-copy.test.mjs test/smoke.test.mjs test/brand-contract.test.mjs test/brand-leak.test.mjs",
+  );
+  assert.equal(
+    packageJson.scripts["test:routes"],
+    "node --test test/profile-route.test.mjs test/export-route.test.mjs test/account-route.test.mjs test/checkout-api-contract.test.mjs test/pdf-route.test.mjs test/credit-lifecycle.test.mjs test/scan-trust.test.mjs test/memory-crud-contract.test.mjs test/stripe-webhook-idempotency.test.mjs test/subscription-lifecycle.test.mjs",
+  );
+  assert.equal(
+    packageJson.scripts["validate:full"],
+    "npm run test:product-truth && npm run test:routes && npm run typecheck && npm run build && npm run test:e2e",
+  );
   assertDependency(packageJson, "next");
   assertDependency(packageJson, "@supabase/ssr");
   assertDependency(packageJson, "@supabase/supabase-js");

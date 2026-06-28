@@ -44,7 +44,8 @@ test("shows a memory collage without claiming a complete taste profile for one c
   await expect(page.getByRole("heading", { name: "커피 기억 콜라주" })).toBeVisible();
   await expect(page.getByText("확정 기록 1개", { exact: true })).toBeVisible();
   await expect(page.getByText("좁은 범위", { exact: false })).toBeVisible();
-  await expect(page.getByText("복숭아 1회", { exact: false })).toBeVisible();
+  await expect(page.getByText("취향 분석을 위한 데이터가 부족합니다")).toBeVisible();
+  await expect(page.getByText("향미 노트")).toBeVisible();
   await expect(page.getByText("취향 DNA", { exact: false })).toHaveCount(0);
   await page.screenshot({ path: evidencePath, fullPage: true });
 });

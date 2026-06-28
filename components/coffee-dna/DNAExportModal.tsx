@@ -62,7 +62,7 @@ export default function DNAExportModal({
       try {
         await navigator.share({
           title: "나의 커피 DNA",
-          text: `Hyangmi CoffeeDex에서 분석한 저의 커피 DNA는 '${cardProps.typeLabel}' 입니다!`,
+          text: `CoffeeDex에서 분석한 저의 커피 DNA는 '${cardProps.typeLabel}' 입니다!`,
           url: window.location.origin,
         });
       } catch (err) {

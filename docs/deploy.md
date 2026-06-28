@@ -60,17 +60,22 @@ Set these variables in Vercel and in the local shell used for build or route ver
 
 ## Verification
 
-Product-truth verification is:
+The authoritative local launch gate is:
 
 ```bash
-node --test test/product-copy.test.mjs test/smoke.test.mjs
+npm run validate:full
 ```
 
-The broader local validation path uses bundled Node directly:
+It runs product-copy, brand, smoke, route-contract, typecheck, build, and Playwright E2E coverage using existing local fixtures. Product-truth verification alone is:
 
 ```bash
-node --test test/product-copy.test.mjs test/smoke.test.mjs
-npm run typecheck
+npm run test:product-truth
 ```
 
-Use the bundled Node command above for this workspace.
+Route-contract verification alone is:
+
+```bash
+npm run test:routes
+```
+
+Use the npm scripts above for this workspace. They do not require live Supabase or Stripe mutation.

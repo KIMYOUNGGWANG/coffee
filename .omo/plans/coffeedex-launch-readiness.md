@@ -64,7 +64,7 @@ Your next move: execution has been authorized by the user's OMO start-work reque
   QA scenarios (name the exact tool + invocation): Happy/failure route proof with exact command `node --test <new-or-updated-profile-route-test>` saved to `.omo/evidence/coffeedex-launch-readiness/task-1-profile-route.log`; browser proof `npm run build > .omo/evidence/coffeedex-launch-readiness/task-1-build.log 2>&1 && npx playwright test test/auth-gate.test.ts test/auth-resume.test.ts > .omo/evidence/coffeedex-launch-readiness/task-1-auth-playwright.log 2>&1`; failure scenario must include unauthenticated route fixture returning 401, not a mocked success. Cleanup: no persistent server beyond Playwright webServer.
   Commit: Y | `fix(profile): require real auth for profile summary`
 
-- [ ] 2. Make launch validation command match product truth
+- [x] 2. Make launch validation command match product truth
   What to do / Must NOT do: Update `package.json` scripts and `docs/deploy.md` so one authoritative local launch gate includes product-copy, brand, smoke, route-contract, typecheck, build, and Playwright E2E coverage. Keep commands bounded and npm-free beyond existing dependencies. Must not remove existing `test:smoke`, `typecheck`, `build`, or `test:e2e` scripts.
   Parallelization: Wave 1 | Blocked by: Todo 1 for final validation rerun | Blocks: 4, final
   References (executor has NO interview context - be exhaustive): `package.json` currently defines `validate:full` as `npm run test:smoke && npm run typecheck && npm run build && npm run test:e2e`; `docs/deploy.md` currently documents only `product-copy + smoke` and `typecheck`; QA explorer report says product-copy/brand/route contracts are not in the composite gate.
@@ -72,7 +72,7 @@ Your next move: execution has been authorized by the user's OMO start-work reque
   QA scenarios (name the exact tool + invocation): Auxiliary proof `npm run validate:full > .omo/evidence/coffeedex-launch-readiness/task-2-validate-full.log 2>&1`; failure scenario `node -e "const p=require('./package.json'); if (!/product-copy|brand|route/.test(JSON.stringify(p.scripts))) process.exit(1)"` saved to `.omo/evidence/coffeedex-launch-readiness/task-2-script-contract.log`.
   Commit: Y | `chore(validation): align launch readiness gate`
 
-- [ ] 3. Add launch route-contract bundle for trust surfaces
+- [x] 3. Add launch route-contract bundle for trust surfaces
   What to do / Must NOT do: Add a single npm script or documented Node command bundle for launch-critical route contracts: profile, export, account deletion, checkout API, PDF entitlement, credit lifecycle, scan trust, memory CRUD, Stripe webhook idempotency, and subscription lifecycle. If Todo 1 adds a profile route test, include it. Must not make route tests touch live Supabase/Stripe.
   Parallelization: Wave 1 | Blocked by: none | Blocks: 4, final
   References (executor has NO interview context - be exhaustive): Tests discovered by QA explorer: `test/export-route.test.mjs`, `test/account-route.test.mjs`, `test/checkout-api-contract.test.mjs`, `test/pdf-route.test.mjs`, `test/credit-lifecycle.test.mjs`, `test/scan-trust.test.mjs`, `test/memory-crud-contract.test.mjs`, `test/stripe-webhook-idempotency.test.mjs`, `test/subscription-lifecycle.test.mjs`, plus Todo 1 profile route test.
