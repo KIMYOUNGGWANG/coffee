@@ -7,9 +7,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerSupabase();
 
     // Authenticate user
-    // TEMPORARY BYPASS: mock user
-    const user = { id: "mock-user-123" };
-    const authError = null;
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json(
