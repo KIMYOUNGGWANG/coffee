@@ -96,7 +96,7 @@ Your next move: execution has been authorized by the user's OMO start-work reque
   QA scenarios (name the exact tool + invocation): `node --test test/product-copy.test.mjs test/smoke.test.mjs > .omo/evidence/coffeedex-launch-readiness/task-5-product-truth.log 2>&1`; `npm run typecheck > .omo/evidence/coffeedex-launch-readiness/task-5-typecheck.log 2>&1`; failure scenario: source test must fail if docs claim a variable is required while schema treats it optional without explaining the difference.
   Commit: Y | `docs(deploy): align launch environment truth`
 
-- [ ] 6. Audit scan/PDF compatibility boundaries
+- [x] 6. Audit scan/PDF compatibility boundaries
   What to do / Must NOT do: Verify `app/api/v1/cards/scan/route.ts` response fields, `docs/api-spec.md`, smoke/product-copy tests, and `app/api/v1/pdf/route.ts` font fallback behavior so secondary compatibility surfaces are honest. Either document/test `matchScore` as compatibility or remove it if unshipped; verify PDF has a local asset or graceful failure. Must not expand product scope beyond coffee memory.
   Parallelization: Wave 2 | Blocked by: 2, 3 | Blocks: final
   References (executor has NO interview context - be exhaustive): Metis finding about `matchScore: 87` in `app/api/v1/cards/scan/route.ts`; `docs/api-spec.md`; `app/api/v1/pdf/route.ts`; `test/scan-trust.test.mjs`; `test/pdf-route.test.mjs`.

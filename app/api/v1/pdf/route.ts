@@ -7,6 +7,11 @@ import { coffeeDexBrand } from "@/lib/brand";
 import { generateCoffeeDexTastePassportPdf } from "@/lib/pdf-generator";
 import { createServerSupabase } from "@/lib/supabase/server";
 
+function jsonError(status: number, message: string, details?: string): NextResponse {
+  const error = details === undefined ? { code: status, message } : { code: status, message, details };
+  return NextResponse.json({ error }, { status });
+}
+
 const profileSchema = z.object({
   has_pdf_access: z.boolean(),
 });
@@ -22,6 +27,17 @@ const tastingCardSchema = z.object({
 });
 
 const tastingCardsSchema = z.array(tastingCardSchema);
+
+async function readBundledKoreanFont(): Promise<Buffer | NextResponse> {
+  const fontPath = path.join(process.cwd(), "public", "fonts", "NanumGothic-Regular.ttf");
+  try {
+    await fs.access(fontPath);
+  } catch (readError) {
+    const details = readError instanceof Error ? readError.message : "Font asset is unavailable.";
+    return jsonError(503, "PDF 글꼴 리소스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.", details);
+  }
+  return fs.readFile(fontPath);
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -81,19 +97,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Read the Korean font file from local workspace
-    const fontPath = path.join(process.cwd(), "public", "fonts", "NanumGothic-Regular.ttf");
-    let fontBuffer: Buffer;
-    try {
-      fontBuffer = await fs.readFile(fontPath);
-    } catch (readError) {
-      console.error("Font read failed, attempting dynamic download fallback:", readError);
-      // Fallback: download if missing in runtime
-      const response = await fetch("https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf");
-      if (!response.ok) {
-        throw new Error("Korean font file not found and download failed.");
-      }
-      fontBuffer = Buffer.from(await response.arrayBuffer());
+    const fontBuffer = await readBundledKoreanFont();
+    if (fontBuffer instanceof NextResponse) {
+      return fontBuffer;
     }
 
     const exportedAt = new Date().toISOString();

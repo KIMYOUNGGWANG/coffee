@@ -34,7 +34,7 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `PATCH` | `/api/v1/shelf/:id` | Update one owned shelf item, including fill level or finished state. |
 | `DELETE` | `/api/v1/shelf/:id` | Delete one owned shelf item. |
 | `POST` | `/api/v1/checkout` | Create a Stripe Checkout session for premium, card credits, or PDF export. |
-| `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive data for export. |
+| `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive as a PDF download. |
 | `POST` | `/api/v1/webhooks/stripe` | Receive Stripe entitlement events for premium, scan credits, and PDF access. |
 | `POST` | `/api/v1/ai-barista` | Get AI Barista custom brewing advice based on mood situation or extraction feedback (sour, bitter, watery, perfect). |
 | `POST` | `/api/v1/brewing-logs` | Record a new brewing log with extraction parameters and notes for a shelf item. |
@@ -266,6 +266,12 @@ interface TasteAnalyticsResponse {
 ### `GET /api/v1/export?format=json|csv`
 
 Free authenticated download of owner-filtered `tasting_cards`, `brewing_notes`, `coffee_shelf_items`, and `brewing_logs`. JSON returns the four collections in a versioned archive; CSV flattens them into typed rows. Responses are attachments with `private, no-store`, `Pragma: no-cache`, and `nosniff`. If any owned dataset query fails, no partial archive is returned.
+
+### `GET /api/v1/pdf`
+
+Paid compatibility export for authenticated users whose profile has `has_pdf_access: true`. The route queries only the current user's tasting cards, renders a binary `application/pdf` response, and returns it as an attachment with `private, no-store` cache headers. Users without PDF access receive `403`.
+
+PDF generation uses the bundled local Korean font at `public/fonts/NanumGothic-Regular.ttf`. If that asset is unavailable at runtime, the route returns `503` with a structured JSON error instead of fetching a remote font or fabricating a partial artifact.
 
 ### `DELETE /api/v1/account`
 
