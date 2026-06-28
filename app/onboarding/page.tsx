@@ -29,7 +29,7 @@ function activationCopy(contextKind: "default" | "public_card"): string {
     case "default":
       return "당신에게 맞는 커피를 다시 찾기 위한 첫 Taste Card입니다. 취향을 하나 고르면 20초 빠른 기록과 한국어 향미 단어가 먼저 열립니다.";
     case "public_card":
-      return "공유 받은 커피 기록을 보고 끝내지 말고, 오늘 마신 원두도 같은 흐름으로 안전하게 저장해보세요.";
+      return "공유 받은 커피 기록을 보고 끝내지 말고, 방금 본 맛을 참고해 오늘 마신 원두도 20초 빠른 기록으로 안전하게 저장해보세요.";
     default:
       return assertNever(contextKind);
   }

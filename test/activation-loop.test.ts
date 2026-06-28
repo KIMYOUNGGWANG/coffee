@@ -138,6 +138,8 @@ test.describe("Viral activation loop", () => {
     await page.goto("/cards/public-token-001");
     const publicCardCta = page.getByRole("link", { name: "내 CoffeeDex Taste Card 만들기" });
     await expect(publicCardCta).toHaveAttribute("href", "/onboarding?source=public_card&token=public-token-001");
+    await expect(page.getByText("나도 이 커피 마셔봤어요")).toBeVisible();
+    await expect(page.getByText("방금 본 맛을 내 첫 기록의 힌트로 시작하기")).toBeVisible();
     await publicCardCta.click();
 
     // Then

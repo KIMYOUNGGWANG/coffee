@@ -132,10 +132,15 @@ async function captureEvidenceScreenshot(page: Page, path: string): Promise<void
 test.describe("public card sharing", () => {
   test("renders a privacy-safe public card page", async ({ page }) => {
     // Given
+    const eventNames: string[] = [];
     await page.route("**/api/v1/public/cards/public-token-001", async (route) => {
       await fulfillJson(route, publicCardResponse);
     });
     await page.route("**/api/v1/analytics", async (route) => {
+      const body = route.request().postDataJSON() as { readonly eventName?: string };
+      if (typeof body.eventName === "string") {
+        eventNames.push(body.eventName);
+      }
       await fulfillJson(route, { received: true });
     });
 
@@ -147,9 +152,19 @@ test.describe("public card sharing", () => {
     await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();
     await expect(page.getByText("프릳츠 커피")).toBeVisible();
     await expect(page.getByText("복숭아와 꿀의 단맛")).toBeVisible();
+    await expect(page.getByText("나도 이 커피 마셔봤어요")).toBeVisible();
+    await expect(page.getByText("방금 본 맛을 내 첫 기록의 힌트로 시작하기")).toBeVisible();
+    await expect(page.getByText("단맛 5 · 산미 4")).toBeVisible();
     await expect(page.getByRole("link", { name: "내 CoffeeDex Taste Card 만들기" })).toBeVisible();
     await expect(page.locator("body")).not.toContainText("private-user-id");
     await captureEvidenceScreenshot(page, publicShareScreenshotPath);
+
+    // When
+    await page.getByRole("link", { name: "내 CoffeeDex Taste Card 만들기" }).click();
+
+    // Then
+    await expect(page).toHaveURL("/onboarding?source=public_card&token=public-token-001");
+    await expect.poll(() => eventNames).toContain("public_card_cta_clicked");
   });
 
   test("publishes and copies a public card link from the story modal", async ({ page }) => {

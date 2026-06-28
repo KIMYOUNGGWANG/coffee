@@ -16,6 +16,7 @@ export const analyticsEventNames = [
   "story_share_started",
   "public_share_link_copied",
   "public_card_view",
+  "public_card_cta_clicked",
   "scan_started",
   "scan_result_returned",
   "scan_failed",

@@ -51,6 +51,7 @@ const legacyEventNames = [
   "story_share_started",
   "public_share_link_copied",
   "public_card_view",
+  "public_card_cta_clicked",
 ] as const;
 
 const memoryEventNames = [
