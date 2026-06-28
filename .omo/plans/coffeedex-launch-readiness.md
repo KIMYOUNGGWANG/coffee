@@ -80,7 +80,7 @@ Your next move: execution has been authorized by the user's OMO start-work reque
   QA scenarios (name the exact tool + invocation): `npm run test:routes > .omo/evidence/coffeedex-launch-readiness/task-3-routes.log 2>&1` or exact equivalent; failure scenario inspect logs for any live env/secret dependency and save `env | rg 'SUPABASE|STRIPE'` redacted summary only, never raw values.
   Commit: Y | `test(routes): add launch contract gate`
 
-- [ ] 4. Run and repair web golden-flow launch QA
+- [x] 4. Run and repair web golden-flow launch QA
   What to do / Must NOT do: Run browser and Node verification after Todos 1-3, repair only failures in the current web product scope, and capture artifacts. Must not touch mobile or add new product claims.
   Parallelization: Wave 2 | Blocked by: 1, 2, 3 | Blocks: final
   References (executor has NO interview context - be exhaustive): `docs/golden-flows.md`; `test/guest-capture.test.ts`; `test/dashboard-growth.test.ts`; `test/public-share.test.ts`; `test/checkout-return.test.ts`; `test/account-data-controls.test.ts`; `test/payment-dialog.test.ts`; `test/story-export.test.ts`; `playwright.config.ts`.
