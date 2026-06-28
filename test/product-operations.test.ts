@@ -77,8 +77,8 @@ test.describe("CoffeeDex product operations UX", () => {
         color: styles.color,
       };
     });
-    expect(heroCtaColors.color === "rgb(255, 255, 255)" || heroCtaColors.color === "rgb(247, 247, 244)").toBe(true);
     expect(heroCtaColors.color).not.toBe(heroCtaColors.backgroundColor);
+    expect(heroCtaColors.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
     await expect(page.getByText("가격 안내")).toBeVisible();
     await page.getByText("가격 안내").click();
     await expect(page.getByText("월간 Premium")).toBeVisible();

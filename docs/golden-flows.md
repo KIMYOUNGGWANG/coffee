@@ -6,6 +6,8 @@ These are the executable product truths protected by the smoke suite. CoffeeDex 
 
 Given a coffee drinker has a bag photo or knows the coffee details, when they review the editable draft, separate package claims from user-perceived taste, choose whether they would buy again, and confirm the record, then CoffeeDex can persist a private owner-scoped `tasting_cards` memory.
 
+Quick Add Memory Mode is the current one-screen capture path for the same private contract. It lets the user enter bean name, roaster, a one-line note, a would-buy-again choice, and optional Korean flavor helper chips, then saves a confirmed card through `POST /api/v1/cards`. A nonblank one-line note is stored as note/description memory, but it is not last-good-brew evidence; blank notes do not generate fallback rebuy reasons or `footerMeta.extraInfo`.
+
 Evidence surfaces: `/onboarding`, `/dashboard`, `POST /api/v1/cards`
 
 ## Flow 2. Scan a Package into an Editable Draft
@@ -20,7 +22,15 @@ Evidence surfaces: `POST /api/v1/cards/scan`, `useScanCoffeePackage`
 
 Given a user has confirmed memories, when they search or filter by coffee, roaster, origin, process, note, tag, or repurchase intent, then CoffeeDex returns the matching memory and its recorded reason.
 
+Saved cards marked `again` can show private rebuy recall from the user's own `repurchase_reasons`. Last-good-brew recall is shown only when `footer_meta.extraInfo` contains actual brew-like metadata such as method, ratio, temperature, or grams, not from a generic one-line note. This is memory recall only, not an order, referral, or marketplace action.
+
 Evidence surfaces: `/dashboard`, `GET /api/v1/cards`
+
+## Flow 3A. Use Korean Flavor Helper Chips
+
+Given a user wants to save a cup quickly, when they open Quick Add Memory Mode, then CoffeeDex offers Korean flavor helper chips such as fruit, chocolate, honey, citrus, nutty, and floral cues. The chips become editable private tags and do not claim expert SCA scoring.
+
+Evidence surfaces: `/dashboard`, `QuickAddMemoryForm`, `POST /api/v1/cards`
 
 ## Flow 4. Use Fresh Shelf Rebuy Timing
 

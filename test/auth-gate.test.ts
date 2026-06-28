@@ -28,7 +28,7 @@ const loginRequiredResponse = {
 } as const;
 
 const dashboardActivationPath =
-  "/dashboard?intent=first_card&source=public_card&token=public-token-001";
+  "/dashboard?intent=first_card&source=public_card&mode=quick&token=public-token-001";
 
 async function fulfillJson(route: Route, body: unknown, status = 200): Promise<void> {
   await route.fulfill({
@@ -67,8 +67,7 @@ async function mockAuthGateRoutes(page: Page): Promise<void> {
 
 async function expectKoreanAuthGate(page: Page): Promise<void> {
   await expect(page.getByRole("heading", { name: "CoffeeDex 계정으로 계속하기" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "회원가입" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "로그인" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Google로 계속하기" })).toBeVisible();
   await expect(page.getByText(/401/)).not.toBeVisible();
   await expect(page.getByText("데이터 로드 실패")).not.toBeVisible();
   await expect(page.getByText(/Supabase 연결/)).not.toBeVisible();
@@ -83,7 +82,7 @@ test.describe("CoffeeDex authenticated activation gate", () => {
     await page.goto("/cards/public-token-001");
     await page.getByRole("link", { name: "내 CoffeeDex Taste Card 만들기" }).click();
     await expect(page).toHaveURL("/onboarding?source=public_card&token=public-token-001");
-    await page.getByRole("link", { name: "첫 Taste Card 시작하기" }).click();
+    await page.getByTestId("onboarding-first-card-cta").click();
 
     // Then
     await expect(page).toHaveURL(

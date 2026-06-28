@@ -63,10 +63,11 @@ test("activation intent preserves public-card source and token", async () => {
     source: "public_card",
     token: "public-token-001",
     tasteProfile: null,
+    mode: "full",
   });
   assert.equal(
     buildDashboardActivationHref(intent),
-    "/dashboard?intent=first_card&source=public_card&token=public-token-001",
+    "/dashboard?intent=first_card&source=public_card&mode=full&token=public-token-001",
   );
 });
 
@@ -97,11 +98,27 @@ test("activation intent carries supported taste profile values", async () => {
     source: "onboarding",
     token: null,
     tasteProfile: "sweet",
+    mode: "full",
   });
   assert.equal(
     buildDashboardActivationHref(intent),
-    "/dashboard?intent=first_card&source=onboarding&taste_profile=sweet",
+    "/dashboard?intent=first_card&source=onboarding&mode=full&taste_profile=sweet",
   );
+});
+
+test("first-card activation builder routes onboarding into quick add", async () => {
+  const { buildDashboardActivationHref, buildFirstCardActivationIntent } = await loadActivationIntentModule();
+
+  const intent = buildFirstCardActivationIntent({ kind: "default" });
+
+  assert.deepEqual(intent, {
+    kind: "first_card",
+    source: "onboarding",
+    token: null,
+    tasteProfile: null,
+    mode: "quick",
+  });
+  assert.equal(buildDashboardActivationHref(intent), "/dashboard?intent=first_card&source=onboarding&mode=quick");
 });
 
 test("activation intent ignores malformed taste profile values", async () => {
@@ -118,6 +135,7 @@ test("activation intent ignores malformed taste profile values", async () => {
     source: "onboarding",
     token: null,
     tasteProfile: null,
+    mode: "full",
   });
-  assert.equal(buildDashboardActivationHref(intent), "/dashboard?intent=first_card&source=onboarding");
+  assert.equal(buildDashboardActivationHref(intent), "/dashboard?intent=first_card&source=onboarding&mode=full");
 });

@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Hyangmi Mobile Standard | CoffeeDex",
-  description: "A polished mobile design standard for Hyangmi/CoffeeDex.",
+  title: "CoffeeDex Mobile Standard",
+  description: "A polished mobile design standard for CoffeeDex.",
 };
 
 const references = [
@@ -56,7 +56,7 @@ export default function MobileMockupsPage() {
         <section className="order-2 lg:sticky lg:top-6 lg:order-1">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#d9a05b]/30 bg-[#d9a05b]/10 px-3 py-1.5 text-xs font-bold text-[#d9a05b]">
             <Sparkles size={14} aria-hidden="true" />
-            Hyangmi 모바일 기준안
+            CoffeeDex 모바일 기준안
           </div>
           <h1 className="mt-4 font-serif text-4xl font-black leading-[1.05] text-[#f7f1e8] md:text-5xl">
             향미 기록실

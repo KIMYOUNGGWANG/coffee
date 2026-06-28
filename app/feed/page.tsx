@@ -21,15 +21,17 @@ export default async function FeedPage() {
       <header className="mb-8 mt-4 pt-safe">
         <div className="flex items-center gap-3 mb-2">
           <Compass size={28} className="text-primary-amber" />
-          <h1 className="font-serif text-3xl font-black tracking-tight text-foreground">Community Feed</h1>
+          <h1 className="font-serif text-3xl font-black tracking-tight text-foreground">공개 공유 미리보기</h1>
         </div>
-        <p className="text-sm text-muted-foreground">Discover brewing recipes and tasting notes from the CoffeeDex community.</p>
+        <p className="text-sm text-muted-foreground">
+          커뮤니티 기능은 아직 현재 제품 기능이 아닙니다. CoffeeDex community is not a current product capability; 지금은 사용자가 직접 공개한 카드만 확인하는 보조 화면입니다.
+        </p>
         
         <div className="mt-6 relative max-w-md">
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input 
             type="text" 
-            placeholder="Search beans, roasters, or flavors..." 
+            placeholder="원두, 로스터, 향미 검색"
             className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-primary-amber transition-colors text-foreground"
           />
         </div>
@@ -40,8 +42,8 @@ export default async function FeedPage() {
       ) : !cards || cards.length === 0 ? (
         <div className="text-center py-20">
           <Compass size={40} className="mx-auto text-white/20 mb-4" />
-          <h2 className="text-lg font-bold text-foreground">No public memories yet</h2>
-          <p className="text-sm text-muted-foreground mt-2">Be the first to share your coffee journey!</p>
+          <h2 className="text-lg font-bold text-foreground">아직 공개 공유 카드가 없어요</h2>
+          <p className="text-sm text-muted-foreground mt-2">현재 CoffeeDex의 기본 기록은 개인 보관과 다시 찾기에 맞춰져 있습니다.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

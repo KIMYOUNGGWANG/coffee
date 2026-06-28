@@ -23,11 +23,18 @@ Set these variables in Vercel and in the local shell used for build or route ver
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-side Supabase service key for privileged route work. |
 | `STRIPE_SECRET_KEY` | Stripe server key for Checkout sessions. |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret. |
-| `RESEND_API_KEY` | Email provider key expected by the current env schema. |
-| `NEXT_PUBLIC_POSTHOG_KEY` | Analytics key expected by the current env schema. |
-| `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN expected by the current env schema. |
 | `STORAGE_BUCKET_UPLOADS` | Supabase Storage bucket name for uploaded images. |
-| `AI_API_KEY` | Optional AI provider key for tasting notes and package scans. |
+
+## Optional / Recommended Production Environment
+
+The current runtime schema accepts these variables as optional. Configure them for production quality when the matching provider is enabled, but do not treat them as required by local validation or route-contract tests:
+
+| Variable | Purpose |
+| --- | --- |
+| `RESEND_API_KEY` | Optional email provider key for outbound support or transactional email paths when enabled. |
+| `NEXT_PUBLIC_POSTHOG_KEY` | Optional analytics key for production product instrumentation when enabled. |
+| `NEXT_PUBLIC_SENTRY_DSN` | Optional Sentry DSN for production error reporting when enabled. |
+| `AI_API_KEY` | Optional AI provider key for tasting notes and package scans; routes must fall back or return manual-entry states when it is absent. |
 
 ## Supabase Checklist
 
@@ -58,19 +65,49 @@ Set these variables in Vercel and in the local shell used for build or route ver
 - Store the webhook signing secret in `STRIPE_WEBHOOK_SECRET`.
 - Use test-mode fixtures for local verification; do not use live-mode mutation for smoke checks.
 
+## Launch Rollback And Observability Checklist
+
+Use this as the binary prelaunch gate after local validation passes. Local validation proves source contracts and build behavior; production operator actions prove the deployed Vercel, Supabase, and Stripe control planes are ready. Do not paste raw secrets, live customer payloads, or provider tokens into evidence.
+
+### Local Validation Gate
+
+- [ ] `npm run validate:full` exits 0 on the release candidate.
+- [ ] `npm run test:routes` exits 0 without live Supabase or Stripe mutation.
+- [ ] Product-copy checks still reject marketplace, referral, roaster partnership, community social graph, and print-fulfillment claims.
+
+### Production Operator Gate
+
+- [ ] Vercel has a known previous healthy production deployment available for instant rollback; record only the deployment id, timestamp, and operator.
+- [ ] Supabase migration status matches the repository migration history before launch. Rollback is a forward repair migration or a restore from the approved database backup point; do not rewrite applied migrations.
+- [ ] Stripe is in test mode for launch rehearsal, and the webhook endpoint shows successful delivery for `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, and `invoice.payment_failed`.
+- [ ] Stripe webhook retries are clear or explained before launch; any duplicate event is expected to resolve as idempotent rather than grant duplicate entitlements.
+
+### Failure Observability Gate
+
+- [ ] Checkout failures can be traced from the Checkout API response and Vercel function logs without exposing key material.
+- [ ] Webhook failures can be traced by Stripe event id, `stripe_events.processing_status`, and any stored `error_message`; expected terminal states are `processed`, `ignored`, or `failed`.
+- [ ] Scan failures can be distinguished as validation errors, guest trial limit, entitlement denial, provider unconfigured, provider error, or request failure. Provider and request exceptions should appear in Vercel logs with the CoffeeDex scan log prefix.
+- [ ] Account deletion failures report the failed operation name from `deleteCoffeeDexAccount`, including Stripe redaction, product-event anonymization, owned-row deletion, profile deletion, or Auth identity deletion.
+- [ ] Optional Sentry, PostHog, or email tooling is used only when already configured in the environment; launch readiness does not require adding a new vendor.
+
 ## Verification
 
-Product-truth verification is:
+The authoritative local launch gate is:
 
 ```bash
-node --test test/product-copy.test.mjs test/smoke.test.mjs
+npm run validate:full
 ```
 
-The broader local validation path uses bundled Node directly:
+It runs product-copy, brand, smoke, route-contract, typecheck, build, and Playwright E2E coverage using existing local fixtures. Product-truth verification alone is:
 
 ```bash
-node --test test/product-copy.test.mjs test/smoke.test.mjs
-npm run typecheck
+npm run test:product-truth
 ```
 
-Use the bundled Node command above for this workspace.
+Route-contract verification alone is:
+
+```bash
+npm run test:routes
+```
+
+Use the npm scripts above for this workspace. They do not require live Supabase or Stripe mutation.

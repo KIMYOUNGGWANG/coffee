@@ -4,11 +4,12 @@ import DashboardIntentEffects from "@/components/dashboard-intent-effects";
 import { DashboardModals } from "@/components/dashboard-modals";
 import { DashboardMobileNavigation, type DashboardTab } from "@/components/dashboard-navigation";
 import { DashboardScanAction } from "@/components/dashboard-scan-action";
-import type { DashboardActivationIntent } from "@/lib/activation-intent";
+import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import type { CheckoutIntent, CheckoutItemType } from "@/lib/checkout-return";
 import type { TasteProfileKey } from "@/lib/taste-profile";
 import type { TastingCardData } from "@/hooks/useTastingCards";
 import type { useAnalyticsEvents } from "@/hooks/use-analytics-events";
+import type { CardCreatorWizardMode } from "@/components/CardCreatorWizard";
 
 type DashboardRuntimeOverlaysProps = {
   readonly activeTab: DashboardTab;
@@ -20,13 +21,14 @@ type DashboardRuntimeOverlaysProps = {
   readonly showScanAction: boolean;
   readonly isWizardOpen: boolean;
   readonly wizardTasteProfile: TasteProfileKey | null;
+  readonly wizardInitialMode: CardCreatorWizardMode;
   readonly isPaymentOpen: boolean;
   readonly resumedCheckoutItemType: CheckoutItemType | null;
   readonly selectedDetailCard: TastingCardData | null;
   readonly selectedShareCard: TastingCardData | null;
   readonly onTabChange: (tab: DashboardTab) => void;
   readonly onScan: () => void;
-  readonly onOpenWizard: (tasteProfile: TasteProfileKey | null) => void;
+  readonly onOpenWizard: (tasteProfile: TasteProfileKey | null, mode: DashboardActivationMode) => void;
   readonly onOpenPayment: (itemType: CheckoutItemType) => void;
   readonly onCloseWizard: () => void;
   readonly onClosePayment: () => void;
@@ -45,6 +47,7 @@ export function DashboardRuntimeOverlays({
   showScanAction,
   isWizardOpen,
   wizardTasteProfile,
+  wizardInitialMode,
   isPaymentOpen,
   resumedCheckoutItemType,
   selectedDetailCard,
@@ -76,6 +79,7 @@ export function DashboardRuntimeOverlays({
       <DashboardModals
         isWizardOpen={isWizardOpen}
         wizardTasteProfile={wizardTasteProfile}
+        wizardInitialMode={wizardInitialMode}
         onCloseWizard={onCloseWizard}
         isPaymentOpen={isPaymentOpen}
         resumedCheckoutItemType={resumedCheckoutItemType}

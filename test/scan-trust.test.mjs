@@ -13,6 +13,15 @@ function read(relativePath) {
   return readFileSync(path.join(projectRoot, relativePath), "utf8");
 }
 
+function markdownSection(source, heading) {
+  const marker = `### ${heading}`;
+  const start = source.indexOf(marker);
+  assert.notEqual(start, -1, `Expected markdown section: ${heading}`);
+  const contentStart = start + marker.length;
+  const nextHeading = source.indexOf("\n### ", contentStart);
+  return source.slice(contentStart, nextHeading === -1 ? source.length : nextHeading);
+}
+
 function transpileTypescript(source, fileName) {
   return ts.transpileModule(source, {
     compilerOptions: {
@@ -213,6 +222,16 @@ test("Given only a visible coffee title, When Gemini responds, Then unknown pack
   assert.equal(response.status, 200);
   const body = await parseJson(response);
   assert.equal(body.data.kind, "success");
+  assert.deepEqual(Object.keys(body.data).sort(), [
+    "kind",
+    "origin",
+    "process",
+    "source",
+    "subtitle",
+    "tags",
+    "title",
+    "uncertainty",
+  ].sort());
   assert.equal(body.data.title, "Colombia La Esperanza");
   assert.equal(body.data.subtitle, null);
   assert.equal(body.data.origin, null);
@@ -228,6 +247,7 @@ test("Given only a visible coffee title, When Gemini responds, Then unknown pack
   assert.equal("metric1_acidity" in body.data, false);
   assert.equal("metric2_sweetness" in body.data, false);
   assert.equal("metric3_body" in body.data, false);
+  assert.equal("matchScore" in body.data, false);
   assert.doesNotMatch(JSON.stringify(providerRequestBody), /educated estimates|metric[123]/i);
 });
 
@@ -250,4 +270,17 @@ test("Given the provider fails, When scanning, Then no sample coffee is fabricat
     reason: "provider_error",
     manual_entry: true,
   });
+});
+
+test("Given the scan API contract, Then route and docs exclude legacy match scoring", () => {
+  // Given
+  const scanRoute = read("app/api/v1/cards/scan/route.ts");
+  const scanDocs = markdownSection(read("docs/api-spec.md"), "`POST /api/v1/cards/scan`");
+
+  // When / Then
+  assert.doesNotMatch(scanRoute, /matchScore/);
+  assert.doesNotMatch(scanDocs, /matchScore/);
+  assert.match(scanDocs, /title: string \| null/);
+  assert.match(scanDocs, /uncertainty/);
+  assert.match(scanDocs, /manual_entry: true/);
 });

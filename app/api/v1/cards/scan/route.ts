@@ -213,7 +213,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             return jsonError(429, "게스트 스캔 체험을 이미 사용했습니다. 직접 입력을 이용해주세요.");
           }
           const data = await scanWithGemini(parsedRequest.image);
-          return NextResponse.json({ data: { ...data, matchScore: 87 }, guest: { trial_used: true } });
+          return NextResponse.json({ data, guest: { trial_used: true } });
         }
 
         const entitlement = await checkScanEntitlement(supabase, user.id);
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             return entitlement.response;
           case "ready": {
             const data = await scanWithGemini(parsedRequest.image);
-            return NextResponse.json({ data: { ...data, matchScore: 87 }, entitlement: entitlement.entitlement });
+            return NextResponse.json({ data, entitlement: entitlement.entitlement });
           }
           default:
             return assertNever(entitlement);

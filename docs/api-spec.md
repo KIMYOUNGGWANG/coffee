@@ -34,7 +34,7 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `PATCH` | `/api/v1/shelf/:id` | Update one owned shelf item, including fill level or finished state. |
 | `DELETE` | `/api/v1/shelf/:id` | Delete one owned shelf item. |
 | `POST` | `/api/v1/checkout` | Create a Stripe Checkout session for premium, card credits, or PDF export. |
-| `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive data for export. |
+| `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive as a PDF download. |
 | `POST` | `/api/v1/webhooks/stripe` | Receive Stripe entitlement events for premium, scan credits, and PDF access. |
 | `POST` | `/api/v1/ai-barista` | Get AI Barista custom brewing advice based on mood situation or extraction feedback (sour, bitter, watery, perfect). |
 | `POST` | `/api/v1/brewing-logs` | Record a new brewing log with extraction parameters and notes for a shelf item. |
@@ -49,8 +49,11 @@ PDF export, Stripe checkout and entitlements, story export, and public share rou
 Current capability is intentionally scoped to private coffee memory and retrieval:
 
 - personal tasting cards for cafes, home brews, and roasters such as Fritz, Terarosa, Momos, and Anthracite;
+- Quick Add Memory Mode for saving a confirmed private card from bean name, roaster, one-line note, repurchase intent, and optional Korean flavor helper chips without opening the full scan/manual wizard;
 - AI-assisted scan and note drafts that the user reviews before saving;
+- Korean flavor helper chips that let users choose approachable sensory words such as fruit, chocolate, honey, citrus, nutty, and floral notes without expert cupping vocabulary;
 - explicit repurchase memory and retrieval based on confirmed saved records;
+- private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
 - package claims kept distinct from user-perceived taste;
 - evidence-labeled taste snapshots based on sample count and coverage.
@@ -150,12 +153,19 @@ interface CreateCardRequest {
     date?: string;
     extraInfo?: string;
   };
+  repurchaseIntent?: "again" | "maybe" | "no" | "undecided";
+  repurchaseReasons?: string[];
+  scanSource?: "gemini" | "manual" | null;
+  correctedFields?: Array<"title" | "subtitle" | "package_origin" | "package_process" | "tags">;
+  confirmed?: true;
 }
 
 interface CreateCardResponse {
   data: TastingCard;
 }
 ```
+
+Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. It writes `confirmed: true`, `scanSource: "manual"`, the selected Korean flavor helper chips into `tags`, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
 
 ### `POST /api/v1/cards/ai-note`
 
@@ -256,6 +266,12 @@ interface TasteAnalyticsResponse {
 ### `GET /api/v1/export?format=json|csv`
 
 Free authenticated download of owner-filtered `tasting_cards`, `brewing_notes`, `coffee_shelf_items`, and `brewing_logs`. JSON returns the four collections in a versioned archive; CSV flattens them into typed rows. Responses are attachments with `private, no-store`, `Pragma: no-cache`, and `nosniff`. If any owned dataset query fails, no partial archive is returned.
+
+### `GET /api/v1/pdf`
+
+Paid compatibility export for authenticated users whose profile has `has_pdf_access: true`. The route queries only the current user's tasting cards, renders a binary `application/pdf` response, and returns it as an attachment with `private, no-store` cache headers. Users without PDF access receive `403`.
+
+PDF generation uses the bundled local Korean font at `public/fonts/NanumGothic-Regular.ttf`. If that asset is unavailable at runtime, the route returns `503` with a structured JSON error instead of fetching a remote font or fabricating a partial artifact.
 
 ### `DELETE /api/v1/account`
 

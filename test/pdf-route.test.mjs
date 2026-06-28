@@ -91,6 +91,28 @@ export async function createServerSupabase() {
   };
 }
 `,
+	  );
+}
+
+function writeMissingFontFsMock(tempDirectory) {
+  writeFileSync(
+    path.join(tempDirectory, "mock-fs.mjs"),
+    `
+export const promises = {
+  access() {
+    return Promise.reject(Object.assign(
+      new Error("ENOENT: no such file or directory, access '/var/task/public/fonts/NanumGothic-Regular.ttf'"),
+      { code: "ENOENT" },
+    ));
+  },
+  readFile() {
+    return Promise.reject(Object.assign(
+      new Error("ENOENT: no such file or directory, open '/var/task/public/fonts/NanumGothic-Regular.ttf'"),
+      { code: "ENOENT" },
+    ));
+  },
+};
+`,
   );
 }
 
@@ -122,17 +144,21 @@ function writeBrandModule(tempDirectory) {
   );
 }
 
-async function loadPdfRoute() {
+async function loadPdfRoute(options = {}) {
   const tempDirectory = mkdtempSync(path.join(tmpdir(), "coffeedex-pdf-route-"));
   const zodModuleUrl = pathToFileURL(path.join(projectRoot, "node_modules/zod/index.js")).href;
   writeNextResponseMock(tempDirectory);
   writeSupabaseMock(tempDirectory);
   writePdfGeneratorModule(tempDirectory);
   writeBrandModule(tempDirectory);
+  if (options.missingFont) {
+    writeMissingFontFsMock(tempDirectory);
+  }
 
   const routePath = path.join(projectRoot, "app/api/v1/pdf/route.ts");
   const routeSource = read("app/api/v1/pdf/route.ts")
     .replaceAll('"next/server"', '"./next-server.mjs"')
+    .replaceAll('"fs"', options.missingFont ? '"./mock-fs.mjs"' : '"fs"')
     .replaceAll('"zod"', `"${zodModuleUrl}"`)
     .replaceAll('"@/lib/supabase/server"', '"./mock-supabase.mjs"')
     .replaceAll('"@/lib/brand"', '"./brand.mjs"')
@@ -214,6 +240,44 @@ test("GET /api/v1/pdf returns 403 for a user without PDF access", async () => {
     // Then
     assert.equal(response.status, 403);
   } finally {
+    rmSync(tempDirectory, { force: true, recursive: true });
+  }
+});
+
+test("GET /api/v1/pdf returns 503 without fetching a remote font when the bundled font is unavailable", async () => {
+  // Given
+  const { routeModule, supabaseMock, tempDirectory } = await loadPdfRoute({ missingFont: true });
+  const originalFetch = globalThis.fetch;
+  let fetchCalled = false;
+  globalThis.fetch = () => {
+    fetchCalled = true;
+    throw new Error("PDF route must not fetch fonts at runtime");
+  };
+  try {
+    supabaseMock.setPdfRouteScenario({
+      auth: {
+        data: { user: { id: "user-3", email: "font@example.com" } },
+        error: null,
+      },
+      profile: { data: { has_pdf_access: true }, error: null },
+      cards: { data: [], error: null },
+    });
+
+    // When
+    const response = await routeModule.GET(new Request("http://localhost/api/v1/pdf"));
+    const responseText = await response.text();
+    const body = JSON.parse(responseText);
+
+    // Then
+    assert.equal(response.status, 503);
+    assert.equal(fetchCalled, false);
+    assert.equal(body.error.code, 503);
+    assert.match(body.error.message, /PDF 글꼴 리소스/);
+    assert.equal(body.error.details, undefined);
+    assert.doesNotMatch(responseText, /ENOENT/);
+    assert.doesNotMatch(responseText, /\/var\/task|public\/fonts|NanumGothic-Regular\.ttf/);
+  } finally {
+    globalThis.fetch = originalFetch;
     rmSync(tempDirectory, { force: true, recursive: true });
   }
 });

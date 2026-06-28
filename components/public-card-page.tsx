@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AlertCircle, ChevronRight, Coffee, Home, Sparkles } from "lucide-react";
+import { AlertCircle, ChevronRight, Coffee, CopyPlus, Home, Sparkles } from "lucide-react";
 import { z } from "zod";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import { buildOnboardingPublicCardHref } from "@/lib/activation-intent";
@@ -30,6 +30,19 @@ function metricLabel(label: string, value: number) {
       <p className="mt-1 text-xl font-serif font-bold text-foreground">{value} / 5</p>
     </div>
   );
+}
+
+function getTasteBalance(card: PublicTastingCard): string {
+  const metrics = [
+    { label: "산미", value: card.metric1 },
+    { label: "단맛", value: card.metric2 },
+    { label: "바디", value: card.metric3 },
+  ];
+  return metrics
+    .sort((first, second) => second.value - first.value)
+    .slice(0, 2)
+    .map((metric) => `${metric.label} ${metric.value}`)
+    .join(" · ");
 }
 
 export default function PublicCardPage({ token }: PublicCardPageProps) {
@@ -149,16 +162,37 @@ export default function PublicCardPage({ token }: PublicCardPageProps) {
 
         {state.kind === "ready" && (
           <section className="rounded-3xl border border-white/10 bg-white px-5 py-4 shadow-sm">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="text-[10px] font-extrabold uppercase tracking-widest text-primary-amber">Taste Card Loop</p>
-                <h2 className="mt-1 font-serif text-lg font-bold text-foreground">내 커피 취향도 카드로 남기기</h2>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground/80">
-                  마신 원두를 저장하면 공유 카드와 Taste Passport로 이어집니다.
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+              <div className="min-w-0">
+                <p className="inline-flex items-center gap-1.5 rounded-full border border-primary-amber/20 bg-primary-amber/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-primary-amber">
+                  <CopyPlus size={11} />
+                  나도 이 커피 마셔봤어요
                 </p>
+                <h2 className="mt-2 font-serif text-lg font-bold text-foreground">방금 본 맛을 내 첫 기록의 힌트로 시작하기</h2>
+                <p className="mt-1 break-keep text-xs leading-relaxed text-muted-foreground/80">
+                  {state.card.title}의 향미와 균형을 참고해서 20초 빠른 기록으로 이어집니다.
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-full border border-[#2f251f]/10 bg-[#f6efe3] px-3 py-1 text-[11px] font-black text-[#9f6a4a]">
+                    {getTasteBalance(state.card)}
+                  </span>
+                  {state.card.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} className="rounded-full border border-[#2f251f]/10 px-3 py-1 text-[11px] font-black text-muted-foreground">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
               </div>
               <Link
                 href={buildOnboardingPublicCardHref(token)}
+                onClick={() => {
+                  trackEvent("public_card_cta_clicked", {
+                    token,
+                    card_id: state.card.id,
+                    tag_count: state.card.tags.length,
+                  });
+                }}
                 className="inline-flex items-center justify-center gap-1.5 rounded-xl glass-card border border-white/10 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:glass-card border border-white/10/90"
               >
                 내 CoffeeDex Taste Card 만들기

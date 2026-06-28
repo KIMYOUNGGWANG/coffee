@@ -115,14 +115,15 @@ test.describe("Viral activation loop", () => {
     const onboardingCta = page.getByTestId("onboarding-first-card-cta");
     await expect(onboardingCta).toHaveAttribute(
       "href",
-      "/dashboard?intent=first_card&source=onboarding&taste_profile=sweet",
+      "/dashboard?intent=first_card&source=onboarding&mode=quick&taste_profile=sweet",
     );
 
     // When
     await onboardingCta.click();
 
     // Then
-    await expect(page.getByRole("heading", { name: "새로운 테이스팅 카드" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "빠른 커피 기록" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText(/한국어 향미|향미 단어/)).toBeVisible();
     await expect(page.getByTestId("taste-profile-prefill")).toContainText("달고 고소한 컵");
     await expect(page.getByTestId("taste-profile-prefill-sweetness")).toHaveText("단맛 5");
     await expect.poll(() => eventNames).toContain("first_card_cta_clicked");
@@ -137,6 +138,8 @@ test.describe("Viral activation loop", () => {
     await page.goto("/cards/public-token-001");
     const publicCardCta = page.getByRole("link", { name: "내 CoffeeDex Taste Card 만들기" });
     await expect(publicCardCta).toHaveAttribute("href", "/onboarding?source=public_card&token=public-token-001");
+    await expect(page.getByText("나도 이 커피 마셔봤어요")).toBeVisible();
+    await expect(page.getByText("방금 본 맛을 내 첫 기록의 힌트로 시작하기")).toBeVisible();
     await publicCardCta.click();
 
     // Then
@@ -144,15 +147,16 @@ test.describe("Viral activation loop", () => {
     await expect(page.getByText("방금 본 공개 카드처럼")).toBeVisible();
 
     // When
-    const onboardingCta = page.getByRole("link", { name: "첫 Taste Card 시작하기" });
+    const onboardingCta = page.getByRole("link", { name: "20초 빠른 기록 시작하기" });
     await expect(onboardingCta).toHaveAttribute(
       "href",
-      "/dashboard?intent=first_card&source=public_card&token=public-token-001",
+      "/dashboard?intent=first_card&source=public_card&mode=quick&token=public-token-001",
     );
     await onboardingCta.click();
 
     // Then
-    await expect(page.getByRole("heading", { name: "새로운 테이스팅 카드" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "빠른 커피 기록" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText(/한국어 향미|향미 단어/)).toBeVisible();
     await expect.poll(() => eventNames).toContain("first_card_cta_clicked");
   });
 });

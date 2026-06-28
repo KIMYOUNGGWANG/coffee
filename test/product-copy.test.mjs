@@ -19,6 +19,28 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function markdownSection(source, heading) {
+  const marker = `## ${heading}`;
+  const start = source.indexOf(marker);
+  assert.notEqual(start, -1, `Expected markdown section: ${heading}`);
+
+  const contentStart = start + marker.length;
+  const nextHeading = source.indexOf("\n## ", contentStart);
+  return source.slice(contentStart, nextHeading === -1 ? source.length : nextHeading);
+}
+
+function readEnvSchemaVariables() {
+  const envSchema = read("lib/env.ts");
+  const entries = [...envSchema.matchAll(/^\s{2}([A-Z0-9_]+): z\.string\(\)([^\n]*),$/gm)].map(
+    ([, name, modifiers]) => ({ name, optional: modifiers.includes(".optional()") }),
+  );
+
+  return {
+    optional: entries.filter((entry) => entry.optional).map((entry) => entry.name).sort(),
+    required: entries.filter((entry) => !entry.optional).map((entry) => entry.name).sort(),
+  };
+}
+
 const unsupportedVisibleCopyTerms = [
   "Starter " + "SaaS",
   "Official " + "SaaS Layer",
@@ -41,6 +63,9 @@ const unsupportedVisibleCopyPattern = new RegExp(
   unsupportedVisibleCopyTerms.map(escapeRegExp).join("|"),
   "i",
 );
+const unsupportedCommunityClaimPattern = new RegExp(
+  "Discover brewing recipes and tasting notes from the CoffeeDex " + "comm" + "unity",
+);
 
 test("CoffeeDex pages lead with recall and repurchase within the scoped product boundary", () => {
   // Given
@@ -49,8 +74,23 @@ test("CoffeeDex pages lead with recall and repurchase within the scoped product 
   const dashboardClient = read("components/dashboard-client.tsx");
   const dashboardAnalyticsPanel = read("components/dashboard-analytics-panel.tsx");
   const dashboardUsagePanel = read("components/dashboard-usage-panel.tsx");
+  const quickAddMemoryForm = read("components/quick-add-memory-form.tsx");
+  const tastingCard = read("components/TastingCard.tsx");
+  const cardDetailModal = read("components/CardDetailModal.tsx");
+  const feedPage = read("app/feed/page.tsx");
   const onboardingPage = read("app/onboarding/page.tsx");
-  const combinedPages = [homePage, dashboardPage, dashboardClient, dashboardAnalyticsPanel, dashboardUsagePanel, onboardingPage].join("\n");
+  const combinedPages = [
+    homePage,
+    dashboardPage,
+    dashboardClient,
+    dashboardAnalyticsPanel,
+    dashboardUsagePanel,
+    quickAddMemoryForm,
+    tastingCard,
+    cardDetailModal,
+    feedPage,
+    onboardingPage,
+  ].join("\n");
 
   // When / Then
   assertDoesNotShow(combinedPages, unsupportedVisibleCopyPattern, "visible pages");
@@ -58,6 +98,13 @@ test("CoffeeDex pages lead with recall and repurchase within the scoped product 
   assert.match(homePage, /CoffeeDex/);
   assert.match(homePage, /다시 사고 싶은 커피/);
   assert.match(dashboardClient, /DashboardShelfView/);
+  assert.match(quickAddMemoryForm, /빠른 기록/);
+  assert.match(quickAddMemoryForm, /한국어 향미 단어/);
+  assert.match(quickAddMemoryForm, /다시 살래요/);
+  assert.match(tastingCard, /다시 살 이유/);
+  assert.match(cardDetailModal, /마지막 좋았던 추출/);
+  assert.match(feedPage, /커뮤니티 기능은 아직 현재 제품 기능이 아닙니다/);
+  assert.doesNotMatch(feedPage, unsupportedCommunityClaimPattern);
   assert.match(dashboardAnalyticsPanel, /기록|스냅샷/);
   assert.match(dashboardUsagePanel, /기록|스냅샷/);
   assert.match(onboardingPage, /CoffeeDex/);
@@ -69,6 +116,7 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
   const apiSpec = read("docs/api-spec.md");
   const goldenFlows = read("docs/golden-flows.md");
   const deployGuide = read("docs/deploy.md");
+  const marketOpportunities = read("docs/market-opportunities-2026-06-26.md");
 
   // When / Then
   assert.match(apiSpec, /recall and repurchase/i);
@@ -87,6 +135,11 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
   assert.match(apiSpec, /tasting_cards.*brewing_notes.*coffee_shelf_items.*brewing_logs/is);
   assert.match(apiSpec, /confirmed records/i);
   assert.match(apiSpec, /repurchaseBreakdown/);
+  assert.match(apiSpec, /Quick Add Memory Mode/);
+  assert.match(apiSpec, /Korean flavor helper chips/);
+  assert.match(apiSpec, /private rebuy recall from `repurchase_intent` and `repurchase_reasons`/);
+  assert.match(apiSpec, /last-good-brew recall requires brew-like metadata/);
+  assert.doesNotMatch(apiSpec, /optional brew summary|brew summary|추출 요약/i);
 
   assert.match(goldenFlows, /recall and repurchase/i);
   assert.match(goldenFlows, /would buy again/i);
@@ -95,12 +148,131 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
   assert.match(goldenFlows, /not part of the current golden flows/);
   assert.match(goldenFlows, /JSON and CSV/);
   assert.match(goldenFlows, /`DELETE \/api\/v1\/account`/);
+  assert.match(goldenFlows, /Quick Add Memory Mode/);
+  assert.match(goldenFlows, /Korean flavor helper chips/);
+  assert.match(goldenFlows, /private rebuy recall from the user's own `repurchase_reasons`/);
+  assert.match(goldenFlows, /Last-good-brew recall is shown only when `footer_meta.extraInfo` contains actual brew-like metadata/);
+  assert.doesNotMatch(goldenFlows, /optional brew summary|brew summary|추출 요약/i);
 
   assert.match(deployGuide, /Korea-first AI specialty coffee memory and artifact product/);
   assert.match(deployGuide, /future work, not deploy-time capabilities/);
-  assert.doesNotMatch(deployGuide, /npm run validate:full/);
+  assert.match(deployGuide, /npm run validate:full/);
+  assert.match(deployGuide, /product-copy, brand, smoke, route-contract, typecheck, build, and Playwright E2E coverage/);
   assert.match(deployGuide, /process-local/i);
   assert.match(deployGuide, /not distributed/i);
+
+  assert.match(marketOpportunities, /One-line quick notes remain card memory copy, not brew recall/);
+  assert.match(marketOpportunities, /Private rebuy recall surfaces the user's own repurchase reason/);
+  assert.match(marketOpportunities, /Last-good-brew recall stays distinct/);
+});
+
+test("CoffeeDex deploy guide matches the runtime env schema requiredness", () => {
+  // Given
+  const deployGuide = read("docs/deploy.md");
+  const requiredSection = markdownSection(deployGuide, "Required Environment");
+  const optionalSection = markdownSection(deployGuide, "Optional / Recommended Production Environment");
+  const schemaVariables = readEnvSchemaVariables();
+  const schemaRequired = [
+    "NEXT_PUBLIC_APP_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "STORAGE_BUCKET_UPLOADS",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "SUPABASE_SERVICE_ROLE_KEY",
+  ].sort();
+  const schemaOptional = [
+    "AI_API_KEY",
+    "NEXT_PUBLIC_POSTHOG_KEY",
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "RESEND_API_KEY",
+  ].sort();
+
+  // When / Then
+  assert.deepEqual(schemaVariables.required, schemaRequired);
+  assert.deepEqual(schemaVariables.optional, schemaOptional);
+
+  for (const variable of schemaRequired) {
+    assert.match(requiredSection, new RegExp(`\\\`${escapeRegExp(variable)}\\\``));
+    assert.doesNotMatch(optionalSection, new RegExp(`\\\`${escapeRegExp(variable)}\\\``));
+  }
+
+  for (const variable of schemaOptional) {
+    assert.match(optionalSection, new RegExp(`\\\`${escapeRegExp(variable)}\\\``));
+    assert.doesNotMatch(requiredSection, new RegExp(`\\\`${escapeRegExp(variable)}\\\``));
+  }
+
+  assert.match(optionalSection, /optional/i);
+  assert.match(optionalSection, /do not treat them as required/i);
+  assert.doesNotMatch(deployGuide, /expected by the current env schema/i);
+});
+
+test("CoffeeDex deploy guide guards launch rollback and observability boundaries", () => {
+  // Given
+  const deployGuide = read("docs/deploy.md");
+  const launchChecklist = markdownSection(deployGuide, "Launch Rollback And Observability Checklist");
+  const rawSecretExamplePattern =
+    /\b(?:sk_live|sk_test|rk_live|whsec|eyJ[A-Za-z0-9_-]{20,}|-----BEGIN PRIVATE KEY-----)/i;
+  const unsupportedShippedClaimPattern =
+    /\b(?:shipped|launched|available|supports|includes|offers|production capability)\b.{0,80}\b(?:marketplace|referral|roaster partnership|community social graph|print[- ]fulfillment)\b/i;
+
+  // When / Then
+  assert.match(launchChecklist, /binary prelaunch gate/);
+  assert.match(launchChecklist, /Local Validation Gate/);
+  assert.match(launchChecklist, /Production Operator Gate/);
+  assert.match(launchChecklist, /Failure Observability Gate/);
+  assert.match(launchChecklist, /npm run validate:full/);
+  assert.match(launchChecklist, /npm run test:routes/);
+  assert.match(launchChecklist, /Vercel.*rollback/is);
+  assert.match(launchChecklist, /Supabase migration status/i);
+  assert.match(launchChecklist, /forward repair migration|approved database backup point/i);
+  assert.match(launchChecklist, /Stripe is in test mode/i);
+  assert.match(launchChecklist, /checkout\.session\.completed/);
+  assert.match(launchChecklist, /invoice\.payment_failed/);
+  assert.match(launchChecklist, /Checkout failures/i);
+  assert.match(launchChecklist, /Webhook failures/i);
+  assert.match(launchChecklist, /Scan failures/i);
+  assert.match(launchChecklist, /Account deletion failures/i);
+  assert.match(launchChecklist, /deleteCoffeeDexAccount/);
+  assert.match(launchChecklist, /does not require adding a new vendor/i);
+  assert.doesNotMatch(deployGuide, rawSecretExamplePattern);
+  assert.doesNotMatch(deployGuide, unsupportedShippedClaimPattern);
+});
+
+test("CoffeeDex docs and legal copy do not overstate deletion or guest scan guarantees", () => {
+  // Given
+  const sources = [
+    ["deploy guide", read("docs/deploy.md")],
+    ["api spec", read("docs/api-spec.md")],
+    ["golden flows", read("docs/golden-flows.md")],
+    ["privacy", read("app/legal/privacy/page.tsx")],
+    ["terms", read("app/legal/terms/page.tsx")],
+  ];
+  const overstatedDeletionClaim =
+    /automatically delete Storage objects|delete Storage objects automatically|storage-object cleanup is implemented|storage-object cleanup is promised|저장소 파일.*자동 삭제를 보장합니다/i;
+  const overstatedDistributedLimitClaim =
+    /distributed production rate limiting is implemented|production distributed rate limiting is implemented|분산된 사용량 보장입니다|분산된 보안 경계입니다/i;
+
+  // When / Then
+  for (const [label, source] of sources) {
+    assert.doesNotMatch(source, overstatedDeletionClaim, `${label} must not promise storage cleanup`);
+    assert.doesNotMatch(
+      source,
+      overstatedDistributedLimitClaim,
+      `${label} must not promise distributed guest scan limiting`,
+    );
+  }
+
+  assert.match(read("docs/deploy.md"), /does not delete Storage objects/);
+  assert.match(read("docs/api-spec.md"), /does not currently promise storage-object cleanup/);
+  assert.match(read("docs/golden-flows.md"), /storage-object cleanup is not promised/);
+  assert.match(read("app/legal/privacy/page.tsx"), /자동 삭제까지 보장하지 않습니다/);
+  assert.match(read("app/legal/terms/page.tsx"), /자동 삭제를 보장하지 않습니다/);
+  assert.match(read("docs/deploy.md"), /not distributed across Vercel instances/);
+  assert.match(read("docs/api-spec.md"), /not production distributed rate limiting/);
+  assert.match(read("docs/golden-flows.md"), /not distributed production rate limiting/);
+  assert.match(read("app/legal/privacy/page.tsx"), /여러 인스턴스 사이에서 일관되지 않을 수 있습니다/);
+  assert.match(read("app/legal/terms/page.tsx"), /분산된 사용량 보장을 의미하지 않습니다/);
 });
 
 test("CoffeeDex legal copy states guest, analytics, export, and deletion boundaries", () => {

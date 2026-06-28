@@ -1,13 +1,29 @@
 {
   "schema_version": 2,
-  "active_work_id": null,
+  "active_work_id": "coffeedex-launch-readiness",
   "works": {
+    "coffeedex-market-opportunities-sprint": {
+      "work_id": "coffeedex-market-opportunities-sprint",
+      "active_plan": ".omo/plans/coffeedex-market-opportunities-sprint.md",
+      "plan_name": "coffeedex-market-opportunities-sprint",
+      "session_ids": ["codex:019f05f2-4e36-7570-af5a-24b467e68cbf"],
+      "status": "completed",
+      "worktree_path": null
+    },
     "mobile-first-fresh-shelf-visual-fix": {
       "work_id": "mobile-first-fresh-shelf-visual-fix",
       "active_plan": ".omo/plans/mobile-first-fresh-shelf-visual-fix.md",
       "plan_name": "mobile-first-fresh-shelf-visual-fix",
       "session_ids": ["codex:019ee29f-e7f7-77a1-9044-52ae5a7cdd46"],
       "status": "completed",
+      "worktree_path": null
+    },
+    "coffeedex-launch-readiness": {
+      "work_id": "coffeedex-launch-readiness",
+      "active_plan": ".omo/plans/coffeedex-launch-readiness.md",
+      "plan_name": "coffeedex-launch-readiness",
+      "session_ids": ["codex:019f05f2-4e36-7570-af5a-24b467e68cbf"],
+      "status": "active",
       "worktree_path": null
     }
   }

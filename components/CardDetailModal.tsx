@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import { FlavorRadarChart } from "./flavor-radar-chart";
 import AIBrewingGuide from "./AIBrewingGuide";
 import { useQueryClient } from "@tanstack/react-query";
+import { hasBrewRecallMetadata } from "@/lib/brew-recall";
 
 interface CardDetailModalProps {
   card: TastingCardData;
@@ -283,6 +284,12 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
 
   if (!isOpen) return null;
 
+  const privateRebuyReason = card.repurchase_intent === "again"
+    ? card.repurchase_reasons.find((reason) => reason.trim().length > 0)?.trim()
+    : undefined;
+  const footerExtraInfo = card.footer_meta.extraInfo?.trim();
+  const lastGoodBrewSummary = hasBrewRecallMetadata(footerExtraInfo) ? footerExtraInfo : undefined;
+
   const handleEditStart = (note: any) => {
     setEditingNoteId(note.id);
     setEditMethod(note.method);
@@ -331,7 +338,12 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-40 flex items-center justify-center p-4">
-      <div className="glass-card border border-white/10 rounded-3xl w-full max-w-4xl shadow-2xl h-[90vh] flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${card.title} 상세 기록`}
+        className="glass-card border border-white/10 rounded-3xl w-full max-w-4xl shadow-2xl h-[90vh] flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
 
         {/* Left Pane: Tasting Card Display (Physical Passport Style) */}
         <div className="w-full md:w-5/12 bg-black/40 p-6 md:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/10 overflow-y-auto relative z-10">
@@ -358,6 +370,23 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
               </div>
               <h2 className="font-serif text-3xl font-extrabold leading-tight text-foreground">{card.title}</h2>
               <p className="text-sm font-semibold text-muted-foreground">{card.subtitle}</p>
+
+              {(privateRebuyReason || lastGoodBrewSummary) && (
+                <div className="space-y-2 pt-1 text-xs">
+                  {privateRebuyReason && (
+                    <div className="min-w-0 border-l border-primary-amber/50 pl-3">
+                      <p className="text-[10px] font-bold tracking-wider text-primary-amber">다시 살 이유</p>
+                      <p className="mt-0.5 truncate text-foreground/85">{privateRebuyReason}</p>
+                    </div>
+                  )}
+                  {lastGoodBrewSummary && (
+                    <div className="min-w-0 border-l border-white/20 pl-3">
+                      <p className="text-[10px] font-bold tracking-wider text-primary-amber">마지막 좋았던 추출</p>
+                      <p className="mt-0.5 truncate text-foreground/85">{lastGoodBrewSummary}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Image if available */}
               {card.image_url && (

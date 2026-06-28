@@ -4,9 +4,10 @@ import { Camera, Sparkles } from "lucide-react";
 
 type DashboardEmptyStateProps = {
   readonly onCreateCard: () => void;
+  readonly onQuickAdd: () => void;
 };
 
-export default function DashboardEmptyState({ onCreateCard }: DashboardEmptyStateProps) {
+export default function DashboardEmptyState({ onCreateCard, onQuickAdd }: DashboardEmptyStateProps) {
   return (
     <section className="mx-auto max-w-xl py-12 text-center" aria-labelledby="first-coffee-title">
       <span className="mx-auto grid size-16 place-items-center rounded-full border border-primary-amber/30 bg-primary-amber/10 text-primary-amber">
@@ -22,14 +23,31 @@ export default function DashboardEmptyState({ onCreateCard }: DashboardEmptyStat
       <p className="mx-auto mt-4 max-w-md break-keep text-sm leading-7 text-muted-foreground">
         패키지 사진을 찍으면 로스터리, 원산지, 가공 방식과 향미를 읽어 편집 가능한 기록 초안을 만듭니다.
       </p>
-      <button
-        type="button"
-        onClick={onCreateCard}
-        className="mt-7 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-amber px-6 text-sm font-black text-background-dark shadow-[0_12px_28px_rgba(0,0,0,0.32)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground active:scale-95"
-      >
-        <Camera aria-hidden="true" size={18} />
-        원두 패키지 스캔하기
-      </button>
+      <div className="mt-7 flex flex-col items-center justify-center gap-2 sm:flex-row">
+        <button
+          type="button"
+          onClick={onQuickAdd}
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-amber px-6 text-sm font-black text-background-dark shadow-[0_12px_28px_rgba(0,0,0,0.32)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground active:scale-95"
+        >
+          <Sparkles aria-hidden="true" size={18} />
+          빠른 기록
+        </button>
+        <button
+          type="button"
+          onClick={onCreateCard}
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-primary-amber/45 px-6 text-sm font-black text-primary-amber transition-colors hover:bg-primary-amber/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95"
+        >
+          <Camera aria-hidden="true" size={18} />
+          원두 패키지 스캔하기
+        </button>
+        <button
+          type="button"
+          onClick={onCreateCard}
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/15 px-6 text-sm font-black text-muted-foreground transition-colors hover:border-primary-amber/45 hover:text-primary-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95"
+        >
+          새로운 카드 기록하기
+        </button>
+      </div>
       <div className="mx-auto mt-10 h-2 w-full max-w-sm rounded-sm bg-[var(--shelf-wood)] shadow-[0_8px_16px_rgba(0,0,0,0.4)]" aria-hidden="true" />
     </section>
   );
