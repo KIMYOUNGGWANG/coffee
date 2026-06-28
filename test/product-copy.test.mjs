@@ -207,6 +207,38 @@ test("CoffeeDex deploy guide matches the runtime env schema requiredness", () =>
   assert.doesNotMatch(deployGuide, /expected by the current env schema/i);
 });
 
+test("CoffeeDex deploy guide guards launch rollback and observability boundaries", () => {
+  // Given
+  const deployGuide = read("docs/deploy.md");
+  const launchChecklist = markdownSection(deployGuide, "Launch Rollback And Observability Checklist");
+  const rawSecretExamplePattern =
+    /\b(?:sk_live|sk_test|rk_live|whsec|eyJ[A-Za-z0-9_-]{20,}|-----BEGIN PRIVATE KEY-----)/i;
+  const unsupportedShippedClaimPattern =
+    /\b(?:shipped|launched|available|supports|includes|offers|production capability)\b.{0,80}\b(?:marketplace|referral|roaster partnership|community social graph|print[- ]fulfillment)\b/i;
+
+  // When / Then
+  assert.match(launchChecklist, /binary prelaunch gate/);
+  assert.match(launchChecklist, /Local Validation Gate/);
+  assert.match(launchChecklist, /Production Operator Gate/);
+  assert.match(launchChecklist, /Failure Observability Gate/);
+  assert.match(launchChecklist, /npm run validate:full/);
+  assert.match(launchChecklist, /npm run test:routes/);
+  assert.match(launchChecklist, /Vercel.*rollback/is);
+  assert.match(launchChecklist, /Supabase migration status/i);
+  assert.match(launchChecklist, /forward repair migration|approved database backup point/i);
+  assert.match(launchChecklist, /Stripe is in test mode/i);
+  assert.match(launchChecklist, /checkout\.session\.completed/);
+  assert.match(launchChecklist, /invoice\.payment_failed/);
+  assert.match(launchChecklist, /Checkout failures/i);
+  assert.match(launchChecklist, /Webhook failures/i);
+  assert.match(launchChecklist, /Scan failures/i);
+  assert.match(launchChecklist, /Account deletion failures/i);
+  assert.match(launchChecklist, /deleteCoffeeDexAccount/);
+  assert.match(launchChecklist, /does not require adding a new vendor/i);
+  assert.doesNotMatch(deployGuide, rawSecretExamplePattern);
+  assert.doesNotMatch(deployGuide, unsupportedShippedClaimPattern);
+});
+
 test("CoffeeDex docs and legal copy do not overstate deletion or guest scan guarantees", () => {
   // Given
   const sources = [

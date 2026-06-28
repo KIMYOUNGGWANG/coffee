@@ -104,7 +104,7 @@ Your next move: execution has been authorized by the user's OMO start-work reque
   QA scenarios (name the exact tool + invocation): `node --test test/scan-trust.test.mjs test/pdf-route.test.mjs test/product-copy.test.mjs > .omo/evidence/coffeedex-launch-readiness/task-6-scan-pdf.log 2>&1`; failure scenario: contract test must catch undocumented scan response fields or PDF unavailable state.
   Commit: Y | `fix(contracts): align scan and pdf launch boundaries`
 
-- [ ] 7. Add launch rollback and observability checklist
+- [x] 7. Add launch rollback and observability checklist
   What to do / Must NOT do: Add a concise launch checklist doc section covering Vercel rollback, Supabase migration status/rollback notes, Stripe test-mode webhook event checks, and failure observability for checkout/webhook/scan/account deletion. Add tests only if this touches product copy contracts. Must not add new observability vendor integration unless already configured.
   Parallelization: Wave 2 | Blocked by: 2, 3 | Blocks: final
   References (executor has NO interview context - be exhaustive): `docs/deploy.md`; Metis findings on observability and rollback gaps; `app/api/v1/webhooks/stripe/route.ts`; `app/api/v1/cards/scan/route.ts`; `lib/account-deletion.ts`.

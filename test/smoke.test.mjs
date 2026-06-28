@@ -120,6 +120,15 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(deployGuide, /AI_API_KEY/);
   assert.match(deployGuide, /NEXT_PUBLIC_SUPABASE_URL/);
   assert.match(deployGuide, /STRIPE_WEBHOOK_SECRET/);
+  assert.match(deployGuide, /Launch Rollback And Observability Checklist/);
+  assert.match(deployGuide, /Local Validation Gate/);
+  assert.match(deployGuide, /Production Operator Gate/);
+  assert.match(deployGuide, /Failure Observability Gate/);
+  assert.match(deployGuide, /Vercel.*rollback/is);
+  assert.match(deployGuide, /Supabase migration status/i);
+  assert.match(deployGuide, /Stripe is in test mode/i);
+  assert.match(deployGuide, /stripe_events\.processing_status/);
+  assert.match(deployGuide, /deleteCoffeeDexAccount/);
 });
 
 test("CoffeeDex pages and routes present the coffee memory product", () => {

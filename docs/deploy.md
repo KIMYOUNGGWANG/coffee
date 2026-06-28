@@ -65,6 +65,31 @@ The current runtime schema accepts these variables as optional. Configure them f
 - Store the webhook signing secret in `STRIPE_WEBHOOK_SECRET`.
 - Use test-mode fixtures for local verification; do not use live-mode mutation for smoke checks.
 
+## Launch Rollback And Observability Checklist
+
+Use this as the binary prelaunch gate after local validation passes. Local validation proves source contracts and build behavior; production operator actions prove the deployed Vercel, Supabase, and Stripe control planes are ready. Do not paste raw secrets, live customer payloads, or provider tokens into evidence.
+
+### Local Validation Gate
+
+- [ ] `npm run validate:full` exits 0 on the release candidate.
+- [ ] `npm run test:routes` exits 0 without live Supabase or Stripe mutation.
+- [ ] Product-copy checks still reject marketplace, referral, roaster partnership, community social graph, and print-fulfillment claims.
+
+### Production Operator Gate
+
+- [ ] Vercel has a known previous healthy production deployment available for instant rollback; record only the deployment id, timestamp, and operator.
+- [ ] Supabase migration status matches the repository migration history before launch. Rollback is a forward repair migration or a restore from the approved database backup point; do not rewrite applied migrations.
+- [ ] Stripe is in test mode for launch rehearsal, and the webhook endpoint shows successful delivery for `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, and `invoice.payment_failed`.
+- [ ] Stripe webhook retries are clear or explained before launch; any duplicate event is expected to resolve as idempotent rather than grant duplicate entitlements.
+
+### Failure Observability Gate
+
+- [ ] Checkout failures can be traced from the Checkout API response and Vercel function logs without exposing key material.
+- [ ] Webhook failures can be traced by Stripe event id, `stripe_events.processing_status`, and any stored `error_message`; expected terminal states are `processed`, `ignored`, or `failed`.
+- [ ] Scan failures can be distinguished as validation errors, guest trial limit, entitlement denial, provider unconfigured, provider error, or request failure. Provider and request exceptions should appear in Vercel logs with the CoffeeDex scan log prefix.
+- [ ] Account deletion failures report the failed operation name from `deleteCoffeeDexAccount`, including Stripe redaction, product-event anonymization, owned-row deletion, profile deletion, or Auth identity deletion.
+- [ ] Optional Sentry, PostHog, or email tooling is used only when already configured in the environment; launch readiness does not require adding a new vendor.
+
 ## Verification
 
 The authoritative local launch gate is:
