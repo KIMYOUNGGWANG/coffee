@@ -42,7 +42,7 @@ test("CoffeeDex package identity exposes the real app stack", () => {
   );
   assert.equal(
     packageJson.scripts["test:routes"],
-    "node --test test/profile-route.test.mjs test/export-route.test.mjs test/account-route.test.mjs test/checkout-api-contract.test.mjs test/pdf-route.test.mjs test/credit-lifecycle.test.mjs test/scan-trust.test.mjs test/memory-crud-contract.test.mjs test/stripe-webhook-idempotency.test.mjs test/subscription-lifecycle.test.mjs",
+    "node --test test/profile-route.test.mjs test/export-route.test.mjs test/account-route.test.mjs test/checkout-api-contract.test.mjs test/pdf-route.test.mjs test/credit-lifecycle.test.mjs test/scan-trust.test.mjs test/memory-crud-contract.test.mjs test/rebuy-intelligence-route.test.mjs test/stripe-webhook-idempotency.test.mjs test/subscription-lifecycle.test.mjs",
   );
   assert.equal(
     packageJson.scripts["validate:full"],
