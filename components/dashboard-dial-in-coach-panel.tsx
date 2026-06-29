@@ -43,7 +43,7 @@ export function DashboardDialInCoachPanel({
 
   if (isLoading) {
     return (
-      <section className="rounded-[1.75rem] border border-white/12 bg-[#2A1A12] p-5 text-[#FFF8EC]" aria-label="Dial-in Coach">
+      <section className="espresso-panel p-5" aria-label="Dial-in Coach">
         <div className="h-4 w-32 animate-pulse rounded-full bg-white/10" />
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           <div className="h-40 animate-pulse rounded-2xl bg-white/[0.055]" />
@@ -56,7 +56,7 @@ export function DashboardDialInCoachPanel({
 
   if (error || !data) {
     return (
-      <section className="rounded-[1.75rem] border border-white/12 bg-[#2A1A12] p-5 text-[#FFF8EC]" aria-label="Dial-in Coach">
+      <section className="espresso-panel p-5" aria-label="Dial-in Coach">
         <div className="flex gap-3">
           <AlertTriangle className="mt-1 text-primary-amber" size={18} />
           <div>
@@ -85,10 +85,10 @@ export function DashboardDialInCoachPanel({
   };
 
   return (
-    <section className="rounded-[1.75rem] border border-primary-amber/20 bg-[#2A1A12] p-4 text-[#FFF8EC] shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-5" aria-label="Dial-in Coach">
+    <section className="espresso-panel p-4 sm:p-5" aria-label="Dial-in Coach">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary-amber/28 bg-primary-amber/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary-amber">
+          <span className="coffee-kicker">
             <SlidersHorizontal size={12} />
             Dial-in Coach
           </span>
@@ -111,7 +111,7 @@ export function DashboardDialInCoachPanel({
       </div>
 
       <div className="mt-5 grid gap-3 lg:grid-cols-[1.1fr_0.9fr_1fr]">
-        <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-4">
+        <div className="coffee-metric-card">
           <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">Selected Bean</p>
           <p className="mt-3 break-keep text-lg font-black leading-6">{data.title}</p>
           <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.subtitle}</p>
@@ -124,7 +124,7 @@ export function DashboardDialInCoachPanel({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-4">
+        <div className="coffee-metric-card">
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <Coffee size={13} />
             Starting Recipe
@@ -140,7 +140,7 @@ export function DashboardDialInCoachPanel({
           <p className="mt-4 text-sm font-black text-primary-amber">{data.recipe.method}</p>
         </div>
 
-        <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-4">
+        <div className="coffee-metric-card">
           <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">Next Moves</p>
           <div className="mt-3 space-y-3">
             {data.adjustments.slice(0, 3).map((adjustment) => (

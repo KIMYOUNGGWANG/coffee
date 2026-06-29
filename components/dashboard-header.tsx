@@ -49,8 +49,8 @@ export function DashboardHeader({
     <header className="coffee-dashboard-header">
       <div className="flex min-w-0 items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-primary-amber">CoffeeDex</p>
-          <h2 className="mt-1 break-keep font-serif text-2xl font-black tracking-tight text-background-dark sm:text-3xl">개인 커피룸</h2>
+          <p className="coffee-kicker">CoffeeDex room</p>
+          <h2 className="mt-3 break-keep font-serif text-2xl font-black tracking-tight text-background-dark sm:text-3xl">개인 커피룸</h2>
         </div>
 
         <div className="flex items-center gap-3">
@@ -68,7 +68,7 @@ export function DashboardHeader({
           </span>
           <Button
             onClick={onCreateCard}
-            className="hidden min-h-10 rounded-full border-0 bg-background-dark px-4 text-xs font-black text-[#FFF8EC] shadow-[0_12px_28px_rgba(42,26,18,0.18)] hover:bg-background-dark/90 md:inline-flex"
+            className="coffee-pill-button hidden border-0 px-4 md:inline-flex"
           >
             <Camera aria-hidden="true" size={15} />
             원두 스캔
@@ -76,7 +76,7 @@ export function DashboardHeader({
         </div>
       </div>
 
-      <div className="mt-6 flex flex-col gap-5 rounded-[1.25rem] border border-background-dark/10 bg-white/38 p-4 sm:hidden" aria-label={`패스포트 다음 단계 ${completedCount}/${nextMilestone}`}>
+      <div className="premium-card mt-6 flex flex-col gap-5 p-4 sm:hidden" aria-label={`패스포트 다음 단계 ${completedCount}/${nextMilestone}`}>
         <div className="flex justify-between items-center px-2">
           {[
             { label: "기록", value: cardCount.toString().padStart(2, "0") },
@@ -103,9 +103,7 @@ export function DashboardHeader({
       <div className="mt-7 flex items-end justify-between gap-4">
         <div>
           {activeTab === "shelf" && (
-            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.18em] text-primary-amber">
-              memory and rebuy system
-            </p>
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.18em] text-primary-amber">memory and rebuy system</p>
           )}
           <h1 className="break-keep font-serif text-4xl font-black leading-[1.05] tracking-tight text-background-dark sm:text-6xl">
             {tabTitles[activeTab]}
@@ -121,7 +119,7 @@ export function DashboardHeader({
           <button
             type="button"
             onClick={() => onSortChange(nextSortOption(sortBy))}
-            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-background-dark/12 bg-white/44 px-4 text-xs font-black text-background-dark transition-colors hover:border-primary-amber/50 hover:text-primary-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
+            className="coffee-chip inline-flex shrink-0 items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
           >
             <SortAsc aria-hidden="true" size={16} />
             정렬
