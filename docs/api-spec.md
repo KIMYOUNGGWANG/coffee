@@ -37,6 +37,7 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive as a PDF download. |
 | `POST` | `/api/v1/webhooks/stripe` | Receive Stripe entitlement events for premium, scan credits, and PDF access. |
 | `POST` | `/api/v1/ai-barista` | Get AI Barista custom brewing advice based on mood situation or extraction feedback (sour, bitter, watery, perfect). |
+| `GET` | `/api/v1/dial-in-coach` | Derive a concrete first-cup recipe and next adjustments from owned shelf beans and brew logs. |
 | `POST` | `/api/v1/brewing-logs` | Record a new brewing log with extraction parameters and notes for a shelf item. |
 | `GET` | `/api/v1/brewing-logs` | Fetch the current user's history of brewing logs. |
 
@@ -55,6 +56,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - explicit repurchase memory and retrieval based on confirmed saved records;
 - private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
+- private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
 - package claims kept distinct from user-perceived taste;
 - evidence-labeled taste snapshots based on sample count and coverage.
 
@@ -349,6 +351,10 @@ The profile surface preserves CoffeeDex paid and rate-limited compatibility feat
 | `parameters` | `jsonb` | Nested variables (waterTemp, waterAmount, coffeeAmount, grindSize, brewTime). |
 | `rating` | `integer` | Taste rating (1-5). |
 | `simple_note` | `text` | Optional brewing note or recipe tuning details. |
+| `coach_source` | `text` | Optional source such as `dial_in_coach`, `ai_barista`, or `manual`. |
+| `coach_feedback` | `text` | Optional post-brew feedback: `too_sour`, `too_bitter`, `too_weak`, `too_heavy`, or `balanced`. |
+| `coach_iteration` | `integer` | Optional dial-in iteration number from 1 to 12. |
+| `coach_snapshot` | `jsonb` | Optional private snapshot of the coach suggestion that led to the log. |
 
 ## AI Barista & Brewing Feedback API Specification
 
@@ -371,6 +377,52 @@ The profile surface preserves CoffeeDex paid and rate-limited compatibility feat
   }
   ```
 
+### `GET /api/v1/dial-in-coach`
+
+Return a private first-cup recipe and next-move plan from the user's current shelf beans and recent brewing logs. The route reads only owned `coffee_shelf_items` and `brewing_logs`. It does not call a marketplace, community feed, roaster partner, or background notification system.
+
+- **Response Payload**:
+  ```json
+  {
+    "data": {
+      "generatedAt": "2026-06-29T00:00:00.000Z",
+      "selectedShelfItemId": "uuid-string-or-null",
+      "title": "Fritz Ethiopia Sidama",
+      "subtitle": "Ethiopia floral citrus",
+      "problem": "새 원두의 첫 컵을 안정적으로 시작하는 것이 목표입니다.",
+      "recipe": {
+        "method": "V60",
+        "coffeeAmount": 15,
+        "waterAmount": 240,
+        "waterTemp": 93,
+        "grindSize": "Medium Fine",
+        "brewTime": "2:45",
+        "ratioLabel": "1:16"
+      },
+      "adjustments": [
+        {
+          "trigger": "too_sour",
+          "label": "시거나 날카로우면",
+          "nextMove": "분쇄를 한 단계 곱게 하거나 물 온도를 1-2도 올려요."
+        }
+      ],
+      "evidence": ["잔량 45%", "로스팅 후 9일"],
+      "suggestedLog": {
+        "shelfItemId": "uuid-string-or-null",
+        "method": "V60",
+        "parameters": { "...": "recipe values" },
+        "simpleNote": "Dial-in Coach 시작 레시피...",
+        "coachSnapshot": {
+          "source": "dial_in_coach",
+          "title": "Fritz Ethiopia Sidama",
+          "generatedAt": "2026-06-29T00:00:00.000Z",
+          "evidence": ["잔량 45%"]
+        }
+      }
+    }
+  }
+  ```
+
 ### `POST /api/v1/brewing-logs`
 
 - **Request Headers**: `Content-Type: application/json`
@@ -387,7 +439,14 @@ The profile surface preserves CoffeeDex paid and rate-limited compatibility feat
       "brewTime": "165"
     },
     "rating": 3,
-    "simpleNote": "AI Barista Tuning: too_sour recommendation applied."
+    "simpleNote": "AI Barista Tuning: too_sour recommendation applied.",
+    "coachSource": "dial_in_coach",
+    "coachFeedback": "too_sour",
+    "coachIteration": 1,
+    "coachSnapshot": {
+      "source": "dial_in_coach",
+      "title": "Fritz Ethiopia Sidama"
+    }
   }
   ```
 - **Response Payload**:
@@ -401,7 +460,11 @@ The profile surface preserves CoffeeDex paid and rate-limited compatibility feat
       "method": "Hario V60",
       "parameters": { ... },
       "rating": 3,
-      "simple_note": "AI Barista Tuning:..."
+      "simple_note": "AI Barista Tuning:...",
+      "coach_source": "dial_in_coach",
+      "coach_feedback": "too_sour",
+      "coach_iteration": 1,
+      "coach_snapshot": { "...": "private coach context" }
     }
   }
   ```

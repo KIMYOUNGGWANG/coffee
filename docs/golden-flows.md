@@ -38,6 +38,12 @@ Given a user has beans on the private shelf, when CoffeeDex renders the shelf ca
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/shelf`, `PATCH /api/v1/shelf/:id`, `evaluateFreshShelfStatus`
 
+## Flow 4A. Start a Dial-in Coach Recipe
+
+Given a user has a current shelf bean, when they open the brewing log tab, then CoffeeDex derives a first-cup starting recipe from the owned shelf item, roast/open timing, and recent owned brew logs. The user can save that suggestion as a private `brewing_logs` row with a `coach_snapshot`, then adjust one variable at a time after tasting. This is personal brew guidance only, not a community recipe feed, marketplace recommendation, or roaster order.
+
+Evidence surfaces: `/dashboard`, `GET /api/v1/dial-in-coach`, `POST /api/v1/brewing-logs`, `buildDialInCoach`
+
 ## Flow 5. Review a Progressive Taste Snapshot
 
 Given a user has confirmed memories, when they open the snapshot, then CoffeeDex displays literal sample count and coverage. One to two records form a collage, three to four show first signals, five to nine show an early preview, and ten or more sufficiently varied records show a current snapshot. Sparse data never appears complete.

@@ -62,6 +62,63 @@ const analyticsResponse = {
   },
 } as const;
 
+const dialInCoachResponse = {
+  data: {
+    generatedAt: "2026-06-29T00:00:00.000Z",
+    selectedShelfItemId: "shelf-sidama",
+    title: "프릳츠 커피 에티오피아 시다마",
+    subtitle: "Ethiopia Sidama Washed",
+    problem: "새 원두의 첫 컵을 안정적으로 시작하는 것이 목표입니다.",
+    recipe: {
+      method: "V60",
+      coffeeAmount: 15,
+      waterAmount: 240,
+      waterTemp: 93,
+      grindSize: "Medium Fine",
+      brewTime: "2:45",
+      ratioLabel: "1:16",
+    },
+    adjustments: [
+      {
+        trigger: "too_sour",
+        label: "시거나 날카로우면",
+        nextMove: "분쇄를 한 단계 곱게 하거나 물 온도를 1-2도 올려요.",
+      },
+      {
+        trigger: "too_bitter",
+        label: "쓰거나 텁텁하면",
+        nextMove: "분쇄를 한 단계 굵게 하거나 총 추출 시간을 15초 줄여요.",
+      },
+      {
+        trigger: "too_weak",
+        label: "묽고 비어 있으면",
+        nextMove: "물량을 15g 줄이거나 원두를 1g 늘려 농도를 올려요.",
+      },
+    ],
+    evidence: ["프릳츠 커피 에티오피아 시다마 잔량 8%", "로스팅 후 28일"],
+    suggestedLog: {
+      shelfItemId: "shelf-sidama",
+      method: "V60",
+      parameters: {
+        method: "V60",
+        coffeeAmount: 15,
+        waterAmount: 240,
+        waterTemp: 93,
+        grindSize: "Medium Fine",
+        brewTime: "2:45",
+        ratioLabel: "1:16",
+      },
+      simpleNote: "Dial-in Coach 시작 레시피: 15g/240g, 93C, Medium Fine, 2:45",
+      coachSnapshot: {
+        source: "dial_in_coach",
+        title: "프릳츠 커피 에티오피아 시다마",
+        generatedAt: "2026-06-29T00:00:00.000Z",
+        evidence: ["프릳츠 커피 에티오피아 시다마 잔량 8%"],
+      },
+    },
+  },
+} as const;
+
 const subscriptionResponse = {
   data: {
     cancelAtPeriodEnd: false,
@@ -99,6 +156,12 @@ async function mockDashboardRoutes(page: Page): Promise<void> {
         return;
       case "/api/v1/profile/analytics":
         await fulfillJson(route, analyticsResponse);
+        return;
+      case "/api/v1/dial-in-coach":
+        await fulfillJson(route, dialInCoachResponse);
+        return;
+      case "/api/v1/brewing-logs":
+        await fulfillJson(route, { data: [] });
         return;
       case "/api/v1/subscription":
         await fulfillJson(route, subscriptionResponse);
@@ -142,6 +205,12 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
           return;
         case "/api/v1/profile/analytics":
           await fulfillJson(route, analyticsResponse);
+          return;
+        case "/api/v1/dial-in-coach":
+          await fulfillJson(route, dialInCoachResponse);
+          return;
+        case "/api/v1/brewing-logs":
+          await fulfillJson(route, { data: [] });
           return;
         case "/api/v1/subscription":
           await fulfillJson(route, subscriptionResponse);
@@ -249,5 +318,69 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     expect(metrics.bodyScrollWidth).toBeLessThanOrEqual(metrics.innerWidth);
     expect(metrics.hasHorizontalOverflow).toBe(false);
     expect(metrics.quickActionsOverlapFixedControls).toBe(false);
+  });
+
+  test("renders Dial-in Coach on the log tab and saves the suggested recipe", async ({ page }) => {
+    let savedCoachSource: unknown = null;
+
+    await page.route("**/api/v1/**", async (route) => {
+      const requestUrl = new URL(route.request().url());
+
+      if (requestUrl.pathname === "/api/v1/brewing-logs" && route.request().method() === "POST") {
+        const payload = route.request().postDataJSON() as { coachSource?: unknown };
+        savedCoachSource = payload.coachSource;
+        await fulfillJson(route, { data: { id: "log-from-coach" } }, 201);
+        return;
+      }
+
+      switch (requestUrl.pathname) {
+        case "/api/v1/shelf":
+          await fulfillJson(route, shelfResponse);
+          return;
+        case "/api/v1/cards":
+          await fulfillJson(route, emptyCardsResponse);
+          return;
+        case "/api/v1/profile":
+          await fulfillJson(route, profileResponse);
+          return;
+        case "/api/v1/profile/analytics":
+          await fulfillJson(route, analyticsResponse);
+          return;
+        case "/api/v1/dial-in-coach":
+          await fulfillJson(route, dialInCoachResponse);
+          return;
+        case "/api/v1/brewing-logs":
+          await fulfillJson(route, { data: [] });
+          return;
+        case "/api/v1/subscription":
+          await fulfillJson(route, subscriptionResponse);
+          return;
+        case "/api/v1/analytics":
+          await fulfillJson(route, { received: true });
+          return;
+        default:
+          await route.fulfill({
+            status: 404,
+            contentType: "application/json",
+            body: JSON.stringify({ error: { message: requestUrl.pathname } }),
+          });
+      }
+    });
+
+    await page.goto(dashboardUrl);
+    await page
+      .getByRole("navigation", { name: "대시보드 주요 메뉴" })
+      .getByRole("button", { name: "기록", exact: true })
+      .first()
+      .click();
+
+    await expect(page.getByRole("region", { name: "Dial-in Coach" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "오늘 첫 컵을 어디서 시작할지 정해드릴게요" })).toBeVisible();
+    await expect(page.getByText("원두 15g")).toBeVisible();
+
+    await page.getByRole("button", { name: "이 레시피로 로그 시작" }).click();
+
+    await expect(page.getByText("오늘의 시작 레시피를 추출 로그에 저장했어요.")).toBeVisible();
+    expect(savedCoachSource).toBe("dial_in_coach");
   });
 });

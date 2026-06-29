@@ -42,7 +42,7 @@ test("CoffeeDex package identity exposes the real app stack", () => {
   );
   assert.equal(
     packageJson.scripts["test:routes"],
-    "node --test test/profile-route.test.mjs test/export-route.test.mjs test/account-route.test.mjs test/checkout-api-contract.test.mjs test/pdf-route.test.mjs test/credit-lifecycle.test.mjs test/scan-trust.test.mjs test/memory-crud-contract.test.mjs test/stripe-webhook-idempotency.test.mjs test/subscription-lifecycle.test.mjs",
+    "node --test test/profile-route.test.mjs test/export-route.test.mjs test/account-route.test.mjs test/checkout-api-contract.test.mjs test/pdf-route.test.mjs test/credit-lifecycle.test.mjs test/scan-trust.test.mjs test/memory-crud-contract.test.mjs test/dial-in-coach-route.test.mjs test/stripe-webhook-idempotency.test.mjs test/subscription-lifecycle.test.mjs",
   );
   assert.equal(
     packageJson.scripts["validate:full"],
@@ -81,6 +81,8 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(apiSpec, /\/api\/v1\/ai-barista/);
   assert.match(apiSpec, /\/api\/v1\/brewing-logs/);
   assert.match(apiSpec, /brewing_logs/);
+  assert.match(apiSpec, /\/api\/v1\/dial-in-coach/);
+  assert.match(apiSpec, /coach_snapshot/);
   assert.match(apiSpec, /too_sour \| too_bitter/);
   assert.match(apiSpec, /CoffeeShelfItem/);
   assert.match(apiSpec, /Fresh Shelf guidance is advisory product copy/);
@@ -108,6 +110,7 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(goldenFlows, /Last-good-brew recall is shown only when `footer_meta.extraInfo` contains actual brew-like metadata/);
   assert.doesNotMatch(goldenFlows, /optional brew summary|brew summary|추출 요약/i);
   assert.match(goldenFlows, /Flow 4\. Use Fresh Shelf Rebuy Timing/);
+  assert.match(goldenFlows, /Flow 4A\. Start a Dial-in Coach Recipe/);
   assert.match(goldenFlows, /wait, drink now, finish soon, or rebuy/);
   assert.match(goldenFlows, /Flow 5\. Review a Progressive Taste Snapshot/);
   assert.match(goldenFlows, /Flow 6\. Export or Delete Owned Data/);
