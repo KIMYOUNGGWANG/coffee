@@ -1,21 +1,25 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "CoffeeDex",
+    "slug": "coffeedex",
     "version": "1.0.0",
     "scheme": "coffeedex",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0A0A0A"
-    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "kr.lucasdev.coffeedex",
+      "infoPlist": {
+        "NSCameraUsageDescription": "CoffeeDex uses the camera when you upload or capture coffee memories.",
+        "NSPhotoLibraryUsageDescription": "CoffeeDex lets you choose photos for coffee tasting notes."
+      }
     },
     "android": {
+      "package": "kr.lucasdev.coffeedex",
+      "permissions": [
+        "CAMERA"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -34,6 +38,14 @@
         "expo-camera",
         {
           "cameraPermission": "Allow CoffeeDex to access your camera to scan coffee beans."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0A0A0A"
         }
       ]
     ]
