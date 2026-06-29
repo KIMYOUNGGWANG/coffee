@@ -53,7 +53,8 @@ export default function TastingCard({
       >
         {/* FRONT FACE */}
         <article 
-          className="absolute inset-0 backface-hidden min-w-0 rounded-[1.35rem] border border-background-dark/10 bg-[#FFF8EC]/88 p-5 shadow-[0_18px_42px_rgba(73,48,36,0.14)] flex flex-col cursor-pointer transition-[background-color,transform,box-shadow] hover:bg-[#FFF8EC]"
+          className={`absolute inset-0 backface-hidden min-w-0 rounded-[1.35rem] border border-background-dark/10 bg-[#FFF8EC]/88 p-5 shadow-[0_18px_42px_rgba(73,48,36,0.14)] flex flex-col cursor-pointer transition-[background-color,transform,box-shadow] hover:bg-[#FFF8EC] ${isFlipped ? "pointer-events-none" : "pointer-events-auto"}`}
+          aria-hidden={isFlipped}
           onClick={() => setIsFlipped(true)}
         >
       <button
@@ -142,7 +143,8 @@ export default function TastingCard({
 
         {/* BACK FACE */}
         <article 
-          className="absolute inset-0 backface-hidden min-w-0 rounded-[1.35rem] border border-white/12 bg-[#2A1A12] p-6 shadow-[0_30px_60px_rgba(73,48,36,0.32)] flex flex-col rotate-y-180"
+          className={`absolute inset-0 backface-hidden min-w-0 rounded-[1.35rem] border border-white/12 bg-[#2A1A12] p-6 shadow-[0_30px_60px_rgba(73,48,36,0.32)] flex flex-col rotate-y-180 ${isFlipped ? "pointer-events-auto" : "pointer-events-none"}`}
+          aria-hidden={!isFlipped}
         >
           <div className="flex justify-between items-start mb-5 border-b border-white/10 pb-4">
             <h3 className="font-serif text-2xl font-black text-[#FFF8EC] tracking-tight">Brewing Guide</h3>
