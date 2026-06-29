@@ -44,6 +44,12 @@ Given a user has a current shelf bean, when they open the brewing log tab, then 
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/dial-in-coach`, `POST /api/v1/brewing-logs`, `buildDialInCoach`
 
+## Flow 4B. Follow Rebuy Intelligence
+
+Given a user has owned cards, shelf items, or brewing logs, when CoffeeDex opens the shelf dashboard, then it shows a private Rebuy Intelligence panel with four owner-data actions: a rebuy timing reminder, a taste-match criterion from liked cards, a package or shelf based repurchase search memory, and a brew-failure adjustment prompt. This is a personal memory loop only; it does not claim community recommendations, partner offers, marketplace listings, roaster orders, or background notification delivery.
+
+Evidence surfaces: `/dashboard`, `GET /api/v1/rebuy-intelligence`, `buildRebuyIntelligence`
+
 ## Flow 5. Review a Progressive Taste Snapshot
 
 Given a user has confirmed memories, when they open the snapshot, then CoffeeDex displays literal sample count and coverage. One to two records form a collage, three to four show first signals, five to nine show an early preview, and ten or more sufficiently varied records show a current snapshot. Sparse data never appears complete.

@@ -33,6 +33,7 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `POST` | `/api/v1/shelf` | Add a bean to the current user's private coffee shelf. |
 | `PATCH` | `/api/v1/shelf/:id` | Update one owned shelf item, including fill level or finished state. |
 | `DELETE` | `/api/v1/shelf/:id` | Delete one owned shelf item. |
+| `GET` | `/api/v1/rebuy-intelligence` | Derive the current user's Rebuy Intelligence loop from owned cards, shelf items, and brewing logs. |
 | `POST` | `/api/v1/checkout` | Create a Stripe Checkout session for premium, card credits, or PDF export. |
 | `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive as a PDF download. |
 | `POST` | `/api/v1/webhooks/stripe` | Receive Stripe entitlement events for premium, scan credits, and PDF access. |
@@ -57,6 +58,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
+- private Rebuy Intelligence that combines Fresh Shelf timing, taste-match criteria, package/scan repurchase search memory, and brew-failure adjustment prompts from owned data only;
 - package claims kept distinct from user-perceived taste;
 - evidence-labeled taste snapshots based on sample count and coverage.
 
@@ -133,6 +135,64 @@ interface CoffeeShelfItem {
 ```
 
 Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. They do not create reminders, roaster orders, partner offers, or marketplace transactions.
+
+### `GET /api/v1/rebuy-intelligence`
+
+Return a private action loop that helps the user decide what to drink, fix, or buy again next. The route reads only owner-scoped `tasting_cards`, `coffee_shelf_items`, and `brewing_logs`; it does not create community recommendations, partner referrals, marketplace listings, roaster orders, or persisted notification jobs.
+
+```typescript
+interface RebuyIntelligenceResponse {
+  data: {
+    generatedAt: string;
+    summary: string;
+    featureScores: Array<{
+      feature: "rebuy_reminder" | "taste_match" | "purchase_memory" | "brew_failure_memory";
+      roi: number;
+      retention: number;
+      painkiller: number;
+      monetization: number;
+      difficulty: number;
+      reason: string;
+    }>;
+    rebuyReminder: {
+      title: string;
+      subtitle: string;
+      reason: string;
+      actionLabel: string;
+      priority: "high" | "medium" | "low";
+      cardId: string | null;
+      shelfItemId: string | null;
+    };
+    tasteMatch: {
+      anchorCardId: string | null;
+      anchorTitle: string;
+      matchCardId: string | null;
+      matchTitle: string;
+      sharedTags: string[];
+      reason: string;
+      searchPrompt: string;
+    };
+    purchaseMemory: {
+      title: string;
+      subtitle: string;
+      source: "scan" | "shelf" | "manual";
+      searchUrl: string;
+      reason: string;
+      cardId: string | null;
+      shelfItemId: string | null;
+    };
+    brewFailureMemory: {
+      title: string;
+      subtitle: string;
+      problem: "too_sour" | "too_bitter" | "weak" | "dry" | "unknown";
+      adjustment: string;
+      evidence: string;
+      logId: string | null;
+      shelfItemId: string | null;
+    };
+  };
+}
+```
 
 ### `POST /api/v1/cards`
 

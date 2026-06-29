@@ -124,6 +124,56 @@ export type DialInCoachData = {
   };
 };
 
+export type RebuyIntelligenceData = {
+  readonly generatedAt: string;
+  readonly summary: string;
+  readonly featureScores: readonly {
+    readonly feature: "rebuy_reminder" | "taste_match" | "purchase_memory" | "brew_failure_memory";
+    readonly roi: number;
+    readonly retention: number;
+    readonly painkiller: number;
+    readonly monetization: number;
+    readonly difficulty: number;
+    readonly reason: string;
+  }[];
+  readonly rebuyReminder: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly reason: string;
+    readonly actionLabel: string;
+    readonly priority: "high" | "medium" | "low";
+    readonly cardId: string | null;
+    readonly shelfItemId: string | null;
+  };
+  readonly tasteMatch: {
+    readonly anchorCardId: string | null;
+    readonly anchorTitle: string;
+    readonly matchCardId: string | null;
+    readonly matchTitle: string;
+    readonly sharedTags: readonly string[];
+    readonly reason: string;
+    readonly searchPrompt: string;
+  };
+  readonly purchaseMemory: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly source: "scan" | "shelf" | "manual";
+    readonly searchUrl: string;
+    readonly reason: string;
+    readonly cardId: string | null;
+    readonly shelfItemId: string | null;
+  };
+  readonly brewFailureMemory: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly problem: "too_sour" | "too_bitter" | "weak" | "dry" | "unknown";
+    readonly adjustment: string;
+    readonly evidence: string;
+    readonly logId: string | null;
+    readonly shelfItemId: string | null;
+  };
+};
+
 export type CreateTastingCardInput = {
   readonly category: TastingCardData["category"];
   readonly title: string;
@@ -220,6 +270,24 @@ export function useDialInCoach() {
       const data = getResponseData<DialInCoachData>(json);
       if (!data) {
         throw new Error("다이얼인 코치 응답이 비어 있습니다.");
+      }
+      return data;
+    },
+  });
+}
+
+export function useRebuyIntelligence() {
+  return useQuery<RebuyIntelligenceData>({
+    queryKey: ["rebuy-intelligence"],
+    queryFn: async () => {
+      const response = await fetch("/api/v1/rebuy-intelligence");
+      const json = await readJsonResponse(response);
+      if (!response.ok) {
+        throw new Error(getResponseErrorMessage(json, "재구매 인텔리전스를 불러오는 데 실패했습니다."));
+      }
+      const data = getResponseData<RebuyIntelligenceData>(json);
+      if (!data) {
+        throw new Error("재구매 인텔리전스 응답이 비어 있습니다.");
       }
       return data;
     },

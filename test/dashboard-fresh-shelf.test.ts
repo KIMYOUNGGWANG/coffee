@@ -119,6 +119,60 @@ const dialInCoachResponse = {
   },
 } as const;
 
+const rebuyIntelligenceResponse = {
+  data: {
+    generatedAt: "2026-06-29T00:00:00.000Z",
+    summary: "재구매 시점, 취향 기준, 구매 단서, 실패 보정값을 한 번에 이어주는 반복 사용 루프입니다.",
+    featureScores: [
+      {
+        feature: "rebuy_reminder",
+        roi: 92,
+        retention: 95,
+        painkiller: 90,
+        monetization: 72,
+        difficulty: 28,
+        reason: "원두가 줄어드는 실제 순간에 다시 방문할 이유를 만듭니다.",
+      },
+    ],
+    rebuyReminder: {
+      title: "에티오피아 시다마",
+      subtitle: "프릳츠 커피",
+      reason: "거의 비었어요. 다시 살지 판단할 타이밍입니다.",
+      actionLabel: "재구매 후보 열기",
+      priority: "high",
+      cardId: null,
+      shelfItemId: "shelf-sidama",
+    },
+    tasteMatch: {
+      anchorCardId: null,
+      anchorTitle: "프릳츠 커피 에티오피아 시다마",
+      matchCardId: null,
+      matchTitle: "다음 구매 후보를 고를 기준",
+      sharedTags: ["citrus"],
+      reason: "좋았던 카드의 맛 기준을 다음 구매 검색어로 바꿨어요.",
+      searchPrompt: "프릳츠 커피 citrus 비슷한 원두",
+    },
+    purchaseMemory: {
+      title: "에티오피아 시다마",
+      subtitle: "프릳츠 커피",
+      source: "shelf",
+      searchUrl: "https://www.google.com/search?q=%ED%94%84%EB%A6%B3%EC%B8%A0%20%EC%BB%A4%ED%94%BC%20%EC%97%90%ED%8B%B0%EC%98%A4%ED%94%BC%EC%95%84%20%EC%8B%9C%EB%8B%A4%EB%A7%88%20%EC%9B%90%EB%91%90%20%EA%B5%AC%EB%A7%A4",
+      reason: "서랍에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요.",
+      cardId: null,
+      shelfItemId: "shelf-sidama",
+    },
+    brewFailureMemory: {
+      title: "실패 컵도 다음 컵의 레시피가 됩니다",
+      subtitle: "Brew Failure Memory",
+      problem: "unknown",
+      adjustment: "맛이 아쉬웠던 컵에 산미, 쓴맛, 묽음 같은 단서를 남겨두세요.",
+      evidence: "실패 로그가 쌓이면 다음 조정값을 바로 제안합니다.",
+      logId: null,
+      shelfItemId: null,
+    },
+  },
+} as const;
+
 const subscriptionResponse = {
   data: {
     cancelAtPeriodEnd: false,
@@ -162,6 +216,9 @@ async function mockDashboardRoutes(page: Page): Promise<void> {
         return;
       case "/api/v1/brewing-logs":
         await fulfillJson(route, { data: [] });
+        return;
+      case "/api/v1/rebuy-intelligence":
+        await fulfillJson(route, rebuyIntelligenceResponse);
         return;
       case "/api/v1/subscription":
         await fulfillJson(route, subscriptionResponse);
@@ -212,6 +269,9 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
         case "/api/v1/brewing-logs":
           await fulfillJson(route, { data: [] });
           return;
+        case "/api/v1/rebuy-intelligence":
+          await fulfillJson(route, rebuyIntelligenceResponse);
+          return;
         case "/api/v1/subscription":
           await fulfillJson(route, subscriptionResponse);
           return;
@@ -245,7 +305,21 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     await expect(page.getByRole("heading", { name: /원두 보관함/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: "에티오피아 시다마" })).toBeVisible();
     await expect(page.getByText("다시 살 타이밍")).toBeVisible();
-    await expect(page.getByText("거의 비었어요. 다시 살지 판단할 타이밍입니다.")).toBeVisible();
+    await expect(page.getByText("거의 비었어요. 다시 살지 판단할 타이밍입니다.").first()).toBeVisible();
+  });
+
+  test("renders Rebuy Intelligence as the next retention loop on the shelf tab", async ({ page }) => {
+    await mockDashboardRoutes(page);
+
+    await page.goto(dashboardUrl);
+
+    await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Rebuy Intelligence" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "다음에 다시 살 커피를 놓치지 않게" })).toBeVisible();
+    await expect(page.getByText("Rebuy Reminder")).toBeVisible();
+    await expect(page.getByText("Taste Match")).toBeVisible();
+    await expect(page.getByText("Bag To Rebuy")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Brew Failure/ })).toBeVisible();
   });
 
   test("keeps the mobile shelf within the viewport and away from fixed controls", async ({ page }) => {

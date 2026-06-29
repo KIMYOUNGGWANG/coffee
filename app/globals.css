@@ -5,34 +5,37 @@
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
 
-  --color-background-dark: #000000;
-  --color-primary-amber: #D4AF37;
-  --color-secondary-gray: #A3A3A3;
-  --color-warm-gray: hsl(36, 14%, 88%);
+  --color-background-dark: #2A1A12;
+  --color-primary-amber: #BD7650;
+  --color-secondary-gray: #8F7867;
+  --color-warm-gray: #E8D8C1;
   
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --font-sans: "Pretendard Variable", "Pretendard", "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   
-  --background: #000000;
-  --surface: #0A0A0A;
-  --surface-muted: #111111;
-  --foreground: #F5F5F5;
-  --muted-foreground: #A3A3A3;
-  --border: rgba(255, 255, 255, 0.08);
-  --accent: #D4AF37;
-  --accent-foreground: #000000;
+  --background: #f6efe3;
+  --surface: #fff8ec;
+  --surface-muted: #efe1cf;
+  --surface-strong: #2a1a12;
+  --foreground: #2a1a12;
+  --muted-foreground: #7d6554;
+  --border: rgba(42, 26, 18, 0.14);
+  --accent: #bd7650;
+  --accent-foreground: #fff8ec;
   
-  --success: #4d7c54;
-  --warning: #dfa857;
-  --danger: #d9463e;
-  --ring: rgba(212, 175, 55, 0.3);
+  --success: #4e7452;
+  --warning: #b87b38;
+  --danger: #bd4a3f;
+  --ring: rgba(189, 118, 80, 0.34);
   
-  --shelf-wood: #000000;
-  --shelf-wood-highlight: rgba(255, 255, 255, 0.05);
+  --shelf-wood: #d7b98e;
+  --shelf-wood-highlight: rgba(255, 248, 236, 0.72);
+  --shadow-soft: 0 24px 70px rgba(73, 48, 36, 0.16);
+  --shadow-tight: 0 10px 24px rgba(73, 48, 36, 0.12);
 }
 
 * {
@@ -51,7 +54,10 @@ body {
 
 body {
   margin: 0;
-  background: var(--background);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 236, 0.72), rgba(246, 239, 227, 0.98) 18rem),
+    repeating-linear-gradient(90deg, rgba(42, 26, 18, 0.018) 0 1px, transparent 1px 88px),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -71,14 +77,27 @@ a {
 .coffee-app-shell {
   width: min(100%, 80rem);
   margin-inline: auto;
-  padding: 2rem 1.5rem;
+  padding: 1rem 1rem 2rem;
   padding-bottom: calc(9rem + env(safe-area-inset-bottom));
+  background: transparent;
+  color: var(--foreground);
+}
+
+.coffee-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .coffee-dashboard-header {
-  margin-bottom: 3rem;
-  padding: 1.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1.75rem;
+  background:
+    linear-gradient(135deg, rgba(255, 248, 236, 0.96), rgba(240, 223, 201, 0.76)),
+    var(--surface);
+  box-shadow: var(--shadow-soft);
 }
 
 .coffee-dashboard-header h1 {
@@ -89,24 +108,33 @@ a {
   letter-spacing: -0.01em;
 }
 
+.glass-card,
+.surface-panel {
+  background: rgba(255, 248, 236, 0.82);
+  border-color: var(--border);
+  color: var(--foreground);
+  box-shadow: var(--shadow-tight);
+}
+
 /* Digital Shelf Grid */
 .coffee-shelf-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4rem 2rem;
+  gap: 1rem;
+  align-items: stretch;
 }
 
 @media (min-width: 640px) {
   .coffee-shelf-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 5rem 3rem;
+    gap: 1.25rem;
   }
 }
 
 @media (min-width: 1024px) {
   .coffee-shelf-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6rem 4rem;
+    gap: 1.5rem;
   }
 }
 
@@ -126,8 +154,8 @@ a {
   left: 10%;
   right: 10%;
   height: 1px;
-  background: rgba(255,255,255,0.03);
-  box-shadow: 0 10px 30px rgba(0,0,0,1);
+  background: rgba(42, 26, 18, 0.08);
+  box-shadow: 0 10px 30px rgba(73, 48, 36, 0.16);
   border-radius: 50%;
   z-index: 1;
 }
@@ -138,7 +166,7 @@ a {
   aspect-ratio: 3/4;
   object-fit: contain;
   object-position: bottom;
-  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 1));
+  filter: drop-shadow(0 20px 30px rgba(73, 48, 36, 0.24));
   z-index: 2;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -146,8 +174,25 @@ a {
 @media (hover: hover) and (pointer: fine) {
   .coffee-shelf-item:hover .coffee-package-image {
     transform: translateY(-12px) scale(1.02);
-    filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 1)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.05));
+    filter: drop-shadow(0 30px 40px rgba(73, 48, 36, 0.28));
   }
+}
+
+.coffee-package-stage {
+  display: grid;
+  min-height: 9rem;
+  place-items: center;
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(180deg, rgba(255, 248, 236, 0.82), rgba(232, 216, 193, 0.38));
+}
+
+.coffee-package-missing {
+  display: grid;
+  gap: 0.5rem;
+  place-items: center;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
 }
 
 /* Package Details */
@@ -193,12 +238,12 @@ a {
   width: 4rem;
   height: 4rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #A68A2B);
+  background: linear-gradient(135deg, var(--accent), #8f533b);
   color: var(--accent-foreground);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 32px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 18px 42px rgba(73, 48, 36, 0.24);
   z-index: 50;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -210,12 +255,63 @@ a {
 
 /* Glass Card Pattern (For Modals, Passports) */
 .glass-panel {
-  background: rgba(10, 10, 10, 0.7);
+  background: rgba(255, 248, 236, 0.86);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
   border-radius: 1.5rem;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--shadow-soft);
+}
+
+.coffee-archive-layout {
+  display: grid;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.coffee-passport-sidebar {
+  min-width: 0;
+}
+
+.coffee-archive-cabinet {
+  min-width: 0;
+}
+
+.coffee-archive-detail-card {
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: rgba(255, 248, 236, 0.82);
+  box-shadow: var(--shadow-tight);
+}
+
+.shelf-filter-shell > summary {
+  color: var(--muted-foreground);
+}
+
+.custom-scrollbar {
+  scrollbar-color: rgba(189, 118, 80, 0.45) transparent;
+  scrollbar-width: thin;
+}
+
+@media (min-width: 768px) {
+  .coffee-app-shell {
+    padding: 1.5rem;
+    padding-bottom: 3rem;
+  }
+
+  .coffee-dashboard-header {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .coffee-app-shell {
+    padding-top: 2rem;
+  }
+
+  .coffee-archive-layout {
+    grid-template-columns: minmax(18rem, 0.72fr) minmax(0, 1.8fr);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

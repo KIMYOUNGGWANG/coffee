@@ -49,26 +49,26 @@ export function DashboardHeader({
     <header className="coffee-dashboard-header">
       <div className="flex min-w-0 items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[9px] tracking-[0.2em] font-light uppercase text-muted-foreground/70">CoffeeDex</p>
-          <h2 className="font-serif text-xl font-light tracking-widest text-foreground/90 sm:text-2xl mt-1">향미 선반</h2>
+          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-primary-amber">CoffeeDex</p>
+          <h2 className="mt-1 break-keep font-serif text-2xl font-black tracking-tight text-background-dark sm:text-3xl">개인 커피룸</h2>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="hidden min-w-44 sm:block" aria-label={`패스포트 다음 단계 ${completedCount}/${nextMilestone}`}>
-            <div className="flex justify-between text-xs font-bold">
+            <div className="flex justify-between text-xs font-black text-background-dark">
               <span>{milestoneLabel}</span>
               <span className="text-primary-amber">{completedCount} / {nextMilestone}</span>
             </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-background-dark/10">
               <div className="h-full rounded-full bg-primary-amber" style={{ width: `${progress}%` }} />
             </div>
           </div>
-          <span className="grid size-10 place-items-center rounded-full border border-white/10 bg-white/5 text-muted-foreground">
+          <span className="grid size-10 place-items-center rounded-full border border-background-dark/10 bg-white/45 text-background-dark/70 shadow-sm">
             <UserRound aria-hidden="true" size={18} />
           </span>
           <Button
             onClick={onCreateCard}
-            className="hidden min-h-10 rounded-xl border-0 bg-primary-amber px-4 text-xs font-extrabold text-background-dark hover:bg-primary-amber hover:opacity-90 md:inline-flex"
+            className="hidden min-h-10 rounded-full border-0 bg-background-dark px-4 text-xs font-black text-[#FFF8EC] shadow-[0_12px_28px_rgba(42,26,18,0.18)] hover:bg-background-dark/90 md:inline-flex"
           >
             <Camera aria-hidden="true" size={15} />
             원두 스캔
@@ -76,7 +76,7 @@ export function DashboardHeader({
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col gap-6 sm:hidden border-y border-white/10 py-5" aria-label={`패스포트 다음 단계 ${completedCount}/${nextMilestone}`}>
+      <div className="mt-6 flex flex-col gap-5 rounded-[1.25rem] border border-background-dark/10 bg-white/38 p-4 sm:hidden" aria-label={`패스포트 다음 단계 ${completedCount}/${nextMilestone}`}>
         <div className="flex justify-between items-center px-2">
           {[
             { label: "기록", value: cardCount.toString().padStart(2, "0") },
@@ -84,35 +84,35 @@ export function DashboardHeader({
             { label: "등급", value: `${completedCount}/${nextMilestone}` },
           ].map((item) => (
             <div key={item.label} className="flex flex-col text-center">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{item.label}</p>
-              <p className="mt-1.5 font-serif text-2xl font-light text-foreground">{item.value}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{item.label}</p>
+              <p className="mt-1.5 font-serif text-2xl font-black text-background-dark">{item.value}</p>
             </div>
           ))}
         </div>
         <div className="w-full px-2">
-          <div className="flex justify-between text-[11px] font-bold text-muted-foreground mb-2">
+          <div className="flex justify-between text-[11px] font-black text-muted-foreground mb-2">
             <span>{milestoneLabel}</span>
             <span className="text-primary-amber">{Math.round(progress)}%</span>
           </div>
-          <div className="h-1 overflow-hidden rounded-full bg-white/5">
-            <div className="h-full rounded-full bg-primary-amber shadow-[0_0_10px_rgba(212,175,55,0.5)]" style={{ width: `${progress}%` }} />
+          <div className="h-1.5 overflow-hidden rounded-full bg-background-dark/10">
+            <div className="h-full rounded-full bg-primary-amber" style={{ width: `${progress}%` }} />
           </div>
         </div>
       </div>
 
-      <div className="mt-8 flex items-end justify-between gap-4">
+      <div className="mt-7 flex items-end justify-between gap-4">
         <div>
           {activeTab === "shelf" && (
-            <p className="mb-3 text-[10px] tracking-widest font-light uppercase text-muted-foreground">
-              나의 Taste Passport
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.18em] text-primary-amber">
+              memory and rebuy system
             </p>
           )}
-          <h1 className="break-keep font-serif text-5xl font-light tracking-tight text-foreground sm:text-6xl">
+          <h1 className="break-keep font-serif text-4xl font-black leading-[1.05] tracking-tight text-background-dark sm:text-6xl">
             {tabTitles[activeTab]}
           </h1>
           {activeTab === "shelf" && (
-            <p className="mt-4 break-keep text-sm font-light leading-relaxed text-muted-foreground">
-              기록한 원두들을 찬장에 진열해 보세요. 기록한 원두 {cardCount}봉
+            <p className="mt-4 max-w-2xl break-keep text-sm font-semibold leading-7 text-muted-foreground">
+              기억한 맛, 지금 가진 원두, 다음 구매 신호를 한 화면에서 이어봅니다. 기록한 원두 {cardCount}봉
             </p>
           )}
         </div>
@@ -121,7 +121,7 @@ export function DashboardHeader({
           <button
             type="button"
             onClick={() => onSortChange(nextSortOption(sortBy))}
-            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-white/15 px-4 text-xs font-bold text-muted-foreground transition-colors hover:border-primary-amber/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-background-dark/12 bg-white/44 px-4 text-xs font-black text-background-dark transition-colors hover:border-primary-amber/50 hover:text-primary-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
           >
             <SortAsc aria-hidden="true" size={16} />
             정렬
@@ -129,7 +129,7 @@ export function DashboardHeader({
         )}
       </div>
 
-      <div className="mt-6 border-t border-white/10 pt-3">
+      <div className="mt-6 border-t border-background-dark/10 pt-3">
         <DashboardDesktopNavigation activeTab={activeTab} onTabChange={onTabChange} />
       </div>
     </header>
