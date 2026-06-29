@@ -85,16 +85,16 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
   return (
     <main
       data-testid={isClientReady ? "auth-gate-ready" : undefined}
-      className="starter-shell min-h-screen text-foreground bg-[#0D0A07]"
+      className="min-h-[100dvh] bg-[var(--background)] px-4 py-5 text-foreground sm:grid sm:place-items-center"
     >
-      <section className="surface-panel mx-auto w-full max-w-md border border-white/10 glass-card p-6 shadow-sm md:p-8">
+      <section className="mx-auto flex min-h-[calc(100dvh-2.5rem)] w-full max-w-md flex-col justify-center rounded-[1.75rem] border border-background-dark/10 bg-[#FFF8EC]/90 p-6 shadow-[0_24px_70px_rgba(73,48,36,0.16)] sm:min-h-0 md:p-8">
         <div className="space-y-3 text-center">
-          <div className="mx-auto flex size-11 items-center justify-center rounded-full bg-primary-amber text-[#0D0A07]">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-[1.1rem] bg-primary-amber/16 text-background-dark ring-1 ring-primary-amber/24">
             <Coffee size={20} aria-hidden="true" />
           </div>
-          <p className="hero-kicker text-primary-amber">CoffeeDex</p>
-          <h1 className="font-serif text-2xl font-bold text-foreground">CoffeeDex 계정으로 계속하기</h1>
-          <p className="mx-auto max-w-sm text-sm leading-6 text-foreground/65">
+          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary-amber">CoffeeDex</p>
+          <h1 className="break-keep font-serif text-3xl font-black leading-tight text-background-dark">CoffeeDex 계정으로 계속하기</h1>
+          <p className="mx-auto max-w-sm break-keep text-sm font-semibold leading-6 text-muted-foreground">
             Google 계정으로 로그인하면 방금 보던 커피 기록으로 이어집니다.
           </p>
         </div>
@@ -111,7 +111,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
             type="button"
             disabled={!isConfigured || isSubmitting}
             onClick={() => void runAuthAction("google")}
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-white py-2 text-[#0D0A07] hover:bg-white/90"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-background-dark/10 bg-white py-3 text-background-dark shadow-[0_12px_26px_rgba(73,48,36,0.1)] hover:bg-white/90"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -135,7 +135,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
           )}
 
           {process.env.NODE_ENV === "development" && (
-            <div className="pt-4 border-t border-white/10 mt-6">
+            <div className="mt-6 border-t border-background-dark/10 pt-4">
               <Button
                 type="button"
                 onClick={() => {
@@ -143,9 +143,9 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
                   localStorage.setItem("mock_test_mode", "true");
                   globalThis.location.assign(redirectTo);
                 }}
-                className="w-full bg-surface border border-white/20 text-white hover:bg-white/10"
+                className="w-full rounded-2xl border border-background-dark/10 bg-background-dark text-[#FFF8EC] hover:bg-background-dark/90"
               >
-                🚀 테스트 계정으로 바로 입장하기 (Mock)
+                테스트 계정으로 바로 입장하기 (Mock)
               </Button>
             </div>
           )}

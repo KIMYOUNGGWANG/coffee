@@ -88,11 +88,11 @@ export default function LandingPlaygroundClient() {
 
       <div className="space-y-2">
         <h3 className="break-keep font-serif text-2xl font-black leading-tight text-foreground sm:text-3xl">
-          향미 AI 컵 노트를 지금 직접 테스트해 보세요
+          CoffeeDex 컵 노트를 지금 직접 테스트해 보세요
         </h3>
         <p className="max-w-3xl break-keep text-sm text-foreground/68 font-semibold leading-6">
-          아래 샘플 원두 패키지 중 하나를 클릭하면, 향미만의 Gemini Vision 기술이 원두 라벨을 인식하고
-          SCA 표준 아로마 휠에 맞춘 분석 결과 카드를 3초 안에 가상 시뮬레이션으로 완성합니다.
+          아래 샘플 원두 패키지 중 하나를 클릭하면, CoffeeDex가 원두 라벨에서 읽을 수 있는 단서를 바탕으로
+          저장 전 검토할 수 있는 향미 기록 초안을 가상 시뮬레이션으로 완성합니다.
         </p>
       </div>
 
