@@ -40,7 +40,15 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "doctor": "npx --yes expo-doctor",
+    "typecheck": "tsc --noEmit",
+    "export:ios": "expo export --platform ios --output-dir /tmp/coffeedex-mobile-export-ios",
+    "export:android": "expo export --platform android --output-dir /tmp/coffeedex-mobile-export-android",
+    "build:ios:preview": "npx --yes eas-cli build --platform ios --profile preview",
+    "build:android:preview": "npx --yes eas-cli build --platform android --profile preview",
+    "build:ios:production": "npx --yes eas-cli build --platform ios --profile production",
+    "build:android:production": "npx --yes eas-cli build --platform android --profile production"
   },
   "private": true
 }
