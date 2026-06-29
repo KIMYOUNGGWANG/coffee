@@ -28,10 +28,10 @@ function LoadingCards() {
     <div className="coffee-shelf-grid" aria-label="원두 선반 불러오는 중">
       {loadingItems.map((item) => (
         <div key={item} className="animate-pulse">
-          <div className="aspect-[3/4] rounded-2xl bg-white/5" />
-          <div className="mt-3 h-3 w-1/3 rounded bg-white/10" />
-          <div className="mt-2 h-5 w-4/5 rounded bg-white/10" />
-          <div className="mt-2 h-3 w-1/2 rounded bg-white/5" />
+          <div className="aspect-[3/4] rounded-2xl bg-background-dark/6" />
+          <div className="mt-3 h-3 w-1/3 rounded bg-background-dark/10" />
+          <div className="mt-2 h-5 w-4/5 rounded bg-background-dark/10" />
+          <div className="mt-2 h-3 w-1/2 rounded bg-background-dark/6" />
         </div>
       ))}
     </div>
@@ -68,9 +68,9 @@ export default function DashboardCardsSection({
   if (cards.length === 0) {
     if (totalCardCount > 0 && hasActiveFilters) {
       return (
-        <section className="mx-auto max-w-lg rounded-3xl border border-white/10 bg-white/5 px-5 py-10 text-center" aria-labelledby="no-memory-results-title">
+        <section className="mx-auto max-w-lg rounded-[1.5rem] border border-background-dark/10 bg-[#FFF8EC]/78 px-5 py-10 text-center shadow-[0_18px_42px_rgba(73,48,36,0.12)]" aria-labelledby="no-memory-results-title">
           <SearchX aria-hidden="true" size={32} className="mx-auto text-primary-amber" />
-          <h2 id="no-memory-results-title" className="mt-4 font-serif text-xl font-bold text-foreground">검색 결과가 없어요</h2>
+          <h2 id="no-memory-results-title" className="mt-4 font-serif text-xl font-black text-background-dark">검색 결과가 없어요</h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">검색어를 줄이거나 재구매 생각과 맛 조건을 초기화해 보세요.</p>
           <button
             type="button"

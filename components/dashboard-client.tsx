@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import DashboardCheckoutNotice from "@/components/dashboard-checkout-notice";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardDialInCoachPanel } from "@/components/dashboard-dial-in-coach-panel";
 import type { DashboardTab } from "@/components/dashboard-navigation";
 import { DashboardPassportView } from "@/components/dashboard-passport-view";
 import { DashboardRuntimeOverlays } from "@/components/dashboard-runtime-overlays";
@@ -11,7 +12,7 @@ import { DashboardShelfView } from "@/components/dashboard-shelf-view";
 import DailyBrewingCalendar from "@/components/daily-brewing-calendar";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import { useDashboardCheckoutReturn } from "@/hooks/use-dashboard-checkout-return";
-import { useDeleteTastingCard, useTasteAnalytics, useTastingCards, useUserProfile } from "@/hooks/useTastingCards";
+import { useDeleteTastingCard, useDialInCoach, useRebuyIntelligence, useTasteAnalytics, useTastingCards, useUserProfile } from "@/hooks/useTastingCards";
 import type { CardCreatorWizardMode } from "@/components/CardCreatorWizard";
 import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import { buildAuthGateHref, isAuthRequiredError } from "@/lib/auth-redirect";
@@ -63,6 +64,19 @@ export default function DashboardClient({
     error: analyticsError,
     failureReason: analyticsFailureReason,
   } = useTasteAnalytics();
+  const {
+    data: dialInCoach,
+    isLoading: isDialInCoachLoading,
+    error: dialInCoachError,
+    failureReason: dialInCoachFailureReason,
+    refetch: refetchDialInCoach,
+  } = useDialInCoach();
+  const {
+    data: rebuyIntelligence,
+    isLoading: isRebuyIntelligenceLoading,
+    error: rebuyIntelligenceError,
+    failureReason: rebuyIntelligenceFailureReason,
+  } = useRebuyIntelligence();
   const deleteCardMutation = useDeleteTastingCard();
   const filteredCards = useMemo(() => filterDashboardCards(cards, {
     searchQuery,
@@ -86,6 +100,10 @@ export default function DashboardClient({
     profileFailureReason,
     analyticsError,
     analyticsFailureReason,
+    dialInCoachError,
+    dialInCoachFailureReason,
+    rebuyIntelligenceError,
+    rebuyIntelligenceFailureReason,
   ].some(isAuthRequiredError);
 
   useEffect(() => {
@@ -212,6 +230,9 @@ export default function DashboardClient({
             onSelectCard={setSelectedDetailCard}
             onShareCard={setSelectedShareCard}
             analytics={analytics}
+            rebuyIntelligence={rebuyIntelligence}
+            isRebuyIntelligenceLoading={isRebuyIntelligenceLoading}
+            rebuyIntelligenceError={rebuyIntelligenceError}
             onOpenPassport={() => setActiveTab("passport")}
             dnaData={null}
             isDnaLoading={false}
@@ -221,7 +242,18 @@ export default function DashboardClient({
         )}
 
         {activeTab === "log" && (
-          <DailyBrewingCalendar refreshTrigger={shelfRefreshTrigger} onLogAdded={triggerShelfRefresh} />
+          <div className="space-y-6">
+            <DashboardDialInCoachPanel
+              data={dialInCoach}
+              isLoading={isDialInCoachLoading}
+              error={dialInCoachError}
+              onSaved={() => {
+                triggerShelfRefresh();
+                void refetchDialInCoach();
+              }}
+            />
+            <DailyBrewingCalendar refreshTrigger={shelfRefreshTrigger} onLogAdded={triggerShelfRefresh} />
+          </div>
         )}
 
         {activeTab === "passport" && <DashboardPassportView analytics={analytics} cards={cards} isLoading={isAnalyticsLoading} refreshTrigger={shelfRefreshTrigger} />}
@@ -250,7 +282,7 @@ export default function DashboardClient({
         resumedCheckoutItemType={resumedCheckoutItemType}
         selectedDetailCard={selectedDetailCard}
         selectedShareCard={selectedShareCard}
-        showScanAction={true}
+        showScanAction={false}
         onTabChange={setActiveTab}
         onScan={() => openWizard("mobile_scan_action")}
         onOpenWizard={openActivationWizard}

@@ -17,6 +17,10 @@ const createBrewingLogSchema = z.object({
   autoRecipe: z.boolean().optional(),
   rating: z.number().int().min(1).max(5).optional().nullable(),
   simpleNote: z.string().optional().nullable(),
+  coachSource: z.enum(["dial_in_coach", "ai_barista", "manual"]).optional().nullable(),
+  coachFeedback: z.enum(["too_sour", "too_bitter", "too_weak", "too_heavy", "balanced"]).optional().nullable(),
+  coachIteration: z.number().int().min(1).max(12).optional().nullable(),
+  coachSnapshot: z.record(z.unknown()).optional().nullable(),
 });
 
 // GET /api/v1/brewing-logs - Fetch brewing logs for authenticated user
@@ -117,6 +121,10 @@ export async function POST(request: NextRequest) {
         parameters: finalParameters,
         rating: validatedData.rating || null,
         simple_note: validatedData.simpleNote || null,
+        coach_source: validatedData.coachSource ?? null,
+        coach_feedback: validatedData.coachFeedback ?? null,
+        coach_iteration: validatedData.coachIteration ?? null,
+        coach_snapshot: validatedData.coachSnapshot ?? {},
       })
       .select()
       .single();

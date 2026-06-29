@@ -3,10 +3,11 @@
 import DashboardCardsSection from "@/components/dashboard-cards-section";
 import { DashboardFeaturedArchiveCard } from "@/components/dashboard-featured-archive-card";
 import { DashboardPassportSidebar } from "@/components/dashboard-passport-sidebar";
+import { DashboardRebuyIntelligencePanel } from "@/components/dashboard-rebuy-intelligence-panel";
 import { DashboardRetentionLoop } from "@/components/dashboard-retention-loop";
 import { DashboardShelfFilters } from "@/components/dashboard-shelf-filters";
 import CoffeeShelfGrid from "@/components/coffee-shelf-grid";
-import type { TasteAnalyticsData, TastingCardData } from "@/hooks/useTastingCards";
+import type { RebuyIntelligenceData, TasteAnalyticsData, TastingCardData } from "@/hooks/useTastingCards";
 import type { RepurchaseFilter } from "@/lib/dashboard-card-filter";
 import CoffeeDNACard, { type CoffeeDNAData } from "@/components/coffee-dna/CoffeeDNACard";
 
@@ -43,6 +44,9 @@ type DashboardShelfViewProps = {
   readonly onSelectCard: (card: TastingCardData) => void;
   readonly onShareCard: (card: TastingCardData) => void;
   readonly analytics: TasteAnalyticsData | undefined;
+  readonly rebuyIntelligence: RebuyIntelligenceData | undefined;
+  readonly isRebuyIntelligenceLoading: boolean;
+  readonly rebuyIntelligenceError: unknown;
   readonly onOpenPassport: () => void;
   readonly dnaData: CoffeeDNAData | null;
   readonly isDnaLoading: boolean;
@@ -83,6 +87,9 @@ export function DashboardShelfView({
   onSelectCard,
   onShareCard,
   analytics,
+  rebuyIntelligence,
+  isRebuyIntelligenceLoading,
+  rebuyIntelligenceError,
   onOpenPassport,
   dnaData,
   isDnaLoading,
@@ -114,6 +121,14 @@ export function DashboardShelfView({
         />
       )}
       <CoffeeShelfGrid onDataChange={onShelfDataChange} />
+      <DashboardRebuyIntelligencePanel
+        data={rebuyIntelligence}
+        cards={cards}
+        isLoading={isRebuyIntelligenceLoading}
+        error={rebuyIntelligenceError}
+        onQuickAdd={onQuickAdd}
+        onSelectCard={onSelectCard}
+      />
       {cards.length > 0 && (
         <DashboardRetentionLoop cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />
       )}

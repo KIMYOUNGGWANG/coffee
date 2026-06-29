@@ -53,13 +53,13 @@ export default function TastingCard({
       >
         {/* FRONT FACE */}
         <article 
-          className="absolute inset-0 backface-hidden min-w-0 rounded-2xl bg-white/[0.03] backdrop-blur-3xl border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.8)] p-6 flex flex-col cursor-pointer transition-colors hover:bg-white/[0.05]"
+          className="absolute inset-0 backface-hidden min-w-0 rounded-[1.35rem] border border-background-dark/10 bg-[#FFF8EC]/88 p-5 shadow-[0_18px_42px_rgba(73,48,36,0.14)] flex flex-col cursor-pointer transition-[background-color,transform,box-shadow] hover:bg-[#FFF8EC]"
           onClick={() => setIsFlipped(true)}
         >
       <button
         type="button"
         onClick={() => onSelect?.(card)}
-        className="block w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber focus-visible:ring-offset-4 focus-visible:ring-offset-background-dark"
+        className="block w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--background)]"
         aria-label={`${card.title} 상세 보기`}
       >
         <div className="coffee-package-stage">
@@ -80,37 +80,37 @@ export default function TastingCard({
         </div>
 
         <div className="mt-5 min-w-0">
-          <p className="truncate text-[10px] tracking-widest uppercase font-light text-[#D4AF37] mb-2">{origin}</p>
-          <h2 className="mt-1 line-clamp-2 break-keep font-serif text-2xl font-light leading-tight tracking-tight text-foreground sm:text-3xl">
+          <p className="mb-2 truncate text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">{origin}</p>
+          <h2 className="mt-1 line-clamp-2 break-keep font-serif text-2xl font-black leading-tight tracking-tight text-background-dark sm:text-3xl">
             {card.title}
           </h2>
           <p className="mt-2 truncate text-xs font-light text-muted-foreground">{card.subtitle}</p>
           <div className="mt-5 flex flex-wrap gap-2">
-            <span className="rounded-md border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-2 py-1.5 text-[10px] font-light tracking-wide text-[#D4AF37]">
+            <span className="rounded-lg border border-primary-amber/30 bg-primary-amber/10 px-2 py-1.5 text-[10px] font-black tracking-wide text-primary-amber">
               {repurchaseLabels[card.repurchase_intent]}
             </span>
             {card.package_process && (
-              <span className="rounded-md border border-white/10 px-2 py-1.5 text-[10px] font-light tracking-wide text-muted-foreground">
+              <span className="rounded-lg border border-background-dark/10 bg-white/45 px-2 py-1.5 text-[10px] font-semibold tracking-wide text-muted-foreground">
                 {card.package_process}
               </span>
             )}
           </div>
           {tastingNotes.length > 0 && (
-            <p className="mt-3 line-clamp-2 text-xs leading-relaxed font-light text-white/50">
+            <p className="mt-3 line-clamp-2 text-xs font-semibold leading-relaxed text-muted-foreground">
               {tastingNotes.join(" · ")}
             </p>
           )}
           {privateRebuyReason && (
-            <div className="mt-3 min-w-0 border-l border-[#D4AF37]/40 pl-3">
-              <p className="text-[10px] font-light tracking-wider text-[#D4AF37]">다시 살 이유</p>
-              <p className="mt-0.5 truncate text-xs font-light text-foreground/80">{privateRebuyReason}</p>
+            <div className="mt-3 min-w-0 border-l border-primary-amber/50 pl-3">
+              <p className="text-[10px] font-black tracking-wider text-primary-amber">다시 살 이유</p>
+              <p className="mt-0.5 truncate text-xs font-semibold text-background-dark/80">{privateRebuyReason}</p>
             </div>
           )}
         </div>
       </button>
 
-          <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-5">
-            <span className="inline-flex items-center gap-1.5 text-xs font-light text-[#D4AF37]">
+          <div className="mt-auto flex items-center justify-between border-t border-background-dark/10 pt-5">
+            <span className="inline-flex items-center gap-1.5 text-xs font-black text-primary-amber">
               <Star aria-hidden="true" size={14} fill="currentColor" />
               {cardRating(card)}
             </span>
@@ -119,7 +119,7 @@ export default function TastingCard({
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onShare(card); }}
-                  className="grid size-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-white/5 hover:text-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
+                  className="grid size-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-primary-amber/10 hover:text-primary-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
                   aria-label={`${card.title} 공유`}
                 >
                   <Share2 aria-hidden="true" size={15} />
@@ -142,13 +142,13 @@ export default function TastingCard({
 
         {/* BACK FACE */}
         <article 
-          className="absolute inset-0 backface-hidden min-w-0 rounded-2xl bg-black/90 backdrop-blur-3xl border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.8)] p-6 flex flex-col rotate-y-180"
+          className="absolute inset-0 backface-hidden min-w-0 rounded-[1.35rem] border border-white/12 bg-[#2A1A12] p-6 shadow-[0_30px_60px_rgba(73,48,36,0.32)] flex flex-col rotate-y-180"
         >
-          <div className="flex justify-between items-start mb-5 border-b border-white/5 pb-4">
-            <h3 className="font-serif text-2xl font-light text-foreground tracking-tight">Brewing Guide</h3>
+          <div className="flex justify-between items-start mb-5 border-b border-white/10 pb-4">
+            <h3 className="font-serif text-2xl font-black text-[#FFF8EC] tracking-tight">Brewing Guide</h3>
             <button 
               onClick={() => setIsFlipped(false)}
-              className="text-[10px] uppercase tracking-widest font-light text-muted-foreground hover:text-white transition-colors cursor-pointer bg-transparent border-none"
+              className="cursor-pointer border-none bg-transparent text-[10px] font-black uppercase tracking-widest text-[#FFF8EC]/54 transition-colors hover:text-white"
             >
               Back
             </button>
@@ -159,8 +159,8 @@ export default function TastingCard({
 
             {/* AI Analysis Excerpt */}
             <div>
-              <h4 className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-1.5">Tasting Profile</h4>
-              <p className="text-[11px] leading-relaxed text-foreground/80 line-clamp-4">
+              <h4 className="text-[10px] font-medium text-[#FFF8EC]/56 uppercase tracking-widest mb-1.5">Tasting Profile</h4>
+              <p className="text-[11px] leading-relaxed text-[#FFF8EC]/80 line-clamp-4">
                 {card.ai_description || "조화로운 향미 밸런스가 돋보이는 커피입니다."}
               </p>
             </div>
