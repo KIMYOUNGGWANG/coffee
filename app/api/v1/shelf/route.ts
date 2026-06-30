@@ -5,6 +5,9 @@ import { z } from "zod";
 
 const purchaseUrlSchema = z.string().trim().url().max(500).optional().nullable();
 const purchaseNoteSchema = z.string().trim().min(1).max(160).optional().nullable();
+const rebuyPrioritySchema = z.enum(["normal", "pinned", "paused"]).optional();
+const rebuyReminderDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "올바른 날짜 형식(YYYY-MM-DD)이어야 합니다.").optional().nullable();
+const rebuyActionSchema = z.enum(["none", "drank", "will_rebuy", "rebought"]).optional();
 
 const createShelfItemSchema = z.object({
   roasterName: z.string().min(1, "로스터리 이름을 입력해주세요."),
@@ -17,6 +20,9 @@ const createShelfItemSchema = z.object({
   tastingCardId: z.string().uuid().optional().nullable(),
   purchaseUrl: purchaseUrlSchema,
   purchaseNote: purchaseNoteSchema,
+  rebuyPriority: rebuyPrioritySchema,
+  rebuyReminderDate: rebuyReminderDateSchema,
+  rebuyAction: rebuyActionSchema,
   rating: z.number().int().min(1).max(5).optional().nullable(),
   wantAgain: z.boolean().optional().nullable(),
 });
@@ -106,6 +112,10 @@ export async function POST(request: NextRequest) {
         tasting_card_id: validatedData.tastingCardId || null,
         purchase_url: validatedData.purchaseUrl ?? null,
         purchase_note: validatedData.purchaseNote ?? null,
+        rebuy_priority: validatedData.rebuyPriority ?? "normal",
+        rebuy_reminder_date: validatedData.rebuyReminderDate ?? null,
+        rebuy_action: validatedData.rebuyAction ?? "none",
+        rebuy_action_at: validatedData.rebuyAction && validatedData.rebuyAction !== "none" ? new Date().toISOString() : null,
         rating: validatedData.rating || null,
         want_again: validatedData.wantAgain ?? false,
       })

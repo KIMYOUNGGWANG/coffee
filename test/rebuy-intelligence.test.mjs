@@ -106,6 +106,10 @@ test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is buil
           tasting_card_id: "card-sidama",
           purchase_url: "https://fritz.example/sidama",
           purchase_note: "Fritz 공식몰 200g 옵션",
+          rebuy_priority: "normal",
+          rebuy_reminder_date: null,
+          rebuy_action: "none",
+          rebuy_action_at: null,
           created_at: "2026-06-19T00:00:00.000Z",
         },
       ],
@@ -130,6 +134,10 @@ test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is buil
             tasting_card_id: "card-sidama",
             purchase_url: "https://fritz.example/sidama",
             purchase_note: "Fritz 공식몰 200g 옵션",
+            rebuy_priority: "normal",
+            rebuy_reminder_date: null,
+            rebuy_action: "none",
+            rebuy_action_at: null,
             created_at: "2026-06-19T00:00:00.000Z",
           },
         },
@@ -151,6 +159,63 @@ test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is buil
       "brew_failure_memory",
       "taste_match",
     ]);
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("Given a pinned or due shelf reminder, When Rebuy Intelligence is built, Then it outranks passive freshness timing", async () => {
+  const loaded = await loadRebuyIntelligenceModule();
+  try {
+    const { buildRebuyIntelligence } = loaded.module;
+    const result = buildRebuyIntelligence({
+      now: new Date("2026-06-29T12:00:00.000Z"),
+      cards: [card()],
+      shelfItems: [
+        {
+          id: "shelf-low",
+          roaster_name: "Low Stock",
+          bean_name: "Almost Empty",
+          origin: null,
+          roast_date: "2026-06-01",
+          opened_date: "2026-06-10",
+          fill_level: 5,
+          is_finished: false,
+          tasting_card_id: null,
+          purchase_url: null,
+          purchase_note: null,
+          rebuy_priority: "normal",
+          rebuy_reminder_date: null,
+          rebuy_action: "none",
+          rebuy_action_at: null,
+          created_at: "2026-06-10T00:00:00.000Z",
+        },
+        {
+          id: "shelf-pinned",
+          roaster_name: "Fritz",
+          bean_name: "Ethiopia Sidama",
+          origin: "Ethiopia Sidama Washed",
+          roast_date: "2026-06-20",
+          opened_date: null,
+          fill_level: 80,
+          is_finished: false,
+          tasting_card_id: "card-sidama",
+          purchase_url: null,
+          purchase_note: null,
+          rebuy_priority: "pinned",
+          rebuy_reminder_date: "2026-06-29",
+          rebuy_action: "will_rebuy",
+          rebuy_action_at: "2026-06-28T00:00:00.000Z",
+          created_at: "2026-06-28T00:00:00.000Z",
+        },
+      ],
+      brewingLogs: [],
+    });
+
+    assert.equal(result.rebuyReminder.shelfItemId, "shelf-pinned");
+    assert.equal(result.rebuyReminder.priority, "high");
+    assert.equal(result.rebuyReminder.actionLabel, "다시 찾기");
+    assert.match(result.rebuyReminder.reason, /재구매 예정일|다시 살/);
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }

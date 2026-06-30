@@ -34,6 +34,10 @@ interface ShelfItem {
   tasting_card_id: string | null;
   purchase_url: string | null;
   purchase_note: string | null;
+  rebuy_priority: "normal" | "pinned" | "paused";
+  rebuy_reminder_date: string | null;
+  rebuy_action: "none" | "drank" | "will_rebuy" | "rebought";
+  rebuy_action_at: string | null;
   tasting_cards?: TastingCard | null;
 }
 
@@ -86,6 +90,10 @@ function isShelfItem(value: unknown): value is ShelfItem {
     && (typeof value.tasting_card_id === "string" || value.tasting_card_id === null)
     && (typeof value.purchase_url === "string" || value.purchase_url === null || value.purchase_url === undefined)
     && (typeof value.purchase_note === "string" || value.purchase_note === null || value.purchase_note === undefined)
+    && (value.rebuy_priority === "normal" || value.rebuy_priority === "pinned" || value.rebuy_priority === "paused" || value.rebuy_priority === undefined)
+    && (typeof value.rebuy_reminder_date === "string" || value.rebuy_reminder_date === null || value.rebuy_reminder_date === undefined)
+    && (value.rebuy_action === "none" || value.rebuy_action === "drank" || value.rebuy_action === "will_rebuy" || value.rebuy_action === "rebought" || value.rebuy_action === undefined)
+    && (typeof value.rebuy_action_at === "string" || value.rebuy_action_at === null || value.rebuy_action_at === undefined)
     && (tastingCard === undefined || tastingCard === null || isTastingCard(tastingCard))
   );
 }
@@ -99,6 +107,10 @@ function readShelfItems(payload: unknown): ShelfItem[] {
       ...item,
       purchase_url: item.purchase_url ?? null,
       purchase_note: item.purchase_note ?? null,
+      rebuy_priority: item.rebuy_priority ?? "normal",
+      rebuy_reminder_date: item.rebuy_reminder_date ?? null,
+      rebuy_action: item.rebuy_action ?? "none",
+      rebuy_action_at: item.rebuy_action_at ?? null,
     }));
 }
 
@@ -255,6 +267,10 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
           tasting_card_id: null,
           purchase_url: null,
           purchase_note: null,
+          rebuy_priority: "normal",
+          rebuy_reminder_date: null,
+          rebuy_action: "none",
+          rebuy_action_at: null,
         } as ShelfItem]);
         setArchivedItems([]);
         setTastingCards([]);
@@ -416,6 +432,47 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
         console.error("Error toggling finish state:", String(error));
       }
       alert("원두 상태 업데이트 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleUpdateReminderState = async (
+    id: string,
+    update: {
+      rebuyPriority?: ShelfItem["rebuy_priority"];
+      rebuyReminderDate?: string | null;
+      rebuyAction?: ShelfItem["rebuy_action"];
+    },
+  ) => {
+    try {
+      const response = await fetch(`/api/v1/shelf/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(update),
+      });
+
+      if (!response.ok) throw new Error("Failed to update reminder state");
+
+      const applyReminderUpdate = (item: ShelfItem): ShelfItem => {
+        if (item.id !== id) return item;
+
+        return {
+          ...item,
+          rebuy_priority: update.rebuyPriority ?? item.rebuy_priority,
+          rebuy_reminder_date: update.rebuyReminderDate !== undefined ? update.rebuyReminderDate : item.rebuy_reminder_date,
+          rebuy_action: update.rebuyAction ?? item.rebuy_action,
+          rebuy_action_at: update.rebuyAction !== undefined && update.rebuyAction !== "none" ? new Date().toISOString() : item.rebuy_action_at,
+        };
+      };
+
+      setItems((currentItems) => currentItems.map(applyReminderUpdate));
+      setArchivedItems((currentItems) => currentItems.map(applyReminderUpdate));
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error updating rebuy reminder state:", error);
+      } else {
+        console.error("Error updating rebuy reminder state:", String(error));
+      }
+      alert("재구매 리마인더 상태 업데이트 중 오류가 발생했습니다.");
     }
   };
 
@@ -775,6 +832,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
               item={item}
               onUpdateFillLevel={handleUpdateFillLevel}
               onToggleFinished={handleToggleFinished}
+              onUpdateReminderState={handleUpdateReminderState}
               onDelete={handleDeleteItem}
             />
           ))}

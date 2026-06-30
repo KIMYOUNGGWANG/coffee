@@ -34,6 +34,10 @@ export type RebuyIntelligenceShelfItem = {
   readonly tasting_card_id: string | null;
   readonly purchase_url: string | null;
   readonly purchase_note: string | null;
+  readonly rebuy_priority?: "normal" | "pinned" | "paused";
+  readonly rebuy_reminder_date?: string | null;
+  readonly rebuy_action?: "none" | "drank" | "will_rebuy" | "rebought";
+  readonly rebuy_action_at?: string | null;
   readonly created_at?: string;
 };
 
@@ -181,11 +185,18 @@ function purchaseUrlFor(url: string | null, label: string): string {
   return url ?? purchaseSearchUrl(label);
 }
 
+function dateOnlyTime(value: string | null | undefined): number {
+  if (!value) return 0;
+  const parsed = new Date(`${value}T00:00:00.000Z`).getTime();
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 function buildRebuyReminder(
   cards: readonly RebuyIntelligenceCard[],
   shelfItems: readonly RebuyIntelligenceShelfItem[],
   now: Date,
 ): RebuyReminderInsight {
+  const todayTime = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   const shelfCandidates = shelfItems
     .map((item) => ({
       item,
@@ -196,22 +207,43 @@ function buildRebuyReminder(
         isFinished: item.is_finished,
         now,
       }),
+      isPinned: item.rebuy_priority === "pinned",
+      isDue: dateOnlyTime(item.rebuy_reminder_date) > 0 && dateOnlyTime(item.rebuy_reminder_date) <= todayTime,
+      wantsRebuy: item.rebuy_action === "will_rebuy",
     }))
-    .filter(({ status }) => status.kind === "rebuy" || status.kind === "finish_soon")
+    .filter(({ item, status, isPinned, isDue, wantsRebuy }) => (
+      item.rebuy_priority !== "paused"
+      && item.rebuy_action !== "rebought"
+      && (isPinned || isDue || wantsRebuy || status.kind === "rebuy" || status.kind === "finish_soon")
+    ))
     .sort((first, second) => {
+      const reminderPriority = (candidate: typeof first) => {
+        if (candidate.isDue) return 0;
+        if (candidate.wantsRebuy) return 1;
+        if (candidate.isPinned) return 2;
+        return 3;
+      };
       const priority = { rebuy: 0, finish_soon: 1, drink_now: 2, waiting: 3 };
-      return priority[first.status.kind] - priority[second.status.kind]
+      return reminderPriority(first) - reminderPriority(second)
+        || priority[first.status.kind] - priority[second.status.kind]
         || first.item.fill_level - second.item.fill_level;
     });
 
   const shelfCandidate = shelfCandidates[0];
   if (shelfCandidate) {
+    const reason = shelfCandidate.isDue
+      ? "앱 안에 저장한 재구매 예정일이 오늘이거나 지났어요."
+      : shelfCandidate.wantsRebuy
+        ? "다시 살 원두로 직접 표시해둔 기억입니다."
+        : shelfCandidate.isPinned
+          ? "다시 살 후보로 고정해둔 원두입니다."
+          : shelfCandidate.status.reason;
     return {
       title: shelfCandidate.item.bean_name,
       subtitle: shelfCandidate.item.roaster_name,
-      reason: shelfCandidate.status.reason,
-      actionLabel: shelfCandidate.status.kind === "rebuy" ? "재구매 후보 열기" : "마시고 판단하기",
-      priority: shelfCandidate.status.kind === "rebuy" ? "high" : "medium",
+      reason,
+      actionLabel: shelfCandidate.isDue || shelfCandidate.wantsRebuy || shelfCandidate.status.kind === "rebuy" ? "다시 찾기" : "마시고 판단하기",
+      priority: shelfCandidate.isDue || shelfCandidate.wantsRebuy || shelfCandidate.status.kind === "rebuy" ? "high" : "medium",
       cardId: shelfCandidate.item.tasting_card_id,
       shelfItemId: shelfCandidate.item.id,
     };

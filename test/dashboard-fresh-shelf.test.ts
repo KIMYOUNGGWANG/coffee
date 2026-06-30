@@ -35,6 +35,12 @@ const shelfResponse = {
       tasting_card_id: null,
       tasting_cards: null,
       total_weight: 200,
+      purchase_url: "https://fritz.example/sidama",
+      purchase_note: "Fritz 공식몰 200g 옵션",
+      rebuy_priority: "normal",
+      rebuy_reminder_date: null,
+      rebuy_action: "none",
+      rebuy_action_at: null,
     },
   ],
 } as const;
@@ -194,9 +200,15 @@ async function fulfillJson(route: Route, body: unknown, status = 200): Promise<v
   });
 }
 
-async function mockDashboardRoutes(page: Page): Promise<void> {
+async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[] = []): Promise<void> {
   await page.route("**/api/v1/**", async (route) => {
     const requestUrl = new URL(route.request().url());
+
+    if (requestUrl.pathname.startsWith("/api/v1/shelf/") && route.request().method() === "PATCH") {
+      shelfPatchBodies.push(route.request().postDataJSON());
+      await fulfillJson(route, { data: { id: "shelf-sidama" } });
+      return;
+    }
 
     switch (requestUrl.pathname) {
       case "/api/v1/shelf":
@@ -320,6 +332,32 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     await expect(page.getByText("Taste Match")).toBeVisible();
     await expect(page.getByText("Bag To Rebuy")).toBeVisible();
     await expect(page.getByRole("button", { name: /Brew Failure/ })).toBeVisible();
+  });
+
+  test("lets users pin and mark a shelf item for in-app rebuy follow-up", async ({ page }) => {
+    const patchBodies: unknown[] = [];
+    await mockDashboardRoutes(page, patchBodies);
+
+    await page.goto(dashboardUrl);
+
+    await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+    await page.getByRole("heading", { name: "에티오피아 시다마" }).click();
+    await expect(page.getByText("앱 내부 리마인더")).toBeVisible();
+    await page.waitForTimeout(900);
+
+    await page.getByRole("button", { name: /고정/ }).click();
+    await expect.poll(() => patchBodies.length).toBe(1);
+    if (!await page.getByText("앱 내부 리마인더").first().isVisible()) {
+      await page.getByRole("heading", { name: "에티오피아 시다마" }).click();
+      await expect(page.getByText("앱 내부 리마인더")).toBeVisible();
+      await page.waitForTimeout(900);
+    }
+    await page.getByText("다시 살래요").click({ force: true });
+
+    expect(patchBodies).toEqual([
+      { rebuyPriority: "pinned" },
+      { rebuyAction: "will_rebuy", rebuyPriority: "pinned" },
+    ]);
   });
 
   test("keeps the mobile shelf within the viewport and away from fixed controls", async ({ page }) => {

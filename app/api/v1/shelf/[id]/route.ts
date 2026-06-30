@@ -5,6 +5,9 @@ import { z } from "zod";
 
 const purchaseUrlSchema = z.string().trim().url().max(500).optional().nullable();
 const purchaseNoteSchema = z.string().trim().min(1).max(160).optional().nullable();
+const rebuyPrioritySchema = z.enum(["normal", "pinned", "paused"]).optional();
+const rebuyReminderDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "올바른 날짜 형식(YYYY-MM-DD)이어야 합니다.").optional().nullable();
+const rebuyActionSchema = z.enum(["none", "drank", "will_rebuy", "rebought"]).optional();
 
 const updateShelfItemSchema = z.object({
   roasterName: z.string().optional(),
@@ -18,6 +21,9 @@ const updateShelfItemSchema = z.object({
   tastingCardId: z.string().uuid().optional().nullable(),
   purchaseUrl: purchaseUrlSchema,
   purchaseNote: purchaseNoteSchema,
+  rebuyPriority: rebuyPrioritySchema,
+  rebuyReminderDate: rebuyReminderDateSchema,
+  rebuyAction: rebuyActionSchema,
 });
 
 type UpdateShelfItemPayload = {
@@ -32,6 +38,10 @@ type UpdateShelfItemPayload = {
   tasting_card_id?: string | null;
   purchase_url?: string | null;
   purchase_note?: string | null;
+  rebuy_priority?: "normal" | "pinned" | "paused";
+  rebuy_reminder_date?: string | null;
+  rebuy_action?: "none" | "drank" | "will_rebuy" | "rebought";
+  rebuy_action_at?: string | null;
 };
 
 // PATCH /api/v1/shelf/[id] - Update a specific shelf item (e.g., adjust fill level)
@@ -75,6 +85,12 @@ export async function PATCH(
     if (validatedData.tastingCardId !== undefined) updateData.tasting_card_id = validatedData.tastingCardId;
     if (validatedData.purchaseUrl !== undefined) updateData.purchase_url = validatedData.purchaseUrl;
     if (validatedData.purchaseNote !== undefined) updateData.purchase_note = validatedData.purchaseNote;
+    if (validatedData.rebuyPriority !== undefined) updateData.rebuy_priority = validatedData.rebuyPriority;
+    if (validatedData.rebuyReminderDate !== undefined) updateData.rebuy_reminder_date = validatedData.rebuyReminderDate;
+    if (validatedData.rebuyAction !== undefined) {
+      updateData.rebuy_action = validatedData.rebuyAction;
+      updateData.rebuy_action_at = validatedData.rebuyAction === "none" ? null : new Date().toISOString();
+    }
 
     if (validatedData.fillLevel !== undefined) {
       updateData.fill_level = validatedData.fillLevel;
