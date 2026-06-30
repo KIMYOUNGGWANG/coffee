@@ -3,6 +3,9 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/api-errors";
 import { z } from "zod";
 
+const purchaseUrlSchema = z.string().trim().url().max(500).optional().nullable();
+const purchaseNoteSchema = z.string().trim().min(1).max(160).optional().nullable();
+
 const createShelfItemSchema = z.object({
   roasterName: z.string().min(1, "로스터리 이름을 입력해주세요."),
   beanName: z.string().min(1, "원두 이름을 입력해주세요."),
@@ -12,6 +15,8 @@ const createShelfItemSchema = z.object({
   totalWeight: z.number().int().min(1, "무게는 1g 이상이어야 합니다.").default(200),
   fillLevel: z.number().int().min(0).max(100).default(100),
   tastingCardId: z.string().uuid().optional().nullable(),
+  purchaseUrl: purchaseUrlSchema,
+  purchaseNote: purchaseNoteSchema,
   rating: z.number().int().min(1).max(5).optional().nullable(),
   wantAgain: z.boolean().optional().nullable(),
 });
@@ -99,6 +104,8 @@ export async function POST(request: NextRequest) {
         fill_level: validatedData.fillLevel,
         is_finished: validatedData.fillLevel === 0,
         tasting_card_id: validatedData.tastingCardId || null,
+        purchase_url: validatedData.purchaseUrl ?? null,
+        purchase_note: validatedData.purchaseNote ?? null,
         rating: validatedData.rating || null,
         want_again: validatedData.wantAgain ?? false,
       })

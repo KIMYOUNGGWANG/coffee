@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Scale, Archive, Trash2, Calendar, Sparkles } from "lucide-react";
+import { Archive, ExternalLink, Sparkles, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { evaluateFreshShelfStatus } from "@/lib/fresh-shelf";
 
@@ -19,6 +19,8 @@ export interface ShelfItem {
   fill_level: number;
   is_finished: boolean;
   tasting_card_id: string | null;
+  purchase_url: string | null;
+  purchase_note: string | null;
 }
 
 interface CoffeePackageItemProps {
@@ -45,6 +47,11 @@ const getRoastColorClasses = (roasterName: string, beanName: string, origin: str
   return "bg-[#0D0905] border-[#1F150D] text-white"; // Ultra dark terracotta
 };
 
+function buildPurchaseUrl(item: ShelfItem): string {
+  if (item.purchase_url) return item.purchase_url;
+  return `https://www.google.com/search?q=${encodeURIComponent(`${item.roaster_name} ${item.bean_name} 원두 구매`)}`;
+}
+
 export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, onDelete }: CoffeePackageItemProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -67,7 +74,14 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
         onClick={() => setIsFlipped(!isFlipped)}
       >
         {/* Front of the Bag */}
-        <div className={cn("absolute inset-0 backface-hidden rounded-md shadow-[0_30px_60px_rgba(0,0,0,0.8)] flex flex-col justify-end p-5 border text-left", packageColors)}>
+        <div
+          className={cn(
+            "absolute inset-0 backface-hidden rounded-md shadow-[0_30px_60px_rgba(0,0,0,0.8)] flex flex-col justify-end p-5 border text-left",
+            isFlipped ? "pointer-events-none" : "pointer-events-auto",
+            packageColors,
+          )}
+          aria-hidden={isFlipped}
+        >
           {/* Noise overlay for premium paper/bag texture */}
           <div className="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none rounded-md" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
           
@@ -92,7 +106,11 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
 
         {/* Back of the Bag (Details & Controls) */}
         <div 
-          className="absolute inset-0 backface-hidden rounded-md shadow-[0_30px_60px_rgba(0,0,0,0.8)] p-5 flex flex-col bg-black/80 backdrop-blur-2xl border border-white/10"
+          className={cn(
+            "absolute inset-0 backface-hidden rounded-md shadow-[0_30px_60px_rgba(0,0,0,0.8)] p-5 flex flex-col bg-black/80 backdrop-blur-2xl border border-white/10",
+            isFlipped ? "pointer-events-auto" : "pointer-events-none",
+          )}
+          aria-hidden={!isFlipped}
           style={{ transform: "rotateY(180deg)" }}
           onClick={(e) => e.stopPropagation()} // Prevent flip when interacting with controls
         >
@@ -120,6 +138,20 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                 </div>
                 <p className="text-white/60 leading-relaxed font-light">{freshShelfStatus.reason}</p>
              </div>
+
+             <a
+                href={buildPurchaseUrl(item)}
+                target="_blank"
+                rel="noreferrer"
+                className="flex min-h-[44px] items-center justify-between gap-3 rounded-md border border-[#D4AF37]/20 bg-[#D4AF37]/5 px-3 py-3 text-[10px] font-light text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/15"
+                onClick={(event) => event.stopPropagation()}
+             >
+                <span className="min-w-0">
+                  <span className="block font-bold">다시 찾기</span>
+                  <span className="block truncate text-white/50">{item.purchase_note ?? "저장된 단서로 재구매 검색을 엽니다."}</span>
+                </span>
+                <ExternalLink size={12} className="shrink-0" />
+             </a>
 
              <div className="space-y-2">
                 <div className="flex justify-between items-center text-[10px] min-h-[24px]">

@@ -13,6 +13,8 @@ export type RebuyIntelligenceCard = {
   readonly scan_source: "gemini" | "manual" | null;
   readonly package_origin: string | null;
   readonly package_process: string | null;
+  readonly purchase_url: string | null;
+  readonly purchase_note: string | null;
   readonly footer_meta?: {
     readonly origin?: string;
     readonly extraInfo?: string;
@@ -30,6 +32,8 @@ export type RebuyIntelligenceShelfItem = {
   readonly fill_level: number;
   readonly is_finished: boolean;
   readonly tasting_card_id: string | null;
+  readonly purchase_url: string | null;
+  readonly purchase_note: string | null;
   readonly created_at?: string;
 };
 
@@ -173,6 +177,10 @@ function purchaseSearchUrl(label: string): string {
   return `https://www.google.com/search?q=${encodeURIComponent(`${label} 원두 구매`)}`;
 }
 
+function purchaseUrlFor(url: string | null, label: string): string {
+  return url ?? purchaseSearchUrl(label);
+}
+
 function buildRebuyReminder(
   cards: readonly RebuyIntelligenceCard[],
   shelfItems: readonly RebuyIntelligenceShelfItem[],
@@ -295,8 +303,11 @@ function buildPurchaseMemory(
       title: shelfCandidate.bean_name,
       subtitle: shelfCandidate.roaster_name,
       source: "shelf",
-      searchUrl: purchaseSearchUrl(label),
-      reason: shelfCandidate.origin ? `${shelfCandidate.origin} 단서까지 함께 기억합니다.` : "서랍에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요.",
+      searchUrl: purchaseUrlFor(shelfCandidate.purchase_url, label),
+      reason: shelfCandidate.purchase_note
+        ?? (shelfCandidate.purchase_url
+          ? "서랍에 저장한 개인 구매 링크를 바로 열 수 있어요."
+          : shelfCandidate.origin ? `${shelfCandidate.origin} 단서까지 함께 기억합니다.` : "서랍에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요."),
       cardId: shelfCandidate.tasting_card_id,
       shelfItemId: shelfCandidate.id,
     };
@@ -312,8 +323,11 @@ function buildPurchaseMemory(
     title: cardCandidate.title,
     subtitle: cardCandidate.subtitle,
     source: cardCandidate.scan_source ? "scan" : "manual",
-    searchUrl: purchaseSearchUrl(cardLabel(cardCandidate)),
-    reason: cardCandidate.scan_source ? "봉투 스캔으로 남긴 패키지 단서를 재구매 검색으로 이어갑니다." : "카드에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요.",
+    searchUrl: purchaseUrlFor(cardCandidate.purchase_url, cardLabel(cardCandidate)),
+    reason: cardCandidate.purchase_note
+      ?? (cardCandidate.purchase_url
+        ? "카드에 저장한 개인 구매 링크를 바로 열 수 있어요."
+        : cardCandidate.scan_source ? "봉투 스캔으로 남긴 패키지 단서를 재구매 검색으로 이어갑니다." : "카드에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요."),
     cardId: cardCandidate.id,
     shelfItemId: null,
   };

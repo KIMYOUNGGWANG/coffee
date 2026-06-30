@@ -14,6 +14,8 @@ export const repurchaseIntentSchema = z.enum(repurchaseIntents);
 export const scanSourceSchema = z.enum(scanSources);
 export const correctableCoffeeFieldSchema = z.enum(correctableCoffeeFields);
 export const repurchaseReasonSchema = z.string().trim().min(1).max(80);
+export const purchaseUrlSchema = z.string().trim().url().max(500).nullable().default(null);
+export const purchaseNoteSchema = z.string().trim().min(1).max(160).nullable().default(null);
 
 const packageClaimSchema = z.string().trim().min(1).max(160).nullable().default(null);
 const repurchaseReasonsSchema = z
@@ -48,6 +50,8 @@ export const coffeeMemorySchema = z
   .object({
     package_origin: packageClaimSchema,
     package_process: packageClaimSchema,
+    purchase_url: purchaseUrlSchema,
+    purchase_note: purchaseNoteSchema,
     repurchase_intent: repurchaseIntentSchema.default("undecided"),
     repurchase_reasons: repurchaseReasonsSchema,
     scan_source: scanSourceSchema.nullable().default(null),

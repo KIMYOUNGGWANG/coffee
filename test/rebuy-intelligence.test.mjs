@@ -63,6 +63,8 @@ function card(overrides = {}) {
     scan_source: "gemini",
     package_origin: "Ethiopia Sidama",
     package_process: "Washed",
+    purchase_url: null,
+    purchase_note: null,
     footer_meta: { origin: "Ethiopia", extraInfo: "V60 15g 250g 92C" },
     created_at: "2026-06-20T00:00:00.000Z",
     ...overrides,
@@ -102,6 +104,8 @@ test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is buil
           fill_level: 8,
           is_finished: false,
           tasting_card_id: "card-sidama",
+          purchase_url: "https://fritz.example/sidama",
+          purchase_note: "Fritz 공식몰 200g 옵션",
           created_at: "2026-06-19T00:00:00.000Z",
         },
       ],
@@ -124,6 +128,8 @@ test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is buil
             fill_level: 8,
             is_finished: false,
             tasting_card_id: "card-sidama",
+            purchase_url: "https://fritz.example/sidama",
+            purchase_note: "Fritz 공식몰 200g 옵션",
             created_at: "2026-06-19T00:00:00.000Z",
           },
         },
@@ -135,7 +141,8 @@ test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is buil
     assert.equal(result.tasteMatch.matchCardId, "card-kenya");
     assert.deepEqual(result.tasteMatch.sharedTags, ["citrus"]);
     assert.equal(result.purchaseMemory.source, "shelf");
-    assert.match(result.purchaseMemory.searchUrl, /Fritz\+Ethiopia\+Sidama|Fritz%20Ethiopia%20Sidama/);
+    assert.equal(result.purchaseMemory.searchUrl, "https://fritz.example/sidama");
+    assert.equal(result.purchaseMemory.reason, "Fritz 공식몰 200g 옵션");
     assert.equal(result.brewFailureMemory.problem, "too_sour");
     assert.match(result.brewFailureMemory.adjustment, /곱게|온도/);
     assert.deepEqual(result.featureScores.map((score) => score.feature), [

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ImageOff, Share2, Star, Trash2, ArrowRight } from "lucide-react";
+import { ArrowRight, ExternalLink, ImageOff, Share2, Star, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { TastingCardData } from "@/hooks/useTastingCards";
 import type { RepurchaseIntent } from "@/lib/coffee-memory";
@@ -17,6 +17,10 @@ type TastingCardProps = {
 
 function cardRating(card: TastingCardData): string {
   return ((card.metric1 + card.metric2 + card.metric3) / 3).toFixed(1);
+}
+
+function cardPurchaseUrl(card: TastingCardData): string {
+  return card.purchase_url ?? `https://www.google.com/search?q=${encodeURIComponent(`${card.subtitle} ${card.title} 원두 구매`)}`;
 }
 
 const repurchaseLabels: Readonly<Record<RepurchaseIntent, string>> = {
@@ -107,6 +111,14 @@ export default function TastingCard({
               <p className="mt-0.5 truncate text-xs font-semibold text-background-dark/80">{privateRebuyReason}</p>
             </div>
           )}
+          {(card.purchase_url || card.purchase_note) && (
+            <div className="mt-3 min-w-0 border-l border-background-dark/15 pl-3">
+              <p className="text-[10px] font-black tracking-wider text-muted-foreground">구매 단서</p>
+              <p className="mt-0.5 truncate text-xs font-semibold text-background-dark/80">
+                {card.purchase_note ?? "저장한 링크가 있어요"}
+              </p>
+            </div>
+          )}
         </div>
       </button>
 
@@ -168,13 +180,23 @@ export default function TastingCard({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => onSelect?.(card)}
-            className="mt-4 w-full flex items-center justify-center gap-2 rounded-xl bg-primary-amber text-background-dark py-3 text-xs font-black transition-transform hover:scale-[1.02]"
-          >
-            상세 기록 보기 <ArrowRight size={14} />
-          </button>
+          <div className="mt-4 grid gap-2">
+            <a
+              href={cardPurchaseUrl(card)}
+              target="_blank"
+              rel="noreferrer"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary-amber/40 bg-primary-amber/10 py-3 text-xs font-black text-primary-amber transition-transform hover:scale-[1.02]"
+            >
+              {card.purchase_url ? "구매 단서 열기" : "재구매 검색 열기"} <ExternalLink size={14} />
+            </a>
+            <button
+              type="button"
+              onClick={() => onSelect?.(card)}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary-amber text-background-dark py-3 text-xs font-black transition-transform hover:scale-[1.02]"
+            >
+              상세 기록 보기 <ArrowRight size={14} />
+            </button>
+          </div>
         </article>
       </motion.div>
     </div>

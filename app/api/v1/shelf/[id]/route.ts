@@ -3,6 +3,9 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/api-errors";
 import { z } from "zod";
 
+const purchaseUrlSchema = z.string().trim().url().max(500).optional().nullable();
+const purchaseNoteSchema = z.string().trim().min(1).max(160).optional().nullable();
+
 const updateShelfItemSchema = z.object({
   roasterName: z.string().optional(),
   beanName: z.string().optional(),
@@ -13,7 +16,23 @@ const updateShelfItemSchema = z.object({
   fillLevel: z.number().int().min(0).max(100).optional(),
   isFinished: z.boolean().optional(),
   tastingCardId: z.string().uuid().optional().nullable(),
+  purchaseUrl: purchaseUrlSchema,
+  purchaseNote: purchaseNoteSchema,
 });
+
+type UpdateShelfItemPayload = {
+  roaster_name?: string;
+  bean_name?: string;
+  origin?: string | null;
+  roast_date?: string | null;
+  opened_date?: string | null;
+  total_weight?: number;
+  fill_level?: number;
+  is_finished?: boolean;
+  tasting_card_id?: string | null;
+  purchase_url?: string | null;
+  purchase_note?: string | null;
+};
 
 // PATCH /api/v1/shelf/[id] - Update a specific shelf item (e.g., adjust fill level)
 export async function PATCH(
@@ -46,7 +65,7 @@ export async function PATCH(
     const validatedData = result.data;
 
     // Build update object mapping camelCase to snake_case
-    const updateData: Record<string, any> = {};
+    const updateData: UpdateShelfItemPayload = {};
     if (validatedData.roasterName !== undefined) updateData.roaster_name = validatedData.roasterName;
     if (validatedData.beanName !== undefined) updateData.bean_name = validatedData.beanName;
     if (validatedData.origin !== undefined) updateData.origin = validatedData.origin;
@@ -54,6 +73,8 @@ export async function PATCH(
     if (validatedData.openedDate !== undefined) updateData.opened_date = validatedData.openedDate;
     if (validatedData.totalWeight !== undefined) updateData.total_weight = validatedData.totalWeight;
     if (validatedData.tastingCardId !== undefined) updateData.tasting_card_id = validatedData.tastingCardId;
+    if (validatedData.purchaseUrl !== undefined) updateData.purchase_url = validatedData.purchaseUrl;
+    if (validatedData.purchaseNote !== undefined) updateData.purchase_note = validatedData.purchaseNote;
 
     if (validatedData.fillLevel !== undefined) {
       updateData.fill_level = validatedData.fillLevel;

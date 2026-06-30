@@ -18,19 +18,19 @@ export async function GET() {
     const [cardsResult, shelfResult, brewLogsResult] = await Promise.all([
       supabase
         .from("tasting_cards")
-        .select("id,title,subtitle,metric1,metric2,metric3,tags,repurchase_intent,repurchase_reasons,scan_source,package_origin,package_process,footer_meta,created_at")
+        .select("id,title,subtitle,metric1,metric2,metric3,tags,repurchase_intent,repurchase_reasons,scan_source,package_origin,package_process,purchase_url,purchase_note,footer_meta,created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(60),
       supabase
         .from("coffee_shelf_items")
-        .select("id,roaster_name,bean_name,origin,roast_date,opened_date,fill_level,is_finished,tasting_card_id,created_at")
+        .select("id,roaster_name,bean_name,origin,roast_date,opened_date,fill_level,is_finished,tasting_card_id,purchase_url,purchase_note,created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(60),
       supabase
         .from("brewing_logs")
-        .select("id,shelf_item_id,brewed_at,method,parameters,rating,simple_note,coffee_shelf_items(id,roaster_name,bean_name,origin,roast_date,opened_date,fill_level,is_finished,tasting_card_id,created_at)")
+        .select("id,shelf_item_id,brewed_at,method,parameters,rating,simple_note,coffee_shelf_items(id,roaster_name,bean_name,origin,roast_date,opened_date,fill_level,is_finished,tasting_card_id,purchase_url,purchase_note,created_at)")
         .eq("user_id", user.id)
         .order("brewed_at", { ascending: false })
         .limit(40),

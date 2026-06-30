@@ -11,6 +11,8 @@ import {
 import { z } from "zod";
 
 const packageClaimSchema = z.string().trim().min(1).max(160).nullable();
+const purchaseUrlSchema = z.string().trim().url().max(500).nullable();
+const purchaseNoteSchema = z.string().trim().min(1).max(160).nullable();
 const cardRowSchema = z.record(z.unknown());
 
 const updateCardSchema = z.object({
@@ -33,6 +35,8 @@ const updateCardSchema = z.object({
   }).optional(),
   packageOrigin: packageClaimSchema.optional(),
   packageProcess: packageClaimSchema.optional(),
+  purchaseUrl: purchaseUrlSchema.optional(),
+  purchaseNote: purchaseNoteSchema.optional(),
   repurchaseIntent: repurchaseIntentSchema.optional(),
   repurchaseReasons: z.array(repurchaseReasonSchema).max(8).optional(),
   scanSource: scanSourceSchema.nullable().optional(),
@@ -42,6 +46,8 @@ const updateCardSchema = z.object({
 }).strict().superRefine((value, context) => {
   const hasMemoryInput = value.packageOrigin !== undefined
     || value.packageProcess !== undefined
+    || value.purchaseUrl !== undefined
+    || value.purchaseNote !== undefined
     || value.repurchaseIntent !== undefined
     || value.repurchaseReasons !== undefined
     || value.scanSource !== undefined
@@ -84,6 +90,8 @@ type UpdateCardPayload = {
   footer_meta?: CardFooterMeta;
   package_origin?: string | null;
   package_process?: string | null;
+  purchase_url?: string | null;
+  purchase_note?: string | null;
   repurchase_intent?: "again" | "maybe" | "no" | "undecided";
   repurchase_reasons?: string[];
   scan_source?: "gemini" | "manual" | null;
@@ -97,6 +105,8 @@ function withMemoryDefaults(row: unknown) {
   const memory = coffeeMemorySchema.parse({
     package_origin: parsedRow.package_origin,
     package_process: parsedRow.package_process,
+    purchase_url: parsedRow.purchase_url,
+    purchase_note: parsedRow.purchase_note,
     repurchase_intent: parsedRow.repurchase_intent,
     repurchase_reasons: parsedRow.repurchase_reasons,
     scan_source: parsedRow.scan_source,
@@ -191,6 +201,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (validatedData.footerMeta !== undefined) updatePayload.footer_meta = validatedData.footerMeta;
     if (validatedData.packageOrigin !== undefined) updatePayload.package_origin = validatedData.packageOrigin;
     if (validatedData.packageProcess !== undefined) updatePayload.package_process = validatedData.packageProcess;
+    if (validatedData.purchaseUrl !== undefined) updatePayload.purchase_url = validatedData.purchaseUrl;
+    if (validatedData.purchaseNote !== undefined) updatePayload.purchase_note = validatedData.purchaseNote;
     if (validatedData.repurchaseIntent !== undefined) updatePayload.repurchase_intent = validatedData.repurchaseIntent;
     if (validatedData.repurchaseReasons !== undefined) updatePayload.repurchase_reasons = [...validatedData.repurchaseReasons];
     if (validatedData.scanSource !== undefined) updatePayload.scan_source = validatedData.scanSource;

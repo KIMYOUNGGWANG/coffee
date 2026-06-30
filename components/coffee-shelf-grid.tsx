@@ -32,6 +32,8 @@ interface ShelfItem {
   fill_level: number;
   is_finished: boolean;
   tasting_card_id: string | null;
+  purchase_url: string | null;
+  purchase_note: string | null;
   tasting_cards?: TastingCard | null;
 }
 
@@ -82,6 +84,8 @@ function isShelfItem(value: unknown): value is ShelfItem {
     && typeof value.fill_level === "number"
     && typeof value.is_finished === "boolean"
     && (typeof value.tasting_card_id === "string" || value.tasting_card_id === null)
+    && (typeof value.purchase_url === "string" || value.purchase_url === null || value.purchase_url === undefined)
+    && (typeof value.purchase_note === "string" || value.purchase_note === null || value.purchase_note === undefined)
     && (tastingCard === undefined || tastingCard === null || isTastingCard(tastingCard))
   );
 }
@@ -89,7 +93,13 @@ function isShelfItem(value: unknown): value is ShelfItem {
 function readShelfItems(payload: unknown): ShelfItem[] {
   if (!isRecord(payload) || !Array.isArray(payload.data)) return [];
 
-  return payload.data.filter(isShelfItem);
+  return payload.data
+    .filter(isShelfItem)
+    .map((item) => ({
+      ...item,
+      purchase_url: item.purchase_url ?? null,
+      purchase_note: item.purchase_note ?? null,
+    }));
 }
 
 function readTastingCards(payload: unknown): TastingCard[] {
@@ -130,6 +140,8 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
   const [openedDate, setOpenedDate] = useState("");
   const [totalWeight, setTotalWeight] = useState(200);
   const [tastingCardId, setTastingCardId] = useState("");
+  const [purchaseUrl, setPurchaseUrl] = useState("");
+  const [purchaseNote, setPurchaseNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleScanComplete = (result: ScanResult) => {
@@ -241,6 +253,8 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
           fill_level: 50,
           is_finished: false,
           tasting_card_id: null,
+          purchase_url: null,
+          purchase_note: null,
         } as ShelfItem]);
         setArchivedItems([]);
         setTastingCards([]);
@@ -323,6 +337,8 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
         totalWeight: Number(totalWeight),
         fillLevel: 100,
         tastingCardId: tastingCardId || null,
+        purchaseUrl: purchaseUrl.trim() || null,
+        purchaseNote: purchaseNote.trim() || null,
       };
 
       const response = await fetch("/api/v1/shelf", {
@@ -441,6 +457,8 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
     setOpenedDate("");
     setTotalWeight(200);
     setTastingCardId("");
+    setPurchaseUrl("");
+    setPurchaseNote("");
   };
 
   const getFillLevelColor = (level: number) => {
@@ -599,6 +617,30 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                   onChange={e => setOrigin(e.target.value)}
                   className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <label htmlFor="purchase-url" className="text-xs font-semibold text-muted-foreground">다시 찾을 링크</label>
+                  <input
+                    id="purchase-url"
+                    type="url"
+                    placeholder="https://roaster.example/coffee"
+                    value={purchaseUrl}
+                    onChange={e => setPurchaseUrl(e.target.value)}
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label htmlFor="purchase-note" className="text-xs font-semibold text-muted-foreground">구매 단서</label>
+                  <input
+                    id="purchase-note"
+                    placeholder="예: 공식몰 200g 옵션"
+                    value={purchaseNote}
+                    onChange={e => setPurchaseNote(e.target.value)}
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2">

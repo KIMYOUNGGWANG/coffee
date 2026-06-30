@@ -71,6 +71,8 @@ export interface TastingCardData {
   };
   package_origin: string | null;
   package_process: string | null;
+  purchase_url: string | null;
+  purchase_note: string | null;
   repurchase_intent: RepurchaseIntent;
   repurchase_reasons: readonly string[];
   scan_source: ScanSource | null;
@@ -191,6 +193,8 @@ export type CreateTastingCardInput = {
   readonly footerMeta: TastingCardData["footer_meta"];
   readonly packageOrigin?: string | null;
   readonly packageProcess?: string | null;
+  readonly purchaseUrl?: string | null;
+  readonly purchaseNote?: string | null;
   readonly repurchaseIntent?: RepurchaseIntent;
   readonly repurchaseReasons?: readonly string[];
   readonly scanSource?: ScanSource | null;
@@ -215,6 +219,8 @@ export type UpdateTastingCardInput = {
   readonly footerMeta?: TastingCardData["footer_meta"];
   readonly packageOrigin?: string | null;
   readonly packageProcess?: string | null;
+  readonly purchaseUrl?: string | null;
+  readonly purchaseNote?: string | null;
   readonly repurchaseIntent?: RepurchaseIntent;
   readonly repurchaseReasons?: readonly string[];
   readonly scanSource?: ScanSource | null;

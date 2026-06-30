@@ -11,6 +11,8 @@ import {
 import { z } from "zod";
 
 const packageClaimSchema = z.string().trim().min(1).max(160).nullable();
+const purchaseUrlSchema = z.string().trim().url().max(500).nullable();
+const purchaseNoteSchema = z.string().trim().min(1).max(160).nullable();
 const cardRowSchema = z.record(z.unknown());
 
 const createCardSchema = z.object({
@@ -34,6 +36,8 @@ const createCardSchema = z.object({
   }).default({}),
   packageOrigin: packageClaimSchema.optional(),
   packageProcess: packageClaimSchema.optional(),
+  purchaseUrl: purchaseUrlSchema.optional(),
+  purchaseNote: purchaseNoteSchema.optional(),
   repurchaseIntent: repurchaseIntentSchema.optional(),
   repurchaseReasons: z.array(repurchaseReasonSchema).max(8).optional(),
   scanSource: scanSourceSchema.nullable().optional(),
@@ -43,6 +47,8 @@ const createCardSchema = z.object({
 }).strict().superRefine((value, context) => {
   const hasMemoryInput = value.packageOrigin !== undefined
     || value.packageProcess !== undefined
+    || value.purchaseUrl !== undefined
+    || value.purchaseNote !== undefined
     || value.repurchaseIntent !== undefined
     || value.repurchaseReasons !== undefined
     || value.scanSource !== undefined
@@ -62,6 +68,8 @@ function withMemoryDefaults(row: unknown) {
   const memory = coffeeMemorySchema.parse({
     package_origin: parsedRow.package_origin,
     package_process: parsedRow.package_process,
+    purchase_url: parsedRow.purchase_url,
+    purchase_note: parsedRow.purchase_note,
     repurchase_intent: parsedRow.repurchase_intent,
     repurchase_reasons: parsedRow.repurchase_reasons,
     scan_source: parsedRow.scan_source,
@@ -157,6 +165,8 @@ export async function POST(request: NextRequest) {
         footer_meta: validatedData.footerMeta,
         package_origin: validatedData.packageOrigin ?? null,
         package_process: validatedData.packageProcess ?? null,
+        purchase_url: validatedData.purchaseUrl ?? null,
+        purchase_note: validatedData.purchaseNote ?? null,
         repurchase_intent: validatedData.repurchaseIntent ?? "undecided",
         repurchase_reasons: validatedData.repurchaseReasons ?? [],
         scan_source: validatedData.scanSource ?? null,
