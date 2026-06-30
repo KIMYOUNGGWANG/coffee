@@ -116,3 +116,51 @@ test("Given a recent successful brew log, When Dial-in Coach is built, Then it r
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }
 });
+
+test("Given a recent sour feedback log, When Dial-in Coach is built, Then it adjusts the next cup instead of repeating the miss", async () => {
+  const loaded = await loadDialInCoachModule();
+  try {
+    const { buildDialInCoach } = loaded.module;
+    const result = buildDialInCoach({
+      now: new Date("2026-06-29T00:00:00.000Z"),
+      shelfItems: [
+        {
+          id: "shelf-1",
+          roaster_name: "Fritz",
+          bean_name: "Ethiopia Sidama Washed",
+          origin: "Ethiopia floral citrus",
+          roast_date: "2026-06-20",
+          opened_date: "2026-06-26",
+          fill_level: 45,
+          is_finished: false,
+        },
+      ],
+      brewingLogs: [
+        {
+          id: "log-1",
+          shelf_item_id: "shelf-1",
+          brewed_at: "2026-06-28T10:00:00.000Z",
+          method: "V60",
+          parameters: {
+            coffeeAmount: 15,
+            waterAmount: 240,
+            waterTemp: 93,
+            grindSize: "Medium Fine",
+            brewTime: "2:45",
+          },
+          rating: 2,
+          simple_note: "최근 컵이 시거나 날카로웠어요.",
+          coach_feedback: "too_sour",
+        },
+      ],
+    });
+
+    assert.equal(result.recipe.waterTemp, 94);
+    assert.equal(result.recipe.ratioLabel, "시큼함 보정");
+    assert.match(result.recipe.grindSize, /finer/);
+    assert.match(result.problem, /시거나 날카로웠음/);
+    assert.ok(result.evidence.some((value) => value.includes("최근 피드백")));
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});

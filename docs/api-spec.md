@@ -42,6 +42,8 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `POST` | `/api/v1/brewing-logs` | Record a new brewing log with extraction parameters and notes for a shelf item. |
 | `GET` | `/api/v1/brewing-logs` | Fetch the current user's history of brewing logs. |
 
+`POST /api/v1/brewing-logs` accepts optional `coachFeedback` values of `too_sour`, `too_bitter`, `too_weak`, `too_heavy`, or `balanced`. Dial-in Coach reads the existing `brewing_logs.coach_feedback` field as private Brew Failure Memory and uses it to adjust the next recipe; no new public recipe feed, marketplace, or community comparison is created.
+
 The historical `tasting_cards` table, generic metric columns, route paths, and applied migrations remain unchanged for compatibility. They are implementation identifiers, not the canonical brand.
 
 PDF export, Stripe checkout and entitlements, story export, and public share routes remain supported as secondary compatibility surfaces. They do not define the primary recall and repurchase journey and must not lead landing, onboarding, empty-state, or dashboard actions.
@@ -60,6 +62,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - private purchase memory through optional `purchase_url` and `purchase_note` fields on cards and shelf items, used only to reopen the user's own saved buying clue or fallback search;
 - private in-app rebuy reminder state on shelf items through `rebuy_priority`, `rebuy_reminder_date`, `rebuy_action`, and `rebuy_action_at`; this is a saved UI loop, not push delivery or an order flow;
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
+- private Brew Failure Memory inside Dial-in Coach, where one-tap sour, bitter, weak, heavy, or balanced feedback is saved to `brewing_logs.coach_feedback` and changes the next recommended recipe;
 - private Rebuy Intelligence that combines Fresh Shelf timing, taste-match criteria, package/scan repurchase search memory, and brew-failure adjustment prompts from owned data only;
 - package claims kept distinct from user-perceived taste;
 - evidence-labeled taste snapshots based on sample count and coverage.

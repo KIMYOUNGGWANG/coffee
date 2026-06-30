@@ -25,7 +25,7 @@ export async function GET() {
         .limit(20),
       supabase
         .from("brewing_logs")
-        .select("id,shelf_item_id,brewed_at,method,parameters,rating,simple_note")
+        .select("id,shelf_item_id,brewed_at,method,parameters,rating,simple_note,coach_feedback")
         .eq("user_id", user.id)
         .order("brewed_at", { ascending: false })
         .limit(30),
