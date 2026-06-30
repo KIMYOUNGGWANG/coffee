@@ -17,6 +17,7 @@ export type DialInBrewLog = {
   readonly parameters: Record<string, unknown>;
   readonly rating: number | null;
   readonly simple_note: string | null;
+  readonly coach_feedback?: DialInFeedback | null;
 };
 
 export type DialInRecipe = {
@@ -34,6 +35,8 @@ export type DialInAdjustment = {
   readonly label: string;
   readonly nextMove: string;
 };
+
+export type DialInFeedback = DialInAdjustment["trigger"] | "balanced";
 
 export type DialInCoachData = {
   readonly generatedAt: string;
@@ -97,6 +100,29 @@ const defaultAdjustments: readonly DialInAdjustment[] = [
   },
 ];
 
+const feedbackCopy: Readonly<Record<DialInFeedback, { readonly label: string; readonly nextMove: string }>> = {
+  too_sour: {
+    label: "시거나 날카로웠음",
+    nextMove: "이번 컵은 분쇄를 한 단계 곱게 하고 물 온도를 1도 올려 시작해요.",
+  },
+  too_bitter: {
+    label: "쓰거나 텁텁했음",
+    nextMove: "이번 컵은 분쇄를 한 단계 굵게 하고 총 추출을 15초 짧게 가져가요.",
+  },
+  too_weak: {
+    label: "묽고 비어 있었음",
+    nextMove: "이번 컵은 물을 15g 줄이거나 원두를 1g 늘려 농도를 먼저 올려요.",
+  },
+  too_heavy: {
+    label: "무겁고 답답했음",
+    nextMove: "이번 컵은 물을 15g 늘리고 마지막 푸어를 더 빠르게 마쳐요.",
+  },
+  balanced: {
+    label: "좋았음",
+    nextMove: "좋았던 컵은 그대로 반복하고 다음 변화는 한 번에 하나만 줘요.",
+  },
+};
+
 function daysSince(dateValue: string | null, now: Date): number | null {
   if (!dateValue) return null;
   const parsed = new Date(`${dateValue}T00:00:00.000Z`);
@@ -112,6 +138,12 @@ function readNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function brewedTime(log: DialInBrewLog | undefined): number {
+  if (!log) return 0;
+  const parsed = new Date(log.brewed_at);
+  return Number.isFinite(parsed.getTime()) ? parsed.getTime() : 0;
+}
+
 function scoreShelfItem(item: DialInShelfItem): number {
   if (item.is_finished || item.fill_level <= 0) return -100;
   return item.fill_level <= 25 ? 20 : item.fill_level <= 50 ? 12 : 5;
@@ -123,7 +155,45 @@ function selectShelfItem(shelfItems: readonly DialInShelfItem[]): DialInShelfIte
     .find((item) => !item.is_finished) ?? null;
 }
 
-function recipeFor(item: DialInShelfItem | null, logs: readonly DialInBrewLog[], now: Date): DialInRecipe {
+function applyFeedbackToRecipe(recipe: DialInRecipe, feedback: DialInFeedback | null): DialInRecipe {
+  switch (feedback) {
+    case "too_sour":
+      return {
+        ...recipe,
+        waterTemp: recipe.waterTemp + 1,
+        grindSize: `${recipe.grindSize} + finer`,
+        brewTime: `${recipe.brewTime} + 15s`,
+        ratioLabel: "시큼함 보정",
+      };
+    case "too_bitter":
+      return {
+        ...recipe,
+        waterTemp: Math.max(86, recipe.waterTemp - 1),
+        grindSize: `${recipe.grindSize} + coarser`,
+        brewTime: `${recipe.brewTime} - 15s`,
+        ratioLabel: "쓴맛 보정",
+      };
+    case "too_weak":
+      return {
+        ...recipe,
+        coffeeAmount: recipe.coffeeAmount + 1,
+        waterAmount: Math.max(120, recipe.waterAmount - 15),
+        ratioLabel: "묽음 보정",
+      };
+    case "too_heavy":
+      return {
+        ...recipe,
+        waterAmount: recipe.waterAmount + 15,
+        brewTime: `${recipe.brewTime} fast finish`,
+        ratioLabel: "무거움 보정",
+      };
+    case "balanced":
+    case null:
+      return recipe;
+  }
+}
+
+function baseRecipeFor(item: DialInShelfItem | null, logs: readonly DialInBrewLog[], now: Date): DialInRecipe {
   const recentSuccessfulLog = logs.find((log) => log.rating !== null && log.rating >= 4);
   if (recentSuccessfulLog) {
     const parameters = recentSuccessfulLog.parameters;
@@ -170,6 +240,22 @@ function recipeFor(item: DialInShelfItem | null, logs: readonly DialInBrewLog[],
   return fallbackRecipe;
 }
 
+function latestFeedbackLog(logs: readonly DialInBrewLog[]): DialInBrewLog | undefined {
+  return logs.find((log) => log.coach_feedback);
+}
+
+function recipeFor(item: DialInShelfItem | null, logs: readonly DialInBrewLog[], now: Date): DialInRecipe {
+  const recentSuccessfulLog = logs.find((log) => log.rating !== null && log.rating >= 4);
+  const feedbackLog = latestFeedbackLog(logs);
+  const feedback = feedbackLog?.coach_feedback ?? null;
+  const baseRecipe = baseRecipeFor(item, logs, now);
+
+  if (!feedback || feedback === "balanced") return baseRecipe;
+  if (brewedTime(recentSuccessfulLog) > brewedTime(feedbackLog)) return baseRecipe;
+
+  return applyFeedbackToRecipe(baseRecipe, feedback);
+}
+
 function evidenceFor(
   item: DialInShelfItem | null,
   logs: readonly DialInBrewLog[],
@@ -185,12 +271,21 @@ function evidenceFor(
   if (roastAge !== null) evidence.push(`로스팅 후 ${roastAge}일`);
   if (openedAge !== null) evidence.push(`개봉 후 ${openedAge}일`);
   if (successfulLog) evidence.push(`최근 ${successfulLog.method} 성공 로그 반영`);
+  if (failedLog?.coach_feedback && failedLog.coach_feedback !== "balanced") {
+    evidence.push(`최근 피드백: ${feedbackCopy[failedLog.coach_feedback].label}`);
+  }
   if (failedLog?.simple_note) evidence.push(`최근 실패 메모: ${failedLog.simple_note}`);
 
   return evidence.length > 0 ? evidence : ["선반 원두를 등록하면 원두별 시작점을 더 정확히 제안합니다."];
 }
 
 function problemFor(logs: readonly DialInBrewLog[]): string {
+  const feedback = latestFeedbackLog(logs)?.coach_feedback ?? null;
+  if (feedback && feedback !== "balanced") {
+    return `${feedbackCopy[feedback].label}. ${feedbackCopy[feedback].nextMove}`;
+  }
+  if (feedback === "balanced") return "최근 컵이 좋았어요. 같은 레시피를 반복할 수 있게 시작점을 고정합니다.";
+
   const failedLog = logs.find((log) => log.rating !== null && log.rating <= 2);
   if (!failedLog) return "새 원두의 첫 컵을 안정적으로 시작하는 것이 목표입니다.";
 

@@ -126,6 +126,8 @@ export type DialInCoachData = {
   };
 };
 
+export type DialInCoachFeedback = "too_sour" | "too_bitter" | "too_weak" | "too_heavy" | "balanced";
+
 export type RebuyIntelligenceData = {
   readonly generatedAt: string;
   readonly summary: string;
