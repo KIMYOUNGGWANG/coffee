@@ -323,6 +323,13 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
           date: form.date,
           extraInfo: form.extraInfo ? `${form.extraInfo}, 92°C` : "92°C",
         },
+        packageOrigin: form.origin || null,
+        packageProcess: form.extraInfo || null,
+        purchaseUrl: form.purchaseUrl.trim() || null,
+        purchaseNote: form.purchaseNote.trim() || null,
+        scanSource: lastScannedData ? "gemini" : "manual",
+        correctedFields: [],
+        confirmed: true,
       });
 
       clearWizardMessages();
@@ -561,6 +568,29 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                     <ImageIcon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
                   </div>
                   <p className="text-[10px] text-muted-foreground/60">배경이 깔끔한 사진의 URL을 입력하면 카드에 표시됩니다.</p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground">다시 찾을 링크</label>
+                    <input
+                      type="url"
+                      placeholder="https://roaster.example/coffee"
+                      value={form.purchaseUrl}
+                      onChange={(e) => updateForm({ purchaseUrl: e.target.value })}
+                      className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground">구매 단서</label>
+                    <input
+                      type="text"
+                      placeholder="예: 공식몰, 200g 옵션"
+                      value={form.purchaseNote}
+                      onChange={(e) => updateForm({ purchaseNote: e.target.value })}
+                      className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground"
+                    />
+                  </div>
                 </div>
               </div>
             )}

@@ -32,6 +32,8 @@ test("create-card client sends camelCase fields when image, AI, and footer metad
   assert.match(payloadSource, /imageUrl:\s*form\.imageUrl/);
   assert.match(payloadSource, /aiDescription:\s*form\.aiDescription/);
   assert.match(payloadSource, /footerMeta:\s*\{/);
+  assert.match(payloadSource, /purchaseUrl:\s*form\.purchaseUrl\.trim\(\)\s*\|\|\s*null/);
+  assert.match(payloadSource, /purchaseNote:\s*form\.purchaseNote\.trim\(\)\s*\|\|\s*null/);
   assert.doesNotMatch(payloadSource, /image_url|ai_description|footer_meta/);
 });
 
@@ -45,6 +47,8 @@ test("create-card hook accepts the camelCase client contract", () => {
   assert.match(hookSource, /readonly aiDescription:\s*string/);
   assert.match(hookSource, /readonly footerMeta:\s*TastingCardData\["footer_meta"\]/);
   assert.match(hookSource, /readonly packageOrigin\?:\s*string \| null/);
+  assert.match(hookSource, /readonly purchaseUrl\?:\s*string \| null/);
+  assert.match(hookSource, /readonly purchaseNote\?:\s*string \| null/);
   assert.match(hookSource, /readonly repurchaseIntent\?:\s*RepurchaseIntent/);
   assert.match(hookSource, /readonly confirmed\?:\s*true/);
   assert.match(hookSource, /mutationFn:\s*async \(newCard: CreateTastingCardInput\)/);
@@ -58,10 +62,14 @@ test("create-card API validates camelCase request fields and maps them to databa
   assert.match(routeSource, /imageUrl:\s*z\.string\(\)\.url\(\)\.nullable\(\)\.optional\(\)/);
   assert.match(routeSource, /aiDescription:\s*z\.string\(\)\.default\(""\)/);
   assert.match(routeSource, /footerMeta:\s*z\.object\(\{/);
+  assert.match(routeSource, /purchaseUrl:\s*purchaseUrlSchema\.optional\(\)/);
+  assert.match(routeSource, /purchaseNote:\s*purchaseNoteSchema\.optional\(\)/);
   assert.match(routeSource, /image_url:\s*validatedData\.imageUrl\s*\|\|\s*null/);
   assert.match(routeSource, /ai_description:\s*validatedData\.aiDescription/);
   assert.match(routeSource, /footer_meta:\s*validatedData\.footerMeta/);
   assert.match(routeSource, /package_origin:\s*validatedData\.packageOrigin/);
+  assert.match(routeSource, /purchase_url:\s*validatedData\.purchaseUrl/);
+  assert.match(routeSource, /purchase_note:\s*validatedData\.purchaseNote/);
   assert.match(routeSource, /repurchase_intent:\s*validatedData\.repurchaseIntent/);
   assert.match(routeSource, /confirmed_at:\s*validatedData\.confirmed\s*\?\s*new Date\(\)\.toISOString\(\)\s*:\s*null/);
 });

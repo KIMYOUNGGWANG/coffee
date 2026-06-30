@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { BookOpenText, RefreshCcw, SlidersHorizontal } from "lucide-react";
 import DashboardCheckoutNotice from "@/components/dashboard-checkout-notice";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardDialInCoachPanel } from "@/components/dashboard-dial-in-coach-panel";
@@ -178,8 +179,11 @@ export default function DashboardClient({
     }
   };
 
+  const rebuySignal = rebuyIntelligence?.rebuyReminder.title ?? "재구매 신호 준비 중";
+  const dialInSignal = dialInCoach?.title ?? "오늘의 시작 레시피 준비 중";
+
   return (
-    <main className="coffee-app-shell min-h-screen bg-background-dark text-foreground" data-testid={isDashboardReady ? "dashboard-ready" : undefined}>
+    <main className="coffee-app-shell min-h-screen text-foreground" data-testid={isDashboardReady ? "dashboard-ready" : undefined}>
       <DashboardHeader
         activeTab={activeTab}
         cardCount={cards?.length ?? 0}
@@ -190,6 +194,30 @@ export default function DashboardClient({
       />
 
       {checkoutNotice && <DashboardCheckoutNotice notice={checkoutNotice} onDismiss={dismissCheckoutNotice} />}
+
+      <section className="mb-4 grid gap-3 sm:grid-cols-3" aria-label="CoffeeDex 오늘 요약">
+        {[
+          { label: "저장한 기억", value: `${cards?.length ?? 0}개`, helper: "Taste Passport에 쌓인 커피", icon: BookOpenText },
+          { label: "다시 살 후보", value: rebuySignal, helper: "Rebuy Intelligence", icon: RefreshCcw },
+          { label: "오늘 시작점", value: dialInSignal, helper: "Dial-in Coach", icon: SlidersHorizontal },
+        ].map((item) => {
+          const Icon = item.icon;
+          return (
+            <article key={item.label} className="premium-shell">
+              <div className="premium-card flex min-h-28 items-start gap-3 p-4">
+                <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-background-dark text-[#FFF8EC] shadow-[0_12px_26px_rgba(73,48,36,0.18)]">
+                  <Icon aria-hidden="true" size={17} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">{item.label}</p>
+                  <p className="mt-2 line-clamp-2 break-keep text-sm font-black leading-5 text-background-dark">{item.value}</p>
+                  <p className="mt-1 text-[11px] font-bold text-muted-foreground">{item.helper}</p>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </section>
 
       <section className="coffee-workspace min-w-0">
         {activeTab === "shelf" && (

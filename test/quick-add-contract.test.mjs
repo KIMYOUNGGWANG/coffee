@@ -90,6 +90,8 @@ function sampleForm(overrides = {}) {
     origin: "Ethiopia",
     date: "2026-06-26",
     extraInfo: "Washed",
+    purchaseUrl: "https://fritz.example/guji",
+    purchaseNote: "공식몰 200g 옵션",
     ...overrides,
   };
 }
@@ -114,6 +116,10 @@ test("Given quick add fields, When the user confirms again, Then the compact mem
   assert.equal(payload.subtitle, "Fritz Coffee");
   assert.equal(payload.confirmed, true);
   assert.equal(payload.repurchaseIntent, "again");
+  assert.equal(payload.packageOrigin, "Ethiopia");
+  assert.equal(payload.packageProcess, "Washed");
+  assert.equal(payload.purchaseUrl, "https://fritz.example/guji");
+  assert.equal(payload.purchaseNote, "공식몰 200g 옵션");
   assert.deepEqual(plain(payload.repurchaseReasons), ["복숭아 단맛"]);
   assert.deepEqual(plain(payload.tags), ["복숭아", "꿀"]);
   assert.equal(payload.scanSource, "manual");

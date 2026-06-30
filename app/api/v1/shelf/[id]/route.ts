@@ -3,6 +3,12 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/api-errors";
 import { z } from "zod";
 
+const purchaseUrlSchema = z.string().trim().url().max(500).optional().nullable();
+const purchaseNoteSchema = z.string().trim().min(1).max(160).optional().nullable();
+const rebuyPrioritySchema = z.enum(["normal", "pinned", "paused"]).optional();
+const rebuyReminderDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "올바른 날짜 형식(YYYY-MM-DD)이어야 합니다.").optional().nullable();
+const rebuyActionSchema = z.enum(["none", "drank", "will_rebuy", "rebought"]).optional();
+
 const updateShelfItemSchema = z.object({
   roasterName: z.string().optional(),
   beanName: z.string().optional(),
@@ -13,7 +19,30 @@ const updateShelfItemSchema = z.object({
   fillLevel: z.number().int().min(0).max(100).optional(),
   isFinished: z.boolean().optional(),
   tastingCardId: z.string().uuid().optional().nullable(),
+  purchaseUrl: purchaseUrlSchema,
+  purchaseNote: purchaseNoteSchema,
+  rebuyPriority: rebuyPrioritySchema,
+  rebuyReminderDate: rebuyReminderDateSchema,
+  rebuyAction: rebuyActionSchema,
 });
+
+type UpdateShelfItemPayload = {
+  roaster_name?: string;
+  bean_name?: string;
+  origin?: string | null;
+  roast_date?: string | null;
+  opened_date?: string | null;
+  total_weight?: number;
+  fill_level?: number;
+  is_finished?: boolean;
+  tasting_card_id?: string | null;
+  purchase_url?: string | null;
+  purchase_note?: string | null;
+  rebuy_priority?: "normal" | "pinned" | "paused";
+  rebuy_reminder_date?: string | null;
+  rebuy_action?: "none" | "drank" | "will_rebuy" | "rebought";
+  rebuy_action_at?: string | null;
+};
 
 // PATCH /api/v1/shelf/[id] - Update a specific shelf item (e.g., adjust fill level)
 export async function PATCH(
@@ -46,7 +75,7 @@ export async function PATCH(
     const validatedData = result.data;
 
     // Build update object mapping camelCase to snake_case
-    const updateData: Record<string, any> = {};
+    const updateData: UpdateShelfItemPayload = {};
     if (validatedData.roasterName !== undefined) updateData.roaster_name = validatedData.roasterName;
     if (validatedData.beanName !== undefined) updateData.bean_name = validatedData.beanName;
     if (validatedData.origin !== undefined) updateData.origin = validatedData.origin;
@@ -54,6 +83,14 @@ export async function PATCH(
     if (validatedData.openedDate !== undefined) updateData.opened_date = validatedData.openedDate;
     if (validatedData.totalWeight !== undefined) updateData.total_weight = validatedData.totalWeight;
     if (validatedData.tastingCardId !== undefined) updateData.tasting_card_id = validatedData.tastingCardId;
+    if (validatedData.purchaseUrl !== undefined) updateData.purchase_url = validatedData.purchaseUrl;
+    if (validatedData.purchaseNote !== undefined) updateData.purchase_note = validatedData.purchaseNote;
+    if (validatedData.rebuyPriority !== undefined) updateData.rebuy_priority = validatedData.rebuyPriority;
+    if (validatedData.rebuyReminderDate !== undefined) updateData.rebuy_reminder_date = validatedData.rebuyReminderDate;
+    if (validatedData.rebuyAction !== undefined) {
+      updateData.rebuy_action = validatedData.rebuyAction;
+      updateData.rebuy_action_at = validatedData.rebuyAction === "none" ? null : new Date().toISOString();
+    }
 
     if (validatedData.fillLevel !== undefined) {
       updateData.fill_level = validatedData.fillLevel;

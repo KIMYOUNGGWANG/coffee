@@ -31,7 +31,7 @@ export function DashboardRebuyIntelligencePanel({
 }: DashboardRebuyIntelligencePanelProps) {
   if (isLoading) {
     return (
-      <section className="rounded-[1.75rem] border border-white/12 bg-[#2A1A12] p-5 text-[#FFF8EC]" aria-label="Rebuy Intelligence">
+      <section className="espresso-panel p-5" aria-label="Rebuy Intelligence">
         <div className="h-4 w-36 animate-pulse rounded-full bg-white/10" />
         <div className="mt-5 grid gap-3 md:grid-cols-4">
           {[0, 1, 2, 3].map((index) => (
@@ -44,7 +44,7 @@ export function DashboardRebuyIntelligencePanel({
 
   if (error || !data) {
     return (
-      <section className="rounded-[1.75rem] border border-white/12 bg-[#2A1A12] p-5 text-[#FFF8EC]" aria-label="Rebuy Intelligence">
+      <section className="espresso-panel p-5" aria-label="Rebuy Intelligence">
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-1 text-primary-amber" size={18} />
           <div>
@@ -64,10 +64,10 @@ export function DashboardRebuyIntelligencePanel({
   const topScore = data.featureScores[0];
 
   return (
-    <section className="rounded-[1.75rem] border border-primary-amber/20 bg-[#2A1A12] p-4 text-[#FFF8EC] shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-5" aria-label="Rebuy Intelligence">
+    <section className="espresso-panel p-4 sm:p-5" aria-label="Rebuy Intelligence">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary-amber/28 bg-primary-amber/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary-amber">
+          <span className="coffee-kicker">
             <RefreshCcw size={12} />
             Rebuy Intelligence
           </span>
@@ -78,7 +78,7 @@ export function DashboardRebuyIntelligencePanel({
             {data.summary}
           </p>
         </div>
-        <div className="rounded-2xl border border-white/12 bg-white/[0.035] px-4 py-3">
+        <div className="coffee-metric-card">
           <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">Top ROI</p>
           <p className="mt-1 text-sm font-black text-[#FFF8EC]">{topScore.roi}점 · {topScore.reason}</p>
         </div>
@@ -88,7 +88,7 @@ export function DashboardRebuyIntelligencePanel({
         <button
           type="button"
           onClick={() => (reminderCard ? onSelectCard(reminderCard) : onQuickAdd())}
-          className="min-w-0 rounded-2xl border border-white/12 bg-white/[0.04] p-4 text-left transition hover:border-primary-amber/35"
+          className="coffee-metric-card min-w-0 text-left transition hover:-translate-y-0.5 hover:border-primary-amber/35"
         >
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <ShoppingBag size={13} />
@@ -105,7 +105,7 @@ export function DashboardRebuyIntelligencePanel({
         <button
           type="button"
           onClick={() => (matchCard ? onSelectCard(matchCard) : onQuickAdd())}
-          className="min-w-0 rounded-2xl border border-white/12 bg-white/[0.04] p-4 text-left transition hover:border-primary-amber/35"
+          className="coffee-metric-card min-w-0 text-left transition hover:-translate-y-0.5 hover:border-primary-amber/35"
         >
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <Sparkles size={13} />
@@ -120,7 +120,7 @@ export function DashboardRebuyIntelligencePanel({
         <button
           type="button"
           onClick={() => openExternal(data.purchaseMemory.searchUrl)}
-          className="min-w-0 rounded-2xl border border-white/12 bg-white/[0.04] p-4 text-left transition hover:border-primary-amber/35"
+          className="coffee-metric-card min-w-0 text-left transition hover:-translate-y-0.5 hover:border-primary-amber/35"
         >
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <Search size={13} />
@@ -138,7 +138,7 @@ export function DashboardRebuyIntelligencePanel({
         <button
           type="button"
           onClick={() => (purchaseCard ? onSelectCard(purchaseCard) : onQuickAdd())}
-          className="min-w-0 rounded-2xl border border-white/12 bg-white/[0.04] p-4 text-left transition hover:border-primary-amber/35"
+          className="coffee-metric-card min-w-0 text-left transition hover:-translate-y-0.5 hover:border-primary-amber/35"
         >
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <AlertTriangle size={13} />

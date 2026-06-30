@@ -13,6 +13,8 @@ export type RebuyIntelligenceCard = {
   readonly scan_source: "gemini" | "manual" | null;
   readonly package_origin: string | null;
   readonly package_process: string | null;
+  readonly purchase_url: string | null;
+  readonly purchase_note: string | null;
   readonly footer_meta?: {
     readonly origin?: string;
     readonly extraInfo?: string;
@@ -30,6 +32,12 @@ export type RebuyIntelligenceShelfItem = {
   readonly fill_level: number;
   readonly is_finished: boolean;
   readonly tasting_card_id: string | null;
+  readonly purchase_url: string | null;
+  readonly purchase_note: string | null;
+  readonly rebuy_priority?: "normal" | "pinned" | "paused";
+  readonly rebuy_reminder_date?: string | null;
+  readonly rebuy_action?: "none" | "drank" | "will_rebuy" | "rebought";
+  readonly rebuy_action_at?: string | null;
   readonly created_at?: string;
 };
 
@@ -173,11 +181,22 @@ function purchaseSearchUrl(label: string): string {
   return `https://www.google.com/search?q=${encodeURIComponent(`${label} 원두 구매`)}`;
 }
 
+function purchaseUrlFor(url: string | null, label: string): string {
+  return url ?? purchaseSearchUrl(label);
+}
+
+function dateOnlyTime(value: string | null | undefined): number {
+  if (!value) return 0;
+  const parsed = new Date(`${value}T00:00:00.000Z`).getTime();
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 function buildRebuyReminder(
   cards: readonly RebuyIntelligenceCard[],
   shelfItems: readonly RebuyIntelligenceShelfItem[],
   now: Date,
 ): RebuyReminderInsight {
+  const todayTime = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   const shelfCandidates = shelfItems
     .map((item) => ({
       item,
@@ -188,22 +207,43 @@ function buildRebuyReminder(
         isFinished: item.is_finished,
         now,
       }),
+      isPinned: item.rebuy_priority === "pinned",
+      isDue: dateOnlyTime(item.rebuy_reminder_date) > 0 && dateOnlyTime(item.rebuy_reminder_date) <= todayTime,
+      wantsRebuy: item.rebuy_action === "will_rebuy",
     }))
-    .filter(({ status }) => status.kind === "rebuy" || status.kind === "finish_soon")
+    .filter(({ item, status, isPinned, isDue, wantsRebuy }) => (
+      item.rebuy_priority !== "paused"
+      && item.rebuy_action !== "rebought"
+      && (isPinned || isDue || wantsRebuy || status.kind === "rebuy" || status.kind === "finish_soon")
+    ))
     .sort((first, second) => {
+      const reminderPriority = (candidate: typeof first) => {
+        if (candidate.isDue) return 0;
+        if (candidate.wantsRebuy) return 1;
+        if (candidate.isPinned) return 2;
+        return 3;
+      };
       const priority = { rebuy: 0, finish_soon: 1, drink_now: 2, waiting: 3 };
-      return priority[first.status.kind] - priority[second.status.kind]
+      return reminderPriority(first) - reminderPriority(second)
+        || priority[first.status.kind] - priority[second.status.kind]
         || first.item.fill_level - second.item.fill_level;
     });
 
   const shelfCandidate = shelfCandidates[0];
   if (shelfCandidate) {
+    const reason = shelfCandidate.isDue
+      ? "앱 안에 저장한 재구매 예정일이 오늘이거나 지났어요."
+      : shelfCandidate.wantsRebuy
+        ? "다시 살 원두로 직접 표시해둔 기억입니다."
+        : shelfCandidate.isPinned
+          ? "다시 살 후보로 고정해둔 원두입니다."
+          : shelfCandidate.status.reason;
     return {
       title: shelfCandidate.item.bean_name,
       subtitle: shelfCandidate.item.roaster_name,
-      reason: shelfCandidate.status.reason,
-      actionLabel: shelfCandidate.status.kind === "rebuy" ? "재구매 후보 열기" : "마시고 판단하기",
-      priority: shelfCandidate.status.kind === "rebuy" ? "high" : "medium",
+      reason,
+      actionLabel: shelfCandidate.isDue || shelfCandidate.wantsRebuy || shelfCandidate.status.kind === "rebuy" ? "다시 찾기" : "마시고 판단하기",
+      priority: shelfCandidate.isDue || shelfCandidate.wantsRebuy || shelfCandidate.status.kind === "rebuy" ? "high" : "medium",
       cardId: shelfCandidate.item.tasting_card_id,
       shelfItemId: shelfCandidate.item.id,
     };
@@ -295,8 +335,11 @@ function buildPurchaseMemory(
       title: shelfCandidate.bean_name,
       subtitle: shelfCandidate.roaster_name,
       source: "shelf",
-      searchUrl: purchaseSearchUrl(label),
-      reason: shelfCandidate.origin ? `${shelfCandidate.origin} 단서까지 함께 기억합니다.` : "서랍에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요.",
+      searchUrl: purchaseUrlFor(shelfCandidate.purchase_url, label),
+      reason: shelfCandidate.purchase_note
+        ?? (shelfCandidate.purchase_url
+          ? "서랍에 저장한 개인 구매 링크를 바로 열 수 있어요."
+          : shelfCandidate.origin ? `${shelfCandidate.origin} 단서까지 함께 기억합니다.` : "서랍에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요."),
       cardId: shelfCandidate.tasting_card_id,
       shelfItemId: shelfCandidate.id,
     };
@@ -312,8 +355,11 @@ function buildPurchaseMemory(
     title: cardCandidate.title,
     subtitle: cardCandidate.subtitle,
     source: cardCandidate.scan_source ? "scan" : "manual",
-    searchUrl: purchaseSearchUrl(cardLabel(cardCandidate)),
-    reason: cardCandidate.scan_source ? "봉투 스캔으로 남긴 패키지 단서를 재구매 검색으로 이어갑니다." : "카드에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요.",
+    searchUrl: purchaseUrlFor(cardCandidate.purchase_url, cardLabel(cardCandidate)),
+    reason: cardCandidate.purchase_note
+      ?? (cardCandidate.purchase_url
+        ? "카드에 저장한 개인 구매 링크를 바로 열 수 있어요."
+        : cardCandidate.scan_source ? "봉투 스캔으로 남긴 패키지 단서를 재구매 검색으로 이어갑니다." : "카드에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요."),
     cardId: cardCandidate.id,
     shelfItemId: null,
   };

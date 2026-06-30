@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Scale, Archive, Trash2, Calendar, Sparkles } from "lucide-react";
+import { Archive, Bell, CheckCircle2, ExternalLink, Pin, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { evaluateFreshShelfStatus } from "@/lib/fresh-shelf";
 
@@ -19,12 +19,26 @@ export interface ShelfItem {
   fill_level: number;
   is_finished: boolean;
   tasting_card_id: string | null;
+  purchase_url: string | null;
+  purchase_note: string | null;
+  rebuy_priority: "normal" | "pinned" | "paused";
+  rebuy_reminder_date: string | null;
+  rebuy_action: "none" | "drank" | "will_rebuy" | "rebought";
+  rebuy_action_at: string | null;
 }
 
 interface CoffeePackageItemProps {
   item: ShelfItem;
   onUpdateFillLevel: (id: string, newLevel: number) => void;
   onToggleFinished: (id: string, isFinished: boolean) => void;
+  onUpdateReminderState: (
+    id: string,
+    update: {
+      rebuyPriority?: ShelfItem["rebuy_priority"];
+      rebuyReminderDate?: string | null;
+      rebuyAction?: ShelfItem["rebuy_action"];
+    },
+  ) => void;
   onDelete: (id: string) => void;
 }
 
@@ -45,7 +59,12 @@ const getRoastColorClasses = (roasterName: string, beanName: string, origin: str
   return "bg-[#0D0905] border-[#1F150D] text-white"; // Ultra dark terracotta
 };
 
-export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, onDelete }: CoffeePackageItemProps) {
+function buildPurchaseUrl(item: ShelfItem): string {
+  if (item.purchase_url) return item.purchase_url;
+  return `https://www.google.com/search?q=${encodeURIComponent(`${item.roaster_name} ${item.bean_name} 원두 구매`)}`;
+}
+
+export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, onUpdateReminderState, onDelete }: CoffeePackageItemProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const freshShelfStatus = evaluateFreshShelfStatus({
@@ -56,6 +75,7 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
   });
 
   const packageColors = getRoastColorClasses(item.roaster_name, item.bean_name, item.origin);
+  const isPinnedForRebuy = item.rebuy_priority === "pinned";
 
   return (
     <div className="coffee-shelf-item group cursor-pointer perspective-1000">
@@ -67,7 +87,14 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
         onClick={() => setIsFlipped(!isFlipped)}
       >
         {/* Front of the Bag */}
-        <div className={cn("absolute inset-0 backface-hidden rounded-md shadow-[0_30px_60px_rgba(0,0,0,0.8)] flex flex-col justify-end p-5 border text-left", packageColors)}>
+        <div
+          className={cn(
+            "absolute inset-0 backface-hidden rounded-md shadow-[0_30px_60px_rgba(0,0,0,0.8)] flex flex-col justify-end p-5 border text-left",
+            isFlipped ? "pointer-events-none" : "pointer-events-auto",
+            packageColors,
+          )}
+          aria-hidden={isFlipped}
+        >
           {/* Noise overlay for premium paper/bag texture */}
           <div className="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none rounded-md" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
           
@@ -92,7 +119,11 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
 
         {/* Back of the Bag (Details & Controls) */}
         <div 
-          className="absolute inset-0 backface-hidden rounded-md shadow-[0_30px_60px_rgba(0,0,0,0.8)] p-5 flex flex-col bg-black/80 backdrop-blur-2xl border border-white/10"
+          className={cn(
+            "absolute inset-0 backface-hidden rounded-md shadow-[0_30px_60px_rgba(0,0,0,0.8)] p-5 flex flex-col bg-black/80 backdrop-blur-2xl border border-white/10",
+            isFlipped ? "pointer-events-auto" : "pointer-events-none",
+          )}
+          aria-hidden={!isFlipped}
           style={{ transform: "rotateY(180deg)" }}
           onClick={(e) => e.stopPropagation()} // Prevent flip when interacting with controls
         >
@@ -119,6 +150,89 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                   {freshShelfStatus.label}
                 </div>
                 <p className="text-white/60 leading-relaxed font-light">{freshShelfStatus.reason}</p>
+             </div>
+
+             <a
+                href={buildPurchaseUrl(item)}
+                target="_blank"
+                rel="noreferrer"
+                className="flex min-h-[44px] items-center justify-between gap-3 rounded-md border border-[#D4AF37]/20 bg-[#D4AF37]/5 px-3 py-3 text-[10px] font-light text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/15"
+                onClick={(event) => event.stopPropagation()}
+             >
+                <span className="min-w-0">
+                  <span className="block font-bold">다시 찾기</span>
+                  <span className="block truncate text-white/50">{item.purchase_note ?? "저장된 단서로 재구매 검색을 엽니다."}</span>
+                </span>
+                <ExternalLink size={12} className="shrink-0" />
+             </a>
+
+             <div className="space-y-2 rounded-md border border-[#D4AF37]/15 bg-[#D4AF37]/5 p-3 text-[10px]">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 font-bold text-[#D4AF37]">
+                      <Bell size={12} />
+                      앱 내부 리마인더
+                    </div>
+                    <p className="mt-1 truncate text-white/50">
+                      {item.rebuy_reminder_date ? `${item.rebuy_reminder_date}에 다시 보기` : "다음 구매 타이밍을 저장하세요."}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onUpdateReminderState(item.id, { rebuyPriority: isPinnedForRebuy ? "normal" : "pinned" })}
+                    className={cn(
+                      "flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-md border px-3 py-2 font-bold transition-colors cursor-pointer",
+                      isPinnedForRebuy
+                        ? "border-[#D4AF37]/50 bg-[#D4AF37]/20 text-[#D4AF37]"
+                        : "border-white/10 bg-white/5 text-white/60 hover:text-white",
+                    )}
+                  >
+                    <Pin size={12} />
+                    {isPinnedForRebuy ? "고정됨" : "고정"}
+                  </button>
+                </div>
+                <input
+                  type="date"
+                  value={item.rebuy_reminder_date ?? ""}
+                  onChange={(event) => onUpdateReminderState(item.id, { rebuyReminderDate: event.target.value || null })}
+                  className="min-h-[44px] w-full rounded-md border border-white/10 bg-black/30 px-3 py-2 text-[11px] text-white outline-none focus:border-[#D4AF37]/50"
+                  aria-label="재구매 예정일"
+                />
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => onUpdateReminderState(item.id, { rebuyAction: "drank" })}
+                    className={cn(
+                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 transition-colors cursor-pointer",
+                      item.rebuy_action === "drank" ? "border-white/30 bg-white/15 text-white" : "border-white/10 bg-white/5 text-white/55 hover:text-white",
+                    )}
+                  >
+                    <CheckCircle2 size={12} />
+                    마셨음
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onUpdateReminderState(item.id, { rebuyAction: "will_rebuy", rebuyPriority: "pinned" })}
+                    className={cn(
+                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 transition-colors cursor-pointer",
+                      item.rebuy_action === "will_rebuy" ? "border-[#D4AF37]/50 bg-[#D4AF37]/20 text-[#D4AF37]" : "border-[#D4AF37]/20 bg-[#D4AF37]/5 text-[#D4AF37]/75 hover:text-[#D4AF37]",
+                    )}
+                  >
+                    <Bell size={12} />
+                    다시 살래요
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onUpdateReminderState(item.id, { rebuyAction: "rebought", rebuyPriority: "normal", rebuyReminderDate: null })}
+                    className={cn(
+                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 transition-colors cursor-pointer",
+                      item.rebuy_action === "rebought" ? "border-[#4d7c54]/50 bg-[#4d7c54]/20 text-[#9fca9a]" : "border-white/10 bg-white/5 text-white/55 hover:text-white",
+                    )}
+                  >
+                    <RotateCcw size={12} />
+                    완료
+                  </button>
+                </div>
              </div>
 
              <div className="space-y-2">

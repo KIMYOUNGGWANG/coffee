@@ -57,6 +57,8 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - explicit repurchase memory and retrieval based on confirmed saved records;
 - private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
+- private purchase memory through optional `purchase_url` and `purchase_note` fields on cards and shelf items, used only to reopen the user's own saved buying clue or fallback search;
+- private in-app rebuy reminder state on shelf items through `rebuy_priority`, `rebuy_reminder_date`, `rebuy_action`, and `rebuy_action_at`; this is a saved UI loop, not push delivery or an order flow;
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
 - private Rebuy Intelligence that combines Fresh Shelf timing, taste-match criteria, package/scan repurchase search memory, and brew-failure adjustment prompts from owned data only;
 - package claims kept distinct from user-perceived taste;
@@ -91,6 +93,8 @@ interface TastingCard {
   };
   package_origin: string | null;
   package_process: string | null;
+  purchase_url: string | null;
+  purchase_note: string | null;
   repurchase_intent: "again" | "maybe" | "no" | "undecided";
   repurchase_reasons: string[];
   scan_source: "gemini" | "manual" | null;
@@ -129,12 +133,18 @@ interface CoffeeShelfItem {
   fill_level: number;
   is_finished: boolean;
   tasting_card_id: string | null;
+  purchase_url: string | null;
+  purchase_note: string | null;
+  rebuy_priority: "normal" | "pinned" | "paused";
+  rebuy_reminder_date: string | null;
+  rebuy_action: "none" | "drank" | "will_rebuy" | "rebought";
+  rebuy_action_at: string | null;
   created_at: string;
   updated_at: string;
 }
 ```
 
-Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. They do not create reminders, roaster orders, partner offers, or marketplace transactions.
+Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. The saved rebuy reminder fields only keep app-internal state for pinned candidates, next-buy dates, and completed/drank/will-rebuy actions. They do not create push notifications, roaster orders, partner offers, or marketplace transactions.
 
 ### `GET /api/v1/rebuy-intelligence`
 
@@ -215,6 +225,10 @@ interface CreateCardRequest {
     date?: string;
     extraInfo?: string;
   };
+  packageOrigin?: string | null;
+  packageProcess?: string | null;
+  purchaseUrl?: string | null;
+  purchaseNote?: string | null;
   repurchaseIntent?: "again" | "maybe" | "no" | "undecided";
   repurchaseReasons?: string[];
   scanSource?: "gemini" | "manual" | null;
@@ -227,7 +241,7 @@ interface CreateCardResponse {
 }
 ```
 
-Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. It writes `confirmed: true`, `scanSource: "manual"`, the selected Korean flavor helper chips into `tags`, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
+Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. It writes `confirmed: true`, `scanSource: "manual"`, the selected Korean flavor helper chips into `tags`, optional private purchase clues into `purchaseUrl` and `purchaseNote`, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
 
 ### `POST /api/v1/cards/ai-note`
 
@@ -362,6 +376,8 @@ The endpoint does not claim transactional rollback across those services. Redact
 | `footer_meta` | `jsonb` | Origin, date, recipe, or other display metadata. |
 | `package_origin` | `text` | Nullable package claim, separate from perceived taste. |
 | `package_process` | `text` | Nullable package processing claim. |
+| `purchase_url` | `text` | Nullable user-saved buying clue URL, not an affiliate or marketplace listing. |
+| `purchase_note` | `text` | Nullable user-saved buying note. |
 | `repurchase_intent` | `text` | `again`, `maybe`, `no`, or `undecided`. |
 | `repurchase_reasons` | `text[]` | User-recorded reasons for the intent. |
 | `scan_source` | `text` | Nullable `gemini` or `manual` provenance. |
@@ -398,6 +414,12 @@ The profile surface preserves CoffeeDex paid and rate-limited compatibility feat
 | `fill_level` | `integer` | Current level check (0-100). |
 | `is_finished` | `boolean` | Set true if fill level is 0. |
 | `tasting_card_id` | `uuid` | Optional linked tasting card ID. |
+| `purchase_url` | `text` | Nullable user-saved buying clue URL, not an affiliate or marketplace listing. |
+| `purchase_note` | `text` | Nullable user-saved buying note. |
+| `rebuy_priority` | `text` | `normal`, `pinned`, or `paused`; controls in-app rebuy candidate priority. |
+| `rebuy_reminder_date` | `date` | Nullable next-buy date shown inside CoffeeDex. |
+| `rebuy_action` | `text` | `none`, `drank`, `will_rebuy`, or `rebought`; user action state for the loop. |
+| `rebuy_action_at` | `timestamptz` | Nullable timestamp for the latest rebuy action. |
 
 ### `brewing_logs`
 

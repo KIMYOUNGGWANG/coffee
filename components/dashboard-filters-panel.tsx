@@ -64,7 +64,8 @@ export default function DashboardFiltersPanel({
   };
 
   return (
-    <section className="glass-card mb-6 space-y-4 rounded-[1.5rem] border border-background-dark/10 p-4 shadow-sm sm:p-5" aria-labelledby="memory-retrieval-title">
+    <section className="premium-shell mb-6" aria-labelledby="memory-retrieval-title">
+      <div className="premium-card space-y-4 p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Search aria-hidden="true" size={16} className="text-primary-amber" />
@@ -74,7 +75,7 @@ export default function DashboardFiltersPanel({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-xs font-bold text-primary-amber transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
+            className="coffee-chip inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
             aria-label="검색과 필터 초기화"
           >
             <RotateCcw aria-hidden="true" size={13} />
@@ -93,12 +94,12 @@ export default function DashboardFiltersPanel({
             value={searchQuery}
             onChange={(event) => onSearchQueryChange(event.target.value)}
             placeholder="원두, 로스터리, 원산지, 가공 방식, 메모 검색"
-            className="min-h-12 w-full rounded-2xl border border-background-dark/10 bg-white/70 py-3 pl-10 pr-3 text-sm font-semibold text-background-dark placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber"
+            className="min-h-12 w-full rounded-2xl border border-background-dark/10 bg-white/72 py-3 pl-10 pr-3 text-sm font-semibold text-background-dark shadow-[inset_0_1px_0_rgba(255,255,255,0.72)] placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber"
           />
         </div>
         <button
           type="submit"
-          className="min-h-12 shrink-0 rounded-2xl bg-background-dark px-4 text-sm font-black text-[#FFF8EC] transition-[background-color,transform] hover:bg-background-dark/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] active:scale-[0.98]"
+          className="coffee-pill-button min-h-12 shrink-0 px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
         >
           찾기
         </button>
@@ -116,8 +117,9 @@ export default function DashboardFiltersPanel({
                 aria-pressed={isSelected}
                 onClick={() => onSelectedRepurchaseIntentChange(option.value)}
                 className={isSelected
-                  ? "min-h-11 shrink-0 rounded-full border border-primary-amber bg-primary-amber/15 px-3.5 text-xs font-black text-primary-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
-                  : "min-h-11 shrink-0 rounded-full border border-background-dark/10 bg-white/54 px-3.5 text-xs font-bold text-muted-foreground transition-colors hover:border-primary-amber/35 hover:text-background-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"}
+                  ? "coffee-chip shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
+                  : "coffee-chip shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"}
+                data-active={isSelected ? "true" : "false"}
               >
                 {option.label}
               </button>
@@ -134,14 +136,14 @@ export default function DashboardFiltersPanel({
         <div className="grid gap-4 pt-3 sm:grid-cols-2 xl:grid-cols-4">
           <label className="space-y-1.5 text-xs font-bold text-muted-foreground">
             <span>추출 도구</span>
-            <select value={selectedMethod} onChange={(event) => onSelectedMethodChange(event.target.value)} className="min-h-11 w-full rounded-xl border border-background-dark/10 bg-white/70 px-3 text-xs font-semibold text-background-dark focus:outline-none focus:ring-2 focus:ring-primary-amber">
+            <select value={selectedMethod} onChange={(event) => onSelectedMethodChange(event.target.value)} className="min-h-11 w-full rounded-xl border border-background-dark/10 bg-white/72 px-3 text-xs font-semibold text-background-dark focus:outline-none focus:ring-2 focus:ring-primary-amber">
               <option value="">전체 도구</option>
               {availableMethods.map((method) => <option key={method} value={method}>{method}</option>)}
             </select>
           </label>
           <label className="space-y-1.5 text-xs font-bold text-muted-foreground">
             <span>로스팅 포인트</span>
-            <select value={selectedRoast} onChange={(event) => onSelectedRoastChange(event.target.value)} className="min-h-11 w-full rounded-xl border border-background-dark/10 bg-white/70 px-3 text-xs font-semibold text-background-dark focus:outline-none focus:ring-2 focus:ring-primary-amber">
+            <select value={selectedRoast} onChange={(event) => onSelectedRoastChange(event.target.value)} className="min-h-11 w-full rounded-xl border border-background-dark/10 bg-white/72 px-3 text-xs font-semibold text-background-dark focus:outline-none focus:ring-2 focus:ring-primary-amber">
               <option value="">전체 로스팅</option>
               <option value="light">Light (약배전)</option>
               <option value="medium">Medium (중배전)</option>
@@ -150,7 +152,7 @@ export default function DashboardFiltersPanel({
           </label>
           <label className="space-y-1.5 text-xs font-bold text-muted-foreground">
             <span>정렬 기준</span>
-            <select value={sortBy} onChange={(event) => onSortByChange(event.target.value)} className="min-h-11 w-full rounded-xl border border-background-dark/10 bg-white/70 px-3 text-xs font-semibold text-background-dark focus:outline-none focus:ring-2 focus:ring-primary-amber">
+            <select value={sortBy} onChange={(event) => onSortByChange(event.target.value)} className="min-h-11 w-full rounded-xl border border-background-dark/10 bg-white/72 px-3 text-xs font-semibold text-background-dark focus:outline-none focus:ring-2 focus:ring-primary-amber">
               <option value="newest">최신 등록순</option>
               <option value="repurchase">재구매 우선순</option>
               <option value="acidity_desc">산미 높은순</option>
@@ -175,6 +177,7 @@ export default function DashboardFiltersPanel({
           </div>
         </div>
       </details>
+      </div>
     </section>
   );
 }

@@ -13,6 +13,14 @@ const migrationPath = path.join(
   projectRoot,
   "supabase/migrations/20260618000000_add_coffee_memory_contract.sql",
 );
+const purchaseMemoryMigrationPath = path.join(
+  projectRoot,
+  "supabase/migrations/20260630000000_add_purchase_memory_fields.sql",
+);
+const rebuyReminderMigrationPath = path.join(
+  projectRoot,
+  "supabase/migrations/20260630001000_add_shelf_rebuy_reminder_state.sql",
+);
 
 function normalizeSql(sql) {
   return sql.toLowerCase().replace(/\s+/g, " ");
@@ -31,6 +39,35 @@ test("Given the legacy card schema, When memory fields are added, Then owner RLS
   assert.equal(existsSync(migrationPath), true, "the additive memory migration exists");
   const migrationSql = normalizeSql(readFileSync(migrationPath, "utf8"));
   assert.doesNotMatch(migrationSql, /disable row level security|drop policy|create table/);
+});
+
+test("Given cards and shelf items, When purchase memory is added, Then personal rebuy links stay additive", () => {
+  assert.equal(existsSync(purchaseMemoryMigrationPath), true, "the additive purchase memory migration exists");
+  const sql = normalizeSql(readFileSync(purchaseMemoryMigrationPath, "utf8"));
+
+  assert.match(sql, /alter table public\.tasting_cards add column if not exists purchase_url text/);
+  assert.match(sql, /add column if not exists purchase_note text/);
+  assert.match(sql, /alter table public\.coffee_shelf_items add column if not exists purchase_url text/);
+  assert.match(sql, /add column if not exists purchase_note text/);
+  assert.match(sql, /create index if not exists idx_tasting_cards_user_purchase_url/);
+  assert.match(sql, /create index if not exists idx_coffee_shelf_items_user_purchase_url/);
+  assert.doesNotMatch(sql, /disable row level security|drop policy|create table/);
+});
+
+test("Given shelf items, When internal rebuy reminders are added, Then state stays owner-scoped and additive", () => {
+  assert.equal(existsSync(rebuyReminderMigrationPath), true, "the additive shelf reminder migration exists");
+  const sql = normalizeSql(readFileSync(rebuyReminderMigrationPath, "utf8"));
+
+  assert.match(sql, /alter table public\.coffee_shelf_items/);
+  assert.match(sql, /add column if not exists rebuy_priority text not null default 'normal'/);
+  assert.match(sql, /add column if not exists rebuy_reminder_date date/);
+  assert.match(sql, /add column if not exists rebuy_action text not null default 'none'/);
+  assert.match(sql, /add column if not exists rebuy_action_at timestamptz/);
+  assert.match(sql, /rebuy_priority in \('normal', 'pinned', 'paused'\)/);
+  assert.match(sql, /rebuy_action in \('none', 'drank', 'will_rebuy', 'rebought'\)/);
+  assert.match(sql, /idx_coffee_shelf_items_user_rebuy_priority/);
+  assert.match(sql, /idx_coffee_shelf_items_user_rebuy_reminder_date/);
+  assert.doesNotMatch(sql, /disable row level security|drop policy|create table/);
 });
 
 test("Given existing tasting cards, When the migration runs, Then memory columns are additive and replay-safe", () => {

@@ -32,6 +32,12 @@ interface ShelfItem {
   fill_level: number;
   is_finished: boolean;
   tasting_card_id: string | null;
+  purchase_url: string | null;
+  purchase_note: string | null;
+  rebuy_priority: "normal" | "pinned" | "paused";
+  rebuy_reminder_date: string | null;
+  rebuy_action: "none" | "drank" | "will_rebuy" | "rebought";
+  rebuy_action_at: string | null;
   tasting_cards?: TastingCard | null;
 }
 
@@ -82,6 +88,12 @@ function isShelfItem(value: unknown): value is ShelfItem {
     && typeof value.fill_level === "number"
     && typeof value.is_finished === "boolean"
     && (typeof value.tasting_card_id === "string" || value.tasting_card_id === null)
+    && (typeof value.purchase_url === "string" || value.purchase_url === null || value.purchase_url === undefined)
+    && (typeof value.purchase_note === "string" || value.purchase_note === null || value.purchase_note === undefined)
+    && (value.rebuy_priority === "normal" || value.rebuy_priority === "pinned" || value.rebuy_priority === "paused" || value.rebuy_priority === undefined)
+    && (typeof value.rebuy_reminder_date === "string" || value.rebuy_reminder_date === null || value.rebuy_reminder_date === undefined)
+    && (value.rebuy_action === "none" || value.rebuy_action === "drank" || value.rebuy_action === "will_rebuy" || value.rebuy_action === "rebought" || value.rebuy_action === undefined)
+    && (typeof value.rebuy_action_at === "string" || value.rebuy_action_at === null || value.rebuy_action_at === undefined)
     && (tastingCard === undefined || tastingCard === null || isTastingCard(tastingCard))
   );
 }
@@ -89,7 +101,17 @@ function isShelfItem(value: unknown): value is ShelfItem {
 function readShelfItems(payload: unknown): ShelfItem[] {
   if (!isRecord(payload) || !Array.isArray(payload.data)) return [];
 
-  return payload.data.filter(isShelfItem);
+  return payload.data
+    .filter(isShelfItem)
+    .map((item) => ({
+      ...item,
+      purchase_url: item.purchase_url ?? null,
+      purchase_note: item.purchase_note ?? null,
+      rebuy_priority: item.rebuy_priority ?? "normal",
+      rebuy_reminder_date: item.rebuy_reminder_date ?? null,
+      rebuy_action: item.rebuy_action ?? "none",
+      rebuy_action_at: item.rebuy_action_at ?? null,
+    }));
 }
 
 function readTastingCards(payload: unknown): TastingCard[] {
@@ -130,6 +152,8 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
   const [openedDate, setOpenedDate] = useState("");
   const [totalWeight, setTotalWeight] = useState(200);
   const [tastingCardId, setTastingCardId] = useState("");
+  const [purchaseUrl, setPurchaseUrl] = useState("");
+  const [purchaseNote, setPurchaseNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleScanComplete = (result: ScanResult) => {
@@ -241,6 +265,12 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
           fill_level: 50,
           is_finished: false,
           tasting_card_id: null,
+          purchase_url: null,
+          purchase_note: null,
+          rebuy_priority: "normal",
+          rebuy_reminder_date: null,
+          rebuy_action: "none",
+          rebuy_action_at: null,
         } as ShelfItem]);
         setArchivedItems([]);
         setTastingCards([]);
@@ -323,6 +353,8 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
         totalWeight: Number(totalWeight),
         fillLevel: 100,
         tastingCardId: tastingCardId || null,
+        purchaseUrl: purchaseUrl.trim() || null,
+        purchaseNote: purchaseNote.trim() || null,
       };
 
       const response = await fetch("/api/v1/shelf", {
@@ -403,6 +435,47 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
     }
   };
 
+  const handleUpdateReminderState = async (
+    id: string,
+    update: {
+      rebuyPriority?: ShelfItem["rebuy_priority"];
+      rebuyReminderDate?: string | null;
+      rebuyAction?: ShelfItem["rebuy_action"];
+    },
+  ) => {
+    try {
+      const response = await fetch(`/api/v1/shelf/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(update),
+      });
+
+      if (!response.ok) throw new Error("Failed to update reminder state");
+
+      const applyReminderUpdate = (item: ShelfItem): ShelfItem => {
+        if (item.id !== id) return item;
+
+        return {
+          ...item,
+          rebuy_priority: update.rebuyPriority ?? item.rebuy_priority,
+          rebuy_reminder_date: update.rebuyReminderDate !== undefined ? update.rebuyReminderDate : item.rebuy_reminder_date,
+          rebuy_action: update.rebuyAction ?? item.rebuy_action,
+          rebuy_action_at: update.rebuyAction !== undefined && update.rebuyAction !== "none" ? new Date().toISOString() : item.rebuy_action_at,
+        };
+      };
+
+      setItems((currentItems) => currentItems.map(applyReminderUpdate));
+      setArchivedItems((currentItems) => currentItems.map(applyReminderUpdate));
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error updating rebuy reminder state:", error);
+      } else {
+        console.error("Error updating rebuy reminder state:", String(error));
+      }
+      alert("재구매 리마인더 상태 업데이트 중 오류가 발생했습니다.");
+    }
+  };
+
   const handleDeleteItem = async (id: string) => {
     if (!confirm("정말 이 원두를 보관함에서 영구 삭제하시겠습니까?")) return;
     try {
@@ -441,6 +514,8 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
     setOpenedDate("");
     setTotalWeight(200);
     setTastingCardId("");
+    setPurchaseUrl("");
+    setPurchaseNote("");
   };
 
   const getFillLevelColor = (level: number) => {
@@ -601,6 +676,30 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                 />
               </div>
 
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <label htmlFor="purchase-url" className="text-xs font-semibold text-muted-foreground">다시 찾을 링크</label>
+                  <input
+                    id="purchase-url"
+                    type="url"
+                    placeholder="https://roaster.example/coffee"
+                    value={purchaseUrl}
+                    onChange={e => setPurchaseUrl(e.target.value)}
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label htmlFor="purchase-note" className="text-xs font-semibold text-muted-foreground">구매 단서</label>
+                  <input
+                    id="purchase-note"
+                    placeholder="예: 공식몰 200g 옵션"
+                    value={purchaseNote}
+                    onChange={e => setPurchaseNote(e.target.value)}
+                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-1 col-span-1">
                   <label htmlFor="weight" className="text-xs font-semibold text-muted-foreground">용량(g)</label>
@@ -733,6 +832,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
               item={item}
               onUpdateFillLevel={handleUpdateFillLevel}
               onToggleFinished={handleToggleFinished}
+              onUpdateReminderState={handleUpdateReminderState}
               onDelete={handleDeleteItem}
             />
           ))}

@@ -19,6 +19,8 @@ export interface TastingCardFormState {
   origin: string;
   date: string;
   extraInfo: string;
+  purchaseUrl: string;
+  purchaseNote: string;
 }
 
 const initialFormState: TastingCardFormState = {
@@ -39,6 +41,8 @@ const initialFormState: TastingCardFormState = {
   origin: "",
   date: new Date().toISOString().split("T")[0],
   extraInfo: "",
+  purchaseUrl: "",
+  purchaseNote: "",
 };
 
 interface TastingStore {

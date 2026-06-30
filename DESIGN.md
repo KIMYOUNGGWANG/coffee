@@ -46,3 +46,74 @@
 ## 7. Accessibility (WCAG 2.2)
 - Focus rings should be thin, crisp white or gold outlines.
 - Support `prefers-reduced-motion` for all 3D transitions.
+
+## 8. Mobile App Direction: "The Personal Coffee Room"
+
+The bridge app should not feel like a web landing page or an AI scanner. It should feel like a private coffee room where the user's cups, notes, and beans quietly accumulate.
+
+### Mobile Navigation
+- Primary tabs: `룸`, `노트`, `서랍`, `나`.
+- Use place-like labels over feature labels. Avoid `스캔`, `패스포트`, `분석` as primary tab names.
+- Default posture: private, calm, personal.
+
+### Mobile Palette
+- `roomCanvas`: `#FFF6E8`
+- `roomCanvasMuted`: `#F0DFC9`
+- `paper`: `#FFF8EC`
+- `linen`: `#E8D8C1`
+- `espresso`: `#2A1A12`
+- `soil`: `#493024`
+- `cocoa`: `#654D3D`
+- `mutedCocoa`: `#8F7867`
+- `clay`: `#BD7650`
+- `sage`: `#8FA57D`
+- `leaf`: `#4E7452`
+- `line`: `rgba(42, 26, 18, 0.14)`
+
+### Mobile Components
+- **Room card**: warm paper surface, 24-32px radius, one meaningful image or note.
+- **Diary note**: paper surface with a clay left accent and serif body text for memory fragments.
+- **Bean drawer row**: image thumbnail, coffee name, memory tags, rating or repurchase signal.
+- **Private panel**: dark espresso surface used sparingly for privacy/trust moments only.
+- **Mood chips**: three to four tactile choices, active chip filled with `soil`.
+
+### Mobile Copy Rules
+- Prefer personal Korean: `오늘 커피는 어떤 기분이었나요?`, `다시 열어보고 싶은 원두들`, `기록은 나에게 먼저 보여야 해요`.
+- Avoid front-facing AI language in navigation, headings, and primary buttons.
+- Use `사진 기록`, `맞게 읽었는지 확인`, `내 문장`, `비공개 저장` instead of `AI 분석`, `스캐너`, `Confidence`.
+
+## 9. Web App Redesign Direction: "Quiet Roastery Command Room"
+
+CoffeeDex web should feel like a premium mobile web app first, not a marketing site that happens to have an app. Keep the product positioning fixed: private coffee memory, fresh shelf, rebuy decisions, and better next brews.
+
+### Reference Synthesis
+- Premium coffee brands: use product restraint, warm materials, and large whitespace rather than dense feature chrome.
+- Coffee logging apps: keep utility from brew logs and filters, but avoid dense parameter-first cockpit layouts on the first screen.
+- Consumer journal apps: prioritize emotional return loops, recognizable personal artifacts, and low-friction resume points.
+- SaaS dashboards: borrow clear status modules, segmented navigation, and compact decision panels.
+
+### Web Palette Tokens
+- `canvas`: `#F7EFE2`
+- `paper`: `#FFF9EF`
+- `linen`: `#EFE0CC`
+- `espresso`: `#291912`
+- `soil`: `#372319`
+- `cocoaMuted`: `#7C6454`
+- `clay`: `#BD7650`
+- `clayStrong`: `#8F533B`
+- `leaf`: `#4E7452`
+- `line`: `rgba(41, 25, 18, 0.14)`
+
+### Web Components
+- **Premium shell**: low-contrast outer tray with 6px padding, 32px radius, and warm tinted shadow.
+- **Premium card**: paper inner core, subtle inset highlight, 26px radius, and no generic gray border/shadow treatment.
+- **Espresso panel**: dark espresso command surface for high-leverage modules such as Rebuy Intelligence and Dial-in Coach only.
+- **Coffee chip**: tactile filter chip with 44px minimum touch height, active state filled with soft clay.
+- **Glance strip**: three compact modules below the header: saved memories, rebuy candidate, and brew starting point.
+
+### Screen Priorities
+- **Dashboard first impression**: answer what the user has, what to rebuy, and what to brew next before scrolling.
+- **Shelf/cards**: keep package and memory cards scannable; avoid nested card clutter.
+- **Records/log**: Dial-in Coach sits above the calendar as the reason to return before brewing.
+- **Passport**: analytic panels should feel like a personal profile, not a generic BI dashboard.
+- **Mobile WebView**: bottom nav remains thumb-first, safe-area aware, and visually separate from page content.

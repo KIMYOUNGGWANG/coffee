@@ -170,6 +170,8 @@ export function WizardPreview({ form, wizardMode, quickRepurchaseIntent }: Wizar
             },
             package_origin: null,
             package_process: null,
+            purchase_url: form.purchaseUrl.trim() || null,
+            purchase_note: form.purchaseNote.trim() || null,
             repurchase_intent: wizardMode === "quick" ? quickRepurchaseIntent : "undecided",
             repurchase_reasons: wizardMode === "quick"
               ? buildQuickAddMemoryPayload({ confirmed: true, form, repurchaseIntent: quickRepurchaseIntent }).repurchaseReasons ?? []

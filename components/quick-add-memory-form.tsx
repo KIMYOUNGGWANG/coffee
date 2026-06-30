@@ -13,7 +13,7 @@ export type QuickRepurchaseIntent = Exclude<RepurchaseIntent, "undecided">;
 export type QuickFlavorChip = (typeof QUICK_FLAVOR_CHIPS)[number];
 
 export type QuickAddMemoryFields = Readonly<
-  Pick<TastingCardFormState, "title" | "subtitle" | "imageUrl" | "metric1" | "metric2" | "metric3" | "metric4" | "metric5" | "metric6" | "rawNote" | "origin" | "date" | "extraInfo">
+  Pick<TastingCardFormState, "title" | "subtitle" | "imageUrl" | "metric1" | "metric2" | "metric3" | "metric4" | "metric5" | "metric6" | "rawNote" | "origin" | "date" | "extraInfo" | "purchaseUrl" | "purchaseNote">
 > & {
   readonly tags: readonly string[];
 };
@@ -73,6 +73,10 @@ export function buildQuickAddMemoryPayload(input: BuildQuickAddMemoryPayloadInpu
       date: input.form.date,
       ...(oneLineNote ? { extraInfo: oneLineNote } : {}),
     },
+    packageOrigin: input.form.origin || null,
+    packageProcess: input.form.extraInfo || null,
+    purchaseUrl: input.form.purchaseUrl.trim() || null,
+    purchaseNote: input.form.purchaseNote.trim() || null,
     repurchaseIntent: input.repurchaseIntent,
     repurchaseReasons,
     scanSource: "manual",
@@ -180,6 +184,31 @@ export function QuickAddMemoryForm({
             onChange={(event) => updateForm({ rawNote: event.target.value })}
             className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground h-20 resize-none"
           />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="quick-purchase-url" className="text-xs font-semibold text-muted-foreground">다시 찾을 링크</label>
+            <input
+              id="quick-purchase-url"
+              type="url"
+              placeholder="https://roaster.example/coffee"
+              value={form.purchaseUrl}
+              onChange={(event) => updateForm({ purchaseUrl: event.target.value })}
+              className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="quick-purchase-note" className="text-xs font-semibold text-muted-foreground">구매 단서</label>
+            <input
+              id="quick-purchase-note"
+              type="text"
+              placeholder="예: 공식몰 200g 옵션"
+              value={form.purchaseNote}
+              onChange={(event) => updateForm({ purchaseNote: event.target.value })}
+              className="border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-amber bg-black/40 text-foreground"
+            />
+          </div>
         </div>
 
         <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-3">
