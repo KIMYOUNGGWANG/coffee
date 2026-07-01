@@ -114,7 +114,7 @@ export function DashboardDialInCoachPanel({
       setIsSaving(true);
       setSavedMessage(null);
       await saveSuggestedLog(data);
-      setSavedMessage("오늘의 시작 레시피를 추출 로그에 저장했어요.");
+      setSavedMessage("오늘의 시작 레시피와 선반 잔량을 함께 저장했어요.");
       onSaved();
     } catch (saveError) {
       setSavedMessage(saveError instanceof Error ? saveError.message : "저장에 실패했습니다.");
@@ -128,7 +128,7 @@ export function DashboardDialInCoachPanel({
       setSavingFeedback(feedback.value);
       setSavedMessage(null);
       await saveFeedbackLog(data, feedback);
-      setSavedMessage(`${feedback.label} 피드백을 저장했어요. 다음 추천은 이 조정값을 반영합니다.`);
+      setSavedMessage(`${feedback.label} 피드백과 선반 잔량을 저장했어요. 다음 추천은 이 조정값을 반영합니다.`);
       onSaved();
     } catch (saveError) {
       setSavedMessage(saveError instanceof Error ? saveError.message : "저장에 실패했습니다.");
@@ -150,6 +150,9 @@ export function DashboardDialInCoachPanel({
           </h2>
           <p className="mt-2 max-w-2xl break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">
             {data.problem}
+          </p>
+          <p className="mt-2 break-keep text-xs font-bold leading-5 text-primary-amber/82">
+            이 레시피로 기록하면 사용한 원두 무게만큼 선반 잔량도 자동으로 줄어듭니다.
           </p>
         </div>
         <button

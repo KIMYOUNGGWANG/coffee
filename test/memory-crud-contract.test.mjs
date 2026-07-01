@@ -156,6 +156,8 @@ test("Given legacy rows, When cards are listed, Then memory compatibility defaul
   assert.deepEqual(body.data[0], legacyCard({
     package_origin: null,
     package_process: null,
+    purchase_url: null,
+    purchase_note: null,
     repurchase_intent: "undecided",
     repurchase_reasons: [],
     scan_source: null,
