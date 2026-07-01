@@ -93,21 +93,22 @@ CoffeeDex web should feel like a premium mobile web app first, not a marketing s
 - SaaS dashboards: borrow clear status modules, segmented navigation, and compact decision panels.
 
 ### Web Palette Tokens
-- `canvas`: `#F7EFE2`
-- `paper`: `#FFF9EF`
-- `linen`: `#EFE0CC`
+- `canvas`: `#120B07`
+- `canvasLift`: `#1B100B`
+- `paper`: `#FFF8EC`
+- `linen`: `#E8D8C1`
 - `espresso`: `#291912`
 - `soil`: `#372319`
-- `cocoaMuted`: `#7C6454`
-- `clay`: `#BD7650`
-- `clayStrong`: `#8F533B`
-- `leaf`: `#4E7452`
-- `line`: `rgba(41, 25, 18, 0.14)`
+- `cocoaMuted`: `#B9A28E`
+- `clay`: `#D18A5C`
+- `clayStrong`: `#F0B978`
+- `leaf`: `#8FA57D`
+- `line`: `rgba(255, 248, 236, 0.13)`
 
 ### Web Components
-- **Premium shell**: low-contrast outer tray with 6px padding, 32px radius, and warm tinted shadow.
-- **Premium card**: paper inner core, subtle inset highlight, 26px radius, and no generic gray border/shadow treatment.
-- **Espresso panel**: dark espresso command surface for high-leverage modules such as Rebuy Intelligence and Dial-in Coach only.
+- **Premium shell**: dark espresso outer tray with 6px padding, 32px radius, warm rim light, and no pale app chrome.
+- **Premium card**: dark roasted inner core, subtle inset highlight, 26px radius, and visible cream text at WCAG AA contrast.
+- **Espresso panel**: darkest command surface for high-leverage modules such as Rebuy Intelligence and Dial-in Coach.
 - **Coffee chip**: tactile filter chip with 44px minimum touch height, active state filled with soft clay.
 - **Glance strip**: three compact modules below the header: saved memories, rebuy candidate, and brew starting point.
 
@@ -117,3 +118,4 @@ CoffeeDex web should feel like a premium mobile web app first, not a marketing s
 - **Records/log**: Dial-in Coach sits above the calendar as the reason to return before brewing.
 - **Passport**: analytic panels should feel like a personal profile, not a generic BI dashboard.
 - **Mobile WebView**: bottom nav remains thumb-first, safe-area aware, and visually separate from page content.
+- **Release polish rule**: primary and secondary CTAs must keep readable labels in both idle and disabled states; avoid `text-white/*` buttons on light surfaces and avoid `text-background-dark` inside dark cards.

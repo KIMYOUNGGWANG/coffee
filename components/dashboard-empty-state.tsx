@@ -9,7 +9,7 @@ type DashboardEmptyStateProps = {
 
 export default function DashboardEmptyState({ onCreateCard, onQuickAdd }: DashboardEmptyStateProps) {
   return (
-    <section className="mx-auto max-w-xl rounded-[1.75rem] border border-background-dark/10 bg-[#FFF8EC]/76 px-5 py-12 text-center shadow-[0_18px_42px_rgba(73,48,36,0.12)]" aria-labelledby="first-coffee-title">
+    <section className="mx-auto max-w-xl rounded-[1.75rem] border border-white/12 bg-white/[0.06] px-5 py-12 text-center shadow-[0_22px_60px_rgba(0,0,0,0.32)]" aria-labelledby="first-coffee-title">
       <span className="mx-auto grid size-16 place-items-center rounded-[1.25rem] border border-primary-amber/30 bg-primary-amber/10 text-primary-amber">
         <Camera aria-hidden="true" size={27} />
       </span>
@@ -17,7 +17,7 @@ export default function DashboardEmptyState({ onCreateCard, onQuickAdd }: Dashbo
         <Sparkles aria-hidden="true" size={13} />
         20초 안에 첫 기록
       </span>
-      <h2 id="first-coffee-title" className="mt-3 break-keep font-serif text-3xl font-black leading-tight text-background-dark sm:text-4xl">
+      <h2 id="first-coffee-title" className="mt-3 break-keep font-serif text-3xl font-black leading-tight text-[#FFF8EC] sm:text-4xl">
         첫 원두를 선반에 올려보세요.
       </h2>
       <p className="mx-auto mt-4 max-w-md break-keep text-sm leading-7 text-muted-foreground">
@@ -27,7 +27,7 @@ export default function DashboardEmptyState({ onCreateCard, onQuickAdd }: Dashbo
         <button
           type="button"
           onClick={onQuickAdd}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-background-dark px-6 text-sm font-black text-[#FFF8EC] shadow-[0_12px_28px_rgba(73,48,36,0.18)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-amber px-6 text-sm font-black text-[#120B07] shadow-[0_12px_28px_rgba(209,138,92,0.22)] transition-transform hover:bg-[#F0B978] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95"
         >
           <Sparkles aria-hidden="true" size={18} />
           빠른 기록
@@ -35,7 +35,7 @@ export default function DashboardEmptyState({ onCreateCard, onQuickAdd }: Dashbo
         <button
           type="button"
           onClick={onCreateCard}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-primary-amber/45 bg-white/40 px-6 text-sm font-black text-primary-amber transition-colors hover:bg-primary-amber/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-primary-amber/45 bg-primary-amber/12 px-6 text-sm font-black text-primary-amber transition-colors hover:bg-primary-amber/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95"
         >
           <Camera aria-hidden="true" size={18} />
           원두 패키지 스캔하기
@@ -43,7 +43,7 @@ export default function DashboardEmptyState({ onCreateCard, onQuickAdd }: Dashbo
         <button
           type="button"
           onClick={onCreateCard}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-background-dark/10 bg-white/40 px-6 text-sm font-black text-muted-foreground transition-colors hover:border-primary-amber/45 hover:text-primary-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/14 bg-white/[0.07] px-6 text-sm font-black text-[#FFF8EC]/76 transition-colors hover:border-primary-amber/45 hover:text-primary-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95"
         >
           새로운 카드 기록하기
         </button>

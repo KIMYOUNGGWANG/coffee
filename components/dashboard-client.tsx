@@ -205,13 +205,13 @@ export default function DashboardClient({
           return (
             <article key={item.label} className="premium-shell">
               <div className="premium-card flex min-h-28 items-start gap-3 p-4">
-                <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-background-dark text-[#FFF8EC] shadow-[0_12px_26px_rgba(73,48,36,0.18)]">
+                <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary-amber text-[#120B07] shadow-[0_12px_26px_rgba(209,138,92,0.18)]">
                   <Icon aria-hidden="true" size={17} />
                 </span>
                 <div className="min-w-0">
                   <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">{item.label}</p>
-                  <p className="mt-2 line-clamp-2 break-keep text-sm font-black leading-5 text-background-dark">{item.value}</p>
-                  <p className="mt-1 text-[11px] font-bold text-muted-foreground">{item.helper}</p>
+                  <p className="mt-2 line-clamp-2 break-keep text-sm font-black leading-5 text-[#FFF8EC]">{item.value}</p>
+                  <p className="mt-1 text-[11px] font-bold text-[#FFF8EC]/58">{item.helper}</p>
                 </div>
               </div>
             </article>

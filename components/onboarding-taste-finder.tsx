@@ -156,14 +156,14 @@ export default function OnboardingTasteFinder({ dashboardHref }: OnboardingTaste
         <Link
           href={activationHref}
           data-testid="onboarding-first-card-cta"
-          className="inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-primary-amber bg-primary-amber px-5 text-center text-sm font-black leading-5 text-background-dark shadow-[0_16px_42px_rgba(217,160,91,0.2)] transition-transform hover:-translate-y-0.5 sm:text-base"
+          className="inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-primary-amber bg-primary-amber px-5 text-center text-sm font-black leading-5 text-[#120B07] shadow-[0_16px_42px_rgba(217,160,91,0.24)] transition-transform hover:-translate-y-0.5 hover:bg-[#F0B978] sm:text-base"
         >
           <span className="break-keep">20초 빠른 기록 시작하기</span>
           <ArrowRight size={18} />
         </Link>
         <Link
           href="/dashboard"
-          className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-5 text-center text-sm font-black leading-5 text-[#F7F7F4]/72 transition hover:-translate-y-0.5 hover:border-primary-amber/30 hover:text-primary-amber sm:w-auto"
+          className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border border-white/18 bg-white/[0.075] px-5 text-center text-sm font-black leading-5 text-[#F7F7F4] transition hover:-translate-y-0.5 hover:border-primary-amber/40 hover:bg-white/[0.11] hover:text-primary-amber sm:w-auto"
         >
           <ScanLine size={16} />
           <span className="break-keep">샘플 CoffeeDex 기록 보기</span>
