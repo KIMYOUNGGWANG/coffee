@@ -34,9 +34,9 @@ Evidence surfaces: `/dashboard`, `QuickAddMemoryForm`, `POST /api/v1/cards`
 
 ## Flow 4. Use Fresh Shelf Rebuy Timing
 
-Given a user has beans on the private shelf, when CoffeeDex renders the shelf card, then it derives a Korean next-action signal from roast date, opened date, fill level, and finished state: wait, drink now, finish soon, or rebuy. The card also estimates Shelf Runway: grams left, cups remaining, likely run-out timing, and a suggested in-app rebuy reminder date from the user's own weight, fill level, and opened date. If the user saved a purchase link or buying note, the shelf keeps that private clue so the user can reopen it later; otherwise CoffeeDex falls back to a search URL. The user can also pin a bean as a personal rebuy candidate, apply the suggested next-buy date, and mark it as drank, will-rebuy, or rebought. This guidance is local product memory, not a push notification, roaster order, marketplace listing, or partner referral.
+Given a user has beans on the private shelf, when CoffeeDex renders the shelf card, then it derives a Korean next-action signal from roast date, opened date, fill level, and finished state: wait, drink now, finish soon, or rebuy. The card also derives a Peak Window cue from the owned roast/open dates so the user can see whether a bean is still resting, in its peak range, ready to finish now, or past its peak. The card also estimates Shelf Runway: grams left, cups remaining, likely run-out timing, and a suggested in-app rebuy reminder date from the user's own weight, fill level, and opened date. If the user saved a purchase link or buying note, the shelf keeps that private clue so the user can reopen it later; otherwise CoffeeDex falls back to a search URL. The user can also pin a bean as a personal rebuy candidate, apply the suggested next-buy date, and mark it as drank, will-rebuy, or rebought. This guidance is local product memory, not a push notification, roaster order, marketplace listing, or partner referral.
 
-Evidence surfaces: `/dashboard`, `GET /api/v1/shelf`, `PATCH /api/v1/shelf/:id`, `evaluateFreshShelfStatus`, `evaluateShelfRunway`
+Evidence surfaces: `/dashboard`, `GET /api/v1/shelf`, `PATCH /api/v1/shelf/:id`, `evaluateFreshShelfStatus`, `evaluateFreshPeakWindow`, `evaluateShelfRunway`
 
 ## Flow 4A. Start a Dial-in Coach Recipe
 

@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Archive, Bell, CheckCircle2, ExternalLink, Pin, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Archive, Bell, CheckCircle2, Clock3, ExternalLink, Pin, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { evaluateFreshShelfStatus } from "@/lib/fresh-shelf";
+import { evaluateFreshPeakWindow, evaluateFreshShelfStatus } from "@/lib/fresh-shelf";
 import { evaluateShelfRunway } from "@/lib/shelf-runway";
 
 // Exporting the type here so it can be used, or we could keep it in coffee-shelf-grid.
@@ -77,6 +77,10 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
   const shelfRunway = evaluateShelfRunway({
     totalWeight: item.total_weight,
     fillLevel: item.fill_level,
+    openedDate: item.opened_date,
+  });
+  const freshPeakWindow = evaluateFreshPeakWindow({
+    roastDate: item.roast_date,
     openedDate: item.opened_date,
   });
 
@@ -156,6 +160,24 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                   {freshShelfStatus.label}
                 </div>
                 <p className="text-white/60 leading-relaxed font-light">{freshShelfStatus.reason}</p>
+             </div>
+
+             <div className="text-[10px] rounded-md border border-[#D4AF37]/15 bg-[#D4AF37]/5 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 font-bold text-[#D4AF37]">
+                      <Clock3 size={12} />
+                      Peak Window
+                    </div>
+                    <p className="mt-1 font-bold text-white">{freshPeakWindow.label}</p>
+                  </div>
+                  {freshPeakWindow.targetDate && (
+                    <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-1 font-bold text-white/65">
+                      {freshPeakWindow.targetDate}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 leading-relaxed text-white/58">{freshPeakWindow.reason}</p>
              </div>
 
              <div className="text-[10px] rounded-md border border-[#D4AF37]/15 bg-[#D4AF37]/5 p-3">

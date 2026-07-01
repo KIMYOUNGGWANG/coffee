@@ -15,17 +15,51 @@ export type FreshShelfStatus = {
   readonly tone: "resting" | "fresh" | "warning" | "critical";
 };
 
+export type FreshPeakWindowPhase = "unknown" | "resting" | "peak" | "enjoy_now" | "fading";
+
+export type FreshPeakWindowInput = {
+  readonly roastDate?: string | null;
+  readonly openedDate?: string | null;
+  readonly now?: Date;
+};
+
+export type FreshPeakWindow = {
+  readonly phase: FreshPeakWindowPhase;
+  readonly label: string;
+  readonly reason: string;
+  readonly targetDate: string | null;
+  readonly daysUntilTarget: number | null;
+};
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function assertNever(value: never): never {
   throw new Error(`Unhandled FreshShelfStatusKind: ${value}`);
 }
 
-function daysSince(dateValue: string | null | undefined, now: Date): number | null {
+function parseDate(dateValue: string | null | undefined): Date | null {
   if (!dateValue) return null;
   const parsed = new Date(`${dateValue}T00:00:00.000Z`);
   if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
+}
+
+function formatDate(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function addDays(date: Date, days: number): Date {
+  return new Date(date.getTime() + days * DAY_MS);
+}
+
+function daysSince(dateValue: string | null | undefined, now: Date): number | null {
+  const parsed = parseDate(dateValue);
+  if (!parsed) return null;
   return Math.max(0, Math.floor((now.getTime() - parsed.getTime()) / DAY_MS));
+}
+
+function daysUntil(date: Date, now: Date): number {
+  return Math.max(0, Math.ceil((date.getTime() - now.getTime()) / DAY_MS));
 }
 
 function status(kind: FreshShelfStatusKind, reason: string): FreshShelfStatus {
@@ -94,4 +128,65 @@ export function evaluateFreshShelfStatus(input: FreshShelfInput): FreshShelfStat
   }
 
   return status("finish_soon", "날짜 정보가 부족하거나 신선 구간을 지났습니다. 잔량을 보며 마무리해 보세요.");
+}
+
+export function evaluateFreshPeakWindow(input: FreshPeakWindowInput): FreshPeakWindow {
+  const now = input.now ?? new Date();
+  const roastDate = parseDate(input.roastDate);
+  const roastAgeDays = daysSince(input.roastDate, now);
+  const openedAgeDays = daysSince(input.openedDate, now);
+
+  if (!roastDate || roastAgeDays === null) {
+    return {
+      phase: "unknown",
+      label: "피크 추정 대기",
+      reason: "로스팅일을 입력하면 쉬는 기간과 피크 구간을 계산합니다.",
+      targetDate: null,
+      daysUntilTarget: null,
+    };
+  }
+
+  if (roastAgeDays <= 4) {
+    const target = addDays(roastDate, 5);
+    return {
+      phase: "resting",
+      label: "조금 더 쉬는 중",
+      reason: `로스팅 후 ${roastAgeDays}일째입니다. ${formatDate(target)}부터 첫 향미 확인을 시작해 보세요.`,
+      targetDate: formatDate(target),
+      daysUntilTarget: daysUntil(target, now),
+    };
+  }
+
+  if (roastAgeDays <= 21) {
+    const target = addDays(roastDate, 21);
+    const openedNote =
+      openedAgeDays !== null && openedAgeDays >= 14 ? ` 개봉 후 ${openedAgeDays}일째라 자주 꺼내는 편이 좋습니다.` : "";
+
+    return {
+      phase: "peak",
+      label: "피크 구간",
+      reason: `로스팅 후 ${roastAgeDays}일째입니다. 지금이 향미 확인에 좋은 구간입니다.${openedNote}`,
+      targetDate: formatDate(target),
+      daysUntilTarget: daysUntil(target, now),
+    };
+  }
+
+  if (roastAgeDays <= 35) {
+    const target = addDays(roastDate, 35);
+    return {
+      phase: "enjoy_now",
+      label: "지금 마무리",
+      reason: `로스팅 후 ${roastAgeDays}일째입니다. 남은 향미가 흐려지기 전에 자주 꺼내세요.`,
+      targetDate: formatDate(target),
+      daysUntilTarget: daysUntil(target, now),
+    };
+  }
+
+  return {
+    phase: "fading",
+    label: "피크 지남",
+    reason: `로스팅 후 ${roastAgeDays}일째입니다. 기록이 좋았다면 재구매 후보로 남기고 빠르게 마무리하세요.`,
+    targetDate: null,
+    daysUntilTarget: null,
+  };
 }
