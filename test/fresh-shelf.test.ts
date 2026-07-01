@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { evaluateFreshShelfStatus } from "../lib/fresh-shelf";
+import { evaluateFreshPeakWindow, evaluateFreshShelfStatus } from "../lib/fresh-shelf";
 
 const baseNow = new Date("2026-06-19T12:00:00.000Z");
 
@@ -69,5 +69,67 @@ test.describe("evaluateFreshShelfStatus", () => {
 
     expect(status.kind).toBe("finish_soon");
     expect(status.reason).toContain("잔량");
+  });
+});
+
+test.describe("evaluateFreshPeakWindow", () => {
+  test("asks for roast date before estimating the peak window", () => {
+    const window = evaluateFreshPeakWindow({
+      roastDate: null,
+      openedDate: null,
+      now: baseNow,
+    });
+
+    expect(window.phase).toBe("unknown");
+    expect(window.label).toBe("피크 추정 대기");
+    expect(window.targetDate).toBeNull();
+  });
+
+  test("keeps very recent beans in the resting window", () => {
+    const window = evaluateFreshPeakWindow({
+      roastDate: "2026-06-17",
+      openedDate: null,
+      now: baseNow,
+    });
+
+    expect(window.phase).toBe("resting");
+    expect(window.label).toBe("조금 더 쉬는 중");
+    expect(window.targetDate).toBe("2026-06-22");
+    expect(window.daysUntilTarget).toBe(3);
+  });
+
+  test("marks beans in the post-rest range as peak", () => {
+    const window = evaluateFreshPeakWindow({
+      roastDate: "2026-06-05",
+      openedDate: "2026-06-07",
+      now: baseNow,
+    });
+
+    expect(window.phase).toBe("peak");
+    expect(window.label).toBe("피크 구간");
+    expect(window.targetDate).toBe("2026-06-26");
+  });
+
+  test("nudges older beans toward finishing before the flavor fades", () => {
+    const window = evaluateFreshPeakWindow({
+      roastDate: "2026-05-20",
+      openedDate: "2026-05-25",
+      now: baseNow,
+    });
+
+    expect(window.phase).toBe("enjoy_now");
+    expect(window.label).toBe("지금 마무리");
+    expect(window.reason).toContain("로스팅 후 30일");
+  });
+
+  test("marks long-past roast dates as faded", () => {
+    const window = evaluateFreshPeakWindow({
+      roastDate: "2026-05-01",
+      openedDate: "2026-05-10",
+      now: baseNow,
+    });
+
+    expect(window.phase).toBe("fading");
+    expect(window.label).toBe("피크 지남");
   });
 });

@@ -59,6 +59,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - explicit repurchase memory and retrieval based on confirmed saved records;
 - private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
+- private Peak Window guidance that derives resting, peak, finish-now, and faded timing from existing roast/open dates without creating a notification, order, or marketplace action;
 - private Shelf Runway estimates that derive cups remaining, likely run-out timing, and a suggested in-app rebuy reminder date from shelf weight, fill level, and opened date;
 - private Brew-to-Shelf consumption that turns each owned brewing log dose into an automatic shelf fill-level update, keeping Fresh Shelf, Shelf Runway, and Rebuy Intelligence current without a separate inventory chore;
 - private purchase memory through optional `purchase_url` and `purchase_note` fields on cards and shelf items, used only to reopen the user's own saved buying clue or fallback search;
@@ -150,7 +151,7 @@ interface CoffeeShelfItem {
 }
 ```
 
-Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. The saved rebuy reminder fields only keep app-internal state for pinned candidates, next-buy dates, and completed/drank/will-rebuy actions. They do not create push notifications, roaster orders, partner offers, or marketplace transactions.
+Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. Peak Window guidance is also derived at render time from the same owned shelf dates and returns `unknown`, `resting`, `peak`, `enjoy_now`, or `fading` as a private drink-timing cue; it is not persisted. The saved rebuy reminder fields only keep app-internal state for pinned candidates, next-buy dates, and completed/drank/will-rebuy actions. They do not create push notifications, roaster orders, partner offers, or marketplace transactions.
 
 ### `GET /api/v1/rebuy-intelligence`
 
