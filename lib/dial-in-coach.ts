@@ -45,6 +45,18 @@ export type DialInCoachData = {
   readonly subtitle: string;
   readonly problem: string;
   readonly recipe: DialInRecipe;
+  readonly grindMemory: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly method: string | null;
+    readonly grindSize: string | null;
+    readonly coffeeAmount: number | null;
+    readonly waterAmount: number | null;
+    readonly waterTemp: number | null;
+    readonly brewTime: string | null;
+    readonly rating: number | null;
+    readonly brewedAt: string | null;
+  };
   readonly adjustments: readonly DialInAdjustment[];
   readonly evidence: readonly string[];
   readonly suggestedLog: {
@@ -144,6 +156,10 @@ function brewedTime(log: DialInBrewLog | undefined): number {
   return Number.isFinite(parsed.getTime()) ? parsed.getTime() : 0;
 }
 
+function findRecentSuccessfulLog(logs: readonly DialInBrewLog[]): DialInBrewLog | undefined {
+  return logs.find((log) => log.rating !== null && log.rating >= 4);
+}
+
 function scoreShelfItem(item: DialInShelfItem): number {
   if (item.is_finished || item.fill_level <= 0) return -100;
   return item.fill_level <= 25 ? 20 : item.fill_level <= 50 ? 12 : 5;
@@ -194,7 +210,7 @@ function applyFeedbackToRecipe(recipe: DialInRecipe, feedback: DialInFeedback | 
 }
 
 function baseRecipeFor(item: DialInShelfItem | null, logs: readonly DialInBrewLog[], now: Date): DialInRecipe {
-  const recentSuccessfulLog = logs.find((log) => log.rating !== null && log.rating >= 4);
+  const recentSuccessfulLog = findRecentSuccessfulLog(logs);
   if (recentSuccessfulLog) {
     const parameters = recentSuccessfulLog.parameters;
     return {
@@ -245,7 +261,7 @@ function latestFeedbackLog(logs: readonly DialInBrewLog[]): DialInBrewLog | unde
 }
 
 function recipeFor(item: DialInShelfItem | null, logs: readonly DialInBrewLog[], now: Date): DialInRecipe {
-  const recentSuccessfulLog = logs.find((log) => log.rating !== null && log.rating >= 4);
+  const recentSuccessfulLog = findRecentSuccessfulLog(logs);
   const feedbackLog = latestFeedbackLog(logs);
   const feedback = feedbackLog?.coach_feedback ?? null;
   const baseRecipe = baseRecipeFor(item, logs, now);
@@ -265,7 +281,7 @@ function evidenceFor(
   const roastAge = daysSince(item?.roast_date ?? null, now);
   const openedAge = daysSince(item?.opened_date ?? null, now);
   const failedLog = logs.find((log) => log.rating !== null && log.rating <= 2);
-  const successfulLog = logs.find((log) => log.rating !== null && log.rating >= 4);
+  const successfulLog = findRecentSuccessfulLog(logs);
 
   if (item) evidence.push(`${item.roaster_name} ${item.bean_name} 잔량 ${item.fill_level}%`);
   if (roastAge !== null) evidence.push(`로스팅 후 ${roastAge}일`);
@@ -277,6 +293,42 @@ function evidenceFor(
   if (failedLog?.simple_note) evidence.push(`최근 실패 메모: ${failedLog.simple_note}`);
 
   return evidence.length > 0 ? evidence : ["선반 원두를 등록하면 원두별 시작점을 더 정확히 제안합니다."];
+}
+
+function buildGrindMemory(logs: readonly DialInBrewLog[]): DialInCoachData["grindMemory"] {
+  const recentSuccessfulLog = findRecentSuccessfulLog(logs);
+
+  if (!recentSuccessfulLog) {
+    return {
+      title: "아직 고정된 분쇄도 기억이 없어요",
+      subtitle: "좋았던 컵에 별점 4점 이상을 남기면 다음부터 바로 불러옵니다.",
+      method: null,
+      grindSize: null,
+      coffeeAmount: null,
+      waterAmount: null,
+      waterTemp: null,
+      brewTime: null,
+      rating: null,
+      brewedAt: null,
+    };
+  }
+
+  const parameters = recentSuccessfulLog.parameters;
+  const grindSize = typeof parameters.grindSize === "string" ? parameters.grindSize : null;
+  const brewTime = typeof parameters.brewTime === "string" ? parameters.brewTime : null;
+
+  return {
+    title: "마지막으로 잘 된 세팅",
+    subtitle: `${recentSuccessfulLog.method}${grindSize ? ` · ${grindSize}` : ""}`,
+    method: recentSuccessfulLog.method,
+    grindSize,
+    coffeeAmount: readNumber(parameters.coffeeAmount),
+    waterAmount: readNumber(parameters.waterAmount),
+    waterTemp: readNumber(parameters.waterTemp),
+    brewTime,
+    rating: recentSuccessfulLog.rating,
+    brewedAt: recentSuccessfulLog.brewed_at,
+  };
 }
 
 function problemFor(logs: readonly DialInBrewLog[]): string {
@@ -304,6 +356,7 @@ export function buildDialInCoach(input: BuildDialInCoachInput): DialInCoachData 
     ? input.brewingLogs.filter((log) => log.shelf_item_id === item.id)
     : input.brewingLogs;
   const recipe = recipeFor(item, itemLogs, now);
+  const grindMemory = buildGrindMemory(itemLogs);
   const evidence = evidenceFor(item, itemLogs, now);
   const title = item ? `${item.roaster_name} ${item.bean_name}` : "오늘의 첫 추출 시작점";
 
@@ -314,6 +367,7 @@ export function buildDialInCoach(input: BuildDialInCoachInput): DialInCoachData 
     subtitle: item?.origin ?? "CoffeeDex Dial-in Coach",
     problem: problemFor(itemLogs),
     recipe,
+    grindMemory,
     adjustments: defaultAdjustments,
     evidence,
     suggestedLog: {

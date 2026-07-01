@@ -194,6 +194,21 @@ export function DashboardDialInCoachPanel({
             <span>{data.recipe.brewTime}</span>
           </div>
           <p className="mt-4 text-sm font-black text-primary-amber">{data.recipe.method}</p>
+          <div className="mt-4 rounded-2xl border border-primary-amber/20 bg-primary-amber/10 p-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/85">Grind Memory</p>
+            <p className="mt-1 break-keep text-sm font-black text-[#FFF8EC]">{data.grindMemory.title}</p>
+            <p className="mt-1 break-keep text-xs font-semibold leading-5 text-[#FFF8EC]/58">{data.grindMemory.subtitle}</p>
+            {data.grindMemory.method && (
+              <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] font-bold text-[#FFF8EC]/68">
+                <span>{data.grindMemory.method}</span>
+                <span>{data.grindMemory.grindSize ?? "분쇄도 미기록"}</span>
+                <span>원두 {data.grindMemory.coffeeAmount ?? "-"}g</span>
+                <span>물 {data.grindMemory.waterAmount ?? "-"}g</span>
+                <span>{data.grindMemory.waterTemp ? `${data.grindMemory.waterTemp}C` : "온도 -"}</span>
+                <span>{data.grindMemory.brewTime ?? "시간 -"}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="coffee-metric-card">

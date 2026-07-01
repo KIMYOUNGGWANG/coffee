@@ -180,6 +180,18 @@ async function mockDashboardApiRoutes(page: Page): Promise<void> {
               brewTime: "2:45",
               ratioLabel: "1:16",
             },
+            grindMemory: {
+              title: "아직 고정된 분쇄도 기억이 없어요",
+              subtitle: "좋았던 컵에 별점 4점 이상을 남기면 다음부터 바로 불러옵니다.",
+              method: null,
+              grindSize: null,
+              coffeeAmount: null,
+              waterAmount: null,
+              waterTemp: null,
+              brewTime: null,
+              rating: null,
+              brewedAt: null,
+            },
             adjustments: [],
             evidence: [],
             suggestedLog: {

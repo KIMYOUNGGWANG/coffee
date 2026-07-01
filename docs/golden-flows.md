@@ -44,6 +44,12 @@ Given a user has a current shelf bean, when they open the brewing log tab, then 
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/dial-in-coach`, `POST /api/v1/brewing-logs`, `buildDialInCoach`
 
+## Flow 4A-0. Recall The Last Good Grind Setting
+
+Given a user has a 4-5 star brew log for the current shelf bean, when they open Dial-in Coach, then CoffeeDex shows the last-good method, dose, water, temperature, grind setting, and brew time next to the starting recipe. If no successful log exists, it asks the user to leave a high-rated brew so the setting can be remembered later. This is private repeatability memory only, not a public recipe feed, grinder calibration database, marketplace recommendation, or roaster order.
+
+Evidence surfaces: `/dashboard`, `GET /api/v1/dial-in-coach`, `buildDialInCoach`
+
 ## Flow 4A-1. Let Brew Logs Update Shelf Runway
 
 Given a user logs a brew for an owned shelf bean with a coffee dose, when `POST /api/v1/brewing-logs` saves the private brewing log, then CoffeeDex also decreases that owned shelf item's fill level from the dose and bag weight. The next dashboard refresh uses the updated fill level for Fresh Shelf, Shelf Runway, Rebuy Intelligence, and finished-state guidance. This is private inventory memory only, not a marketplace, public consumption statistic, roaster order, or push notification.

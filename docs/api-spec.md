@@ -64,6 +64,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - private purchase memory through optional `purchase_url` and `purchase_note` fields on cards and shelf items, used only to reopen the user's own saved buying clue or fallback search;
 - private in-app rebuy reminder state on shelf items through `rebuy_priority`, `rebuy_reminder_date`, `rebuy_action`, and `rebuy_action_at`; this is a saved UI loop, not push delivery or an order flow;
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
+- private Grind Memory inside Dial-in Coach, where the latest owned 4-5 star brew log for the selected shelf bean is surfaced as the last-good method, dose, water, temperature, grind setting, and brew time;
 - private Brew Failure Memory inside Dial-in Coach, where one-tap sour, bitter, weak, heavy, or balanced feedback is saved to `brewing_logs.coach_feedback` and changes the next recommended recipe;
 - private Rebuy Intelligence that combines Fresh Shelf timing, taste-match criteria, package/scan repurchase search memory, and brew-failure adjustment prompts from owned data only;
 - package claims kept distinct from user-perceived taste;
@@ -512,6 +513,18 @@ Return a private first-cup recipe and next-move plan from the user's current she
         "brewTime": "2:45",
         "ratioLabel": "1:16"
       },
+      "grindMemory": {
+        "title": "마지막으로 잘 된 세팅",
+        "subtitle": "V60 · Medium Fine",
+        "method": "V60",
+        "grindSize": "Medium Fine",
+        "coffeeAmount": 15,
+        "waterAmount": 240,
+        "waterTemp": 93,
+        "brewTime": "2:45",
+        "rating": 5,
+        "brewedAt": "2026-06-28T10:00:00.000Z"
+      },
       "adjustments": [
         {
           "trigger": "too_sour",
@@ -535,6 +548,8 @@ Return a private first-cup recipe and next-move plan from the user's current she
     }
   }
   ```
+
+`grindMemory` is derived only from the user's own recent successful brewing logs for the selected shelf bean. It is a private recall surface for repeatability, not a public recipe, grinder calibration database, marketplace recommendation, or roaster partner claim.
 
 ### `POST /api/v1/brewing-logs`
 
