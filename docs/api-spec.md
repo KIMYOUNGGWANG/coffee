@@ -42,7 +42,7 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `POST` | `/api/v1/brewing-logs` | Record a new brewing log with extraction parameters and notes for a shelf item. |
 | `GET` | `/api/v1/brewing-logs` | Fetch the current user's history of brewing logs. |
 
-`POST /api/v1/brewing-logs` accepts optional `coachFeedback` values of `too_sour`, `too_bitter`, `too_weak`, `too_heavy`, or `balanced`. Dial-in Coach reads the existing `brewing_logs.coach_feedback` field as private Brew Failure Memory and uses it to adjust the next recipe; no new public recipe feed, marketplace, or community comparison is created.
+`POST /api/v1/brewing-logs` accepts optional `coachFeedback` values of `too_sour`, `too_bitter`, `too_weak`, `too_heavy`, or `balanced`. Dial-in Coach reads the existing `brewing_logs.coach_feedback` field as private Brew Failure Memory and uses it to adjust the next recipe; no new public recipe feed, marketplace, or community comparison is created. When the request includes both an owned `shelfItemId` and `parameters.coffeeAmount`, the route also decreases that owned shelf item's `fill_level` from the logged dose and marks it finished at 0%. The response includes optional `shelfConsumption` metadata for the private Brew-to-Shelf loop.
 
 The historical `tasting_cards` table, generic metric columns, route paths, and applied migrations remain unchanged for compatibility. They are implementation identifiers, not the canonical brand.
 
@@ -60,6 +60,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
 - private Shelf Runway estimates that derive cups remaining, likely run-out timing, and a suggested in-app rebuy reminder date from shelf weight, fill level, and opened date;
+- private Brew-to-Shelf consumption that turns each owned brewing log dose into an automatic shelf fill-level update, keeping Fresh Shelf, Shelf Runway, and Rebuy Intelligence current without a separate inventory chore;
 - private purchase memory through optional `purchase_url` and `purchase_note` fields on cards and shelf items, used only to reopen the user's own saved buying clue or fallback search;
 - private in-app rebuy reminder state on shelf items through `rebuy_priority`, `rebuy_reminder_date`, `rebuy_action`, and `rebuy_action_at`; this is a saved UI loop, not push delivery or an order flow;
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
@@ -441,6 +442,32 @@ The profile surface preserves CoffeeDex paid and rate-limited compatibility feat
 | `coach_feedback` | `text` | Optional post-brew feedback: `too_sour`, `too_bitter`, `too_weak`, `too_heavy`, or `balanced`. |
 | `coach_iteration` | `integer` | Optional dial-in iteration number from 1 to 12. |
 | `coach_snapshot` | `jsonb` | Optional private snapshot of the coach suggestion that led to the log. |
+
+### Brew-to-Shelf Consumption
+
+`POST /api/v1/brewing-logs` keeps inventory current when the log is connected to a shelf bean:
+
+- The route fetches the target `coffee_shelf_items` row with both `id` and `user_id` filters.
+- If `parameters.coffeeAmount` is positive and the shelf item has valid `total_weight` and `fill_level`, CoffeeDex calculates the remaining grams and writes the next `fill_level` back to the same owned shelf item.
+- `is_finished` becomes `true` only when the calculated fill level reaches 0.
+- The update is private inventory memory only. It is not an order, marketplace action, roaster referral, push notification, or public consumption statistic.
+
+Response addition:
+
+```json
+{
+  "data": { "id": "brewing-log-id" },
+  "shelfConsumption": {
+    "shelfItemId": "shelf-item-id",
+    "consumedGrams": 15,
+    "consumedPercent": 8,
+    "previousFillLevel": 50,
+    "nextFillLevel": 43,
+    "remainingGrams": 85,
+    "isFinished": false
+  }
+}
+```
 
 ## AI Barista & Brewing Feedback API Specification
 

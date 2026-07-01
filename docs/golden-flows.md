@@ -44,6 +44,12 @@ Given a user has a current shelf bean, when they open the brewing log tab, then 
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/dial-in-coach`, `POST /api/v1/brewing-logs`, `buildDialInCoach`
 
+## Flow 4A-1. Let Brew Logs Update Shelf Runway
+
+Given a user logs a brew for an owned shelf bean with a coffee dose, when `POST /api/v1/brewing-logs` saves the private brewing log, then CoffeeDex also decreases that owned shelf item's fill level from the dose and bag weight. The next dashboard refresh uses the updated fill level for Fresh Shelf, Shelf Runway, Rebuy Intelligence, and finished-state guidance. This is private inventory memory only, not a marketplace, public consumption statistic, roaster order, or push notification.
+
+Evidence surfaces: `/dashboard`, `POST /api/v1/brewing-logs`, `GET /api/v1/shelf`, `calculateShelfConsumption`
+
 ## Flow 4B. Follow Rebuy Intelligence
 
 Given a user has owned cards, shelf items, or brewing logs, when CoffeeDex opens the shelf dashboard, then it shows a private Rebuy Intelligence panel with four owner-data actions: a rebuy timing reminder, a taste-match criterion from liked cards, a package or shelf based repurchase memory, and a brew-failure adjustment prompt. Saved purchase URLs and buying notes take precedence over generic search links. This is a personal memory loop only; it does not claim community recommendations, partner offers, marketplace listings, roaster orders, or background notification delivery.

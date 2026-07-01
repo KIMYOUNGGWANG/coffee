@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/api-errors";
+import { calculateShelfConsumption } from "@/lib/shelf-consumption";
 import { z } from "zod";
 
 const createBrewingLogSchema = z.object({
@@ -22,6 +23,12 @@ const createBrewingLogSchema = z.object({
   coachIteration: z.number().int().min(1).max(12).optional().nullable(),
   coachSnapshot: z.record(z.unknown()).optional().nullable(),
 });
+
+type ShelfItemForConsumption = {
+  readonly id: string;
+  readonly total_weight: number;
+  readonly fill_level: number;
+};
 
 // GET /api/v1/brewing-logs - Fetch brewing logs for authenticated user
 export async function GET(request: NextRequest) {
@@ -111,6 +118,42 @@ export async function POST(request: NextRequest) {
       };
     }
 
+    let shelfConsumption: {
+      shelfItemId: string;
+      consumedGrams: number;
+      consumedPercent: number;
+      previousFillLevel: number;
+      nextFillLevel: number;
+      remainingGrams: number;
+      isFinished: boolean;
+    } | null = null;
+
+    let shelfItemForConsumption: ShelfItemForConsumption | null = null;
+
+    if (validatedData.shelfItemId && finalParameters.coffeeAmount) {
+      const { data: shelfItem, error: shelfError } = await supabase
+        .from("coffee_shelf_items")
+        .select("id,total_weight,fill_level")
+        .eq("id", validatedData.shelfItemId)
+        .eq("user_id", user.id)
+        .single();
+
+      if (shelfError || !shelfItem) {
+        return NextResponse.json(
+          {
+            error: {
+              code: 400,
+              message: "선택한 원두를 찾을 수 없습니다.",
+              details: shelfError?.message ?? "shelf item not found",
+            },
+          },
+          { status: 400 }
+        );
+      }
+
+      shelfItemForConsumption = shelfItem as ShelfItemForConsumption;
+    }
+
     const { data, error } = await supabase
       .from("brewing_logs")
       .insert({
@@ -136,7 +179,51 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ data }, { status: 201 });
+    if (shelfItemForConsumption) {
+      const consumption = calculateShelfConsumption({
+        totalWeight: shelfItemForConsumption.total_weight,
+        fillLevel: shelfItemForConsumption.fill_level,
+        coffeeAmount: finalParameters.coffeeAmount,
+      });
+
+      if (consumption) {
+        const { error: shelfUpdateError } = await supabase
+          .from("coffee_shelf_items")
+          .update({
+            fill_level: consumption.nextFillLevel,
+            is_finished: consumption.isFinished,
+          })
+          .eq("id", shelfItemForConsumption.id)
+          .eq("user_id", user.id)
+          .select("id")
+          .single();
+
+        if (shelfUpdateError) {
+          return NextResponse.json(
+            {
+              error: {
+                code: 500,
+                message: "추출 로그는 저장됐지만 선반 잔량 업데이트 중 오류가 발생했습니다.",
+                details: shelfUpdateError.message,
+              },
+            },
+            { status: 500 }
+          );
+        }
+
+        shelfConsumption = {
+          shelfItemId: shelfItemForConsumption.id,
+          consumedGrams: consumption.consumedGrams,
+          consumedPercent: consumption.consumedPercent,
+          previousFillLevel: consumption.previousFillLevel,
+          nextFillLevel: consumption.nextFillLevel,
+          remainingGrams: consumption.remainingGrams,
+          isFinished: consumption.isFinished,
+        };
+      }
+    }
+
+    return NextResponse.json({ data, shelfConsumption }, { status: 201 });
   } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: 500, message: "서버 내부 오류가 발생했습니다.", details: getErrorMessage(error) } },

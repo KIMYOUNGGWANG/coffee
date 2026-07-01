@@ -3,12 +3,16 @@
 import React, { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Star, Coffee, Loader2, Clock, Thermometer, Droplet, Layers, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { calculateShelfConsumption } from "@/lib/shelf-consumption";
 import { cn } from "@/lib/utils";
 
 interface ShelfItem {
   id: string;
   roaster_name: string;
   bean_name: string;
+  total_weight: number;
+  fill_level: number;
+  is_finished: boolean;
 }
 
 interface BrewingLog {
@@ -272,6 +276,14 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
   };
 
   const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+  const selectedShelfItem = activeShelfItems.find((item) => item.id === shelfItemId) ?? null;
+  const shelfConsumptionPreview = selectedShelfItem
+    ? calculateShelfConsumption({
+      totalWeight: selectedShelfItem.total_weight,
+      fillLevel: selectedShelfItem.fill_level,
+      coffeeAmount: coffeeAmount ? Number(coffeeAmount) : null,
+    })
+    : null;
 
   return (
     <div className="space-y-6">
@@ -470,6 +482,12 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
                     />
                   </div>
                 </div>
+                {shelfConsumptionPreview && selectedShelfItem && (
+                  <div className="rounded-xl border border-primary-amber/20 bg-primary-amber/10 px-3 py-2 text-[11px] font-bold leading-5 text-[#FFF8EC]/72">
+                    저장하면 {selectedShelfItem.bean_name} 선반 잔량이 {shelfConsumptionPreview.previousFillLevel}%에서{" "}
+                    <span className="text-primary-amber">{shelfConsumptionPreview.nextFillLevel}%</span>로 자동 반영됩니다.
+                  </div>
+                )}
               </div>
 
               <div className="space-y-1">
