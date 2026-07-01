@@ -98,6 +98,18 @@ export type DialInCoachData = {
     readonly brewTime: string;
     readonly ratioLabel: string;
   };
+  readonly grindMemory: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly method: string | null;
+    readonly grindSize: string | null;
+    readonly coffeeAmount: number | null;
+    readonly waterAmount: number | null;
+    readonly waterTemp: number | null;
+    readonly brewTime: string | null;
+    readonly rating: number | null;
+    readonly brewedAt: string | null;
+  };
   readonly adjustments: readonly {
     readonly trigger: "too_sour" | "too_bitter" | "too_weak" | "too_heavy";
     readonly label: string;

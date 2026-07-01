@@ -61,6 +61,8 @@ test("Given a bright active bean, When Dial-in Coach is built, Then it returns a
     assert.equal(result.recipe.coffeeAmount, 15);
     assert.equal(result.recipe.waterAmount, 240);
     assert.equal(result.recipe.waterTemp, 93);
+    assert.equal(result.grindMemory.method, null);
+    assert.match(result.grindMemory.title, /분쇄도 기억/);
     assert.equal(result.suggestedLog.shelfItemId, "shelf-1");
     assert.equal(result.suggestedLog.coachSnapshot.source, "dial_in_coach");
     assert.match(result.suggestedLog.simpleNote, /Dial-in Coach/);
@@ -111,6 +113,13 @@ test("Given a recent successful brew log, When Dial-in Coach is built, Then it r
     assert.equal(result.recipe.coffeeAmount, 18);
     assert.equal(result.recipe.waterAmount, 270);
     assert.equal(result.recipe.ratioLabel, "이전 성공 로그 기반");
+    assert.equal(result.grindMemory.title, "마지막으로 잘 된 세팅");
+    assert.equal(result.grindMemory.method, "Origami");
+    assert.equal(result.grindMemory.grindSize, "Medium");
+    assert.equal(result.grindMemory.coffeeAmount, 18);
+    assert.equal(result.grindMemory.waterAmount, 270);
+    assert.equal(result.grindMemory.waterTemp, 90);
+    assert.equal(result.grindMemory.brewTime, "2:25");
     assert.ok(result.evidence.some((value) => value.includes("성공 로그")));
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
