@@ -50,20 +50,20 @@ export function DashboardHeader({
       <div className="flex min-w-0 items-center justify-between gap-4">
         <div className="min-w-0">
           <p className="coffee-kicker">CoffeeDex room</p>
-          <h2 className="mt-3 break-keep font-serif text-2xl font-black tracking-tight text-background-dark sm:text-3xl">개인 커피룸</h2>
+          <h2 className="mt-3 break-keep font-serif text-2xl font-black tracking-tight text-[#FFF8EC] sm:text-3xl">개인 커피룸</h2>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="hidden min-w-44 sm:block" aria-label={`패스포트 다음 단계 ${completedCount}/${nextMilestone}`}>
-            <div className="flex justify-between text-xs font-black text-background-dark">
+            <div className="flex justify-between text-xs font-black text-[#FFF8EC]">
               <span>{milestoneLabel}</span>
               <span className="text-primary-amber">{completedCount} / {nextMilestone}</span>
             </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-background-dark/10">
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/12">
               <div className="h-full rounded-full bg-primary-amber" style={{ width: `${progress}%` }} />
             </div>
           </div>
-          <span className="grid size-10 place-items-center rounded-full border border-background-dark/10 bg-white/45 text-background-dark/70 shadow-sm">
+          <span className="grid size-10 place-items-center rounded-full border border-white/12 bg-white/[0.07] text-[#FFF8EC]/72 shadow-sm">
             <UserRound aria-hidden="true" size={18} />
           </span>
           <Button
@@ -84,8 +84,8 @@ export function DashboardHeader({
             { label: "등급", value: `${completedCount}/${nextMilestone}` },
           ].map((item) => (
             <div key={item.label} className="flex flex-col text-center">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{item.label}</p>
-              <p className="mt-1.5 font-serif text-2xl font-black text-background-dark">{item.value}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#FFF8EC]/56">{item.label}</p>
+              <p className="mt-1.5 font-serif text-2xl font-black text-[#FFF8EC]">{item.value}</p>
             </div>
           ))}
         </div>
@@ -94,7 +94,7 @@ export function DashboardHeader({
             <span>{milestoneLabel}</span>
             <span className="text-primary-amber">{Math.round(progress)}%</span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-background-dark/10">
+          <div className="h-1.5 overflow-hidden rounded-full bg-white/12">
             <div className="h-full rounded-full bg-primary-amber" style={{ width: `${progress}%` }} />
           </div>
         </div>
@@ -105,11 +105,11 @@ export function DashboardHeader({
           {activeTab === "shelf" && (
             <p className="mb-3 text-[10px] font-black uppercase tracking-[0.18em] text-primary-amber">memory and rebuy system</p>
           )}
-          <h1 className="break-keep font-serif text-4xl font-black leading-[1.05] tracking-tight text-background-dark sm:text-6xl">
+          <h1 className="break-keep font-serif text-4xl font-black leading-[1.05] tracking-tight text-[#FFF8EC] sm:text-6xl">
             {tabTitles[activeTab]}
           </h1>
           {activeTab === "shelf" && (
-            <p className="mt-4 max-w-2xl break-keep text-sm font-semibold leading-7 text-muted-foreground">
+            <p className="mt-4 max-w-2xl break-keep text-sm font-semibold leading-7 text-[#FFF8EC]/68">
               기억한 맛, 지금 가진 원두, 다음 구매 신호를 한 화면에서 이어봅니다. 기록한 원두 {cardCount}봉
             </p>
           )}
@@ -127,7 +127,7 @@ export function DashboardHeader({
         )}
       </div>
 
-      <div className="mt-6 border-t border-background-dark/10 pt-3">
+      <div className="mt-6 border-t border-white/10 pt-3">
         <DashboardDesktopNavigation activeTab={activeTab} onTabChange={onTabChange} />
       </div>
     </header>

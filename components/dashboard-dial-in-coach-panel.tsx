@@ -148,7 +148,7 @@ export function DashboardDialInCoachPanel({
           <h2 className="mt-3 break-keep font-serif text-2xl font-black leading-tight sm:text-3xl">
             오늘 첫 컵을 어디서 시작할지 정해드릴게요
           </h2>
-          <p className="mt-2 max-w-2xl break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">
+          <p className="mt-2 max-w-2xl break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/72">
             {data.problem}
           </p>
           <p className="mt-2 break-keep text-xs font-bold leading-5 text-primary-amber/82">
@@ -159,7 +159,7 @@ export function DashboardDialInCoachPanel({
           type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-primary-amber bg-primary-amber px-4 text-sm font-black text-background-dark transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-primary-amber bg-primary-amber px-4 text-sm font-black text-[#120B07] transition hover:-translate-y-0.5 hover:bg-[#F0B978] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Save size={16} />
           {isSaving ? "저장 중" : "이 레시피로 로그 시작"}
@@ -170,10 +170,10 @@ export function DashboardDialInCoachPanel({
         <div className="coffee-metric-card">
           <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">Selected Bean</p>
           <p className="mt-3 break-keep text-lg font-black leading-6">{data.title}</p>
-          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.subtitle}</p>
+          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/58">{data.subtitle}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {data.evidence.map((item) => (
-              <span key={item} className="rounded-full border border-white/12 bg-white/[0.04] px-3 py-1 text-xs font-bold text-[#FFF8EC]/62">
+              <span key={item} className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-1 text-xs font-bold text-[#FFF8EC]/72">
                 {item}
               </span>
             ))}
@@ -185,7 +185,7 @@ export function DashboardDialInCoachPanel({
             <Coffee size={13} />
             Starting Recipe
           </p>
-          <div className="mt-4 grid grid-cols-2 gap-2 text-sm font-bold text-[#FFF8EC]/72">
+          <div className="mt-4 grid grid-cols-2 gap-2 text-sm font-bold text-[#FFF8EC]/78">
             <span>원두 {data.recipe.coffeeAmount}g</span>
             <span>물 {data.recipe.waterAmount}g</span>
             <span className="inline-flex items-center gap-1"><Thermometer size={13} />{data.recipe.waterTemp}C</span>
@@ -217,7 +217,7 @@ export function DashboardDialInCoachPanel({
             {data.adjustments.slice(0, 3).map((adjustment) => (
               <div key={adjustment.trigger}>
                 <p className="text-sm font-black text-[#FFF8EC]">{adjustment.label}</p>
-                <p className="mt-1 break-keep text-xs font-semibold leading-5 text-[#FFF8EC]/58">{adjustment.nextMove}</p>
+                <p className="mt-1 break-keep text-xs font-semibold leading-5 text-[#FFF8EC]/70">{adjustment.nextMove}</p>
               </div>
             ))}
           </div>
@@ -229,7 +229,7 @@ export function DashboardDialInCoachPanel({
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">Brew Failure Memory</p>
             <h3 className="mt-1 break-keep text-base font-black text-[#FFF8EC]">방금 컵은 어땠나요?</h3>
-            <p className="mt-1 break-keep text-xs font-semibold leading-5 text-[#FFF8EC]/58">
+            <p className="mt-1 break-keep text-xs font-semibold leading-5 text-[#FFF8EC]/70">
               하나만 눌러두면 다음 추천에서 분쇄도, 물 온도, 비율, 시간을 한 변수씩 보정합니다.
             </p>
           </div>
@@ -240,7 +240,7 @@ export function DashboardDialInCoachPanel({
                 type="button"
                 onClick={() => handleFeedbackSave(feedback)}
                 disabled={savingFeedback !== null}
-                className="min-h-10 rounded-full border border-white/12 bg-white/[0.055] px-2 text-[11px] font-black text-[#FFF8EC]/72 transition hover:-translate-y-0.5 hover:border-primary-amber/60 hover:bg-primary-amber/12 hover:text-primary-amber disabled:cursor-not-allowed disabled:opacity-55"
+                className="min-h-10 rounded-full border border-white/14 bg-white/[0.07] px-2 text-[11px] font-black text-[#FFF8EC] transition hover:-translate-y-0.5 hover:border-primary-amber/60 hover:bg-primary-amber/14 hover:text-primary-amber disabled:cursor-not-allowed disabled:opacity-55"
               >
                 {savingFeedback === feedback.value ? "저장 중" : feedback.label}
               </button>
@@ -250,7 +250,7 @@ export function DashboardDialInCoachPanel({
       </div>
 
       {savedMessage && (
-        <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-3 py-2 text-xs font-bold text-[#FFF8EC]/70">
+        <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.07] px-3 py-2 text-xs font-bold text-[#FFF8EC]/82">
           <CheckCircle2 size={14} className="text-primary-amber" />
           {savedMessage}
         </p>

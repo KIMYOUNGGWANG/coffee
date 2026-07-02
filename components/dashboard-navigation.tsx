@@ -37,8 +37,8 @@ function NavigationItems({ activeTab, onTabChange }: DashboardNavigationProps) {
             className={cn(
               "flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-bold transition-[color,background-color,transform,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95 md:min-h-10 md:flex-none md:flex-row md:gap-2 md:px-4 md:text-xs",
               isActive
-                ? "bg-background-dark text-[#FFF8EC] shadow-[0_12px_30px_rgba(73,48,36,0.2)]"
-                : "text-muted-foreground hover:bg-background-dark/6 hover:text-background-dark",
+                ? "bg-primary-amber text-[#120B07] shadow-[0_12px_30px_rgba(209,138,92,0.24)]"
+                : "text-[#FFF8EC]/58 hover:bg-white/[0.07] hover:text-[#FFF8EC]",
             )}
           >
             <Icon aria-hidden="true" size={20} strokeWidth={isActive ? 2.3 : 1.7} />
@@ -48,7 +48,7 @@ function NavigationItems({ activeTab, onTabChange }: DashboardNavigationProps) {
       })}
       <Link
         href="/settings"
-        className="flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-bold text-muted-foreground transition-[color,background-color,transform] hover:bg-background-dark/6 hover:text-background-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95 md:min-h-10 md:flex-none md:flex-row md:gap-2 md:px-4 md:text-xs"
+        className="flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-bold text-[#FFF8EC]/58 transition-[color,background-color,transform] hover:bg-white/[0.07] hover:text-[#FFF8EC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber active:scale-95 md:min-h-10 md:flex-none md:flex-row md:gap-2 md:px-4 md:text-xs"
       >
         <Settings aria-hidden="true" size={20} strokeWidth={1.7} />
         <span>설정</span>
@@ -59,7 +59,7 @@ function NavigationItems({ activeTab, onTabChange }: DashboardNavigationProps) {
 
 export function DashboardDesktopNavigation(props: DashboardNavigationProps) {
   return (
-    <nav aria-label="대시보드 주요 메뉴" className="hidden items-center gap-1 rounded-[1.25rem] border border-background-dark/10 bg-white/42 p-1 md:inline-flex">
+    <nav aria-label="대시보드 주요 메뉴" className="hidden items-center gap-1 rounded-[1.25rem] border border-white/12 bg-white/[0.06] p-1 md:inline-flex">
       <NavigationItems {...props} />
     </nav>
   );
@@ -69,9 +69,9 @@ export function DashboardMobileNavigation(props: DashboardNavigationProps) {
   return (
     <nav
       aria-label="대시보드 주요 메뉴"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-background-dark/10 bg-[#FFF8EC]/92 px-3 pb-[calc(0.55rem+env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-18px_38px_rgba(73,48,36,0.16)] backdrop-blur-xl md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/12 bg-[#120B07]/92 px-3 pb-[calc(0.55rem+env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-18px_42px_rgba(0,0,0,0.46)] backdrop-blur-xl md:hidden"
     >
-      <div className="mx-auto flex max-w-md items-center gap-1 rounded-[1.45rem] border border-background-dark/10 bg-white/76 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+      <div className="mx-auto flex max-w-md items-center gap-1 rounded-[1.45rem] border border-white/12 bg-white/[0.07] p-1 shadow-[inset_0_1px_0_rgba(255,248,236,0.1)]">
         <NavigationItems {...props} />
       </div>
     </nav>

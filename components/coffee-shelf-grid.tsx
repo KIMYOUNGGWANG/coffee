@@ -564,23 +564,23 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
             <Coffee className="text-primary-amber" size={20} />
             원두 보관함 (Coffee Shelf)
           </h2>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-1 leading-5">
             현재 개봉하여 드시고 계시는 원두들의 남은 분량을 시각적으로 관리하고 추출에 활용해 보세요.
           </p>
         </div>
 
         {!isAuthRequired && !loadErrorMessage && (
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
             <button
               onClick={() => setIsScannerOpen(true)}
-              className="bg-[#D4AF37] hover:opacity-90 text-black rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 h-10 px-4 py-2 cursor-pointer border-none"
+              className="flex h-11 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-primary-amber bg-primary-amber px-4 py-2 text-xs font-black text-[#120B07] shadow-[0_12px_30px_rgba(209,138,92,0.2)] transition-all hover:-translate-y-0.5 hover:bg-[#F0B978] sm:flex-none"
             >
               <ScanLine size={15} />
-              AI 스캔 등록
+              봉투 스캔
             </button>
             <button
               onClick={() => setIsDialogOpen(true)}
-              className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 h-10 px-4 py-2 cursor-pointer"
+              className="flex h-11 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-white/16 bg-white/[0.08] px-4 py-2 text-xs font-black text-[#FFF8EC] shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-amber/40 hover:bg-white/[0.12] sm:flex-none"
             >
               <Plus size={15} />
               직접 입력
@@ -590,13 +590,13 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
       </div>
 
       {degassedItemsCount > 0 && !isLoading && !isAuthRequired && !loadErrorMessage && items.length > 0 && (
-        <div className="bg-primary-amber/10 border border-primary-amber/30 rounded-2xl p-4 flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300 shadow-sm">
+        <div className="bg-primary-amber/12 border border-primary-amber/34 rounded-2xl p-4 flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300 shadow-sm">
           <div className="bg-primary-amber/20 p-2 rounded-full text-primary-amber">
             <Sparkles size={18} />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-primary-amber tracking-tight">디개싱(Degassing) 완료!</h4>
-            <p className="text-[11px] text-primary-amber/80 mt-0.5">
+            <h4 className="text-sm font-bold text-primary-amber tracking-tight">디개싱(Degassing) 완료</h4>
+            <p className="text-[11px] text-[#FFF8EC]/72 mt-0.5 leading-5">
               선반 위 <strong className="text-primary-amber">{degassedItemsCount}</strong>개의 원두가 로스팅 후 7일이 지나 향미가 안정화되었습니다. 지금 바로 추출하기 가장 좋은 타이밍이에요.
             </p>
           </div>
@@ -626,7 +626,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                   <label htmlFor="import-card" className="text-xs font-semibold text-muted-foreground">작성한 테이스팅 노트에서 불러오기 (선택)</label>
                   <select
                     id="import-card"
-                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber"
+                    className="w-full bg-black/28 border border-white/14 rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber"
                     value={tastingCardId}
                     onChange={(e) => handleImportTastingCard(e.target.value)}
                   >
@@ -648,7 +648,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                     placeholder="예: 프릳츠, 센터커피"
                     value={roasterName}
                     onChange={e => setRoasterName(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
+                    className="w-full bg-black/28 border border-white/14 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
                     required
                   />
                 </div>
@@ -659,7 +659,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                     placeholder="예: 서울 시네마, 에티오피아 예가체프"
                     value={beanName}
                     onChange={e => setBeanName(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
+                    className="w-full bg-black/28 border border-white/14 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
                     required
                   />
                 </div>
@@ -672,7 +672,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                   placeholder="예: Ethiopia Natural, Washed, 무산소 발효"
                   value={origin}
                   onChange={e => setOrigin(e.target.value)}
-                  className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
+                  className="w-full bg-black/28 border border-white/14 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
                 />
               </div>
 
@@ -685,7 +685,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                     placeholder="https://roaster.example/coffee"
                     value={purchaseUrl}
                     onChange={e => setPurchaseUrl(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
+                    className="w-full bg-black/28 border border-white/14 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
                   />
                 </div>
                 <div className="space-y-1">
@@ -695,7 +695,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                     placeholder="예: 공식몰 200g 옵션"
                     value={purchaseNote}
                     onChange={e => setPurchaseNote(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
+                    className="w-full bg-black/28 border border-white/14 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber placeholder:text-muted-foreground/50"
                   />
                 </div>
               </div>
@@ -708,7 +708,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                     type="number"
                     value={totalWeight}
                     onChange={e => setTotalWeight(Number(e.target.value))}
-                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber"
+                    className="w-full bg-black/28 border border-white/14 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary-amber/20 focus:border-primary-amber"
                     min="1"
                   />
                 </div>
@@ -719,7 +719,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                     type="date"
                     value={roastDate}
                     onChange={e => setRoastDate(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-[10px] text-foreground focus:outline-none"
+                    className="w-full bg-black/28 border border-white/14 rounded-xl px-3 py-2 text-[10px] text-foreground focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1 col-span-1">
@@ -729,7 +729,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                     type="date"
                     value={openedDate}
                     onChange={e => setOpenedDate(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-[10px] text-foreground focus:outline-none"
+                    className="w-full bg-black/28 border border-white/14 rounded-xl px-3 py-2 text-[10px] text-foreground focus:outline-none"
                   />
                 </div>
               </div>
@@ -739,7 +739,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
                   type="button"
                   variant="outline"
                   onClick={() => { setIsDialogOpen(false); resetForm(); }}
-                  className="rounded-xl text-xs h-9 cursor-pointer border-white/20 text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                  className="rounded-xl text-xs h-9 cursor-pointer border-white/20 text-[#FFF8EC]/72 hover:bg-white/10 hover:text-foreground"
                 >
                   취소
                 </Button>

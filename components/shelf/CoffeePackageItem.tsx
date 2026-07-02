@@ -139,30 +139,30 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
         >
            <div className="flex justify-between items-start mb-4 border-b border-white/5 pb-3">
               <span className="text-[10px] tracking-widest uppercase font-light text-[#D4AF37] pt-1">Details</span>
-              <button onClick={() => setIsFlipped(false)} className="text-[10px] text-white/50 hover:text-white transition-colors cursor-pointer bg-transparent border-none p-2 -mt-1 -mr-2 min-w-[44px] min-h-[44px] flex items-start justify-end">닫기</button>
+              <button onClick={() => setIsFlipped(false)} className="text-[11px] font-bold text-white/72 hover:text-white transition-colors cursor-pointer bg-transparent border-none p-2 -mt-1 -mr-2 min-w-[44px] min-h-[44px] flex items-start justify-end">닫기</button>
            </div>
            
            <div className="space-y-4 flex-1 overflow-y-auto pr-1">
-             <div className="grid grid-cols-1 gap-2 text-[10px] text-white/80 font-light">
+             <div className="grid grid-cols-1 gap-2 text-[11px] text-white/82 font-semibold">
                 <div className="flex justify-between items-center min-h-[24px]">
-                  <span className="text-white/50">로스팅 일자</span>
+                  <span className="text-white/64">로스팅 일자</span>
                   <span>{item.roast_date || "미기재"}</span>
                 </div>
                 <div className="flex justify-between items-center min-h-[24px]">
-                  <span className="text-white/50">개봉 일자</span>
+                  <span className="text-white/64">개봉 일자</span>
                   <span>{item.opened_date || "미기재"}</span>
                 </div>
              </div>
 
-             <div className="text-[10px] bg-white/[0.03] rounded-md p-3 border border-white/5">
+             <div className="text-[11px] bg-white/[0.055] rounded-md p-3 border border-white/10">
                 <div className="flex items-center gap-1.5 font-bold text-white mb-1.5">
                   <Sparkles size={12} className="text-[#D4AF37]" />
                   {freshShelfStatus.label}
                 </div>
-                <p className="text-white/60 leading-relaxed font-light">{freshShelfStatus.reason}</p>
+                <p className="text-white/72 leading-relaxed font-medium">{freshShelfStatus.reason}</p>
              </div>
 
-             <div className="text-[10px] rounded-md border border-[#D4AF37]/15 bg-[#D4AF37]/5 p-3">
+             <div className="text-[11px] rounded-md border border-[#D18A5C]/28 bg-[#D18A5C]/10 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 font-bold text-[#D4AF37]">
@@ -183,17 +183,17 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
              <div className="text-[10px] rounded-md border border-[#D4AF37]/15 bg-[#D4AF37]/5 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <div className="flex items-center gap-1.5 font-bold text-[#D4AF37]">
+                    <div className="flex items-center gap-1.5 font-bold text-[#F0B978]">
                       <Bell size={12} />
                       Shelf Runway
                     </div>
                     <p className="mt-1 font-bold text-white">{shelfRunway.label}</p>
                   </div>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 font-bold text-white/65">
+                  <span className="rounded-full border border-white/14 bg-white/8 px-2 py-1 font-bold text-white/78">
                     {shelfRunway.remainingGrams}g
                   </span>
                 </div>
-                <p className="mt-2 leading-relaxed text-white/58">{shelfRunway.reason}</p>
+                <p className="mt-2 leading-relaxed text-white/74">{shelfRunway.reason}</p>
                 {shelfRunway.suggestedRebuyDate && (
                   <button
                     type="button"
@@ -201,7 +201,7 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                       rebuyPriority: "pinned",
                       rebuyReminderDate: shelfRunway.suggestedRebuyDate,
                     })}
-                    className="mt-3 flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-md border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-3 py-2 text-[10px] font-bold text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/18"
+                    className="mt-3 flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-md border border-[#F0B978]/45 bg-[#D18A5C] px-3 py-2 text-[11px] font-black text-[#120B07] transition-colors hover:bg-[#F0B978]"
                   >
                     <Pin size={12} />
                     추천일 {shelfRunway.suggestedRebuyDate} 적용
@@ -213,24 +213,24 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                 href={buildPurchaseUrl(item)}
                 target="_blank"
                 rel="noreferrer"
-                className="flex min-h-[44px] items-center justify-between gap-3 rounded-md border border-[#D4AF37]/20 bg-[#D4AF37]/5 px-3 py-3 text-[10px] font-light text-[#D4AF37] transition-colors hover:bg-[#D4AF37]/15"
+                className="flex min-h-[44px] items-center justify-between gap-3 rounded-md border border-[#F0B978]/35 bg-[#D18A5C]/12 px-3 py-3 text-[11px] font-bold text-[#F0B978] transition-colors hover:bg-[#D18A5C]/20"
                 onClick={(event) => event.stopPropagation()}
              >
                 <span className="min-w-0">
                   <span className="block font-bold">다시 찾기</span>
-                  <span className="block truncate text-white/50">{item.purchase_note ?? "저장된 단서로 재구매 검색을 엽니다."}</span>
+                  <span className="block truncate text-white/68">{item.purchase_note ?? "저장된 단서로 재구매 검색을 엽니다."}</span>
                 </span>
                 <ExternalLink size={12} className="shrink-0" />
              </a>
 
-             <div className="space-y-2 rounded-md border border-[#D4AF37]/15 bg-[#D4AF37]/5 p-3 text-[10px]">
+             <div className="space-y-2 rounded-md border border-[#D18A5C]/24 bg-[#D18A5C]/9 p-3 text-[11px]">
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 font-bold text-[#D4AF37]">
+                    <div className="flex items-center gap-1.5 font-bold text-[#F0B978]">
                       <Bell size={12} />
                       앱 내부 리마인더
                     </div>
-                    <p className="mt-1 truncate text-white/50">
+                    <p className="mt-1 truncate text-white/68">
                       {item.rebuy_reminder_date ? `${item.rebuy_reminder_date}에 다시 보기` : "다음 구매 타이밍을 저장하세요."}
                     </p>
                   </div>
@@ -238,10 +238,10 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                     type="button"
                     onClick={() => onUpdateReminderState(item.id, { rebuyPriority: isPinnedForRebuy ? "normal" : "pinned" })}
                     className={cn(
-                      "flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-md border px-3 py-2 font-bold transition-colors cursor-pointer",
+                      "flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-md border px-3 py-2 font-black transition-colors cursor-pointer",
                       isPinnedForRebuy
-                        ? "border-[#D4AF37]/50 bg-[#D4AF37]/20 text-[#D4AF37]"
-                        : "border-white/10 bg-white/5 text-white/60 hover:text-white",
+                        ? "border-[#F0B978]/50 bg-[#D18A5C]/22 text-[#F0B978]"
+                        : "border-white/16 bg-white/8 text-white/78 hover:text-white",
                     )}
                   >
                     <Pin size={12} />
@@ -252,7 +252,7 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                   type="date"
                   value={item.rebuy_reminder_date ?? ""}
                   onChange={(event) => onUpdateReminderState(item.id, { rebuyReminderDate: event.target.value || null })}
-                  className="min-h-[44px] w-full rounded-md border border-white/10 bg-black/30 px-3 py-2 text-[11px] text-white outline-none focus:border-[#D4AF37]/50"
+                  className="min-h-[44px] w-full rounded-md border border-white/16 bg-black/38 px-3 py-2 text-[12px] font-bold text-white outline-none focus:border-[#F0B978]/60"
                   aria-label="재구매 예정일"
                 />
                 <div className="grid grid-cols-3 gap-1.5">
@@ -260,8 +260,8 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                     type="button"
                     onClick={() => onUpdateReminderState(item.id, { rebuyAction: "drank" })}
                     className={cn(
-                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 transition-colors cursor-pointer",
-                      item.rebuy_action === "drank" ? "border-white/30 bg-white/15 text-white" : "border-white/10 bg-white/5 text-white/55 hover:text-white",
+                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 font-bold transition-colors cursor-pointer",
+                      item.rebuy_action === "drank" ? "border-white/34 bg-white/16 text-white" : "border-white/16 bg-white/8 text-white/76 hover:text-white",
                     )}
                   >
                     <CheckCircle2 size={12} />
@@ -271,8 +271,8 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                     type="button"
                     onClick={() => onUpdateReminderState(item.id, { rebuyAction: "will_rebuy", rebuyPriority: "pinned" })}
                     className={cn(
-                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 transition-colors cursor-pointer",
-                      item.rebuy_action === "will_rebuy" ? "border-[#D4AF37]/50 bg-[#D4AF37]/20 text-[#D4AF37]" : "border-[#D4AF37]/20 bg-[#D4AF37]/5 text-[#D4AF37]/75 hover:text-[#D4AF37]",
+                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 font-bold transition-colors cursor-pointer",
+                      item.rebuy_action === "will_rebuy" ? "border-[#F0B978]/50 bg-[#D18A5C]/22 text-[#F0B978]" : "border-[#F0B978]/28 bg-[#D18A5C]/10 text-[#F0B978] hover:bg-[#D18A5C]/18",
                     )}
                   >
                     <Bell size={12} />
@@ -282,8 +282,8 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                     type="button"
                     onClick={() => onUpdateReminderState(item.id, { rebuyAction: "rebought", rebuyPriority: "normal", rebuyReminderDate: null })}
                     className={cn(
-                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 transition-colors cursor-pointer",
-                      item.rebuy_action === "rebought" ? "border-[#4d7c54]/50 bg-[#4d7c54]/20 text-[#9fca9a]" : "border-white/10 bg-white/5 text-white/55 hover:text-white",
+                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 font-bold transition-colors cursor-pointer",
+                      item.rebuy_action === "rebought" ? "border-[#4d7c54]/50 bg-[#4d7c54]/22 text-[#b8d7b2]" : "border-white/16 bg-white/8 text-white/76 hover:text-white",
                     )}
                   >
                     <RotateCcw size={12} />
@@ -293,9 +293,9 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
              </div>
 
              <div className="space-y-2">
-                <div className="flex justify-between items-center text-[10px] min-h-[24px]">
-                  <span className="text-white/50 font-light">남은 잔량</span>
-                  <span className="font-light text-white">{item.fill_level}% ({item.total_weight}g)</span>
+                <div className="flex justify-between items-center text-[11px] min-h-[24px]">
+                  <span className="text-white/64 font-semibold">남은 잔량</span>
+                  <span className="font-bold text-white">{item.fill_level}% ({item.total_weight}g)</span>
                 </div>
                 <div className="flex gap-1 mt-1">
                   {[100, 75, 50, 25].map(level => (
@@ -303,8 +303,8 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                       key={level}
                       onClick={() => onUpdateFillLevel(item.id, level)}
                       className={cn(
-                        "flex-1 text-[10px] py-3 rounded border transition-colors cursor-pointer min-h-[44px] flex items-center justify-center",
-                        item.fill_level === level ? "bg-[#D4AF37]/20 border-[#D4AF37]/50 text-[#D4AF37] font-bold" : "bg-white/5 border-white/5 text-white/50 hover:bg-white/10 hover:text-white"
+                        "flex-1 text-[11px] py-3 rounded border transition-colors cursor-pointer min-h-[44px] flex items-center justify-center font-bold",
+                        item.fill_level === level ? "bg-[#D18A5C]/22 border-[#F0B978]/50 text-[#F0B978]" : "bg-white/8 border-white/10 text-white/76 hover:bg-white/12 hover:text-white"
                       )}
                     >
                       {level}
@@ -317,13 +317,13 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
            <div className="flex gap-2 pt-4 border-t border-white/5 mt-3">
               <button
                 onClick={() => onToggleFinished(item.id, true)}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-[#D4AF37]/5 hover:bg-[#D4AF37]/15 text-[#D4AF37] text-[10px] font-light py-3 rounded-md transition-colors cursor-pointer border border-[#D4AF37]/20 min-h-[44px]"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-[#D18A5C]/12 hover:bg-[#D18A5C]/20 text-[#F0B978] text-[11px] font-bold py-3 rounded-md transition-colors cursor-pointer border border-[#F0B978]/28 min-h-[44px]"
               >
                 <Archive size={12} /> 다 마심
               </button>
               <button
                 onClick={() => onDelete(item.id)}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-red-500/5 hover:bg-red-500/15 text-red-400 text-[10px] font-light py-3 rounded-md transition-colors cursor-pointer border border-red-500/20 min-h-[44px]"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-red-500/8 hover:bg-red-500/16 text-red-300 text-[11px] font-bold py-3 rounded-md transition-colors cursor-pointer border border-red-400/24 min-h-[44px]"
               >
                 <Trash2 size={12} /> 삭제
               </button>

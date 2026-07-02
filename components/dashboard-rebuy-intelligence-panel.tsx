@@ -76,7 +76,7 @@ export function DashboardRebuyIntelligencePanel({
           <h2 className="mt-3 break-keep font-serif text-2xl font-black leading-tight sm:text-3xl">
             다음에 다시 살 커피를 놓치지 않게
           </h2>
-          <p className="mt-2 max-w-2xl break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">
+          <p className="mt-2 max-w-2xl break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/72">
             {data.summary}
           </p>
         </div>
@@ -116,9 +116,9 @@ export function DashboardRebuyIntelligencePanel({
             Rebuy Reminder
           </p>
           <p className="mt-3 break-keep text-base font-black leading-6">{data.rebuyReminder.title}</p>
-          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.rebuyReminder.subtitle}</p>
-          <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">{data.rebuyReminder.reason}</p>
-          <span className="mt-4 inline-flex min-h-9 items-center rounded-full bg-primary-amber px-3 text-xs font-black text-background-dark">
+          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/58">{data.rebuyReminder.subtitle}</p>
+          <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/72">{data.rebuyReminder.reason}</p>
+          <span className="mt-4 inline-flex min-h-9 items-center rounded-full bg-primary-amber px-3 text-xs font-black text-[#120B07]">
             {data.rebuyReminder.actionLabel}
           </span>
         </button>
@@ -133,8 +133,8 @@ export function DashboardRebuyIntelligencePanel({
             Taste Match
           </p>
           <p className="mt-3 break-keep text-base font-black leading-6">{data.tasteMatch.matchTitle}</p>
-          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.tasteMatch.anchorTitle}</p>
-          <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">{data.tasteMatch.reason}</p>
+          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/58">{data.tasteMatch.anchorTitle}</p>
+          <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/72">{data.tasteMatch.reason}</p>
           <p className="mt-4 line-clamp-2 text-xs font-black text-primary-amber">{data.tasteMatch.searchPrompt}</p>
         </button>
 
@@ -148,8 +148,8 @@ export function DashboardRebuyIntelligencePanel({
             Bag To Rebuy
           </p>
           <p className="mt-3 break-keep text-base font-black leading-6">{data.purchaseMemory.title}</p>
-          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.purchaseMemory.subtitle}</p>
-          <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">{data.purchaseMemory.reason}</p>
+          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/58">{data.purchaseMemory.subtitle}</p>
+          <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/72">{data.purchaseMemory.reason}</p>
           <span className="mt-4 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary-amber/30 px-3 text-xs font-black text-primary-amber">
             재구매 검색 열기
             <ExternalLink size={13} />
@@ -166,9 +166,9 @@ export function DashboardRebuyIntelligencePanel({
             Brew Failure
           </p>
           <p className="mt-3 break-keep text-base font-black leading-6">{data.brewFailureMemory.title}</p>
-          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.brewFailureMemory.subtitle}</p>
-          <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">{data.brewFailureMemory.adjustment}</p>
-          <p className="mt-4 line-clamp-2 text-xs font-semibold text-[#FFF8EC]/45">{data.brewFailureMemory.evidence}</p>
+          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/58">{data.brewFailureMemory.subtitle}</p>
+          <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/72">{data.brewFailureMemory.adjustment}</p>
+          <p className="mt-4 line-clamp-2 text-xs font-semibold text-[#FFF8EC]/58">{data.brewFailureMemory.evidence}</p>
         </button>
       </div>
     </section>

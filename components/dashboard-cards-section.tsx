@@ -68,9 +68,9 @@ export default function DashboardCardsSection({
   if (cards.length === 0) {
     if (totalCardCount > 0 && hasActiveFilters) {
       return (
-        <section className="mx-auto max-w-lg rounded-[1.5rem] border border-background-dark/10 bg-[#FFF8EC]/78 px-5 py-10 text-center shadow-[0_18px_42px_rgba(73,48,36,0.12)]" aria-labelledby="no-memory-results-title">
+        <section className="mx-auto max-w-lg rounded-[1.5rem] border border-white/12 bg-white/[0.06] px-5 py-10 text-center shadow-[0_18px_42px_rgba(0,0,0,0.28)]" aria-labelledby="no-memory-results-title">
           <SearchX aria-hidden="true" size={32} className="mx-auto text-primary-amber" />
-          <h2 id="no-memory-results-title" className="mt-4 font-serif text-xl font-black text-background-dark">검색 결과가 없어요</h2>
+          <h2 id="no-memory-results-title" className="mt-4 font-serif text-xl font-black text-[#FFF8EC]">검색 결과가 없어요</h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">검색어를 줄이거나 재구매 생각과 맛 조건을 초기화해 보세요.</p>
           <button
             type="button"

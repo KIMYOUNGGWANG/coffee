@@ -53,7 +53,7 @@ export function DashboardRetentionLoop({ cards, onQuickAdd, onSelectCard }: Dash
           <button
             type="button"
             onClick={onQuickAdd}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-primary-amber bg-primary-amber px-4 text-sm font-black text-background-dark transition hover:-translate-y-0.5"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-primary-amber bg-primary-amber px-4 text-sm font-black text-[#120B07] transition hover:-translate-y-0.5 hover:bg-[#F0B978]"
           >
             빠른 기록 남기기
           </button>

@@ -56,7 +56,7 @@ export function DashboardFeaturedArchiveCard({
       <button
         type="button"
         onClick={onCreateCard}
-        className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary-amber px-4 text-sm font-black text-background-dark shadow-[0_14px_30px_rgba(217,160,91,0.22)] transition-transform active:scale-[0.98] sm:w-auto sm:px-7"
+        className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary-amber px-4 text-sm font-black text-[#120B07] shadow-[0_14px_30px_rgba(217,160,91,0.22)] transition-transform hover:bg-[#F0B978] active:scale-[0.98] sm:w-auto sm:px-7"
       >
         <Camera aria-hidden="true" size={16} />
         새 원두 스캔
