@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
 import { getErrorMessage } from "@/lib/api-errors";
+import {
+  buildLaunchHealth,
+  filterRealProductEvents,
+  includesQaMarker,
+  type AdminProductEventRow,
+  type AdminStripeEventRow,
+} from "@/lib/admin-launch-health";
 import { createAdminDataClient, requireAdmin } from "@/lib/admin";
 import { AdminSupabaseConfigurationError } from "@/lib/supabase/admin";
 
@@ -53,16 +60,6 @@ type BrewingLogRow = {
   readonly coach_feedback: string | null;
 };
 
-type ProductEventRow = {
-  readonly event_id: string;
-  readonly event_name: string;
-  readonly occurred_at: string;
-  readonly path: string;
-  readonly user_id: string | null;
-  readonly anonymous_id: string | null;
-  readonly properties: Record<string, unknown> | null;
-};
-
 type QueryResult<T> = {
   readonly data: readonly T[] | null;
   readonly error: { readonly message: string } | null;
@@ -94,10 +91,6 @@ function isRebuySignal(row: ShelfItemRow): boolean {
   return row.rebuy_priority === "pinned" || row.rebuy_action === "will_rebuy" || row.rebuy_action === "rebought" || Boolean(row.rebuy_reminder_date);
 }
 
-function includesQaMarker(...values: readonly (string | null | undefined)[]): boolean {
-  return values.some((value) => /\b(qa|test)\b|테스트|테스트용|qa-|test-/i.test(value ?? ""));
-}
-
 function latestTimestamp(...values: readonly (string | null | undefined)[]): string | null {
   const latest = values
     .map((value) => value ? new Date(value).getTime() : Number.NaN)
@@ -123,7 +116,7 @@ export async function GET() {
 
   try {
     const supabase = createAdminDataClient();
-    const [profilesResult, cardsResult, shelfResult, logsResult, eventsResult] = await Promise.all([
+    const [profilesResult, cardsResult, shelfResult, logsResult, eventsResult, stripeEventsResult] = await Promise.all([
       supabase
         .from("profiles")
         .select("id,email,created_at,updated_at,is_premium,scans_used,monthly_scan_limit,is_admin")
@@ -153,10 +146,16 @@ export async function GET() {
         .select("event_id,event_name,occurred_at,path,user_id,anonymous_id,properties")
         .order("occurred_at", { ascending: false })
         .limit(250)
-        .then((result) => queryResult<ProductEventRow>(result)),
+        .then((result) => queryResult<AdminProductEventRow>(result)),
+      supabase
+        .from("stripe_events")
+        .select("event_id,event_type,processing_status,created_at,updated_at,error_message")
+        .order("created_at", { ascending: false })
+        .limit(250)
+        .then((result) => queryResult<AdminStripeEventRow>(result)),
     ]);
 
-    const firstError = profilesResult.error ?? cardsResult.error ?? shelfResult.error ?? logsResult.error ?? eventsResult.error;
+    const firstError = profilesResult.error ?? cardsResult.error ?? shelfResult.error ?? logsResult.error ?? eventsResult.error ?? stripeEventsResult.error;
     if (firstError) {
       return responseError(500, `관리자 데이터를 불러오지 못했습니다: ${firstError.message}`);
     }
@@ -166,12 +165,14 @@ export async function GET() {
     const shelfItems = shelfResult.data ?? [];
     const logs = logsResult.data ?? [];
     const events = eventsResult.data ?? [];
+    const realEvents = filterRealProductEvents(events);
+    const stripeEvents = stripeEventsResult.data ?? [];
     const now = new Date();
     const today = new Date(now);
     today.setHours(0, 0, 0, 0);
     const sevenDaysAgo = new Date(now.getTime() - 7 * DAY_MS);
-    const dashboardEvents = events.filter((event) => event.event_name === "dashboard_view");
-    const activeUsers7d = uniqueCount(events.filter((event) => isAfter(event.occurred_at, sevenDaysAgo)).map((event) => event.user_id));
+    const dashboardEvents = realEvents.filter((event) => event.event_name === "dashboard_view");
+    const activeUsers7d = uniqueCount(realEvents.filter((event) => isAfter(event.occurred_at, sevenDaysAgo)).map((event) => event.user_id));
     const cardOwners = uniqueCount(cards.map((card) => card.user_id));
     const shelfOwners = uniqueCount(shelfItems.map((item) => item.user_id));
     const logOwners = uniqueCount(logs.map((log) => log.user_id));
@@ -181,8 +182,9 @@ export async function GET() {
     ]);
     const feedbackLogs = logs.filter((log) => Boolean(log.coach_feedback));
     const rebuyItems = shelfItems.filter(isRebuySignal);
-    const errorEvents = events.filter((event) => event.event_name.includes("failed") || event.event_name.includes("support"));
+    const errorEvents = realEvents.filter((event) => event.event_name.includes("failed") || event.event_name.includes("support"));
     const adminUsers = profiles.filter((profile) => profile.is_admin === true).length;
+    const launchHealth = buildLaunchHealth({ events, stripeEvents, now });
     const kpis: readonly AdminKpi[] = [
       { label: "전체 유저", value: profiles.length, helper: `오늘 신규 ${profiles.filter((profile) => isAfter(profile.created_at, today)).length}명` },
       { label: "7일 활성", value: activeUsers7d, helper: "최근 product_events 기준" },
@@ -206,7 +208,7 @@ export async function GET() {
       const userCards = cards.filter((card) => card.user_id === profile.id);
       const userShelf = shelfItems.filter((item) => item.user_id === profile.id);
       const userLogs = logs.filter((log) => log.user_id === profile.id);
-      const userEvents = events.filter((event) => event.user_id === profile.id);
+      const userEvents = realEvents.filter((event) => event.user_id === profile.id);
       return {
         id: profile.id,
         email: profile.email,
@@ -237,6 +239,7 @@ export async function GET() {
           source: admin.source,
         },
         kpis,
+        launchHealth,
         funnel,
         memory: {
           tastingCards: cards.length,

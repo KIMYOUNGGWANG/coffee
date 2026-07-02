@@ -92,6 +92,38 @@ Use this as the binary prelaunch gate after local validation passes. Local valid
 - [ ] Account deletion failures report the failed operation name from `deleteCoffeeDexAccount`, including Stripe redaction, product-event anonymization, owned-row deletion, profile deletion, or Auth identity deletion.
 - [ ] Optional Sentry, PostHog, or email tooling is used only when already configured in the environment; launch readiness does not require adding a new vendor.
 
+## Daily Launch Operations Runbook
+
+Use `/admin` as the first daily operating room after production deploy. The dashboard intentionally shows aggregate operating state and short IDs only; do not export raw user memory, package images, tasting notes, OAuth tokens, or Stripe payloads into incident notes.
+
+### Daily 10-Minute Check
+
+1. Open `/admin` with an operator account backed by `profiles.is_admin = true` or the temporary `ADMIN_EMAIL_ALLOWLIST`.
+2. Confirm the Launch Health panel is `정상`. If it shows `P0 확인 필요`, pause launch/promo activity until the failing category is understood.
+3. Review 24h and 7d counts for Google OAuth, card save, shelf save, brewing log save, scan, checkout, and Stripe webhook.
+4. Check Activation Funnel for obvious drops: profile creation to dashboard visit, first memory, purchase clue, brew log, Brew Failure Memory, and Rebuy loop.
+5. Review OAuth/API failure logs and `stripe_events.processing_status = failed` rows. Record only event ids, timestamps, category, and operator action.
+6. Confirm QA/test candidates are expected. Clean only explicit `qa`, `test`, `테스트`, or `mock` rows from `/admin`; never use QA cleanup as account deletion.
+
+### P0/P1 Response
+
+| Category | P0 trigger | First response |
+| --- | --- | --- |
+| Google OAuth | repeated `oauth_failed` in 24h or users cannot enter dashboard | Check Supabase OAuth provider, Google OAuth redirect URI, Vercel domain, and `/auth/callback` logs. Verify `/auth/auth-code-error` records an event and presents a retry path. |
+| Card save | 5+ `card_save_failed` in 24h | Check `/api/v1/cards` function logs, Supabase `tasting_cards` constraints, and recent migration status. Run route-contract tests before patching. |
+| Shelf save | 5+ `shelf_save_failed` in 24h | Check `/api/v1/shelf` logs, `coffee_shelf_items` constraints, and purchase/rebuy columns from latest migrations. |
+| Brewing log save | 5+ `brewing_log_save_failed` in 24h | Check `/api/v1/brewing-logs` logs, shelf ownership filters, and Brew-to-Shelf fill-level updates. |
+| Scan | 5+ `scan_failed` in 24h | Check entitlement state, `AI_API_KEY`, provider responses, file validation errors, and monthly scan counters. |
+| Checkout | any spike in `checkout_failed` | Check Stripe price ids, checkout route logs, and auth email availability. |
+| Stripe webhook | any failed `stripe_events` row in 24h | Treat as P0. Check Stripe dashboard delivery, Vercel webhook logs, `stripe_events.error_message`, and idempotency behavior before replaying. |
+
+### Rollback Notes
+
+- Prefer forward repair migrations for schema issues; do not rewrite applied Supabase migrations.
+- For Vercel regressions, roll back to the last known healthy deployment recorded in the Production Operator Gate.
+- For Stripe webhook repair, replay only after confirming idempotency and the event's current `processing_status`.
+- Keep QA/test data excluded from incident counts by marking test runs with `qa`, `test`, `테스트`, or `mock` in safe operational fields only.
+
 ## Verification
 
 The authoritative local launch gate is:
