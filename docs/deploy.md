@@ -34,6 +34,7 @@ The current runtime schema accepts these variables as optional. Configure them f
 | `RESEND_API_KEY` | Optional email provider key for outbound support or transactional email paths when enabled. |
 | `NEXT_PUBLIC_POSTHOG_KEY` | Optional analytics key for production product instrumentation when enabled. |
 | `NEXT_PUBLIC_SENTRY_DSN` | Optional Sentry DSN for production error reporting when enabled. |
+| `ADMIN_EMAIL_ALLOWLIST` | Optional comma/space separated bootstrap allowlist for `/admin`. Prefer `profiles.is_admin` once the first operator is created. |
 | `AI_API_KEY` | Optional AI provider key for tasting notes and package scans; routes must fall back or return manual-entry states when it is absent. |
 
 ## Supabase Checklist
@@ -44,6 +45,7 @@ The current runtime schema accepts these variables as optional. Configure them f
 - Confirm Storage has the upload bucket named by `STORAGE_BUCKET_UPLOADS`.
 - Verify free JSON and CSV exports can owner-filter `tasting_cards`, `brewing_notes`, `coffee_shelf_items`, and `brewing_logs`.
 - Verify `SUPABASE_SERVICE_ROLE_KEY` is server-only and account deletion can redact audit rows before deleting owned rows, the profile, and finally the Auth identity.
+- Apply `20260702000000_add_admin_role_to_profiles.sql` before enabling `/admin`; grant daily operators with `profiles.is_admin = true` or temporarily via `ADMIN_EMAIL_ALLOWLIST`. Do not add broad RLS policies for operator access.
 
 ## Guest Scan Deployment Boundary
 
