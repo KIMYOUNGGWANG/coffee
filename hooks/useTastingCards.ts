@@ -144,7 +144,7 @@ export type RebuyIntelligenceData = {
   readonly generatedAt: string;
   readonly summary: string;
   readonly featureScores: readonly {
-    readonly feature: "rebuy_reminder" | "taste_match" | "purchase_memory" | "brew_failure_memory";
+    readonly feature: "next_cup_plan" | "rebuy_reminder" | "taste_match" | "purchase_memory" | "brew_failure_memory";
     readonly roi: number;
     readonly retention: number;
     readonly painkiller: number;
@@ -187,6 +187,16 @@ export type RebuyIntelligenceData = {
     readonly evidence: string;
     readonly logId: string | null;
     readonly shelfItemId: string | null;
+  };
+  readonly nextCupPlan: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly reason: string;
+    readonly actionLabel: string;
+    readonly priority: "high" | "medium" | "low";
+    readonly suggestedMethod: string;
+    readonly shelfItemId: string | null;
+    readonly lastBrewLogId: string | null;
   };
 };
 

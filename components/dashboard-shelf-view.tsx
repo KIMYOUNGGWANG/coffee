@@ -40,6 +40,7 @@ type DashboardShelfViewProps = {
   readonly onResetFilters: () => void;
   readonly onCreateCard: () => void;
   readonly onQuickAdd: () => void;
+  readonly onOpenLog: () => void;
   readonly onDeleteCard: (id: string) => void;
   readonly onSelectCard: (card: TastingCardData) => void;
   readonly onShareCard: (card: TastingCardData) => void;
@@ -83,6 +84,7 @@ export function DashboardShelfView({
   onResetFilters,
   onCreateCard,
   onQuickAdd,
+  onOpenLog,
   onDeleteCard,
   onSelectCard,
   onShareCard,
@@ -127,6 +129,7 @@ export function DashboardShelfView({
         isLoading={isRebuyIntelligenceLoading}
         error={rebuyIntelligenceError}
         onQuickAdd={onQuickAdd}
+        onOpenLog={onOpenLog}
         onSelectCard={onSelectCard}
       />
       {cards.length > 0 && (

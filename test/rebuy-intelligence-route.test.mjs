@@ -46,6 +46,7 @@ export function buildRebuyIntelligence(input) {
     tasteMatch: { anchorCardId: null, anchorTitle: "mock", matchCardId: null, matchTitle: "mock", sharedTags: [], reason: "mock", searchPrompt: "mock" },
     purchaseMemory: { title: "mock", subtitle: "mock", source: "manual", searchUrl: "https://example.com", reason: "mock", cardId: null, shelfItemId: null },
     brewFailureMemory: { title: "mock", subtitle: "mock", problem: "unknown", adjustment: "mock", evidence: "mock", logId: null, shelfItemId: null },
+    nextCupPlan: { title: "mock", subtitle: "mock", reason: "mock", actionLabel: "mock", priority: "low", suggestedMethod: "V60", shelfItemId: null, lastBrewLogId: null },
     inputSizes: {
       cards: input.cards.length,
       shelfItems: input.shelfItems.length,

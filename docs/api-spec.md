@@ -67,7 +67,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
 - private Grind Memory inside Dial-in Coach, where the latest owned 4-5 star brew log for the selected shelf bean is surfaced as the last-good method, dose, water, temperature, grind setting, and brew time;
 - private Brew Failure Memory inside Dial-in Coach, where one-tap sour, bitter, weak, heavy, or balanced feedback is saved to `brewing_logs.coach_feedback` and changes the next recommended recipe;
-- private Rebuy Intelligence that combines Fresh Shelf timing, taste-match criteria, package/scan repurchase search memory, and brew-failure adjustment prompts from owned data only;
+- private Rebuy Intelligence that combines Next Cup planning, Fresh Shelf timing, taste-match criteria, package/scan repurchase search memory, and brew-failure adjustment prompts from owned data only;
 - package claims kept distinct from user-perceived taste;
 - evidence-labeled taste snapshots based on sample count and coverage.
 
@@ -163,7 +163,7 @@ interface RebuyIntelligenceResponse {
     generatedAt: string;
     summary: string;
     featureScores: Array<{
-      feature: "rebuy_reminder" | "taste_match" | "purchase_memory" | "brew_failure_memory";
+      feature: "next_cup_plan" | "rebuy_reminder" | "taste_match" | "purchase_memory" | "brew_failure_memory";
       roi: number;
       retention: number;
       painkiller: number;
@@ -206,6 +206,16 @@ interface RebuyIntelligenceResponse {
       evidence: string;
       logId: string | null;
       shelfItemId: string | null;
+    };
+    nextCupPlan: {
+      title: string;
+      subtitle: string;
+      reason: string;
+      actionLabel: string;
+      priority: "high" | "medium" | "low";
+      suggestedMethod: string;
+      shelfItemId: string | null;
+      lastBrewLogId: string | null;
     };
   };
 }

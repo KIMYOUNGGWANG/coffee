@@ -254,6 +254,7 @@ export default function DashboardClient({
             onResetFilters={resetFilters}
             onCreateCard={() => openWizard("empty_state")}
             onQuickAdd={() => openWizard("empty_state_quick_add", "quick")}
+            onOpenLog={() => setActiveTab("log")}
             onDeleteCard={handleDeleteCard}
             onSelectCard={setSelectedDetailCard}
             onShareCard={setSelectedShareCard}

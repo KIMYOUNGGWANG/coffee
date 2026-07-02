@@ -115,6 +115,15 @@ async function mockDashboardApiRoutes(page: Page): Promise<void> {
             summary: "아직 기록이 부족해 다음 재구매 행동을 준비하는 중입니다.",
             featureScores: [
               {
+                feature: "next_cup_plan",
+                roi: 74,
+                retention: 82,
+                painkiller: 78,
+                monetization: 58,
+                difficulty: 22,
+                reason: "원두 기록이 생기면 오늘 마실 컵을 알려줍니다.",
+              },
+              {
                 feature: "rebuy_reminder",
                 roi: 72,
                 retention: 80,
@@ -159,6 +168,16 @@ async function mockDashboardApiRoutes(page: Page): Promise<void> {
               evidence: "아직 실패 로그가 없습니다.",
               logId: null,
               shelfItemId: null,
+            },
+            nextCupPlan: {
+              title: "오늘 마실 원두를 고를 준비 중",
+              subtitle: "Next Cup Plan",
+              reason: "선반에 원두를 하나 올리면 오늘의 첫 컵을 골라줍니다.",
+              actionLabel: "원두 선반 채우기",
+              priority: "low",
+              suggestedMethod: "V60",
+              shelfItemId: null,
+              lastBrewLogId: null,
             },
           },
         });
