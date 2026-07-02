@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Coffee, Plus, Trash2, Archive, Loader2, Sparkles, AlertCircle, Calendar, Weight, Scale, X, ScanLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackAnalyticsEvent } from "@/lib/analytics-client";
 import { buildAuthGateHref } from "@/lib/auth-redirect";
 import { evaluateFreshShelfStatus, type FreshShelfStatus } from "@/lib/fresh-shelf";
 import { cn } from "@/lib/utils";
@@ -233,6 +234,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
       setIsScannerOpen(false);
       fetchShelfData();
     } catch (error) {
+      trackAnalyticsEvent("shelf_save_failed", { surface: "quick_shelf_save" });
       if (error instanceof Error) {
         console.error("Error quick-saving shelf item:", error);
         alert(error.message);
@@ -377,6 +379,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
       resetForm();
       fetchShelfData();
     } catch (error) {
+      trackAnalyticsEvent("shelf_save_failed", { surface: "manual_shelf_save" });
       if (error instanceof Error) {
         console.error("Error creating shelf item:", error);
         alert(error.message);

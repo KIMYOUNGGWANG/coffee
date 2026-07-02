@@ -3,6 +3,7 @@
 import { AlertTriangle, CheckCircle2, Coffee, Save, SlidersHorizontal, Thermometer } from "lucide-react";
 import { useState } from "react";
 import type { DialInCoachData, DialInCoachFeedback } from "@/hooks/useTastingCards";
+import { trackAnalyticsEvent } from "@/lib/analytics-client";
 
 type DashboardDialInCoachPanelProps = {
   readonly data: DialInCoachData | undefined;
@@ -28,6 +29,7 @@ async function saveSuggestedLog(data: DialInCoachData) {
   });
 
   if (!response.ok) {
+    trackAnalyticsEvent("brewing_log_save_failed", { surface: "dial_in_coach", status: response.status });
     throw new Error("다이얼인 로그 저장에 실패했습니다.");
   }
 }
@@ -66,6 +68,7 @@ async function saveFeedbackLog(data: DialInCoachData, feedback: (typeof feedback
   });
 
   if (!response.ok) {
+    trackAnalyticsEvent("brewing_log_save_failed", { surface: "dial_in_feedback", status: response.status });
     throw new Error("컵 피드백 저장에 실패했습니다.");
   }
 }

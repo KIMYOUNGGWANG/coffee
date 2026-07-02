@@ -4,6 +4,7 @@ import type {
   RepurchaseIntent,
   ScanSource,
 } from "@/lib/coffee-memory";
+import { trackAnalyticsEvent } from "@/lib/analytics-client";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -338,11 +339,13 @@ export function useCreateTastingCard() {
 
       const json = await readJsonResponse(response);
       if (!response.ok) {
+        trackAnalyticsEvent("card_save_failed", { surface: "cards_api", status: response.status });
         throw new Error(getResponseErrorMessage(json, "카드를 생성하는 데 실패했습니다."));
       }
 
       const data = getResponseData<TastingCardData>(json);
       if (!data) {
+        trackAnalyticsEvent("card_save_failed", { surface: "cards_api", reason: "empty_response" });
         throw new Error("생성된 카드 응답이 비어 있습니다.");
       }
       return data;
@@ -675,11 +678,13 @@ export function useScanCoffeePackage() {
 
       const json = await readJsonResponse(response);
       if (!response.ok) {
+        trackAnalyticsEvent("scan_failed", { surface: "card_scan", status: response.status });
         throw new Error(getResponseErrorMessage(json, "원두 스캔에 실패했습니다."));
       }
 
       const data = getResponseData<ScannedCoffeeData>(json);
       if (!data) {
+        trackAnalyticsEvent("scan_failed", { surface: "card_scan", reason: "empty_response" });
         throw new Error("원두 스캔 응답이 비어 있습니다.");
       }
       return { data };

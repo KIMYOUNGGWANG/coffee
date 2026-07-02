@@ -13,6 +13,8 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
+import { AdminLaunchHealthPanel } from "@/components/admin-launch-health-panel";
+import type { LaunchHealth } from "@/lib/admin-launch-health";
 
 type AdminKpi = {
   readonly label: string;
@@ -64,6 +66,7 @@ type AdminOverview = {
     readonly source: "email_allowlist" | "profile_role";
   };
   readonly kpis: readonly AdminKpi[];
+  readonly launchHealth: LaunchHealth;
   readonly funnel: readonly FunnelStep[];
   readonly memory: {
     readonly tastingCards: number;
@@ -278,6 +281,8 @@ export default function AdminDashboardClient() {
             return <MetricPanel icon={<Icon className="h-5 w-5" aria-hidden="true" />} key={kpi.label} kpi={kpi} />;
           })}
         </section>
+
+        <AdminLaunchHealthPanel health={overview.launchHealth} />
 
         <section className="mt-6 grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-[30px] border border-white/10 bg-white/[0.045] p-5">

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Star, Coffee, Loader2, Clock, Thermometer, Droplet, Layers, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackAnalyticsEvent } from "@/lib/analytics-client";
 import { calculateShelfConsumption } from "@/lib/shelf-consumption";
 import { cn } from "@/lib/utils";
 
@@ -178,6 +179,7 @@ export default function DailyBrewingCalendar({ refreshTrigger = 0, onLogAdded }:
       fetchLogsAndShelf();
       onLogAdded?.();
     } catch (error) {
+      trackAnalyticsEvent("brewing_log_save_failed", { surface: "daily_calendar" });
       console.error("Error creating brewing log:", error);
       alert("추출 로그 저장 중 오류가 발생했습니다.");
     } finally {

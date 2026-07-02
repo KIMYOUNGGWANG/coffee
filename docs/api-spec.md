@@ -98,6 +98,8 @@ Returns aggregate operational data for the current deployment:
 
 The route reads up to bounded recent rows with the service-role key after admin authorization. It must not expose raw tasting notes, package images, or marketplace-like ordering data.
 
+The response includes `launchHealth`, which separates Google OAuth, card save, shelf save, brewing log save, scan, checkout, and Stripe webhook health over the last 24 hours and 7 days. Product events marked with QA/test/mock indicators are excluded from operating counts. Stripe webhook health also reads `stripe_events.processing_status = failed`; any failed webhook in the last 24 hours is treated as P0.
+
 ### `POST /api/v1/admin/qa-cleanup`
 
 Requires JSON `{ "confirm": true }`. The route deletes only candidates whose card or shelf labels contain explicit QA/test markers such as `qa`, `test`, or `테스트`. It also removes dependent brewing logs for marked shelf items and brewing notes for marked cards. This is an operator hygiene action, not a general account deletion route.

@@ -120,7 +120,8 @@ const state = {
     tasting_cards: [],
     coffee_shelf_items: [],
     brewing_logs: [],
-    product_events: []
+    product_events: [],
+    stripe_events: []
   },
   deleteCalls: []
 };
@@ -132,7 +133,8 @@ export function configureAdmin(next) {
     tasting_cards: next.rows?.tasting_cards ?? [],
     coffee_shelf_items: next.rows?.coffee_shelf_items ?? [],
     brewing_logs: next.rows?.brewing_logs ?? [],
-    product_events: next.rows?.product_events ?? []
+    product_events: next.rows?.product_events ?? [],
+    stripe_events: next.rows?.stripe_events ?? []
   };
   state.deleteCalls = [];
 }
@@ -194,6 +196,12 @@ export function createAdminSupabase() {
     .replaceAll('"@/lib/supabase/server"', '"./supabase-server.mjs"');
   writeFileSync(path.join(tempDirectory, "admin.mjs"), transpile(adminSource, adminSourcePath));
 
+  const launchHealthSourcePath = path.join(projectRoot, "lib/admin-launch-health.ts");
+  writeFileSync(
+    path.join(tempDirectory, "admin-launch-health.mjs"),
+    transpile(readFileSync(launchHealthSourcePath, "utf8"), launchHealthSourcePath),
+  );
+
   for (const [fileName, routePath] of [
     ["overview.mjs", "app/api/v1/admin/overview/route.ts"],
     ["cleanup.mjs", "app/api/v1/admin/qa-cleanup/route.ts"],
@@ -202,6 +210,7 @@ export function createAdminSupabase() {
     const source = readFileSync(absolutePath, "utf8")
       .replaceAll('"next/server"', '"./next-server.mjs"')
       .replaceAll('"@/lib/api-errors"', '"./api-errors.mjs"')
+      .replaceAll('"@/lib/admin-launch-health"', '"./admin-launch-health.mjs"')
       .replaceAll('"@/lib/admin"', '"./admin.mjs"')
       .replaceAll('"@/lib/supabase/admin"', '"./supabase-admin.mjs"')
       .replaceAll('"zod"', '"./zod.mjs"');
@@ -217,13 +226,17 @@ export function createAdminSupabase() {
   };
 }
 
+function isoMinutesAgo(minutes) {
+  return new Date(Date.now() - minutes * 60 * 1000).toISOString();
+}
+
 const adminRows = {
   profiles: [
     {
       id: "user-1",
       email: "member@example.com",
-      created_at: "2026-07-01T00:00:00.000Z",
-      updated_at: "2026-07-01T01:00:00.000Z",
+      created_at: isoMinutesAgo(600),
+      updated_at: isoMinutesAgo(590),
       is_premium: true,
       scans_used: 2,
       monthly_scan_limit: 5,
@@ -236,8 +249,8 @@ const adminRows = {
       user_id: "user-1",
       title: "QA Ethiopia",
       subtitle: "Fritz",
-      created_at: "2026-07-01T02:00:00.000Z",
-      confirmed_at: "2026-07-01T02:10:00.000Z",
+      created_at: isoMinutesAgo(580),
+      confirmed_at: isoMinutesAgo(570),
       purchase_url: "https://example.com",
       purchase_note: null,
       repurchase_intent: "again",
@@ -248,7 +261,7 @@ const adminRows = {
       user_id: "user-1",
       title: "Ethiopia Guji",
       subtitle: "Momos",
-      created_at: "2026-07-01T03:00:00.000Z",
+      created_at: isoMinutesAgo(560),
       confirmed_at: null,
       purchase_url: null,
       purchase_note: null,
@@ -262,7 +275,7 @@ const adminRows = {
       user_id: "user-1",
       roaster_name: "Test Roaster",
       bean_name: "Colombia",
-      created_at: "2026-07-01T04:00:00.000Z",
+      created_at: isoMinutesAgo(540),
       fill_level: 30,
       is_finished: false,
       purchase_url: null,
@@ -277,7 +290,7 @@ const adminRows = {
       id: "brew-1",
       user_id: "user-1",
       shelf_item_id: "shelf-qa",
-      brewed_at: "2026-07-01T05:00:00.000Z",
+      brewed_at: isoMinutesAgo(520),
       method: "V60",
       rating: 3,
       coach_source: "dial_in_coach",
@@ -288,7 +301,7 @@ const adminRows = {
     {
       event_id: "event-1",
       event_name: "dashboard_view",
-      occurred_at: "2026-07-01T06:00:00.000Z",
+      occurred_at: isoMinutesAgo(500),
       path: "/dashboard",
       user_id: "user-1",
       anonymous_id: null,
@@ -297,11 +310,39 @@ const adminRows = {
     {
       event_id: "event-2",
       event_name: "scan_failed",
-      occurred_at: "2026-07-01T07:00:00.000Z",
+      occurred_at: isoMinutesAgo(480),
       path: "/dashboard",
       user_id: "user-1",
       anonymous_id: null,
       properties: {},
+    },
+    {
+      event_id: "event-3",
+      event_name: "card_save_failed",
+      occurred_at: isoMinutesAgo(460),
+      path: "/dashboard",
+      user_id: "user-1",
+      anonymous_id: null,
+      properties: {},
+    },
+    {
+      event_id: "event-4",
+      event_name: "shelf_save_failed",
+      occurred_at: isoMinutesAgo(440),
+      path: "/dashboard",
+      user_id: "user-1",
+      anonymous_id: "qa-session",
+      properties: { qa: true },
+    },
+  ],
+  stripe_events: [
+    {
+      event_id: "stripe-event-1",
+      event_type: "checkout.session.completed",
+      processing_status: "failed",
+      created_at: isoMinutesAgo(420),
+      updated_at: isoMinutesAgo(415),
+      error_message: "fixture failure",
     },
   ],
 };
@@ -340,6 +381,10 @@ test("Given an allowlisted admin, When overview is requested, Then operating KPI
     assert.equal(body.data.memory.purchaseMemories, 2);
     assert.equal(body.data.rebuyDialIn.coachFeedbackLogs, 1);
     assert.equal(body.data.operations.recentFailures[0].eventName, "scan_failed");
+    assert.equal(body.data.launchHealth.status, "p0");
+    assert.equal(body.data.launchHealth.summary.qaExcludedEvents, 1);
+    assert.equal(body.data.launchHealth.metrics.find((metric) => metric.key === "webhook").failures7d, 1);
+    assert.equal(body.data.launchHealth.metrics.find((metric) => metric.key === "shelf_save").failures7d, 0);
     assert.deepEqual(loaded.session.readServerCalls(), []);
     assert.equal(loaded.admin.readAdminState().created, 1);
   } finally {
