@@ -41,6 +41,8 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `GET` | `/api/v1/dial-in-coach` | Derive a concrete first-cup recipe and next adjustments from owned shelf beans and brew logs. |
 | `POST` | `/api/v1/brewing-logs` | Record a new brewing log with extraction parameters and notes for a shelf item. |
 | `GET` | `/api/v1/brewing-logs` | Fetch the current user's history of brewing logs. |
+| `GET` | `/api/v1/admin/overview` | Admin-only operating dashboard summary for KPI, activation, memory, rebuy, Dial-in, failure logs, and QA/test candidates. |
+| `POST` | `/api/v1/admin/qa-cleanup` | Admin-only cleanup action for rows explicitly marked as QA/test data. |
 
 `POST /api/v1/brewing-logs` accepts optional `coachFeedback` values of `too_sour`, `too_bitter`, `too_weak`, `too_heavy`, or `balanced`. Dial-in Coach reads the existing `brewing_logs.coach_feedback` field as private Brew Failure Memory and uses it to adjust the next recipe; no new public recipe feed, marketplace, or community comparison is created. When the request includes both an owned `shelfItemId` and `parameters.coffeeAmount`, the route also decreases that owned shelf item's `fill_level` from the logged dose and marks it finished at 0%. The response includes optional `shelfConsumption` metadata for the private Brew-to-Shelf loop.
 
@@ -74,6 +76,31 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 Story images and PDF artifacts remain secondary compatibility outputs. Stripe remains the payment adapter for those existing entitlements.
 
 Future roaster partnership, referral, and community layers are not current API capabilities. They require separate contracts, consent, moderation, commercial terms, and verification before any user-facing launch.
+
+## Admin Operator Surface
+
+The admin dashboard lives at `/admin` and is an internal operating room, not a customer-facing product surface. Admin routes first authenticate with the regular Supabase session and then allow access only when either:
+
+- the signed-in email appears in `ADMIN_EMAIL_ALLOWLIST`; or
+- the user's own `profiles.is_admin` flag is `true`.
+
+Only after that gate passes do admin API routes create a service-role Supabase client. RLS policies for user product tables remain owner-scoped and are not weakened for the dashboard.
+
+### `GET /api/v1/admin/overview`
+
+Returns aggregate operational data for the current deployment:
+
+- KPI summary for users, 7-day activity, coffee memories, Dial-in feedback, rebuy signals, and recent failure events;
+- Activation Funnel from profile creation through dashboard visits, first memory, purchase clue, brew log, Brew Failure Memory, and Rebuy loop;
+- user/account list with counts and last-activity timestamps;
+- Coffee Memory, Rebuy Intelligence, Dial-in Coach usage summaries;
+- recent failure-like product events and QA/test cleanup candidates.
+
+The route reads up to bounded recent rows with the service-role key after admin authorization. It must not expose raw tasting notes, package images, or marketplace-like ordering data.
+
+### `POST /api/v1/admin/qa-cleanup`
+
+Requires JSON `{ "confirm": true }`. The route deletes only candidates whose card or shelf labels contain explicit QA/test markers such as `qa`, `test`, or `테스트`. It also removes dependent brewing logs for marked shelf items and brewing notes for marked cards. This is an operator hygiene action, not a general account deletion route.
 
 ## Data Contracts
 
@@ -415,6 +442,7 @@ The profile surface preserves CoffeeDex paid and rate-limited compatibility feat
 | `is_premium` | Whether premium scan and theme privileges are active. |
 | `scans_used` | Monthly scan usage counter. |
 | `monthly_scan_limit` | Free monthly package-scan allowance. |
+| `is_admin` | Internal operator flag for `/admin`; default false. |
 
 ### `coffee_shelf_items`
 

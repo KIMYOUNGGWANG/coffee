@@ -10,6 +10,7 @@ const starterEnvSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
+  ADMIN_EMAIL_ALLOWLIST: z.string().optional(),
   STORAGE_BUCKET_UPLOADS: z.string().min(1),
   AI_API_KEY: z.string().optional(),
 });
