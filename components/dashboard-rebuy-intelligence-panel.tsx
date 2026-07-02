@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ExternalLink, RefreshCcw, Search, ShoppingBag, Sparkles } from "lucide-react";
+import { AlertTriangle, Coffee, ExternalLink, RefreshCcw, Search, ShoppingBag, Sparkles } from "lucide-react";
 import type { RebuyIntelligenceData, TastingCardData } from "@/hooks/useTastingCards";
 
 type DashboardRebuyIntelligencePanelProps = {
@@ -9,6 +9,7 @@ type DashboardRebuyIntelligencePanelProps = {
   readonly isLoading: boolean;
   readonly error: unknown;
   readonly onQuickAdd: () => void;
+  readonly onOpenLog: () => void;
   readonly onSelectCard: (card: TastingCardData) => void;
 };
 
@@ -27,14 +28,15 @@ export function DashboardRebuyIntelligencePanel({
   isLoading,
   error,
   onQuickAdd,
+  onOpenLog,
   onSelectCard,
 }: DashboardRebuyIntelligencePanelProps) {
   if (isLoading) {
     return (
       <section className="espresso-panel p-5" aria-label="Rebuy Intelligence">
         <div className="h-4 w-36 animate-pulse rounded-full bg-white/10" />
-        <div className="mt-5 grid gap-3 md:grid-cols-4">
-          {[0, 1, 2, 3].map((index) => (
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {[0, 1, 2, 3, 4].map((index) => (
             <div key={index} className="h-36 animate-pulse rounded-2xl bg-white/[0.055]" />
           ))}
         </div>
@@ -84,7 +86,26 @@ export function DashboardRebuyIntelligencePanel({
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        <button
+          type="button"
+          onClick={onOpenLog}
+          className="coffee-metric-card min-w-0 text-left transition hover:-translate-y-0.5 hover:border-primary-amber/35"
+        >
+          <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
+            <Coffee size={13} />
+            Next Cup
+          </p>
+          <p className="mt-3 break-keep text-base font-black leading-6">{data.nextCupPlan.title}</p>
+          <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">
+            {data.nextCupPlan.subtitle} · {data.nextCupPlan.suggestedMethod}
+          </p>
+          <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">{data.nextCupPlan.reason}</p>
+          <span className="mt-4 inline-flex min-h-9 items-center rounded-full bg-primary-amber px-3 text-xs font-black text-background-dark">
+            {data.nextCupPlan.actionLabel}
+          </span>
+        </button>
+
         <button
           type="button"
           onClick={() => (reminderCard ? onSelectCard(reminderCard) : onQuickAdd())}

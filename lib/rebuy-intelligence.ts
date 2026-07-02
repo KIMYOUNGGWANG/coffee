@@ -1,4 +1,4 @@
-import { evaluateFreshShelfStatus } from "@/lib/fresh-shelf";
+import { evaluateFreshPeakWindow, evaluateFreshShelfStatus } from "@/lib/fresh-shelf";
 
 export type RebuyIntelligenceCard = {
   readonly id: string;
@@ -92,12 +92,23 @@ export type BrewFailureInsight = {
   readonly shelfItemId: string | null;
 };
 
+export type NextCupInsight = {
+  readonly title: string;
+  readonly subtitle: string;
+  readonly reason: string;
+  readonly actionLabel: string;
+  readonly priority: "high" | "medium" | "low";
+  readonly suggestedMethod: string;
+  readonly shelfItemId: string | null;
+  readonly lastBrewLogId: string | null;
+};
+
 export type RebuyIntelligenceResponse = {
   readonly data: {
     readonly generatedAt: string;
     readonly summary: string;
     readonly featureScores: readonly {
-      readonly feature: "rebuy_reminder" | "taste_match" | "purchase_memory" | "brew_failure_memory";
+      readonly feature: "next_cup_plan" | "rebuy_reminder" | "taste_match" | "purchase_memory" | "brew_failure_memory";
       readonly roi: number;
       readonly retention: number;
       readonly painkiller: number;
@@ -109,6 +120,7 @@ export type RebuyIntelligenceResponse = {
     readonly tasteMatch: TasteMatchInsight;
     readonly purchaseMemory: PurchaseMemoryInsight;
     readonly brewFailureMemory: BrewFailureInsight;
+    readonly nextCupPlan: NextCupInsight;
   };
 };
 
@@ -157,6 +169,17 @@ const fallbackBrewFailure: BrewFailureInsight = {
   evidence: "실패 로그가 쌓이면 다음 조정값을 바로 제안합니다.",
   logId: null,
   shelfItemId: null,
+};
+
+const fallbackNextCup: NextCupInsight = {
+  title: "오늘 마실 원두를 고를 준비 중",
+  subtitle: "Next Cup Plan",
+  reason: "선반에 원두를 하나 올리면 로스팅일, 개봉일, 잔량, 최근 기록으로 오늘의 첫 컵을 골라줍니다.",
+  actionLabel: "원두 선반 채우기",
+  priority: "low",
+  suggestedMethod: "V60",
+  shelfItemId: null,
+  lastBrewLogId: null,
 };
 
 function normalize(value: string): string {
@@ -429,8 +452,132 @@ function buildBrewFailureMemory(brewingLogs: readonly RebuyIntelligenceBrewLog[]
   };
 }
 
+function logShelfId(log: RebuyIntelligenceBrewLog): string | null {
+  return log.shelf_item_id ?? readJoinedShelfItem(log.coffee_shelf_items)?.id ?? null;
+}
+
+function latestLogForShelf(
+  brewingLogs: readonly RebuyIntelligenceBrewLog[],
+  shelfItemId: string,
+): RebuyIntelligenceBrewLog | null {
+  return [...brewingLogs]
+    .filter((log) => logShelfId(log) === shelfItemId)
+    .sort((first, second) => recencyTime(second.brewed_at) - recencyTime(first.brewed_at))[0] ?? null;
+}
+
+function methodFromLog(log: RebuyIntelligenceBrewLog | null): string {
+  if (log?.method && log.method.trim().length > 0) return log.method;
+  return "V60";
+}
+
+function buildNextCupPlan(
+  shelfItems: readonly RebuyIntelligenceShelfItem[],
+  brewingLogs: readonly RebuyIntelligenceBrewLog[],
+  now: Date,
+): NextCupInsight {
+  const candidates = shelfItems
+    .filter((item) => !item.is_finished && item.fill_level > 0 && item.rebuy_priority !== "paused")
+    .map((item) => {
+      const status = evaluateFreshShelfStatus({
+        roastDate: item.roast_date,
+        openedDate: item.opened_date,
+        fillLevel: item.fill_level,
+        isFinished: item.is_finished,
+        now,
+      });
+      const peakWindow = evaluateFreshPeakWindow({
+        roastDate: item.roast_date,
+        openedDate: item.opened_date,
+        now,
+      });
+      const latestLog = latestLogForShelf(brewingLogs, item.id);
+      const failedRecently = Boolean(latestLog && latestLog.rating !== null && latestLog.rating <= 2);
+      const hasNoBrew = latestLog === null;
+      const score = (
+        (status.kind === "finish_soon" ? 45 : status.kind === "rebuy" ? 38 : status.kind === "drink_now" ? 32 : 8)
+        + (peakWindow.phase === "peak" ? 35 : peakWindow.phase === "enjoy_now" ? 32 : peakWindow.phase === "fading" ? 18 : peakWindow.phase === "unknown" ? 12 : -18)
+        + (hasNoBrew ? 20 : failedRecently ? 16 : 8)
+        + Math.max(0, 20 - Math.floor(item.fill_level / 5))
+      );
+
+      return { item, status, peakWindow, latestLog, failedRecently, hasNoBrew, score };
+    })
+    .sort((first, second) => second.score - first.score || first.item.fill_level - second.item.fill_level);
+
+  const candidate = candidates[0];
+  if (!candidate) return fallbackNextCup;
+
+  const title = candidate.item.bean_name;
+  const subtitle = candidate.item.roaster_name;
+  const suggestedMethod = methodFromLog(candidate.latestLog);
+
+  if (candidate.peakWindow.phase === "resting") {
+    return {
+      title,
+      subtitle,
+      reason: candidate.peakWindow.reason,
+      actionLabel: "조금 더 쉬게 두기",
+      priority: "low",
+      suggestedMethod,
+      shelfItemId: candidate.item.id,
+      lastBrewLogId: candidate.latestLog?.id ?? null,
+    };
+  }
+
+  if (candidate.failedRecently) {
+    return {
+      title,
+      subtitle,
+      reason: "최근 아쉬웠던 컵이 있어요. Dial-in Coach의 조정값으로 바로 한 번 더 비교해 보세요.",
+      actionLabel: "수정값으로 다시 추출",
+      priority: "high",
+      suggestedMethod,
+      shelfItemId: candidate.item.id,
+      lastBrewLogId: candidate.latestLog?.id ?? null,
+    };
+  }
+
+  if (candidate.status.kind === "finish_soon" || candidate.peakWindow.phase === "enjoy_now" || candidate.peakWindow.phase === "fading") {
+    return {
+      title,
+      subtitle,
+      reason: `${candidate.status.reason} 오늘 한 컵 기록하면 잔량과 재구매 판단이 같이 업데이트됩니다.`,
+      actionLabel: "오늘 마무리 컵",
+      priority: "high",
+      suggestedMethod,
+      shelfItemId: candidate.item.id,
+      lastBrewLogId: candidate.latestLog?.id ?? null,
+    };
+  }
+
+  if (candidate.hasNoBrew) {
+    return {
+      title,
+      subtitle,
+      reason: "아직 이 원두의 추출 기록이 없어요. 첫 컵을 남기면 다음부터 레시피와 잔량이 자동으로 이어집니다.",
+      actionLabel: "첫 컵 기록하기",
+      priority: "medium",
+      suggestedMethod,
+      shelfItemId: candidate.item.id,
+      lastBrewLogId: null,
+    };
+  }
+
+  return {
+    title,
+    subtitle,
+    reason: `${candidate.peakWindow.reason} 최근 ${suggestedMethod} 기록을 기준으로 한 번 더 재현해 보세요.`,
+    actionLabel: "한 번 더 재현하기",
+    priority: "medium",
+    suggestedMethod,
+    shelfItemId: candidate.item.id,
+    lastBrewLogId: candidate.latestLog?.id ?? null,
+  };
+}
+
 export function buildRebuyIntelligence(input: BuildRebuyIntelligenceInput): RebuyIntelligenceResponse["data"] {
   const now = input.now ?? new Date();
+  const nextCupPlan = buildNextCupPlan(input.shelfItems, input.brewingLogs, now);
   const rebuyReminder = buildRebuyReminder(input.cards, input.shelfItems, now);
   const tasteMatch = buildTasteMatch(input.cards);
   const purchaseMemory = buildPurchaseMemory(input.cards, input.shelfItems);
@@ -438,8 +585,17 @@ export function buildRebuyIntelligence(input: BuildRebuyIntelligenceInput): Rebu
 
   return {
     generatedAt: now.toISOString(),
-    summary: "재구매 시점, 취향 기준, 구매 단서, 실패 보정값을 한 번에 이어주는 반복 사용 루프입니다.",
+    summary: "오늘 마실 원두, 재구매 시점, 취향 기준, 구매 단서, 실패 보정값을 한 번에 이어주는 반복 사용 루프입니다.",
     featureScores: [
+      {
+        feature: "next_cup_plan",
+        roi: 94,
+        retention: 96,
+        painkiller: 91,
+        monetization: 70,
+        difficulty: 30,
+        reason: "앱을 열 때마다 오늘 마실 원두와 기록 행동을 바로 정해줍니다.",
+      },
       {
         feature: "rebuy_reminder",
         roi: 92,
@@ -481,5 +637,6 @@ export function buildRebuyIntelligence(input: BuildRebuyIntelligenceInput): Rebu
     tasteMatch,
     purchaseMemory,
     brewFailureMemory,
+    nextCupPlan,
   };
 }

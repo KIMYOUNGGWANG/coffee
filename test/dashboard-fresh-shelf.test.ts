@@ -122,14 +122,35 @@ const dialInCoachResponse = {
         evidence: ["프릳츠 커피 에티오피아 시다마 잔량 8%"],
       },
     },
+    grindMemory: {
+      title: "분쇄도 기억이 아직 없어요",
+      subtitle: "이 원두의 첫 성공 컵을 저장하면 다음 추천에 반복 가능한 세팅이 붙습니다.",
+      method: null,
+      grindSize: null,
+      coffeeAmount: null,
+      waterAmount: null,
+      waterTemp: null,
+      brewTime: null,
+      rating: null,
+      brewedAt: null,
+    },
   },
 } as const;
 
 const rebuyIntelligenceResponse = {
   data: {
     generatedAt: "2026-06-29T00:00:00.000Z",
-    summary: "재구매 시점, 취향 기준, 구매 단서, 실패 보정값을 한 번에 이어주는 반복 사용 루프입니다.",
+    summary: "오늘 마실 원두, 재구매 시점, 취향 기준, 구매 단서, 실패 보정값을 한 번에 이어주는 반복 사용 루프입니다.",
     featureScores: [
+      {
+        feature: "next_cup_plan",
+        roi: 94,
+        retention: 96,
+        painkiller: 91,
+        monetization: 70,
+        difficulty: 30,
+        reason: "앱을 열 때마다 오늘 마실 원두와 기록 행동을 바로 정해줍니다.",
+      },
       {
         feature: "rebuy_reminder",
         roi: 92,
@@ -175,6 +196,16 @@ const rebuyIntelligenceResponse = {
       evidence: "실패 로그가 쌓이면 다음 조정값을 바로 제안합니다.",
       logId: null,
       shelfItemId: null,
+    },
+    nextCupPlan: {
+      title: "에티오피아 시다마",
+      subtitle: "프릳츠 커피",
+      reason: "잔량이 낮아 오늘 한 컵 기록하면 재구매 판단까지 이어집니다.",
+      actionLabel: "오늘 마무리 컵",
+      priority: "high",
+      suggestedMethod: "V60",
+      shelfItemId: "shelf-sidama",
+      lastBrewLogId: null,
     },
   },
 } as const;
@@ -278,6 +309,9 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
         case "/api/v1/dial-in-coach":
           await fulfillJson(route, dialInCoachResponse);
           return;
+        case "/api/v1/rebuy-intelligence":
+          await fulfillJson(route, rebuyIntelligenceResponse);
+          return;
         case "/api/v1/brewing-logs":
           await fulfillJson(route, { data: [] });
           return;
@@ -299,7 +333,7 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
       }
     });
 
-    await page.goto(dashboardUrl);
+    await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
 
     await expect(page.getByRole("heading", { name: "로그인이 필요합니다" })).toBeVisible();
     await expect(page.getByText("원두 보관함은 CoffeeDex 계정에 저장됩니다.")).toBeVisible();
@@ -311,7 +345,7 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
   test("renders the rebuy timing badge on the dashboard shelf tab", async ({ page }) => {
     await mockDashboardRoutes(page);
 
-    await page.goto(dashboardUrl);
+    await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
 
     await expect(page.getByTestId("dashboard-ready")).toBeVisible();
     await expect(page.getByRole("heading", { name: /원두 보관함/ })).toBeVisible();
@@ -323,11 +357,13 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
   test("renders Rebuy Intelligence as the next retention loop on the shelf tab", async ({ page }) => {
     await mockDashboardRoutes(page);
 
-    await page.goto(dashboardUrl);
+    await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
 
     await expect(page.getByTestId("dashboard-ready")).toBeVisible();
     await expect(page.getByRole("region", { name: "Rebuy Intelligence" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "다음에 다시 살 커피를 놓치지 않게" })).toBeVisible();
+    await expect(page.getByText("Next Cup")).toBeVisible();
+    await expect(page.getByRole("button", { name: /오늘 마무리 컵/ })).toBeVisible();
     await expect(page.getByText("Rebuy Reminder")).toBeVisible();
     await expect(page.getByText("Taste Match")).toBeVisible();
     await expect(page.getByText("Bag To Rebuy")).toBeVisible();
@@ -338,7 +374,7 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     const patchBodies: unknown[] = [];
     await mockDashboardRoutes(page, patchBodies);
 
-    await page.goto(dashboardUrl);
+    await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
 
     await expect(page.getByTestId("dashboard-ready")).toBeVisible();
     await page.getByRole("heading", { name: "에티오피아 시다마" }).click();
@@ -364,7 +400,7 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     await page.setViewportSize({ width: 392, height: 844 });
     await mockDashboardRoutes(page);
 
-    await page.goto(dashboardUrl);
+    await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
 
     await expect(page.getByTestId("dashboard-ready")).toBeVisible();
     await expect(page.getByText("다시 살 타이밍")).toBeVisible();
@@ -461,6 +497,9 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
         case "/api/v1/dial-in-coach":
           await fulfillJson(route, dialInCoachResponse);
           return;
+        case "/api/v1/rebuy-intelligence":
+          await fulfillJson(route, rebuyIntelligenceResponse);
+          return;
         case "/api/v1/brewing-logs":
           await fulfillJson(route, { data: [] });
           return;
@@ -479,7 +518,7 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
       }
     });
 
-    await page.goto(dashboardUrl);
+    await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
     await page
       .getByRole("navigation", { name: "대시보드 주요 메뉴" })
       .getByRole("button", { name: "기록", exact: true })
@@ -492,7 +531,7 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
 
     await page.getByRole("button", { name: "이 레시피로 로그 시작" }).click();
 
-    await expect(page.getByText("오늘의 시작 레시피를 추출 로그에 저장했어요.")).toBeVisible();
+    await expect(page.getByText("오늘의 시작 레시피와 선반 잔량을 함께 저장했어요.")).toBeVisible();
     expect(savedCoachSource).toBe("dial_in_coach");
   });
 });

@@ -71,7 +71,7 @@ function card(overrides = {}) {
   };
 }
 
-test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is built, Then all four retention loops are present", async () => {
+test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is built, Then all five retention loops are present", async () => {
   const loaded = await loadRebuyIntelligenceModule();
   try {
     const { buildRebuyIntelligence } = loaded.module;
@@ -153,7 +153,12 @@ test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is buil
     assert.equal(result.purchaseMemory.reason, "Fritz 공식몰 200g 옵션");
     assert.equal(result.brewFailureMemory.problem, "too_sour");
     assert.match(result.brewFailureMemory.adjustment, /곱게|온도/);
+    assert.equal(result.nextCupPlan.shelfItemId, "shelf-sidama");
+    assert.equal(result.nextCupPlan.priority, "high");
+    assert.equal(result.nextCupPlan.actionLabel, "수정값으로 다시 추출");
+    assert.equal(result.nextCupPlan.suggestedMethod, "V60");
     assert.deepEqual(result.featureScores.map((score) => score.feature), [
+      "next_cup_plan",
       "rebuy_reminder",
       "purchase_memory",
       "brew_failure_memory",
@@ -236,6 +241,75 @@ test("Given no saved memories, When Rebuy Intelligence is built, Then it returns
     assert.equal(result.tasteMatch.anchorCardId, null);
     assert.equal(result.purchaseMemory.source, "manual");
     assert.equal(result.brewFailureMemory.logId, null);
+    assert.equal(result.nextCupPlan.shelfItemId, null);
+    assert.equal(result.nextCupPlan.actionLabel, "원두 선반 채우기");
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("Given multiple active shelf beans, When Rebuy Intelligence is built, Then Next Cup picks the bean that should be brewed today", async () => {
+  const loaded = await loadRebuyIntelligenceModule();
+  try {
+    const { buildRebuyIntelligence } = loaded.module;
+    const result = buildRebuyIntelligence({
+      now: new Date("2026-06-29T12:00:00.000Z"),
+      cards: [card()],
+      shelfItems: [
+        {
+          id: "shelf-resting",
+          roaster_name: "Momos",
+          bean_name: "Fresh Gesha",
+          origin: "Panama",
+          roast_date: "2026-06-28",
+          opened_date: null,
+          fill_level: 100,
+          is_finished: false,
+          tasting_card_id: null,
+          purchase_url: null,
+          purchase_note: null,
+          rebuy_priority: "normal",
+          rebuy_reminder_date: null,
+          rebuy_action: "none",
+          rebuy_action_at: null,
+          created_at: "2026-06-28T00:00:00.000Z",
+        },
+        {
+          id: "shelf-open",
+          roaster_name: "Fritz",
+          bean_name: "Ethiopia Sidama",
+          origin: "Ethiopia",
+          roast_date: "2026-06-01",
+          opened_date: "2026-06-05",
+          fill_level: 26,
+          is_finished: false,
+          tasting_card_id: "card-sidama",
+          purchase_url: null,
+          purchase_note: null,
+          rebuy_priority: "normal",
+          rebuy_reminder_date: null,
+          rebuy_action: "none",
+          rebuy_action_at: null,
+          created_at: "2026-06-05T00:00:00.000Z",
+        },
+      ],
+      brewingLogs: [
+        {
+          id: "brew-open",
+          shelf_item_id: "shelf-open",
+          brewed_at: "2026-06-27T09:00:00.000Z",
+          method: "Origami",
+          parameters: {},
+          rating: 4,
+          simple_note: "balanced and sweet",
+        },
+      ],
+    });
+
+    assert.equal(result.nextCupPlan.shelfItemId, "shelf-open");
+    assert.equal(result.nextCupPlan.title, "Ethiopia Sidama");
+    assert.equal(result.nextCupPlan.actionLabel, "오늘 마무리 컵");
+    assert.equal(result.nextCupPlan.suggestedMethod, "Origami");
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }
