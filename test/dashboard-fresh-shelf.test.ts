@@ -326,12 +326,12 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     await page.goto(dashboardUrl);
 
     await expect(page.getByTestId("dashboard-ready")).toBeVisible();
-    await expect(page.getByRole("region", { name: "Rebuy Intelligence" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "다시 살 단서" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "다음에 다시 살 커피를 놓치지 않게" })).toBeVisible();
-    await expect(page.getByText("Rebuy Reminder")).toBeVisible();
-    await expect(page.getByText("Taste Match")).toBeVisible();
-    await expect(page.getByText("Bag To Rebuy")).toBeVisible();
-    await expect(page.getByRole("button", { name: /Brew Failure/ })).toBeVisible();
+    await expect(page.getByText("다시 살 후보")).toBeVisible();
+    await expect(page.getByText("닮은 취향")).toBeVisible();
+    await expect(page.getByText("다시 찾을 원두")).toBeVisible();
+    await expect(page.getByRole("button", { name: /다음엔 다르게/ })).toBeVisible();
   });
 
   test("lets users pin and mark a shelf item for in-app rebuy follow-up", async ({ page }) => {
@@ -482,12 +482,12 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     await page.goto(dashboardUrl);
     await page
       .getByRole("navigation", { name: "대시보드 주요 메뉴" })
-      .getByRole("button", { name: "기록", exact: true })
+      .getByRole("button", { name: "노트", exact: true })
       .first()
       .click();
 
-    await expect(page.getByRole("region", { name: "Dial-in Coach" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "오늘 첫 컵을 어디서 시작할지 정해드릴게요" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "오늘 시작점" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "오늘 첫 컵을 어디서 시작할까요" })).toBeVisible();
     await expect(page.getByText("원두 15g")).toBeVisible();
 
     await page.getByRole("button", { name: "이 레시피로 로그 시작" }).click();

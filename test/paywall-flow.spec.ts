@@ -31,7 +31,14 @@ test.describe("Monetization Paywall Flow", () => {
         case "/api/v1/coffee-dna":
           await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ data: null }) });
           return;
-        case "/api/v1/scan":
+        case "/api/v1/rebuy-intelligence":
+        case "/api/v1/dial-in-coach":
+          await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ data: null }) });
+          return;
+        case "/api/v1/brewing-logs":
+          await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ data: [] }) });
+          return;
+        case "/api/v1/cards/scan":
           await route.fulfill({
             status: 402,
             contentType: "application/json",
@@ -65,10 +72,8 @@ test.describe("Monetization Paywall Flow", () => {
     
     await page.waitForTimeout(1000);
 
-    // Click the AI Scan button to open SmartScanner
-    await page.getByRole("button", { name: "AI 스캔 등록" }).first().click();
+    await page.getByRole("button", { name: "원두 패키지 스캔하기" }).first().click();
 
-    // Set the file in the SmartScanner's hidden input
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles({
       name: 'test-coffee.jpg',
@@ -76,14 +81,15 @@ test.describe("Monetization Paywall Flow", () => {
       buffer: Buffer.from('mock-image-data-base64-string')
     });
 
-    // 4. Verify the Paywall Modal appears
-    await expect(page.getByText("무료 스캔 횟수 초과")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("Premium 구독하기")).toBeVisible();
+    await expect(page.getByText("월간 무료 AI 스캔 한도와 보유 크레딧을 모두 사용했습니다")).toBeVisible({ timeout: 10000 });
+    const paymentDialog = page.getByRole("dialog", { name: "추가 기능 및 결제" });
+    await expect(paymentDialog).toBeVisible();
+    await expect(paymentDialog.getByText("CoffeeDex Premium 구독 (월간)")).toBeVisible();
 
     // 5. Click the Premium upgrade button and wait for the checkout request
     const [checkoutRequest] = await Promise.all([
       page.waitForRequest("/api/v1/checkout"),
-      page.getByText("Premium 구독하기").click()
+      paymentDialog.getByRole("button", { name: "구독하기", exact: true }).click()
     ]);
 
     expect(checkoutRequest.url()).toContain("/api/v1/checkout");

@@ -56,7 +56,7 @@ export function WizardFooter({
   onSubmit,
 }: WizardFooterProps) {
   return (
-    <div className="flex justify-between items-center border-t border-white/10 pt-4">
+    <div className="flex justify-between items-center border-t border-[#fff8ec]/10 pt-4">
       <div className="flex items-center gap-4">
         <button
           type="button"
@@ -137,12 +137,12 @@ interface WizardPreviewProps {
 
 export function WizardPreview({ form, wizardMode, quickRepurchaseIntent }: WizardPreviewProps) {
   return (
-    <div className="flex-1 bg-white/10/20 p-6 md:p-8 flex items-center justify-center relative overflow-hidden">
-      <div className="absolute top-4 left-4 z-10 bg-white/75 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-muted-foreground border border-white/10">
+    <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_52%_26%,rgba(199,122,72,0.18),transparent_32%),linear-gradient(180deg,#2b1a12_0%,#120b08_100%)] p-6 md:p-8">
+      <div className="absolute top-4 left-4 z-10 rounded-full border border-[#fff8ec]/14 bg-[#fff8ec]/10 px-3 py-1 text-[10px] font-black text-[#eadccd] shadow-sm backdrop-blur-md">
         실시간 카드 프리뷰
       </div>
 
-      <div className="w-full max-w-[320px] animate-pulse-slow">
+      <div className="w-full max-w-[320px] rounded-[1.8rem] bg-[#fff8ec] p-3 shadow-[0_24px_70px_rgba(0,0,0,0.34)]">
         <TastingCard
           card={{
             id: "PREVIEW",

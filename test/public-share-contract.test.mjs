@@ -18,6 +18,7 @@ test("public card sharing has a privacy-safe database and route contract", () =>
   const publicRoute = read("app/api/v1/public/cards/[token]/route.ts");
   const shareRoute = read("app/api/v1/cards/[id]/share/route.ts");
   const publicPage = read("app/cards/[token]/page.tsx");
+  const feedPage = read("app/feed/page.tsx");
 
   assert.match(migration, /is_public BOOLEAN NOT NULL DEFAULT false/);
   assert.match(migration, /public_share_token UUID NOT NULL DEFAULT gen_random_uuid\(\)/);
@@ -26,6 +27,8 @@ test("public card sharing has a privacy-safe database and route contract", () =>
   assert.match(publicRoute, /is_public/);
   assert.doesNotMatch(publicRoute, /select\("\*"\)/);
   assert.doesNotMatch(publicRoute, /user_id/);
+  assert.doesNotMatch(feedPage, /select\("\*"\)/);
+  assert.doesNotMatch(feedPage, /user_id/);
   assert.match(shareRoute, /\.eq\("user_id", user\.id\)/);
   assert.match(shareRoute, /is_public: true/);
   assert.match(shareRoute, /export async function DELETE/);

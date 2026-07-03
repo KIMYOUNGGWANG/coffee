@@ -17,10 +17,10 @@ function getPrivateRebuyReason(card: TastingCardData | undefined): string | null
 
 export function DashboardRetentionLoop({ cards, onQuickAdd, onSelectCard }: DashboardRetentionLoopProps) {
   const rebuyCard = cards.find((card) => getPrivateRebuyReason(card));
-  const brewCard = cards.find((card) => getBrewRecallSummary(card.footer_meta.extraInfo));
+  const brewCard = cards.find((card) => getBrewRecallSummary(card.footer_meta.extraInfo ?? ""));
   const anchorCard = rebuyCard ?? brewCard ?? cards[0];
   const rebuyReason = getPrivateRebuyReason(rebuyCard ?? anchorCard);
-  const brewSummary = getBrewRecallSummary((brewCard ?? anchorCard)?.footer_meta.extraInfo);
+  const brewSummary = getBrewRecallSummary((brewCard ?? anchorCard)?.footer_meta.extraInfo ?? "");
 
   if (!anchorCard) return null;
 

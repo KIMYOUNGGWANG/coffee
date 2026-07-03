@@ -1,6 +1,6 @@
 import { createServerSupabase } from "@/lib/supabase/server";
 import PublicFeedCard from "@/components/PublicFeedCard";
-import type { TastingCardData } from "@/hooks/useTastingCards";
+import type { PublicFeedCardData } from "@/components/PublicFeedCard";
 import { Search, Compass } from "lucide-react";
 
 export const revalidate = 60; // ISR cache for 60 seconds
@@ -8,10 +8,21 @@ export const revalidate = 60; // ISR cache for 60 seconds
 export default async function FeedPage() {
   const supabase = await createServerSupabase();
   
-  // Fetch public cards directly from Supabase
   const { data: cards, error } = await supabase
     .from("tasting_cards")
-    .select("*")
+    .select(`
+      id,
+      title,
+      subtitle,
+      metric1,
+      metric2,
+      metric3,
+      tags,
+      ai_description,
+      footer_meta,
+      package_origin,
+      created_at
+    `)
     .eq("is_public", true)
     .order("created_at", { ascending: false })
     .limit(20);
@@ -47,7 +58,7 @@ export default async function FeedPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {cards.map((card: TastingCardData) => (
+          {(cards as PublicFeedCardData[]).map((card) => (
             <PublicFeedCard key={card.id} card={card} />
           ))}
         </div>

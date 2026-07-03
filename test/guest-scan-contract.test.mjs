@@ -48,6 +48,14 @@ export async function createServerSupabase() {
   };
 }
 `);
+  writeFileSync(path.join(tempDirectory, "mock-rate-limit.mjs"), `
+export function readClientIdentity(headers) {
+  return headers.get("x-forwarded-for") ?? "guest-scan-test";
+}
+export function checkRateLimit() {
+  return { allowed: true, remaining: 2, resetAt: Date.now() + 60000 };
+}
+`);
 
   const helperPath = path.join(projectRoot, "lib/guest-scan.ts");
   const helperSource = read("lib/guest-scan.ts").replaceAll('"zod"', `"${zodUrl}"`);
@@ -59,6 +67,7 @@ export async function createServerSupabase() {
     .replaceAll('"zod"', `"${zodUrl}"`)
     .replaceAll('"@/lib/supabase/server"', '"./mock-supabase.mjs"')
     .replaceAll('"@/lib/env"', '"./mock-env.mjs"')
+    .replaceAll('"@/lib/rate-limit"', '"./mock-rate-limit.mjs"')
     .replaceAll('"@/lib/guest-scan"', '"./guest-scan.mjs"');
   writeFileSync(path.join(tempDirectory, "route.mjs"), transpileTypescript(routeSource, routePath));
 

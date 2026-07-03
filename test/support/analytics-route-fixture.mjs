@@ -74,11 +74,22 @@ export function createClient() {
     path.join(tempDirectory, "analytics-events.mjs"),
     transpile(read("lib/analytics-events.ts"), schemaPath),
   );
+  writeFileSync(
+    path.join(tempDirectory, "mock-rate-limit.mjs"),
+    `export function readClientIdentity() {
+  return "analytics-route-test";
+}
+
+export function checkRateLimit() {
+  return { allowed: true, remaining: 99, resetAt: Date.now() + 60000 };
+}`,
+  );
 
   const routeSource = read("app/api/v1/analytics/route.ts")
     .replaceAll('"next/server"', '"./next-server.mjs"')
     .replaceAll('"@/lib/analytics-events"', '"./analytics-events.mjs"')
     .replaceAll('"@/lib/env"', '"./mock-env.mjs"')
+    .replaceAll('"@/lib/rate-limit"', '"./mock-rate-limit.mjs"')
     .replaceAll('"@supabase/supabase-js"', '"./mock-supabase.mjs"');
   writeFileSync(path.join(tempDirectory, "route.mjs"), transpile(routeSource, routePath));
 

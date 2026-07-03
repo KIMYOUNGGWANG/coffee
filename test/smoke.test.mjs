@@ -87,7 +87,7 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(apiSpec, /CoffeeShelfItem/);
   assert.match(apiSpec, /Fresh Shelf guidance is advisory product copy/);
   assert.match(apiSpec, /Quick Add Memory Mode/);
-  assert.match(apiSpec, /Korean flavor helper chips/);
+  assert.match(apiSpec, /default 20-second path/);
   assert.match(apiSpec, /private rebuy recall from `repurchase_intent` and `repurchase_reasons`/);
   assert.match(apiSpec, /last-good-brew recall requires brew-like metadata/);
   assert.doesNotMatch(apiSpec, /optional brew summary|brew summary|추출 요약/i);
@@ -105,7 +105,7 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(goldenFlows, /Flow 2\. Scan a Package into an Editable Draft/);
   assert.match(goldenFlows, /Flow 3\. Retrieve a Coffee Worth Buying Again/);
   assert.match(goldenFlows, /Quick Add Memory Mode/);
-  assert.match(goldenFlows, /Korean flavor helper chips/);
+  assert.match(goldenFlows, /Save a 20-Second Quick Record/);
   assert.match(goldenFlows, /private rebuy recall from the user's own `repurchase_reasons`/);
   assert.match(goldenFlows, /Last-good-brew recall is shown only when `footer_meta.extraInfo` contains actual brew-like metadata/);
   assert.doesNotMatch(goldenFlows, /optional brew summary|brew summary|추출 요약/i);
@@ -146,18 +146,21 @@ test("CoffeeDex pages and routes present the coffee memory product", () => {
   const cardsRoute = read("app/api/v1/cards/route.ts");
   const aiNoteRoute = read("app/api/v1/cards/ai-note/route.ts");
   const scanRoute = read("app/api/v1/cards/scan/route.ts");
+  const analyticsRoute = read("app/api/v1/analytics/route.ts");
+  const supportRoute = read("app/api/v1/support/route.ts");
 
   assert.match(layoutSource, /coffeeDexBrand/);
   assert.match(layoutSource, /coffeeDexBrand\.category/);
   assert.match(homePage, /CoffeeDex/);
-  assert.match(homePage, /다시 사고 싶은 커피/);
+  assert.match(homePage, /다시 살 원두를/);
+  assert.match(homePage, /20초 만에 기억/);
   assert.match(homePage, /Fritz Ethiopia Sidama/);
   assert.match(dashboardPage, /DashboardClient/);
-  assert.match(dashboardHeader, /CoffeeDex/);
-  assert.match(dashboardHeader, /내 원두 아카이브/);
-  assert.match(dashboardHeader, /원두 스캔/);
+  assert.match(dashboardHeader, /Private coffee room/);
+  assert.match(dashboardHeader, /개인 커피룸/);
+  assert.match(dashboardHeader, /내 원두 서랍/);
   assert.match(quickAddMemoryForm, /빠른 기록/);
-  assert.match(quickAddMemoryForm, /한국어 향미 단어/);
+  assert.match(quickAddMemoryForm, /기억이 사라지기 전에 원두, 로스터리, 다시 살 단서/);
   assert.match(feedPage, /커뮤니티 기능은 아직 현재 제품 기능이 아닙니다/);
   assert.doesNotMatch(feedPage, unsupportedCommunityClaimPattern);
   assert.match(onboardingPage, /CoffeeDex/);
@@ -170,6 +173,19 @@ test("CoffeeDex pages and routes present the coffee memory product", () => {
   assert.match(scanRoute, /Analyze this coffee bean package label image/);
   assert.match(scanRoute, /confidence/);
   assert.match(scanRoute, /fallback_mock/);
+  assert.match(scanRoute, /guestScanRateLimit/);
+  assert.match(scanRoute, /checkRateLimit/);
+  assert.match(analyticsRoute, /analyticsRateLimit/);
+  assert.match(analyticsRoute, /Retry-After/);
+  assert.match(supportRoute, /supportRateLimit/);
+  assert.match(supportRoute, /Retry-After/);
+  const legacyScanRoute = read("app/api/v1/scan/route.ts");
+  assert.match(legacyScanRoute, /parseScanRequest/);
+  assert.match(legacyScanRoute, /이미지는 5 MiB 이하여야 합니다/);
+  assert.ok(
+    legacyScanRoute.indexOf("readScanImage(body)") < legacyScanRoute.indexOf("rpc"),
+    "legacy scan route should validate images before consuming scan allowance",
+  );
 });
 
 test("dashboard uses a mobile-first CoffeeDex app shell", () => {
@@ -182,12 +198,12 @@ test("dashboard uses a mobile-first CoffeeDex app shell", () => {
   const tastingCard = read("components/TastingCard.tsx");
   const globalStyles = read("app/globals.css");
 
-  assert.match(dashboardHeader, /CoffeeDex/);
-  assert.match(dashboardHeader, /원두 스캔/);
+  assert.match(dashboardHeader, /Private coffee room/);
+  assert.match(dashboardHeader, /내 원두 서랍/);
   assert.match(dashboardNavigation, /aria-label="대시보드 주요 메뉴"/);
   assert.match(dashboardNavigation, /fixed inset-x-0 bottom-0/);
-  assert.match(dashboardNavigation, /선반/);
-  assert.match(dashboardNavigation, /패스포트/);
+  assert.match(dashboardNavigation, /서랍/);
+  assert.match(dashboardNavigation, /취향/);
   assert.match(dashboardNavigation, /설정/);
   assert.match(dashboardShelfView, /CoffeeShelfGrid/);
   assert.match(coffeeShelfGrid, /evaluateFreshShelfStatus/);

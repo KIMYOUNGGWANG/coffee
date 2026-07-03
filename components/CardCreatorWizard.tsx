@@ -341,29 +341,29 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="glass-card border border-white/10 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-[620px] animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070403]/72 p-4 backdrop-blur-md">
+      <div className="flex h-[90vh] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl border border-[#fff8ec]/12 bg-[#1b100b] shadow-[0_32px_110px_rgba(0,0,0,0.58)] fade-in zoom-in-95 duration-200 md:h-[620px] md:flex-row">
 
         {/* Left pane: Stepper tracker & inputs */}
-        <div className="flex-1 p-6 md:p-8 flex flex-col justify-between overflow-y-auto border-r border-white/10">
+        <div className="flex-1 overflow-y-auto border-r border-[#fff8ec]/10 bg-[#1b100b] p-6 md:p-8 flex flex-col justify-between">
 
           {/* Header */}
-          <div className="flex justify-between items-center pb-4 border-b border-white/10">
+          <div className="flex justify-between items-center pb-4 border-b border-[#fff8ec]/10">
             <div>
-              <h2 className="text-xl font-bold font-serif text-foreground">새로운 테이스팅 카드</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">내 커피 기록을 예쁜 카드로 아카이빙합니다.</p>
+              <h2 className="font-serif text-xl font-black text-[#fff8ec]">새로운 테이스팅 카드</h2>
+              <p className="mt-0.5 text-xs font-semibold text-[#d8c8b6]">내 커피 기록을 예쁜 카드로 아카이빙합니다.</p>
             </div>
             <button
               type="button"
               onClick={handleCloseWizard}
               aria-label="카드 만들기 닫기"
-              className="p-1.5 rounded-full hover:bg-white/10 text-muted-foreground transition-colors"
+              className="rounded-full p-1.5 text-[#d8c8b6] transition-colors hover:bg-[#fff8ec]/10 hover:text-[#fff8ec]"
             >
               <X size={18} />
             </button>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/5 p-1">
+          <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-[#fff8ec]/12 bg-[#fff8ec]/7 p-1">
             <button
               type="button"
               aria-pressed={wizardMode === "quick"}
@@ -375,8 +375,8 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
               }}
               className={`min-h-10 rounded-xl px-3 text-xs font-black transition-colors ${
                 wizardMode === "quick"
-                  ? "bg-primary-amber text-background-dark"
-                  : "text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                  ? "bg-[#c77a48] text-white shadow-sm"
+                  : "text-[#d8c8b6] hover:bg-[#fff8ec]/10 hover:text-[#fff8ec]"
               }`}
             >
               빠른 커피 기록
@@ -391,8 +391,8 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
               }}
               className={`min-h-10 rounded-xl px-3 text-xs font-black transition-colors ${
                 wizardMode === "full"
-                  ? "bg-white text-background-dark"
-                  : "text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                  ? "bg-[#fff8ec] text-[#2f251f] shadow-sm"
+                  : "text-[#d8c8b6] hover:bg-[#fff8ec]/10 hover:text-[#fff8ec]"
               }`}
             >
               스캔/수동 전체 기록

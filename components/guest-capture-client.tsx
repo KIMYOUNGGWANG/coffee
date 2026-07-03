@@ -16,6 +16,7 @@ import {
   type GuestDraftExtractedFields,
 } from "@/lib/guest-draft";
 import { scanResultSchema, type ScanResult } from "@/lib/guest-scan";
+import { isTasteProfileKey, tasteProfilePresetByKey } from "@/lib/taste-profile";
 
 const scanEnvelopeSchema = z.object({ data: scanResultSchema }).passthrough();
 const errorEnvelopeSchema = z.object({ error: z.object({ message: z.string() }) }).passthrough();
@@ -26,6 +27,49 @@ const emptyCorrections: GuestDraftCorrections = {
   title: "", subtitle: "", package_origin: null, package_process: null, tags: [], raw_note: "", acidity: 3, sweetness: 3, body: 3,
   repurchase_intent: "undecided", repurchase_reasons: [], corrected_fields: [],
 };
+
+type CaptureActivation = {
+  readonly enabled: boolean;
+  readonly source: "onboarding" | "public_card" | null;
+  readonly tasteProfile: string | null;
+};
+
+function readCaptureActivation(): CaptureActivation {
+  if (typeof globalThis.location === "undefined") {
+    return { enabled: false, source: null, tasteProfile: null };
+  }
+  const searchParams = new URLSearchParams(globalThis.location.search);
+  const intent = searchParams.get("intent");
+  const source = searchParams.get("source");
+  const tasteProfile = searchParams.get("taste_profile");
+  return {
+    enabled: intent === "first_card",
+    source: source === "onboarding" || source === "public_card" ? source : null,
+    tasteProfile,
+  };
+}
+
+function correctionsFromActivation(activation: CaptureActivation): GuestDraftCorrections {
+  if (!isTasteProfileKey(activation.tasteProfile)) return emptyCorrections;
+  const preset = tasteProfilePresetByKey[activation.tasteProfile];
+  return {
+    ...emptyCorrections,
+    acidity: preset.formDefaults.metric1,
+    sweetness: preset.formDefaults.metric2,
+    body: preset.formDefaults.metric3,
+    tags: [...preset.formDefaults.tags],
+    raw_note: preset.formDefaults.rawNote,
+  };
+}
+
+function activationCopy(activation: CaptureActivation): string | null {
+  if (!activation.enabled) return null;
+  if (activation.source === "public_card") return "방금 본 커피처럼 빠른 기록을 시작해요";
+  if (isTasteProfileKey(activation.tasteProfile)) {
+    return `${tasteProfilePresetByKey[activation.tasteProfile].label}으로 빠른 기록을 시작해요`;
+  }
+  return "좋았던 원두를 20초 만에 남겨요";
+}
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -94,6 +138,7 @@ function requestBody(draft: GuestDraft) {
 }
 
 export function GuestCaptureClient() {
+  const [activation, setActivation] = useState<CaptureActivation>({ enabled: false, source: null, tasteProfile: null });
   const [file, setFile] = useState<File | null>(null);
   const [extracted, setExtracted] = useState<GuestDraftExtractedFields>(emptyExtracted);
   const [corrections, setCorrections] = useState<GuestDraftCorrections>(emptyCorrections);
@@ -133,6 +178,15 @@ export function GuestCaptureClient() {
       throw error;
     } finally {
       setPending(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const nextActivation = readCaptureActivation();
+    setActivation(nextActivation);
+    if (nextActivation.enabled) {
+      setCorrections(correctionsFromActivation(nextActivation));
+      setEditing(true);
     }
   }, []);
 
@@ -219,8 +273,20 @@ export function GuestCaptureClient() {
         <header className="mb-6 flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-xl bg-[#C58948] text-[#19140F]"><Coffee size={20} aria-hidden="true" /></span><span className="font-serif font-bold">CoffeeDex</span></header>
         <section className="mb-6 rounded-3xl border border-white/10 bg-[#24201c] p-5 sm:p-7">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#C58948]">Guest-first memory</p>
-          <h1 className="mt-3 break-keep font-serif text-3xl font-bold leading-tight sm:text-4xl">오늘 마신 커피를 남겨보세요</h1>
-          <p className="mt-3 text-sm leading-6 text-[#F7F7F4]/65">로그인 없이 사진을 읽거나 직접 입력할 수 있어요. 계정은 내 기록에 저장할 때만 필요합니다.</p>
+          <h1 className="mt-3 break-keep font-serif text-3xl font-bold leading-tight sm:text-4xl">다시 살 원두를 20초 만에 남겨요</h1>
+          <p className="mt-3 text-sm leading-6 text-[#F7F7F4]/65">로그인 없이 짧게 기록하고, 내 CoffeeDex에 저장할 때만 계정이 필요합니다. 사진 원본은 저장하지 않아요.</p>
+          {activationCopy(activation) && (
+            <p className="mt-4 rounded-2xl border border-[#C58948]/30 bg-[#C58948]/10 px-4 py-3 text-sm font-bold text-[#F7F7F4]">
+              {activationCopy(activation)}
+            </p>
+          )}
+          {corrections.tags.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {corrections.tags.map((tag) => (
+                <span key={tag} className="rounded-full border border-[#C58948]/30 px-3 py-1 text-xs font-bold text-[#DFA857]">{tag}</span>
+              ))}
+            </div>
+          )}
           {!editing && (
             <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
               <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-4 text-sm font-semibold focus-within:ring-4 focus-within:ring-[#C58948]/30">

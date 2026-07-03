@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/api-errors";
+import { parseScanRequest, type ScanImage } from "@/lib/guest-scan";
 import { z } from "zod";
+
+const scanRequestSchema = z.object({
+  image: z.string().min(1),
+  mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]).default("image/jpeg"),
+}).strict();
 
 const scanResponseSchema = z.object({
   roasterName: z.string().nullish().transform(v => v || ""),
@@ -16,6 +22,31 @@ const scanResponseSchema = z.object({
 });
 
 export type ScanResult = z.infer<typeof scanResponseSchema>;
+
+function jsonError(status: number, message: string) {
+  return NextResponse.json({ error: { code: status, message } }, { status });
+}
+
+function readScanImage(input: unknown): { image: ScanImage } | { response: NextResponse } {
+  const request = scanRequestSchema.safeParse(input);
+  if (!request.success) {
+    return { response: jsonError(400, "JPEG, PNG 또는 WebP 이미지 데이터를 제공해주세요.") };
+  }
+
+  const dataUrl = request.data.image.startsWith("data:")
+    ? request.data.image
+    : `data:${request.data.mimeType};base64,${request.data.image}`;
+  const parsedImage = parseScanRequest({ image: dataUrl });
+
+  switch (parsedImage.kind) {
+    case "ready":
+      return { image: parsedImage.image };
+    case "too_large":
+      return { response: jsonError(413, "이미지는 5 MiB 이하여야 합니다.") };
+    case "invalid":
+      return { response: jsonError(400, "JPEG, PNG 또는 WebP base64 이미지 데이터를 제공해주세요.") };
+  }
+}
 
 /**
  * POST /api/v1/scan
@@ -42,6 +73,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const body: unknown = await request.json();
+    const scanImage = readScanImage(body);
+    if ("response" in scanImage) {
+      return scanImage.response;
+    }
+
     // Check limits via RPC before consuming expensive AI API
     const { data: scanCheck, error: rpcError } = await supabase
       .rpc('increment_user_scan', { target_user_id: user.id });
@@ -63,18 +100,6 @@ export async function POST(request: NextRequest) {
           } 
         },
         { status: 402 },
-      );
-    }
-
-    // Read the image payload
-    const body = await request.json();
-    const imageBase64: string | undefined = body.image;
-    const mimeType: string = body.mimeType ?? "image/jpeg";
-
-    if (!imageBase64 || typeof imageBase64 !== "string" || imageBase64.length < 100) {
-      return NextResponse.json(
-        { error: { code: 400, message: "유효한 이미지 데이터가 필요합니다." } },
-        { status: 400 },
       );
     }
 
@@ -136,8 +161,8 @@ export async function POST(request: NextRequest) {
                 { text: prompt },
                 {
                   inlineData: {
-                    mimeType,
-                    data: imageBase64,
+                    mimeType: scanImage.image.mimeType,
+                    data: scanImage.image.base64Data,
                   },
                 },
               ],

@@ -105,6 +105,28 @@ export function buildDashboardActivationHref(intent: DashboardActivationIntent):
   }
 }
 
+export function buildCaptureActivationHref(intent: DashboardActivationIntent): string {
+  switch (intent.kind) {
+    case "none":
+      return "/capture";
+    case "first_card": {
+      const searchParams = new URLSearchParams();
+      searchParams.set("intent", "first_card");
+      searchParams.set("source", intent.source);
+      searchParams.set("mode", intent.mode);
+      if (intent.token) {
+        searchParams.set("token", intent.token);
+      }
+      if (intent.tasteProfile) {
+        searchParams.set("taste_profile", intent.tasteProfile);
+      }
+      return `/capture?${searchParams.toString()}`;
+    }
+    default:
+      return assertNever(intent);
+  }
+}
+
 export function buildFirstCardActivationIntent(context: OnboardingActivationContext): DashboardActivationIntent {
   switch (context.kind) {
     case "default":

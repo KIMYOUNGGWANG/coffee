@@ -53,7 +53,7 @@ test.describe("CoffeeDex guest capture", () => {
     });
 
     await page.goto("/capture");
-    await expect(page.getByRole("heading", { name: "오늘 마신 커피를 남겨보세요" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "다시 살 원두를 20초 만에 남겨요" })).toBeVisible();
     await expect(page).toHaveURL(/\/capture$/);
 
     await page.getByLabel("원두 패키지 사진 선택").setInputFiles({
@@ -64,20 +64,16 @@ test.describe("CoffeeDex guest capture", () => {
     await page.getByRole("button", { name: "라벨 읽기" }).click();
 
     await expect(page.getByLabel("원두 이름")).toHaveValue("Ethiopia Guji");
-    await expect(page.getByLabel("가공 방식")).toHaveValue("");
+    await expect(page.getByLabel("로스터리")).toHaveValue("April Coffee");
+    await expect(page.getByLabel("가공 방식")).toBeHidden();
     await expect(page.getByText("확실하지 않음", { exact: true })).toBeVisible();
-    await expect(page.getByRole("slider", { name: "산미" })).toHaveValue("3");
-    await expect(page.getByRole("slider", { name: "단맛" })).toHaveValue("3");
-    await expect(page.getByRole("slider", { name: "바디감" })).toHaveValue("3");
+    await expect(page.getByRole("slider", { name: "산미" })).toBeHidden();
+    await expect(page.getByText("자세히 추가", { exact: true })).toBeVisible();
     expect(await readGuestDraft(page)).toBeNull();
     await page.screenshot({ path: "artifacts/guest-capture/mobile-editor.png", fullPage: true });
 
-    await page.getByLabel("가공 방식").fill("Washed");
-    await page.getByRole("slider", { name: "산미" }).fill("4");
-    await page.getByRole("slider", { name: "단맛" }).fill("5");
     await page.getByRole("radio", { name: "또 사고 싶어요" }).check();
-    await page.getByLabel("재구매 이유").fill("깨끗한 단맛, 향이 오래감");
-    await page.getByLabel("나만의 메모").fill("식으면서 복숭아 향이 더 선명했다.");
+    await page.getByLabel("한 줄 메모").fill("식으면서 복숭아 향이 더 선명했다.");
 
     const saveButton = page.getByRole("button", { name: "내 CoffeeDex에 저장" });
     await expect(saveButton).toBeDisabled();
@@ -91,9 +87,10 @@ test.describe("CoffeeDex guest capture", () => {
     expect(storedDraft).not.toContain("guest-photo");
     expect(createBody).toMatchObject({
       title: "Ethiopia Guji",
-      packageProcess: "Washed",
-      metric1: 4,
-      metric2: 5,
+      subtitle: "April Coffee",
+      aiDescription: "식으면서 복숭아 향이 더 선명했다.",
+      metric1: 3,
+      metric2: 3,
       scanSource: "gemini",
       imageUrl: null,
       confirmed: true,
@@ -112,7 +109,9 @@ test.describe("CoffeeDex guest capture", () => {
     await page.getByRole("button", { name: "사진 없이 직접 입력" }).click();
 
     await expect(page.getByLabel("원두 이름")).toHaveValue("");
-    await expect(page.getByLabel("로스터리 / 브랜드")).toHaveValue("");
+    await expect(page.getByLabel("로스터리")).toHaveValue("");
+    await expect(page.getByLabel("한 줄 메모")).toBeVisible();
+    await expect(page.getByText("사진 원본은 저장하지 않아요. 저장할 때만 로그인하고, 비공개 기록으로 저장돼요.")).toBeVisible();
     await expect(page.getByText(/Ethiopia|Guji|Fritz|Sidama/)).toHaveCount(0);
     expect(scanRequests).toBe(0);
   });

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Coffee, Sparkles, ChevronRight, Share2, Layers, BookOpen, Heart } from "lucide-react";
+import { Coffee, Sparkles, ChevronRight, Layers, BookOpen } from "lucide-react";
 import LandingPricingSection from "@/components/landing-pricing-section";
 import LandingPlaygroundClient from "@/components/landing-playground-client";
 import LegalFooterLinks from "@/components/legal-footer-links";
@@ -29,8 +29,8 @@ export default function CoffeeDexHomePage() {
             <Link className="hidden text-sm font-medium text-[#F5F5F5]/50 transition-colors hover:text-[#F5F5F5] md:inline-flex tracking-wide" href="/onboarding">
               온보딩 가이드
             </Link>
-            <Link className={cn(buttonVariants({ size: "sm" }), "shrink-0 bg-[#D4AF37] hover:bg-[#C58948] border-none text-black rounded-full text-xs font-bold transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] cursor-pointer px-5 py-4")} href="/onboarding">
-              Taste Finder 시작
+            <Link className={cn(buttonVariants({ size: "sm" }), "shrink-0 bg-[#D4AF37] hover:bg-[#C58948] border-none text-black rounded-full text-xs font-bold transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] cursor-pointer px-5 py-4")} href="/capture">
+              20초 기록 시작
             </Link>
           </div>
         </header>
@@ -46,13 +46,13 @@ export default function CoffeeDexHomePage() {
             </div>
 
             <h1 className="max-w-full break-keep font-serif text-[clamp(2.5rem,7vw,4.5rem)] font-extrabold leading-[1.1] text-[#F5F5F5]">
-              한국 스페셜티 커피를 <br />
-              <span className="text-[#D4AF37] italic font-light tracking-tight">나만의 맛 여권으로,</span> <br />
+              다시 살 원두를 <br />
+              <span className="text-[#D4AF37] italic font-light tracking-tight">20초 만에 기억,</span> <br />
               {coffeeDexBrand.name}.
             </h1>
 
             <p className="text-sm md:text-lg text-[#F5F5F5]/60 leading-relaxed max-w-xl font-light">
-              다시 사고 싶은 커피를 기억할 수 있도록, 마신 원두의 라벨을 AI로 스캔하여 Taste Passport에 스탬프를 적립해 보세요. 당신의 커피 취향을 정밀하게 분석합니다.
+              기억이 사라지기 전에 원두, 로스터리, 다시 살 단서만 남기면 다음에 찾을 이유가 생깁니다. 사진 원본은 저장하지 않고, 저장할 때만 로그인해요.
             </p>
 
             <div className="flex flex-wrap gap-4 pt-4">
@@ -63,7 +63,7 @@ export default function CoffeeDexHomePage() {
                 )}
                 href="/capture"
               >
-                첫 테이스팅 기록 시작
+                20초 기록 시작
                 <ChevronRight size={18} />
               </Link>
               <Link
@@ -73,7 +73,7 @@ export default function CoffeeDexHomePage() {
                 )}
                 href="/onboarding"
               >
-                30초 Taste Finder로 시작
+                Taste Finder로 맛 방향 고르기
               </Link>
             </div>
           </div>
@@ -116,9 +116,9 @@ export default function CoffeeDexHomePage() {
             <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#D4AF37]">
               경험의 확장
             </span>
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#F5F5F5]">디지털 진열장에 쌓이는 미각 아카이브</h2>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#F5F5F5]">좋았던 원두를 다시 찾는 기억장</h2>
             <p className="text-sm text-[#F5F5F5]/50 leading-relaxed font-light">
-              단순한 기록을 넘어, 소장하고 싶은 포트폴리오를 만들어 드립니다.
+              처음에는 짧게 저장하고, 필요할 때만 스캔과 기록북으로 확장합니다.
             </p>
           </div>
 
@@ -139,7 +139,7 @@ export default function CoffeeDexHomePage() {
             <div className="max-w-xl">
               <h2 className="font-serif text-2xl font-bold text-white mb-2">오늘 제공하는 CoffeeDex 결과물</h2>
               <p className="text-sm font-light leading-relaxed text-[#F5F5F5]/50">
-                현재 범위는 개인 기록, AI 보조 스캔/노트, 디지털 공유와 PDF 내보내기입니다.
+                무료 기록은 비공개로 시작하고, Premium은 원두 봉투를 자주 읽는 사람을 위한 선택 기능입니다.
               </p>
             </div>
             <span className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/10 px-4 py-2 text-xs font-bold text-[#D4AF37] tracking-widest uppercase">

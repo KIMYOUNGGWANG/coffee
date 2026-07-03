@@ -49,7 +49,7 @@ The current runtime schema accepts these variables as optional. Configure them f
 
 - The scan route accepts only JPEG, PNG, or WebP data URLs that pass canonical base64, decoded 5 MiB size, MIME, and magic-byte checks.
 - Raw scan images are passed to the provider in request memory and are not persisted by the CoffeeDex route. Guest text drafts use browser storage for less than 24 hours and exclude raw image data.
-- The anonymous one-trial map is process-local and IP-derived. It resets on instance restart and is not distributed across Vercel instances. Do not present it as production distributed rate limiting or an abuse-security boundary.
+- The anonymous one-trial map and request throttles for guest scan, analytics, and support intake are process-local and IP-derived. They reset on instance restart and are not distributed across Vercel instances. Do not present them as production distributed rate limiting or an abuse-security boundary.
 - A production distributed limit would require a shared store and trusted edge identity handling; that is not implemented here.
 
 ## Privacy And Analytics Boundary

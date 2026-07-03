@@ -28,6 +28,7 @@ function loadQuickAddModule() {
           AlertCircle: () => null,
           Coffee: () => null,
           Loader2: () => null,
+          ShieldCheck: () => null,
         };
       case "@/hooks/use-analytics-events":
         return { useAnalyticsEvents: () => ({ trackEvent: () => undefined }) };
@@ -116,12 +117,17 @@ test("Given quick add fields, When the user confirms again, Then the compact mem
   assert.equal(payload.subtitle, "Fritz Coffee");
   assert.equal(payload.confirmed, true);
   assert.equal(payload.repurchaseIntent, "again");
-  assert.equal(payload.packageOrigin, "Ethiopia");
-  assert.equal(payload.packageProcess, "Washed");
-  assert.equal(payload.purchaseUrl, "https://fritz.example/guji");
-  assert.equal(payload.purchaseNote, "공식몰 200g 옵션");
+  assert.equal(payload.packageOrigin, null);
+  assert.equal(payload.packageProcess, null);
+  assert.equal(payload.purchaseUrl, null);
+  assert.equal(payload.purchaseNote, null);
+  assert.deepEqual(plain(payload.badges), ["20초 기록"]);
+  assert.equal(payload.imageUrl, null);
   assert.deepEqual(plain(payload.repurchaseReasons), ["복숭아 단맛"]);
-  assert.deepEqual(plain(payload.tags), ["복숭아", "꿀"]);
+  assert.deepEqual(plain(payload.tags), []);
+  assert.equal(payload.metric1, 3);
+  assert.equal(payload.metric2, 3);
+  assert.equal(payload.metric3, 3);
   assert.equal(payload.scanSource, "manual");
   assert.deepEqual(plain(payload.correctedFields), []);
 });
@@ -148,11 +154,22 @@ test("Given empty quick add title, When validation runs, Then it blocks submissi
   const { getQuickAddValidationError } = loadQuickAddModule();
 
   // When
-  const message = getQuickAddValidationError({ title: "   " });
+  const message = getQuickAddValidationError({ title: "   ", subtitle: "Fritz Coffee" });
 
   // Then
   assert.equal(message, "원두 이름을 입력해야 빠른 기록을 저장할 수 있어요.");
-  assert.equal(getQuickAddValidationError({ title: "Ethiopia Guji" }), null);
+  assert.equal(getQuickAddValidationError({ title: "Ethiopia Guji", subtitle: "Fritz Coffee" }), null);
+});
+
+test("Given empty quick add roaster, When validation runs, Then it blocks with a searchability error", () => {
+  // Given
+  const { getQuickAddValidationError } = loadQuickAddModule();
+
+  // When / Then
+  assert.equal(
+    getQuickAddValidationError({ title: "Ethiopia Guji", subtitle: "   " }),
+    "로스터리를 입력해야 나중에 다시 찾을 수 있어요.",
+  );
 });
 
 test("Given card footer metadata, When brew recall provenance is checked, Then only compound brew metadata is accepted", () => {

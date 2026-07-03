@@ -76,6 +76,21 @@ async function fulfillJson(route: Route, status: number, body: unknown): Promise
 }
 
 async function mockDashboardShell(page: Page, profileBody: typeof profileResponse | typeof paidCreditProfileResponse = profileResponse): Promise<void> {
+  await page.route("**/api/v1/shelf", async (route) => {
+    await fulfillJson(route, 200, { data: [] });
+  });
+  await page.route("**/api/v1/coffee-dna", async (route) => {
+    await fulfillJson(route, 200, { data: null });
+  });
+  await page.route("**/api/v1/rebuy-intelligence", async (route) => {
+    await fulfillJson(route, 200, { data: null });
+  });
+  await page.route("**/api/v1/dial-in-coach", async (route) => {
+    await fulfillJson(route, 200, { data: null });
+  });
+  await page.route("**/api/v1/brewing-logs", async (route) => {
+    await fulfillJson(route, 200, { data: [] });
+  });
   await page.route("**/api/v1/profile/analytics", async (route) => {
     await fulfillJson(route, 200, analyticsResponse);
   });

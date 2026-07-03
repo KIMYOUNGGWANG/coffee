@@ -4,13 +4,19 @@ import { readStarterEnv } from "@/lib/env";
 import {
   parseScanRequest,
   providerScanResultSchema,
-  readGuestIdentity,
   reserveGuestScan,
   type ScanImage,
   type ScanResult,
 } from "@/lib/guest-scan";
+import { checkRateLimit, readClientIdentity } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { z } from "zod";
+
+const guestScanRateLimit = {
+  key: "guest-scan",
+  limit: 3,
+  windowMs: 60 * 60_000,
+} as const;
 
 const nonNegativeInteger = z.number().int().min(0);
 const scanEntitlementSchema = z.object({
@@ -208,7 +214,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         const supabase = await createServerSupabase();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-          const identity = readGuestIdentity(request.headers);
+          const identity = readClientIdentity(request.headers);
+          const rateLimit = checkRateLimit(identity, guestScanRateLimit);
+          if (!rateLimit.allowed) {
+            return jsonError(429, "게스트 스캔 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.");
+          }
+
           if (!reserveGuestScan(identity)) {
             return jsonError(429, "게스트 스캔 체험을 이미 사용했습니다. 직접 입력을 이용해주세요.");
           }

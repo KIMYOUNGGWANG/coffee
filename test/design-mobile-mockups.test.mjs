@@ -11,10 +11,10 @@ function read(relativePath) {
   return readFileSync(path.join(projectRoot, relativePath), "utf8");
 }
 
-test("Hyangmi mobile mockup keeps the polished CoffeeDex direction", () => {
+test("CoffeeDex mobile mockup keeps the polished CoffeeDex direction", () => {
   const source = read("app/design/mobile-mockups/page.tsx");
 
-  assert.match(source, /Hyangmi 모바일 기준안/);
+  assert.match(source, /CoffeeDex 모바일 기준안/);
   assert.match(source, /디자인 원칙/);
   assert.match(source, /향미 선반/);
   assert.match(source, /취향 지도/);

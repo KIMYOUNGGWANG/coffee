@@ -99,12 +99,26 @@ export async function createServerSupabase() {
   );
 }
 
+function writeRateLimitMock(tempDirectory) {
+  writeFileSync(
+    path.join(tempDirectory, "mock-rate-limit.mjs"),
+    `export function readClientIdentity() {
+  return "route-test-client";
+}
+
+export function checkRateLimit() {
+  return { allowed: true, remaining: 99, resetAt: Date.now() + 60000 };
+}`,
+  );
+}
+
 async function loadScanRoute() {
   const tempDirectory = mkdtempSync(path.join(tmpdir(), "coffeedex-scan-trust-"));
   const zodModuleUrl = pathToFileURL(path.join(projectRoot, "node_modules/zod/index.js")).href;
   writeNextResponseMock(tempDirectory);
   writeEnvMock(tempDirectory);
   writeSupabaseMock(tempDirectory);
+  writeRateLimitMock(tempDirectory);
 
   const helperPath = path.join(projectRoot, "lib/guest-scan.ts");
   const helperSource = read("lib/guest-scan.ts").replaceAll('"zod"', `"${zodModuleUrl}"`);
@@ -116,6 +130,7 @@ async function loadScanRoute() {
     .replaceAll('"zod"', `"${zodModuleUrl}"`)
     .replaceAll('"@/lib/supabase/server"', '"./mock-supabase.mjs"')
     .replaceAll('"@/lib/env"', '"./mock-env.mjs"')
+    .replaceAll('"@/lib/rate-limit"', '"./mock-rate-limit.mjs"')
     .replaceAll('"@/lib/guest-scan"', '"./guest-scan.mjs"');
 
   writeFileSync(path.join(tempDirectory, "route.mjs"), transpileTypescript(routeSource, routePath));

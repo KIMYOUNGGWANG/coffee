@@ -59,20 +59,20 @@ export default function OnboardingTasteFinder({ dashboardHref }: OnboardingTaste
 
   return (
     <div className="grid gap-5">
-      <div className="rounded-[1.75rem] border border-primary-amber/14 bg-[#110c08]/88 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur sm:rounded-[2rem] sm:p-5">
-        <div className="flex items-end justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="rounded-[1.75rem] border border-[#fff8ec]/12 bg-[#1d120d]/86 p-4 shadow-[0_28px_86px_rgba(0,0,0,0.46)] ring-1 ring-[#c77a48]/12 backdrop-blur sm:rounded-[2rem] sm:p-5">
+        <div className="flex items-end justify-between gap-4 border-b border-[#fff8ec]/10 pb-4">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary-amber">
-              30-second Taste Finder
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#b86b3d]">
+              Quick-record preset
             </p>
-            <h2 className="mt-3 break-keep font-serif text-2xl font-black leading-tight text-[#F7F7F4] md:text-3xl">
-              오늘의 취향은 어떤 방향인가요?
+            <h2 className="mt-3 break-keep font-serif text-2xl font-black leading-tight text-[#fff8ec] md:text-3xl">
+              빠른 기록의 맛 방향을 먼저 골라요
             </h2>
           </div>
-          <span className="hidden text-xs font-black text-[#F7F7F4]/42 sm:block">선택 1개</span>
+          <span className="hidden rounded-full border border-[#fff8ec]/12 bg-[#fff8ec]/8 px-3 py-1.5 text-xs font-black text-[#d8c8b6] sm:block">선택 1개</span>
         </div>
 
-        <div className="mt-4 divide-y divide-white/10" role="group" aria-label="Taste Finder profile">
+        <div className="mt-4 grid gap-2" role="group" aria-label="Taste Finder profile">
           {tasteProfileDisplays.map((profile) => {
             const preset = tasteProfilePresetByKey[profile.key];
             const isSelected = selectedTasteProfile === profile.key;
@@ -84,22 +84,22 @@ export default function OnboardingTasteFinder({ dashboardHref }: OnboardingTaste
                 aria-pressed={isSelected}
                 data-testid={`taste-profile-${profile.key}`}
                 onClick={() => setSelectedTasteProfile(profile.key)}
-                className={`group grid w-full grid-cols-[2rem_minmax(0,1fr)_1.25rem] items-center gap-3 py-4 text-left transition sm:grid-cols-[2.25rem_3rem_minmax(0,1fr)_1.5rem] ${
+                className={`group grid w-full grid-cols-[2rem_minmax(0,1fr)_1.25rem] items-center gap-3 rounded-2xl border px-3 py-3 text-left transition sm:grid-cols-[2.25rem_3rem_minmax(0,1fr)_1.5rem] sm:px-4 sm:py-4 ${
                   isSelected
-                    ? "text-[#F7F7F4]"
-                    : "text-[#F7F7F4]/72 hover:text-[#F7F7F4]"
+                    ? "border-[#c77a48]/76 bg-[#c77a48]/18 text-[#fff8ec] shadow-[0_18px_40px_rgba(199,122,72,0.16)]"
+                    : "border-[#fff8ec]/12 bg-[#fff8ec]/7 text-[#eadccd] hover:border-[#c77a48]/40 hover:bg-[#fff8ec]/11"
                 }`}
               >
-                <span className={`grid size-8 place-items-center rounded-full border ${isSelected ? "border-primary-amber bg-primary-amber text-background-dark" : "border-white/24 text-white/32"}`}>
+                <span className={`grid size-8 place-items-center rounded-full border ${isSelected ? "border-[#c77a48] bg-[#c77a48] text-white" : "border-[#fff8ec]/22 bg-[#120b08] text-[#bca995]"}`}>
                   {isSelected ? <Check size={16} /> : <Circle size={16} />}
                 </span>
-                <span className={`hidden size-12 place-items-center rounded-2xl border sm:grid ${isSelected ? "border-primary-amber/40 bg-primary-amber/12 text-primary-amber" : "border-white/10 bg-white/[0.03] text-primary-amber/78"}`}>
+                <span className={`hidden size-12 place-items-center rounded-2xl border sm:grid ${isSelected ? "border-[#c77a48]/44 bg-[#fff8ec] text-[#c77a48]" : "border-[#fff8ec]/12 bg-[#120b08] text-[#b86b3d]"}`}>
                   <Icon size={20} />
                 </span>
                 <span className="min-w-0">
                   <span className="block break-keep font-serif text-lg font-black leading-tight sm:text-xl">{profile.title}</span>
                   <span className="mt-1 block break-keep text-sm font-semibold leading-6 text-current/62">{profile.subtitle}</span>
-                  <span className="mt-1 block text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/82">
+                  <span className="mt-1 block text-[10px] font-black uppercase tracking-[0.16em] text-[#b86b3d]">
                     {preset.notes}
                   </span>
                 </span>
@@ -111,9 +111,9 @@ export default function OnboardingTasteFinder({ dashboardHref }: OnboardingTaste
           })}
         </div>
 
-        <div className="mt-5 rounded-[1.4rem] bg-[#f6efe3] p-4 text-[#2f251f] shadow-[0_18px_50px_rgba(0,0,0,0.24)] sm:rounded-[1.6rem]">
+        <div className="mt-5 rounded-[1.4rem] bg-[#fff8ec] p-4 text-[#2f251f] shadow-[0_18px_44px_rgba(0,0,0,0.22)] sm:rounded-[1.6rem]">
           <div className="flex items-center justify-between border-b border-[#2f251f]/12 pb-3">
-            <p className="text-sm font-black text-[#9f6a4a]">첫 Taste Card 미리보기</p>
+            <p className="text-sm font-black text-[#9f6a4a]">20초 기록 프리셋</p>
             <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#6f6258]">
               {selectedPreset ? "ready" : "waiting"}
             </span>
@@ -146,7 +146,7 @@ export default function OnboardingTasteFinder({ dashboardHref }: OnboardingTaste
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#6f6258]">Taste balance</p>
             <p className="mt-2 text-sm font-extrabold text-[#2f251f]">{previewMetrics}</p>
             <p className="mt-2 break-keep text-xs font-semibold leading-5 text-[#6f6258]">
-              {selectedPreset ? selectedPreset.cue : "취향을 고르면 빠른 기록의 산미, 단맛, 바디 기준이 먼저 잡힙니다."}
+              {selectedPreset ? selectedPreset.cue : "취향을 고르면 빠른 기록에 향미 힌트가 먼저 담깁니다."}
             </p>
           </div>
         </div>
@@ -156,14 +156,16 @@ export default function OnboardingTasteFinder({ dashboardHref }: OnboardingTaste
         <Link
           href={activationHref}
           data-testid="onboarding-first-card-cta"
-          className="inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-primary-amber bg-primary-amber px-5 text-center text-sm font-black leading-5 text-background-dark shadow-[0_16px_42px_rgba(217,160,91,0.2)] transition-transform hover:-translate-y-0.5 sm:text-base"
+          className="inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-[#d8965f] bg-[#c77a48] px-5 text-center text-sm font-black leading-5 text-white shadow-[0_18px_46px_rgba(199,122,72,0.26)] transition hover:-translate-y-0.5 hover:bg-[#b86b3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2f251f]/20 sm:text-base"
+          style={{ color: "#fffaf2" }}
         >
           <span className="break-keep">20초 빠른 기록 시작하기</span>
           <ArrowRight size={18} />
         </Link>
         <Link
           href="/dashboard"
-          className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-5 text-center text-sm font-black leading-5 text-[#F7F7F4]/72 transition hover:-translate-y-0.5 hover:border-primary-amber/30 hover:text-primary-amber sm:w-auto"
+          className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border border-[#fff8ec]/16 bg-[#fff8ec]/8 px-5 text-center text-sm font-black leading-5 text-[#fff8ec] shadow-[0_14px_34px_rgba(0,0,0,0.22)] transition hover:-translate-y-0.5 hover:border-[#c77a48]/42 hover:bg-[#fff8ec]/13 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c77a48]/30 sm:w-auto"
+          style={{ color: "#fff8ec" }}
         >
           <ScanLine size={16} />
           <span className="break-keep">샘플 CoffeeDex 기록 보기</span>

@@ -29,6 +29,8 @@ const loginRequiredResponse = {
 
 const dashboardActivationPath =
   "/dashboard?intent=first_card&source=public_card&mode=quick&token=public-token-001";
+const captureActivationPath =
+  "/capture?intent=first_card&source=public_card&mode=quick&token=public-token-001";
 
 async function fulfillJson(route: Route, body: unknown, status = 200): Promise<void> {
   await route.fulfill({
@@ -76,7 +78,7 @@ async function expectKoreanAuthGate(page: Page): Promise<void> {
 }
 
 test.describe("CoffeeDex authenticated activation gate", () => {
-  test("routes public-card activation into Korean auth gate with safe dashboard redirect", async ({ page }) => {
+  test("routes public-card activation into capture and gates auth only when saving", async ({ page }) => {
     // Given
     await mockAuthGateRoutes(page);
 
@@ -87,8 +89,16 @@ test.describe("CoffeeDex authenticated activation gate", () => {
     await page.getByTestId("onboarding-first-card-cta").click();
 
     // Then
+    await expect(page).toHaveURL(captureActivationPath);
+    await expect(page.getByText("방금 본 커피처럼 빠른 기록을 시작해요")).toBeVisible();
+    await page.getByLabel("원두 이름").fill("Ethiopia Guji");
+    await page.getByLabel("로스터리").fill("프릳츠 커피");
+    await page.getByRole("radio", { name: "또 사고 싶어요" }).check();
+    await page.getByLabel("한 줄 메모").fill("복숭아 단맛을 다시 찾고 싶다.");
+    await page.getByRole("checkbox", { name: "이 내용으로 기록할게요" }).check();
+    await page.getByRole("button", { name: "내 CoffeeDex에 저장" }).click();
     await expect(page).toHaveURL(
-      `/auth?redirect=${encodeURIComponent(dashboardActivationPath)}`,
+      `/auth?redirect=${encodeURIComponent("/capture?resume=1")}`,
     );
     await expectKoreanAuthGate(page);
   });

@@ -1,8 +1,22 @@
 import { Star, Flame, Droplets, Thermometer, Timer } from "lucide-react";
 import type { TastingCardData } from "@/hooks/useTastingCards";
 
+export type PublicFeedCardData = Pick<
+  TastingCardData,
+  | "id"
+  | "title"
+  | "subtitle"
+  | "metric1"
+  | "metric2"
+  | "metric3"
+  | "tags"
+  | "ai_description"
+  | "footer_meta"
+  | "package_origin"
+>;
+
 type PublicFeedCardProps = {
-  card: TastingCardData;
+  card: PublicFeedCardData;
 };
 
 export default function PublicFeedCard({ card }: PublicFeedCardProps) {
