@@ -100,7 +100,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
             <Coffee size={20} aria-hidden="true" />
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary-amber">CoffeeDex</p>
-          <h1 className="break-keep font-serif text-3xl font-black leading-tight text-background-dark">CoffeeDex 계정으로 계속하기</h1>
+          <h2 className="break-keep font-serif text-3xl font-black leading-tight text-background-dark">저장한 원두를 내 서랍에 묶어둘게요</h2>
           <p className="mx-auto max-w-sm break-keep text-sm font-semibold leading-6 text-muted-foreground">
             Google 계정으로 로그인하면 방금 보던 커피 기록으로 이어집니다.
           </p>

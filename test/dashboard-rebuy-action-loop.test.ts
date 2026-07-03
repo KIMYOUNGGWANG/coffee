@@ -1,0 +1,160 @@
+import { expect, test } from "@playwright/test";
+import type { Page, Route } from "@playwright/test";
+
+const dashboardUrl = `${process.env.COFFEEDEX_E2E_BASE_URL ?? ""}/dashboard`;
+
+const shelfResponse = {
+  data: [{
+    bean_name: "에티오피아 시다마",
+    fill_level: 8,
+    id: "shelf-sidama",
+    is_finished: false,
+    opened_date: "2026-06-10",
+    origin: "Ethiopia Sidama Washed",
+    roast_date: "2026-06-01",
+    roaster_name: "프릳츠 커피",
+    tasting_card_id: null,
+    tasting_cards: null,
+    total_weight: 200,
+    purchase_url: "https://fritz.example/sidama",
+    purchase_note: "Fritz 공식몰 200g 옵션",
+    rebuy_priority: "normal",
+    rebuy_reminder_date: null,
+    rebuy_action: "none",
+    rebuy_action_at: null,
+  }],
+} as const;
+
+const rebuyIntelligenceResponse = {
+  data: {
+    generatedAt: "2026-06-29T00:00:00.000Z",
+    summary: "오늘 마실 원두, 재구매 시점, 취향 기준, 구매 단서, 실패 보정값을 한 번에 이어주는 반복 사용 루프입니다.",
+    featureScores: [{
+      feature: "rebuy_reminder",
+      roi: 92,
+      retention: 95,
+      painkiller: 90,
+      monetization: 72,
+      difficulty: 28,
+      reason: "원두가 줄어드는 실제 순간에 다시 방문할 이유를 만듭니다.",
+    }],
+    rebuyReminder: {
+      title: "에티오피아 시다마",
+      subtitle: "프릳츠 커피",
+      reason: "거의 비었어요. 다시 살지 판단할 타이밍입니다.",
+      actionLabel: "재구매 후보 열기",
+      priority: "high",
+      cardId: null,
+      shelfItemId: "shelf-sidama",
+    },
+    tasteMatch: {
+      anchorCardId: null,
+      anchorTitle: "프릳츠 커피 에티오피아 시다마",
+      matchCardId: null,
+      matchTitle: "다음 구매 후보를 고를 기준",
+      sharedTags: ["citrus"],
+      reason: "좋았던 카드의 맛 기준을 다음 구매 검색어로 바꿨어요.",
+      searchPrompt: "프릳츠 커피 citrus 비슷한 원두",
+    },
+    purchaseMemory: {
+      title: "에티오피아 시다마",
+      subtitle: "프릳츠 커피",
+      source: "shelf",
+      searchUrl: "https://www.google.com/search?q=sidama",
+      reason: "서랍에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요.",
+      cardId: null,
+      shelfItemId: "shelf-sidama",
+    },
+    brewFailureMemory: {
+      title: "실패 컵도 다음 컵의 레시피가 됩니다",
+      subtitle: "Brew Failure Memory",
+      problem: "unknown",
+      adjustment: "맛이 아쉬웠던 컵에 산미, 쓴맛, 묽음 같은 단서를 남겨두세요.",
+      evidence: "실패 로그가 쌓이면 다음 조정값을 바로 제안합니다.",
+      logId: null,
+      shelfItemId: null,
+    },
+    nextCupPlan: {
+      title: "에티오피아 시다마",
+      subtitle: "프릳츠 커피",
+      reason: "잔량이 낮아 오늘 한 컵 기록하면 재구매 판단까지 이어집니다.",
+      actionLabel: "오늘 마무리 컵",
+      priority: "high",
+      suggestedMethod: "V60",
+      shelfItemId: "shelf-sidama",
+      lastBrewLogId: null,
+    },
+  },
+} as const;
+
+async function fulfillJson(route: Route, body: unknown, status = 200): Promise<void> {
+  await route.fulfill({
+    status,
+    contentType: "application/json",
+    body: JSON.stringify(body),
+  });
+}
+
+async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[]): Promise<void> {
+  await page.route("**/api/v1/**", async (route) => {
+    const request = route.request();
+    const pathname = new URL(request.url()).pathname;
+
+    if (pathname.startsWith("/api/v1/shelf/") && request.method() === "PATCH") {
+      shelfPatchBodies.push(JSON.parse(request.postData() ?? "{}"));
+      await fulfillJson(route, { data: { id: "shelf-sidama" } });
+      return;
+    }
+
+    switch (pathname) {
+      case "/api/v1/shelf":
+        await fulfillJson(route, shelfResponse);
+        return;
+      case "/api/v1/rebuy-intelligence":
+        await fulfillJson(route, rebuyIntelligenceResponse);
+        return;
+      case "/api/v1/cards":
+      case "/api/v1/brewing-logs":
+        await fulfillJson(route, { data: [] });
+        return;
+      case "/api/v1/profile":
+        await fulfillJson(route, { data: { credits: 1, has_pdf_access: false, is_premium: false, monthly_scan_limit: 5, scans_used: 0 } });
+        return;
+      case "/api/v1/profile/analytics":
+        await fulfillJson(route, { data: { aiAnalysis: "", averageAcidity: 0, averageBody: 0, averageSweetness: 0, topTags: [], totalCards: 0 } });
+        return;
+      case "/api/v1/dial-in-coach":
+        await fulfillJson(route, { data: { title: "오늘 시작점", subtitle: "", recipe: {}, grindMemory: {}, adjustments: [], evidence: [], suggestedLog: {} } });
+        return;
+      case "/api/v1/subscription":
+        await fulfillJson(route, { data: { cancelAtPeriodEnd: false, currentPeriodEnd: null, isPremium: false, lastInvoiceStatus: null, plan: "free", status: "inactive", stripeSubscriptionId: null, updatedAt: null } });
+        return;
+      case "/api/v1/analytics":
+        await fulfillJson(route, { received: true });
+        return;
+      default:
+        await fulfillJson(route, { error: { message: pathname } }, 404);
+    }
+  });
+}
+
+test("saves a Rebuy Intelligence action without opening the shelf item", async ({ page }) => {
+  const patchBodies: unknown[] = [];
+  await mockDashboardRoutes(page, patchBodies);
+
+  await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
+
+  await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+  await expect(page.getByTestId("rebuy-action-loop")).toBeVisible();
+
+  await page.getByTestId("rebuy-action-loop").getByRole("button", { name: "다시 살래요" }).click();
+  await expect.poll(() => patchBodies.length).toBe(1);
+
+  await page.getByTestId("rebuy-action-loop").getByRole("button", { name: "다시 샀음" }).click();
+  await expect.poll(() => patchBodies.length).toBe(2);
+
+  expect(patchBodies).toEqual([
+    { rebuyAction: "will_rebuy", rebuyPriority: "pinned" },
+    { rebuyAction: "rebought", rebuyPriority: "normal", rebuyReminderDate: null },
+  ]);
+});

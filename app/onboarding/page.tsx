@@ -63,7 +63,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
           <div className="max-w-2xl min-w-0">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#c77a48]/38 bg-[#c77a48]/14 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#e9a271] shadow-sm">
               <Sparkles size={12} />
-              비공개 첫 기록
+              Taste Finder 준비
             </div>
             <h2 className="mt-7 max-w-xl break-keep text-3xl font-black leading-tight sm:text-4xl">
               맛 방향을 먼저 고르고 바로 새 노트로 이어가요
