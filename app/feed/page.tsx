@@ -42,6 +42,7 @@ export default async function FeedPage() {
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input 
             type="text" 
+            aria-label="공개 공유 카드 검색"
             placeholder="원두, 로스터, 향미 검색"
             className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-primary-amber transition-colors text-foreground"
           />

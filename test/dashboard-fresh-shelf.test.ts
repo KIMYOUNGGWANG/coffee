@@ -364,10 +364,10 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     await expect(page.getByRole("heading", { name: "다음에 다시 살 커피를 놓치지 않게" })).toBeVisible();
     await expect(page.getByText("Next Cup")).toBeVisible();
     await expect(page.getByRole("button", { name: /오늘 마무리 컵/ })).toBeVisible();
-    await expect(page.getByText("Rebuy Reminder")).toBeVisible();
-    await expect(page.getByText("Taste Match")).toBeVisible();
-    await expect(page.getByText("Bag To Rebuy")).toBeVisible();
-    await expect(page.getByRole("button", { name: /Brew Failure/ })).toBeVisible();
+    await expect(page.getByText("다시 살 후보")).toBeVisible();
+    await expect(page.getByText("닮은 취향")).toBeVisible();
+    await expect(page.getByText("다시 찾을 원두")).toBeVisible();
+    await expect(page.getByRole("button", { name: /다음엔 다르게/ })).toBeVisible();
   });
 
   test("lets users pin and mark a shelf item for in-app rebuy follow-up", async ({ page }) => {

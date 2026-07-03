@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Coffee, Sparkles, ChevronRight, Layers, BookOpen } from "lucide-react";
 import LandingPricingSection from "@/components/landing-pricing-section";
 import LandingPlaygroundClient from "@/components/landing-playground-client";
@@ -7,6 +8,8 @@ import { LandingFeatures } from "@/components/landing-features";
 import { buttonVariants } from "@/components/ui/button";
 import { coffeeDexBrand } from "@/lib/brand";
 import { cn } from "@/lib/utils";
+
+const copyrightYear = 2026;
 
 export default function CoffeeDexHomePage() {
   return (
@@ -29,7 +32,7 @@ export default function CoffeeDexHomePage() {
             <Link className="hidden text-sm font-medium text-[#F5F5F5]/50 transition-colors hover:text-[#F5F5F5] md:inline-flex tracking-wide" href="/onboarding">
               온보딩 가이드
             </Link>
-            <Link className={cn(buttonVariants({ size: "sm" }), "shrink-0 bg-[#D4AF37] hover:bg-[#C58948] border-none text-black rounded-full text-xs font-bold transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] cursor-pointer px-5 py-4")} href="/capture">
+            <Link className={cn(buttonVariants({ size: "sm" }), "shrink-0 bg-[#D4AF37] hover:bg-[#C58948] border-none !text-black rounded-full text-xs font-bold transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] cursor-pointer px-5 py-4")} href="/capture">
               20초 기록 시작
             </Link>
           </div>
@@ -59,7 +62,7 @@ export default function CoffeeDexHomePage() {
               <Link
                 className={cn(
                   buttonVariants({ size: "default" }),
-                  "bg-[#D4AF37] hover:bg-[#C58948] border-none text-black font-extrabold rounded-full transition-all shadow-[0_8px_30px_rgba(212,175,55,0.25)] hover:shadow-[0_12px_40px_rgba(212,175,55,0.4)] hover:-translate-y-1 cursor-pointer flex items-center gap-2 text-sm px-8 py-6"
+                  "bg-[#D4AF37] hover:bg-[#C58948] border-none !text-black font-extrabold rounded-full transition-all shadow-[0_8px_30px_rgba(212,175,55,0.25)] hover:shadow-[0_12px_40px_rgba(212,175,55,0.4)] hover:-translate-y-1 cursor-pointer flex items-center gap-2 text-sm px-8 py-6"
                 )}
                 href="/capture"
               >
@@ -87,10 +90,13 @@ export default function CoffeeDexHomePage() {
               <div className="w-full h-full rounded-[2rem] overflow-hidden border border-white/10 bg-[#0A0A0A] shadow-[0_30px_60px_rgba(0,0,0,0.8)] relative group">
                 <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-transparent to-white/5 pointer-events-none z-10" />
                 
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src="/images/premium_coffee_brewing.png"
-                  alt="Aesthetic coffee brewing setup"
+                  alt="CoffeeDex에 기록할 스페셜티 커피 브루잉 장면"
+                  width={900}
+                  height={1200}
+                  priority
+                  sizes="(min-width: 1024px) 420px, 92vw"
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000 ease-out"
                 />
                 
@@ -153,9 +159,9 @@ export default function CoffeeDexHomePage() {
               <div key={idx} className="flex flex-col space-y-4">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-[#D4AF37]">/ {tag}</span>
                 <div className="h-px w-8 bg-[#D4AF37]/30" />
-                <h4 className="text-base font-bold text-white">
+                <h3 className="text-base font-bold text-white">
                   {idx === 0 ? "맛 여권 스탬프 적립" : idx === 1 ? "원두 라벨 스캔 초안" : idx === 2 ? "재구매 기억과 다음 행동" : "공유용 스토리 카드"}
-                </h4>
+                </h3>
                 <p className="text-xs text-[#F5F5F5]/50 font-light leading-relaxed">
                   {idx === 0 ? "원두명, 로스터리, 산지, 가공 방식, 그리고 컵 노트를 디지털 여권 스탬프로 기록" :
                    idx === 1 ? "패키지 사진에서 읽은 정보를 자동 완성 후보로 제안하고 저장 전 사용자가 수정" :
@@ -168,10 +174,10 @@ export default function CoffeeDexHomePage() {
         </section>
 
         {/* Footer info area */}
-        <footer className="w-full bg-[#0A0A0A] border-t border-white/5 py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-[#F5F5F5]/40 mt-24">
+        <footer className="w-full bg-[#0A0A0A] border-t border-white/5 py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-[#F5F5F5]/60 mt-24">
           <div className="flex items-center gap-2 font-serif">
             <Layers size={14} className="text-[#D4AF37]" />
-            <span>CoffeeDex © {new Date().getFullYear()}</span>
+            <span>CoffeeDex © {copyrightYear}</span>
           </div>
 
           <LegalFooterLinks />

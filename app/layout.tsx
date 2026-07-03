@@ -14,7 +14,12 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: `${coffeeDexBrand.name} — ${coffeeDexBrand.category}`,
   description: `${coffeeDexBrand.englishTagline} Save coffee memories, review your taste map, and download digital artifacts.`,
+  icons: {
+    icon: "/icon.svg",
+  },
 };
+
+const shouldRenderVercelAnalytics = process.env.VERCEL === "1";
 
 export default function RootLayout({
   children,
@@ -25,7 +30,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${playfair.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
-        <Analytics />
+        {shouldRenderVercelAnalytics && <Analytics />}
       </body>
     </html>
   );
