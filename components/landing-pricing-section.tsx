@@ -40,7 +40,7 @@ export default function LandingPricingSection() {
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-left marker:content-none">
           <span>
             <span className="block text-xs font-black text-foreground">추가 기능 및 가격 안내</span>
-            <span className="mt-1 block text-xs text-muted-foreground">더 많은 스캔, PDF 기록북, Premium은 필요할 때 선택할 수 있습니다.</span>
+            <span className="mt-1 block text-xs text-muted-foreground">무료로 저장하고, 다시 살 원두가 늘어날 때만 확장하세요.</span>
           </span>
           <ChevronDown size={18} className="shrink-0 text-primary-amber transition-transform group-open:rotate-180" />
         </summary>
@@ -50,12 +50,12 @@ export default function LandingPricingSection() {
             선택 기능
           </span>
           <h2 className="mt-5 break-keep font-serif text-3xl font-black leading-tight text-foreground md:text-5xl">
-            가격은 기능표가 아니라
-            <span className="block text-primary-amber">기록물의 단계입니다.</span>
+            Premium은 더 많은 기능보다
+            <span className="block text-primary-amber">다시 살 확률을 높입니다.</span>
           </h2>
           <p className="mt-5 max-w-lg text-sm font-semibold leading-7 text-muted-foreground">
-            무료 Taste Card로 시작하고, 더 많은 스캔과 리캡이 필요할 때 Premium으로 확장합니다. PDF는 쌓인 기록을
-            보관 가능한 디지털 기록북으로 꺼내는 별도 결과물입니다.
+            무료 기록은 이름과 단서만 저장해도 충분합니다. Premium은 라벨 스캔, 기록 리캡, 취향 흐름을 자주 써서
+            좋은 원두를 놓치기 싫은 사람을 위한 선택입니다.
           </p>
           <Link href="/legal/payment" className="mt-7 inline-flex border-b border-white/10 text-xs font-black text-foreground transition hover:text-primary-amber">
             결제 및 환불 고지
@@ -71,9 +71,15 @@ export default function LandingPricingSection() {
                   {pricingLabelByItemType[premiumProduct.itemType]} · {productDeckLabel[premiumProduct.itemType]}
                 </p>
                 <h3 className="mt-5 font-serif text-4xl font-black leading-none md:text-5xl">{premiumProduct.name}</h3>
-                <p className="mt-4 max-w-xl text-sm font-semibold leading-7 text-muted-foreground">{premiumProduct.description}</p>
+                <p className="mt-4 max-w-xl text-sm font-semibold leading-7 text-muted-foreground">
+                  원두를 자주 바꾸거나 봉투를 많이 저장한다면, Premium은 기억을 검색 가능한 구매 단서로 정리해줍니다.
+                </p>
                 <ul className="mt-6 grid gap-3">
-                  {premiumProduct.benefits.map((benefit) => (
+                  {[
+                    "라벨 스캔으로 원두명과 로스터리를 빠르게 채움",
+                    "좋았던 이유와 다시 살 후보를 한곳에서 추적",
+                    "취향 리포트로 다음 구매 기준을 좁힘",
+                  ].map((benefit) => (
                     <li key={benefit} className="flex items-start gap-3 text-sm font-bold leading-6 text-muted-foreground">
                       <CheckCircle2 size={16} className="mt-1 shrink-0 text-primary-amber" />
                       <span>{benefit}</span>
@@ -89,9 +95,9 @@ export default function LandingPricingSection() {
                   <span className="pb-1 text-xs font-black text-muted-foreground/60">{premiumProduct.cadence}</span>
                 </div>
                 <div className="mt-6 space-y-2 border-y border-white/10 py-4 text-xs font-bold text-muted-foreground/80">
-                  <p>원두 라벨 사진 판독 한도 해제</p>
-                  <p>기록 기반 취향 리포트</p>
-                  <p>구독 취소 후 현재 결제 기간까지 이용</p>
+                  <p>다시 살 후보가 5개 이상이면 유용</p>
+                  <p>라벨 스캔을 자주 쓰는 사람에게 적합</p>
+                  <p>무료 기록은 계속 비공개로 유지</p>
                 </div>
                 <TrackedLandingLink
                   href={checkoutHref(premiumProduct.itemType)}
