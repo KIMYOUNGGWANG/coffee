@@ -28,7 +28,7 @@ const successNoticeContentByItemType = {
   credits_10: {
     tone: "success",
     title: "CoffeeDex 테이스팅 10팩 충전이 완료되었습니다",
-    description: "프로필과 카드 정보를 새로 확인했어요. 추가 AI 스캔 크레딧을 대시보드에 반영했습니다.",
+    description: "프로필과 카드 정보를 새로 확인했어요. 추가 사진 판독 크레딧을 대시보드에 반영했습니다.",
   },
   checkout: {
     tone: "success",

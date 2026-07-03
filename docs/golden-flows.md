@@ -6,9 +6,9 @@ These are the executable product truths protected by the smoke suite. CoffeeDex 
 
 Given a coffee drinker has a bag photo or knows the coffee details, when they review the editable draft, separate package claims from user-perceived taste, choose whether they would buy again, and confirm the record, then CoffeeDex can persist a private owner-scoped `tasting_cards` memory.
 
-Quick Add Memory Mode is the current one-screen capture path for the same private contract. It lets the user enter bean name, roaster, a one-line note, a would-buy-again choice, and optional Korean flavor helper chips, then saves a confirmed card through `POST /api/v1/cards`. A nonblank one-line note is stored as note/description memory, but it is not last-good-brew evidence; blank notes do not generate fallback rebuy reasons or `footerMeta.extraInfo`.
+Quick Add Memory Mode is the current one-screen capture path for the same private contract. The default 20-second surface shows only bean name, roaster, would-buy-again choice, and a one-line note; origin, process, flavor tags, and acidity/sweetness/body stay behind an optional detail disclosure. A nonblank one-line note is stored as note/description memory, but it is not last-good-brew evidence; blank notes do not generate fallback rebuy reasons or `footerMeta.extraInfo`.
 
-Evidence surfaces: `/onboarding`, `/dashboard`, `POST /api/v1/cards`
+Evidence surfaces: `/capture`, `/onboarding`, `/dashboard`, `POST /api/v1/cards`
 
 ## Flow 2. Scan a Package into an Editable Draft
 
@@ -26,9 +26,9 @@ Saved cards marked `again` can show private rebuy recall from the user's own `re
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/cards`
 
-## Flow 3A. Use Korean Flavor Helper Chips
+## Flow 3A. Save a 20-Second Quick Record
 
-Given a user wants to save a cup quickly, when they open Quick Add Memory Mode, then CoffeeDex offers Korean flavor helper chips such as fruit, chocolate, honey, citrus, nutty, and floral cues. The chips become editable private tags and do not claim expert SCA scoring.
+Given a user wants to save a cup quickly, when they open Quick Add Memory Mode, then CoffeeDex shows bean name, roaster, whether they would buy again, and one-line note before optional detail fields. Purchase clues, flavor tags, package facts, and taste sliders stay outside the default quick-record surface.
 
 Evidence surfaces: `/dashboard`, `QuickAddMemoryForm`, `POST /api/v1/cards`
 

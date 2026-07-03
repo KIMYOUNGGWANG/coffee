@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, SortAsc, UserRound } from "lucide-react";
+import { PenLine, SortAsc, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DashboardDesktopNavigation,
@@ -20,9 +20,9 @@ const passportMilestones = [3, 5, 10] as const;
 const sortOptions = ["newest", "title_asc", "acidity_desc"] as const;
 
 const tabTitles = {
-  shelf: "내 원두 아카이브",
-  log: "커피 기록",
-  passport: "나의 패스포트",
+  shelf: "내 원두 서랍",
+  log: "오늘의 노트",
+  passport: "취향 지도",
   settings: "설정",
 } as const satisfies Record<DashboardTab, string>;
 
@@ -49,7 +49,7 @@ export function DashboardHeader({
     <header className="coffee-dashboard-header">
       <div className="flex min-w-0 items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="coffee-kicker">CoffeeDex room</p>
+          <p className="coffee-kicker">Private coffee room</p>
           <h2 className="mt-3 break-keep font-serif text-2xl font-black tracking-tight text-background-dark sm:text-3xl">개인 커피룸</h2>
         </div>
 
@@ -70,8 +70,8 @@ export function DashboardHeader({
             onClick={onCreateCard}
             className="coffee-pill-button hidden border-0 px-4 md:inline-flex"
           >
-            <Camera aria-hidden="true" size={15} />
-            원두 스캔
+            <PenLine aria-hidden="true" size={15} />
+            오늘 노트
           </Button>
         </div>
       </div>
@@ -103,14 +103,14 @@ export function DashboardHeader({
       <div className="mt-7 flex items-end justify-between gap-4">
         <div>
           {activeTab === "shelf" && (
-            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.18em] text-primary-amber">memory and rebuy system</p>
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.18em] text-primary-amber">memory drawer</p>
           )}
           <h1 className="break-keep font-serif text-4xl font-black leading-[1.05] tracking-tight text-background-dark sm:text-6xl">
             {tabTitles[activeTab]}
           </h1>
           {activeTab === "shelf" && (
             <p className="mt-4 max-w-2xl break-keep text-sm font-semibold leading-7 text-muted-foreground">
-              기억한 맛, 지금 가진 원두, 다음 구매 신호를 한 화면에서 이어봅니다. 기록한 원두 {cardCount}봉
+              기억한 맛과 다시 살 단서를 한곳에 모아둡니다. 지금 서랍에 남긴 원두 {cardCount}봉
             </p>
           )}
         </div>

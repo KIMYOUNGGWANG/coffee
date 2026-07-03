@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Calendar, Plus, Clock, Scale, Thermometer, Star, Sparkles, Droplet, Edit2, Trash2, Check } from "lucide-react";
+import { X, Calendar, Plus, Clock, Scale, Thermometer, Star, Sparkles, Droplet, Edit2, Trash2, Check, Coffee, Heart } from "lucide-react";
 import { TastingCardData, useBrewingNotes, useUpdateBrewingNote, useDeleteBrewingNote } from "@/hooks/useTastingCards";
 import { Button } from "./ui/button";
 import { FlavorRadarChart } from "./flavor-radar-chart";
@@ -99,7 +99,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
       }
     } catch (err) {
       console.error("Failed to fetch feedback advice:", err);
-      alert("AI 바리스타 피드백 호출 도중 에러가 발생했습니다.");
+      alert("브루잉 조정값을 가져오는 중 오류가 발생했습니다.");
     } finally {
       setIsLoadingFeedback(false);
     }
@@ -135,7 +135,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
           brewTime: lastRecipe.brewTime,
         },
         rating: activeFeedback === "perfect" ? 5 : 3,
-        simpleNote: `AI Barista Tuning: ${activeFeedback} recommendation applied.`,
+        simpleNote: `브루잉 조정값 적용: ${activeFeedback}.`,
       };
       
       const response = await fetch("/api/v1/brewing-logs", {
@@ -204,7 +204,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
           method: method || "Hario V60",
           parameters: parameters,
           rating: rating || 5,
-          simpleNote: simpleNote || "👻 취향 쌍둥이의 레시피로 추출함",
+          simpleNote: simpleNote || "취향 쌍둥이의 레시피로 추출함",
           autoRecipe: true
         }),
       });
@@ -424,10 +424,10 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
           <div className="mt-8 bg-white/5 border border-primary-amber/30 p-5 rounded-2xl relative shadow-sm">
             <span className="absolute -top-3 left-4 bg-black px-2 text-[9px] uppercase font-bold text-primary-amber tracking-wider border border-primary-amber/30 rounded-full flex items-center gap-1">
               <Sparkles size={9} />
-              AI Cup Note
+              Flavor Note
             </span>
             <p className="font-serif text-xs italic text-foreground/90 leading-relaxed pt-1.5 font-medium">
-              “{card.ai_description || "느껴지는 아로마 노트를 기록하고 AI 감성 한줄평을 생성해보세요."}”
+              “{card.ai_description || "느껴지는 아로마 노트를 기록하고 향미 한줄평 초안을 만들어보세요."}”
             </p>
           </div>
 
@@ -437,12 +437,12 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
           <div className="mt-6 border border-white/10 bg-white/5 p-5 rounded-2xl relative shadow-sm space-y-4">
             <span className="absolute -top-3 left-4 bg-black px-2.5 py-0.5 text-[9px] uppercase font-bold text-primary-amber tracking-wider border border-white/10 rounded-full flex items-center gap-1">
               <Sparkles size={9} />
-              AI Barista Tuning
+              Brew Tuning
             </span>
             
             <div className="pt-1">
               <h4 className="text-xs font-bold text-foreground">이 원두의 추출 맛은 어떤가요?</h4>
-              <p className="text-[10px] text-muted-foreground mt-0.5">사용자 피드백에 맞춰 AI가 다음 레시피의 변수를 실시간 조정합니다.</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">내 피드백에 맞춰 다음 레시피의 변수를 조정합니다.</p>
             </div>
             
             <div className="grid grid-cols-2 gap-2">
@@ -456,7 +456,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
                     : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
                 }`}
               >
-                <span>🍋</span>
+                <Droplet size={13} aria-hidden="true" />
                 <span>너무 신맛이 강함</span>
               </button>
               
@@ -470,7 +470,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
                     : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
                 }`}
               >
-                <span>☕</span>
+                <Coffee size={13} aria-hidden="true" />
                 <span>너무 쓰거나 떪</span>
               </button>
               
@@ -484,7 +484,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
                     : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
                 }`}
               >
-                <span>💧</span>
+                <Droplet size={13} aria-hidden="true" />
                 <span>싱겁고 연한 느낌</span>
               </button>
               
@@ -498,7 +498,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
                     : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
                 }`}
               >
-                <span>💛</span>
+                <Heart size={13} aria-hidden="true" />
                 <span>딱 맛있고 완벽함</span>
               </button>
             </div>
@@ -508,7 +508,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
               <div className="mt-4 border border-white/10 bg-black/40 rounded-xl p-4 space-y-3 animate-in fade-in duration-200">
                 {isLoadingFeedback ? (
                   <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
-                    <span className="text-[10px] animate-pulse font-semibold">AI 바리스타가 처방전을 작성하고 있습니다...</span>
+                    <span className="text-[10px] animate-pulse font-semibold">다음 컵 조정값을 작성하고 있습니다...</span>
                   </div>
                 ) : (
                   <>
@@ -575,9 +575,9 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
                     <Sparkles size={20} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-foreground">AI 추천 레시피로 기록</h4>
+	                    <h4 className="text-sm font-bold text-foreground">추천 레시피로 기록</h4>
                     <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                      복잡한 변수를 직접 입력할 필요 없이, 이 원두에 가장 잘 맞는 AI 추출 레시피를 기반으로 원클릭 기록을 남깁니다.
+	                      복잡한 변수를 직접 입력할 필요 없이, 이 원두에 어울리는 추출 레시피를 기반으로 원클릭 기록을 남깁니다.
                     </p>
                   </div>
                 </div>
@@ -615,7 +615,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
                             shelfItemId: shelfItemId || null,
                             method: "Hario V60",
                             rating: 4,
-                            simpleNote: "AI 추천 레시피로 추출함",
+	                            simpleNote: "추천 레시피로 추출함",
                             autoRecipe: true
                           }),
                         });
@@ -630,14 +630,14 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
                           alert(errorData.error?.message || "기록 저장에 실패했습니다.");
                         }
                       } catch (err) {
-                        console.error("Failed to save AI log:", err);
+	                        console.error("Failed to save guided log:", err);
                         alert("추출 로그 저장 중 오류가 발생했습니다.");
                       }
                     }}
                     className="px-4 py-2 bg-primary-amber hover:opacity-90 text-[#0D0A07] rounded-xl text-xs font-bold border-none cursor-pointer flex items-center gap-1.5 shadow-md shadow-primary-amber/20"
                   >
                     <Sparkles size={14} />
-                    <span>AI 추천 레시피로 원클릭 기록</span>
+	                    <span>추천 레시피로 원클릭 기록</span>
                   </Button>
                 </div>
               </div>
@@ -646,7 +646,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
               <div className="mt-4 p-5 border border-amber-500/40 bg-gradient-to-r from-black/80 to-[#1A140F] rounded-2xl space-y-4 animate-in slide-in-from-top-4 duration-300 shadow-lg shadow-amber-900/20">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-amber-500/20 rounded-full text-amber-400">
-                    <span className="text-xl leading-none">👻</span>
+	                    <Sparkles size={18} aria-hidden="true" />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-amber-400 flex items-center gap-2">

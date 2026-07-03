@@ -93,8 +93,8 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
         throw new Error(data.error?.message || "추천을 생성하지 못했습니다.");
       }
     } catch (error: any) {
-      console.error("Error generating AI recommendation:", error);
-      alert(error.message || "AI 추천 호출 중 오류가 발생했습니다.");
+      console.error("Error generating brew recommendation:", error);
+      alert(error.message || "브루잉 추천 호출 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -203,10 +203,10 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
       <div className="border-b border-border pb-4">
         <h2 className="text-xl font-bold font-serif text-foreground flex items-center gap-2">
           <Sparkles className="text-primary-amber animate-pulse" size={20} />
-          AI 바리스타 추천 (AI Barista Engine)
+          오늘의 브루잉 가이드
         </h2>
         <p className="text-xs text-muted-foreground mt-1">
-          현재 원두 보관함(Coffee Shelf)에 남아 있는 원두 정보와 귀하의 취향 태그를 종합 분석하여 최적의 핸드드립 레시피와 스페셜 블렌딩 컵을 디자인해 드립니다.
+          현재 원두 보관함에 남아 있는 원두 정보와 취향 태그를 바탕으로 오늘 시작하기 좋은 핸드드립 레시피를 제안합니다.
         </p>
       </div>
 
@@ -255,7 +255,7 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
           ) : (
             <p className="text-xs text-red-400 font-bold flex items-center gap-1">
               <AlertCircle size={12} />
-              보관 중인 활성 원두가 없습니다. AI 추천 진행 시 샘플 원두가 사용됩니다.
+              보관 중인 활성 원두가 없습니다. 추천 진행 시 샘플 원두가 사용됩니다.
             </p>
           )}
         </div>
@@ -289,7 +289,7 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
             </div>
           </div>
           <div className="space-y-2 max-w-sm">
-            <p className="text-xs font-extrabold text-foreground tracking-tight">AI 바리스타 가이드 추출 중</p>
+            <p className="text-xs font-extrabold text-foreground tracking-tight">브루잉 가이드 추출 중</p>
             <p className="text-[11px] text-muted-foreground leading-relaxed font-semibold transition-all duration-500 animate-pulse">
               {loadingMessages[loadingStep]}
             </p>
@@ -320,7 +320,7 @@ export default function AIBaristaPanel({ refreshTrigger = 0 }: AIBaristaPanelPro
           {/* Footer ritual badge */}
           <div className="border-t border-white/10 pt-4 flex justify-between items-center text-[10px] text-muted-foreground font-bold">
             <span className="flex items-center gap-1">
-              ☕ CoffeeDex AI Sommelier System
+              CoffeeDex Brew Guide
             </span>
             <span>
               기분: {situation}

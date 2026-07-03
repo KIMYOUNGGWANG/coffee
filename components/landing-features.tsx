@@ -8,23 +8,23 @@ export function LandingFeatures() {
   const features = [
     {
       icon: <Sparkles size={20} />,
-      title: "디지털 여권",
-      desc: "마신 원두의 정보를 수집하여 국가별 스탬프와 함께 Taste Passport를 채워나갑니다."
+      title: "20초 빠른 기록",
+      desc: "원두 이름, 로스터리, 다시 살지, 한 줄 메모만 먼저 남깁니다."
     },
     {
       icon: <Layers size={20} />,
-      title: "AI 향미 노트",
-      desc: "단순한 메모를 바탕으로 전문가 수준의 SCA 스타일 컵 노트 초안을 제안합니다."
+      title: "사진은 선택",
+      desc: "봉투 스캔은 보조 도구입니다. 사진 원본은 기록에 저장하지 않습니다."
     },
     {
       icon: <Heart size={20} />,
-      title: "취향 분석",
-      desc: "적립된 스탬프 데이터를 바탕으로 개인의 커피 스타일을 정밀하게 분석합니다."
+      title: "다시 살 단서",
+      desc: "좋았던 이유와 구매 힌트를 나중에 바로 찾을 수 있게 묶습니다."
     },
     {
       icon: <Share2 size={20} />,
-      title: "SNS 아티팩트",
-      desc: "가장 빛나는 한 잔의 기록을 인스타그램 스토리에 완벽한 비율로 내보냅니다."
+      title: "필요할 때 확장",
+      desc: "Premium, PDF, 공유 이미지는 첫 기록 후 선택하는 부가 기능입니다."
     }
   ];
 

@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hyangmi App Rebrand V2</title>
+    <style>
+      @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+      @import url("https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&display=swap");
+
+      :root {
+        --ink: #24160e;
+        --espresso: #362115;
+        --cocoa: #665040;
+        --muted: #987f6c;
+        --paper: #fbf2e3;
+        --cream: #fff9ef;
+        --clay: #d58b55;
+        --apricot: #efbd7a;
+        --green: #4d7a58;
+        --mint: #c9d8b8;
+        --rose: #c76f63;
+        --blue: #6f8fa2;
+        --line: rgba(54, 33, 21, 0.13);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background:
+          linear-gradient(90deg, rgba(54, 33, 21, 0.05) 1px, transparent 1px),
+          linear-gradient(rgba(54, 33, 21, 0.045) 1px, transparent 1px),
+          #d9c9b7;
+        background-size: 36px 36px;
+        color: var(--ink);
+        font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      img { display: block; width: 100%; }
+      h1, h2, h3, p { margin: 0; }
+      .serif { font-family: "Noto Serif KR", serif; }
+
+      .page {
+        width: min(100%, 1440px);
+        margin: 0 auto;
+        padding: 30px;
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 30px;
+        align-items: end;
+        margin-bottom: 30px;
+      }
+
+      .pill {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        gap: 7px;
+        border: 1px solid rgba(54, 33, 21, 0.16);
+        border-radius: 999px;
+        background: rgba(255, 249, 239, 0.58);
+        color: #7b4c31;
+        padding: 8px 12px;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .intro h1 {
+        margin-top: 14px;
+        max-width: 690px;
+        font-size: clamp(46px, 5.6vw, 82px);
+        line-height: 1.04;
+        word-break: keep-all;
+      }
+
+      .intro p {
+        color: var(--cocoa);
+        font-size: 16px;
+        line-height: 1.82;
+        word-break: keep-all;
+      }
+
+      .board {
+        border: 1px solid var(--line);
+        background: rgba(255, 249, 239, 0.72);
+        box-shadow: 0 30px 90px rgba(36, 22, 14, 0.15);
+        margin-bottom: 40px;
+      }
+
+      .board-head {
+        display: grid;
+        grid-template-columns: 0.78fr 1.22fr;
+        gap: 28px;
+        align-items: end;
+        border-bottom: 1px solid var(--line);
+        padding: 26px 30px;
+      }
+
+      .board-head h2 {
+        margin-top: 10px;
+        font-size: 38px;
+        line-height: 1.08;
+        word-break: keep-all;
+      }
+
+      .board-head p {
+        color: var(--cocoa);
+        font-size: 14px;
+        line-height: 1.78;
+        word-break: keep-all;
+      }
+
+      .phones {
+        display: grid;
+        grid-template-columns: repeat(3, 390px);
+        gap: 26px;
+        justify-content: center;
+        padding: 34px;
+      }
+
+      .phone {
+        position: relative;
+        width: 390px;
+        height: 844px;
+        overflow: hidden;
+        border: 10px solid #21150f;
+        border-radius: 44px;
+        background: var(--paper);
+        box-shadow: 0 28px 70px rgba(36, 22, 14, 0.24);
+      }
+
+      .phone::before {
+        content: "";
+        position: absolute;
+        z-index: 20;
+        top: 10px;
+        left: 50%;
+        width: 112px;
+        height: 25px;
+        border-radius: 999px;
+        background: #21150f;
+        transform: translateX(-50%);
+      }
+
+      .screen {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+        padding: 44px 20px 94px;
+      }
+
+      .home-rich {
+        background:
+          radial-gradient(circle at 82% 6%, rgba(239, 189, 122, 0.72), transparent 25%),
+          radial-gradient(circle at 8% 42%, rgba(201, 216, 184, 0.65), transparent 31%),
+          linear-gradient(180deg, #fff7e7 0%, #f1e2cc 100%);
+      }
+
+      .scan-rich {
+        background:
+          linear-gradient(180deg, rgba(36, 22, 14, 0.18), transparent 32%),
+          #2a1b13;
+        color: #fff8ec;
+      }
+
+      .taste-rich {
+        background:
+          linear-gradient(135deg, rgba(111, 143, 162, 0.16), transparent 34%),
+          #fbf3e4;
+      }
+
+      .archive-rich {
+        background:
+          linear-gradient(180deg, #efe3d3 0%, #fff8ed 48%, #eadbc9 100%);
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 42px;
+        margin-bottom: 18px;
+      }
+
+      .mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border: 1px solid currentColor;
+        border-radius: 50%;
+        font-family: "Noto Serif KR", serif;
+        font-weight: 900;
+      }
+
+      .muted { color: var(--muted); }
+
+      .hero-title {
+        font-size: 34px;
+        line-height: 1.12;
+        word-break: keep-all;
+      }
+
+      .hero-copy {
+        margin-top: 9px;
+        color: var(--cocoa);
+        font-size: 13px;
+        line-height: 1.7;
+        word-break: keep-all;
+      }
+
+      .feature-photo {
+        position: relative;
+        margin-top: 20px;
+        overflow: hidden;
+        border-radius: 34px;
+        box-shadow: 0 18px 44px rgba(36, 22, 14, 0.18);
+      }
+
+      .feature-photo img {
+        height: 276px;
+        object-fit: cover;
+      }
+
+      .floating-note {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        left: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.64);
+        border-radius: 22px;
+        background: rgba(255, 249, 239, 0.88);
+        padding: 14px;
+        backdrop-filter: blur(14px);
+      }
+
+      .floating-note b,
+      .card b {
+        display: block;
+        font-size: 14px;
+      }
+
+      .floating-note small,
+      .card small {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .quick-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .action-card {
+        min-height: 118px;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: rgba(255, 249, 239, 0.72);
+        padding: 15px;
+      }
+
+      .action-card.dark {
+        background: var(--espresso);
+        color: #fff8ec;
+      }
+
+      .action-card .big {
+        margin-top: 14px;
+        font-size: 28px;
+        font-weight: 950;
+      }
+
+      .bottom-tabs {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        left: 14px;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        min-height: 66px;
+        border: 1px solid rgba(54, 33, 21, 0.12);
+        border-radius: 28px;
+        background: rgba(255, 249, 239, 0.9);
+        box-shadow: 0 10px 32px rgba(36, 22, 14, 0.16);
+        backdrop-filter: blur(18px);
+      }
+
+      .tab {
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 900;
+      }
+
+      .tab.active { color: var(--espresso); }
+
+      .ico {
+        width: 18px;
+        height: 18px;
+        margin-bottom: 4px;
+        border: 2px solid currentColor;
+        border-radius: 7px;
+      }
+
+      .camera {
+        position: relative;
+        height: 500px;
+        overflow: hidden;
+        border-radius: 34px;
+        background: #120d09;
+      }
+
+      .camera img {
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.78;
+      }
+
+      .scan-line {
+        position: absolute;
+        top: 192px;
+        left: 46px;
+        right: 46px;
+        height: 2px;
+        background: #fff8ec;
+        box-shadow: 0 0 22px rgba(255, 248, 236, 0.8);
+      }
+
+      .focus-box {
+        position: absolute;
+        inset: 74px 46px 98px;
+        border: 2px solid rgba(255, 248, 236, 0.92);
+        border-radius: 32px;
+      }
+
+      .capture-copy {
+        position: absolute;
+        right: 16px;
+        bottom: 18px;
+        left: 16px;
+        border-radius: 24px;
+        background: rgba(255, 248, 236, 0.92);
+        color: var(--espresso);
+        padding: 14px;
+      }
+
+      .capture-copy p {
+        margin-top: 4px;
+        color: var(--cocoa);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .shutter-row {
+        display: grid;
+        grid-template-columns: 1fr 74px 1fr;
+        align-items: center;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .shutter {
+        width: 74px;
+        height: 74px;
+        border: 6px solid rgba(255, 248, 236, 0.86);
+        border-radius: 50%;
+        background: #fff8ec;
+        box-shadow: 0 0 0 9px rgba(255, 248, 236, 0.16);
+      }
+
+      .scan-chip {
+        border: 1px solid rgba(255, 248, 236, 0.24);
+        border-radius: 18px;
+        background: rgba(255, 248, 236, 0.1);
+        padding: 12px;
+        color: rgba(255, 248, 236, 0.82);
+        font-size: 12px;
+        font-weight: 850;
+        text-align: center;
+      }
+
+      .sheet {
+        margin-top: 18px;
+        border-radius: 32px 32px 0 0;
+        background: #fff8ec;
+        color: var(--espresso);
+        padding: 18px;
+        box-shadow: 0 -18px 40px rgba(36, 22, 14, 0.16);
+      }
+
+      .field {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        padding: 13px 0;
+      }
+
+      .field:last-child { border-bottom: 0; }
+      .field small { color: var(--muted); font-size: 10px; font-weight: 900; }
+      .field b { margin-top: 4px; font-size: 15px; }
+
+      .edit {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 7px 10px;
+        color: var(--cocoa);
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .wheel-wrap {
+        display: grid;
+        place-items: center;
+        margin-top: 18px;
+      }
+
+      .wheel {
+        position: relative;
+        width: 245px;
+        height: 245px;
+        border-radius: 50%;
+        background:
+          conic-gradient(from 18deg, #c76f63 0 55deg, #efbd7a 55deg 118deg, #d9a35f 118deg 178deg, #c9d8b8 178deg 240deg, #6f8fa2 240deg 300deg, #a96f43 300deg 360deg);
+        box-shadow: inset 0 0 0 18px rgba(255, 249, 239, 0.8), 0 22px 50px rgba(36, 22, 14, 0.12);
+      }
+
+      .wheel::after {
+        content: "복숭아\\A 꿀\\A 홍차";
+        white-space: pre;
+        position: absolute;
+        inset: 74px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: #fff8ec;
+        color: var(--espresso);
+        text-align: center;
+        font-weight: 950;
+        line-height: 1.35;
+      }
+
+      .taste-card {
+        margin-top: 18px;
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        background: rgba(255, 249, 239, 0.78);
+        padding: 17px;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin: 12px 0;
+      }
+
+      .chip {
+        border-radius: 999px;
+        background: rgba(169, 111, 67, 0.11);
+        color: #70462d;
+        padding: 7px 10px;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .primary {
+        display: inline-flex;
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: var(--espresso);
+        color: #fff8ec;
+        padding: 0 17px;
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .secondary {
+        display: inline-flex;
+        min-height: 46px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 249, 239, 0.6);
+        color: var(--espresso);
+        padding: 0 16px;
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .passport-hero {
+        position: relative;
+        margin-top: 18px;
+        border-radius: 34px;
+        background: var(--espresso);
+        color: #fff8ec;
+        padding: 22px;
+        overflow: hidden;
+      }
+
+      .passport-hero::after {
+        content: "";
+        position: absolute;
+        right: -44px;
+        top: -48px;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: rgba(239, 189, 122, 0.24);
+      }
+
+      .passport-hero h3 {
+        position: relative;
+        z-index: 1;
+        max-width: 190px;
+        font-size: 29px;
+        line-height: 1.16;
+      }
+
+      .mini-map {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .stamp {
+        display: grid;
+        height: 88px;
+        place-items: center;
+        border: 1px solid rgba(54, 33, 21, 0.16);
+        border-radius: 50%;
+        background: rgba(255, 249, 239, 0.5);
+        color: #764b31;
+        font-size: 11px;
+        font-weight: 950;
+        text-align: center;
+      }
+
+      .list {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: rgba(255, 249, 239, 0.75);
+        padding: 14px;
+      }
+
+      .footer-note {
+        border: 1px solid var(--line);
+        background: rgba(255, 249, 239, 0.72);
+        padding: 24px;
+      }
+
+      .footer-note h2 { font-size: 30px; margin-bottom: 10px; }
+      .footer-note p {
+        color: var(--cocoa);
+        font-size: 15px;
+        line-height: 1.8;
+        word-break: keep-all;
+      }
+
+      @media (max-width: 1250px) {
+        .phones { grid-template-columns: 390px; }
+      }
+
+      @media (max-width: 760px) {
+        .page { padding: 14px; }
+        .intro, .board-head { grid-template-columns: 1fr; }
+        .phones { grid-template-columns: minmax(0, 1fr); padding: 14px; }
+        .phone { width: min(100%, 390px); margin: 0 auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="intro">
+        <div>
+          <span class="pill">Hyangmi App V2 · less plain, more alive</span>
+          <h1 class="serif">기록 앱이 아니라, 커피 감각을 모으는 작은 도구.</h1>
+        </div>
+        <p>
+          이전 버전은 구조는 맞았지만 화면마다 표정이 비슷했습니다. v2는 홈, 촬영, 맛 선택, 여권 화면의 역할을 더 분명히 나누고,
+          색·사진·데이터 표현을 더 과감하게 사용해 앱이 덜 무난하고 더 기억에 남도록 만든 방향입니다.
+        </p>
+      </section>
+
+      <section class="board">
+        <header class="board-head">
+          <div>
+            <span class="pill">Recommended Direction</span>
+            <h2 class="serif">Sensory Coffee Companion</h2>
+          </div>
+          <p>
+            앱 브릿지로 가져갈 메인 방향입니다. 웹 랜딩의 설명형 구조를 버리고, 사용자가 실제로 매일 보게 될 핵심 화면만 강하게 잡았습니다.
+            AI는 보이지 않게 두고, 사진으로 채우기, 맛 고르기, 기록 저장하기만 남깁니다.
+          </p>
+        </header>
+
+        <div class="phones">
+          <article class="phone">
+            <div class="screen home-rich">
+              <div class="top">
+                <span class="mark">향</span>
+                <span class="pill">오늘 1잔</span>
+              </div>
+              <h2 class="hero-title serif">오늘 마신 커피, 잊기 전에 남겨요.</h2>
+              <p class="hero-copy">사진 한 장으로 시작하고, 맛은 내 언어로 정리합니다.</p>
+              <div class="feature-photo">
+                <img src="../../public/images/premium_coffee_brewing.png" alt="따뜻한 브루잉 장면" />
+                <div class="floating-note">
+                  <b>Fritz Ethiopia Sidama</b>
+                  <small>복숭아 · 꿀 · 홍차 · 다시 살래요</small>
+                </div>
+              </div>
+              <div class="quick-grid">
+                <div class="action-card dark">
+                  <small>바로 하기</small>
+                  <div class="big">사진으로<br />추가</div>
+                </div>
+                <div class="action-card">
+                  <small>이번 달</small>
+                  <div class="big">8잔</div>
+                  <small>좋았던 컵 5잔</small>
+                </div>
+              </div>
+              <nav class="bottom-tabs">
+                <span class="tab active"><i class="ico"></i>홈</span>
+                <span class="tab"><i class="ico"></i>기록</span>
+                <span class="tab"><i class="ico"></i>여권</span>
+                <span class="tab"><i class="ico"></i>나</span>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone">
+            <div class="screen scan-rich">
+              <div class="top">
+                <span class="mark">향</span>
+                <span class="pill" style="background:rgba(255,248,236,.14);color:#fff8ec;border-color:rgba(255,248,236,.25);">사진 기록</span>
+              </div>
+              <div class="camera">
+                <img src="../../public/images/onboarding/private-espresso-coffee-bag.png" alt="원두 봉투 촬영" />
+                <div class="focus-box"></div>
+                <div class="scan-line"></div>
+                <div class="capture-copy">
+                  <b>라벨을 화면 안에 맞춰주세요</b>
+                  <p>읽은 정보는 다음 화면에서 직접 고칠 수 있어요.</p>
+                </div>
+              </div>
+              <div class="shutter-row">
+                <div class="scan-chip">어둡지 않게</div>
+                <div class="shutter"></div>
+                <div class="scan-chip">정면으로</div>
+              </div>
+              <nav class="bottom-tabs">
+                <span class="tab"><i class="ico"></i>홈</span>
+                <span class="tab active"><i class="ico"></i>기록</span>
+                <span class="tab"><i class="ico"></i>여권</span>
+                <span class="tab"><i class="ico"></i>나</span>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone">
+            <div class="screen home-rich">
+              <div class="top">
+                <b>정보 확인</b>
+                <span class="muted" style="font-size:12px;font-weight:900;">저장 전</span>
+              </div>
+              <h2 class="hero-title serif">맞게 읽었는지 확인해 주세요.</h2>
+              <p class="hero-copy">자동으로 채운 정보는 제안일 뿐이에요. 틀린 부분만 고치면 됩니다.</p>
+              <div class="sheet">
+                <div class="field">
+                  <div><small>로스터리</small><b>성수 블렌드</b></div>
+                  <span class="edit">수정</span>
+                </div>
+                <div class="field">
+                  <div><small>원두명</small><b>House Espresso</b></div>
+                  <span class="edit">수정</span>
+                </div>
+                <div class="field">
+                  <div><small>가공 방식</small><b>Washed</b></div>
+                  <span class="edit">수정</span>
+                </div>
+              </div>
+              <div class="row" style="margin-top:18px;">
+                <span class="secondary">다시 찍기</span>
+                <span class="primary">맛 고르기</span>
+              </div>
+              <nav class="bottom-tabs">
+                <span class="tab"><i class="ico"></i>홈</span>
+                <span class="tab active"><i class="ico"></i>기록</span>
+                <span class="tab"><i class="ico"></i>여권</span>
+                <span class="tab"><i class="ico"></i>나</span>
+              </nav>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="board">
+        <header class="board-head">
+          <div>
+            <span class="pill">Deeper App Screens</span>
+            <h2 class="serif">Taste And Passport</h2>
+          </div>
+          <p>
+            단조로움을 줄이려면 기록 후반 화면이 중요합니다. 단순 별점 대신 향미 휠, 내 문장, 산지 여권, 다음 구매 힌트가 있어야 앱을 다시 열 이유가 생깁니다.
+          </p>
+        </header>
+
+        <div class="phones">
+          <article class="phone">
+            <div class="screen taste-rich">
+              <div class="top">
+                <b>맛 고르기</b>
+                <span class="pill">3/4</span>
+              </div>
+              <h2 class="hero-title serif">느낀 맛을 눌러주세요.</h2>
+              <div class="wheel-wrap">
+                <div class="wheel" aria-label="향미 휠"></div>
+              </div>
+              <div class="taste-card">
+                <b>문장으로 정리하면</b>
+                <div class="chips">
+                  <span class="chip">복숭아</span>
+                  <span class="chip">꿀</span>
+                  <span class="chip">홍차</span>
+                  <span class="chip">가벼움</span>
+                </div>
+                <p class="hero-copy">복숭아 같은 산미와 꿀 같은 단맛이 먼저 오고, 식을수록 홍차 같은 여운이 남아요.</p>
+              </div>
+              <div class="row" style="margin-top:16px;">
+                <span class="secondary">직접 쓰기</span>
+                <span class="primary">저장하기</span>
+              </div>
+              <nav class="bottom-tabs">
+                <span class="tab"><i class="ico"></i>홈</span>
+                <span class="tab active"><i class="ico"></i>기록</span>
+                <span class="tab"><i class="ico"></i>여권</span>
+                <span class="tab"><i class="ico"></i>나</span>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone">
+            <div class="screen archive-rich">
+              <div class="top">
+                <span class="mark">향</span>
+                <span class="muted" style="font-size:12px;font-weight:900;">24잔</span>
+              </div>
+              <h2 class="hero-title serif">취향이 쌓이는 맛 여권</h2>
+              <div class="passport-hero">
+                <span class="pill" style="background:rgba(255,248,236,.12);color:#fff8ec;border-color:rgba(255,248,236,.18);">이번 달</span>
+                <h3 class="serif" style="margin-top:12px;">밝은 산미와 꿀 같은 단맛</h3>
+              </div>
+              <div class="mini-map">
+                <div class="stamp">ETH<br />06</div>
+                <div class="stamp">COL<br />04</div>
+                <div class="stamp">KEN<br />03</div>
+                <div class="stamp">BRA<br />02</div>
+                <div class="stamp">PAN<br />01</div>
+                <div class="stamp">NEW</div>
+              </div>
+              <nav class="bottom-tabs">
+                <span class="tab"><i class="ico"></i>홈</span>
+                <span class="tab"><i class="ico"></i>기록</span>
+                <span class="tab active"><i class="ico"></i>여권</span>
+                <span class="tab"><i class="ico"></i>나</span>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone">
+            <div class="screen taste-rich">
+              <div class="top">
+                <b>다음 구매 힌트</b>
+                <span class="pill">개인 기록 기반</span>
+              </div>
+              <h2 class="hero-title serif">다음엔 이런 원두를 찾아보세요.</h2>
+              <div class="list">
+                <div class="card">
+                  <b>Honey Process</b>
+                  <small>단맛과 과일 향을 같이 좋아하는 편이에요.</small>
+                </div>
+                <div class="card">
+                  <b>Light-medium roast</b>
+                  <small>산미는 살리고 바디는 너무 무겁지 않게.</small>
+                </div>
+                <div class="card">
+                  <b>Roaster fit</b>
+                  <small>프릳츠, 나무사이로, 모모스 계열 기록이 잘 맞았어요.</small>
+                </div>
+              </div>
+              <div class="feature-photo" style="margin-top:16px;">
+                <img src="../../public/images/onboarding/private-espresso-coffee-bag.png" alt="추천 원두 패키지" style="height:185px;" />
+              </div>
+              <nav class="bottom-tabs">
+                <span class="tab"><i class="ico"></i>홈</span>
+                <span class="tab"><i class="ico"></i>기록</span>
+                <span class="tab active"><i class="ico"></i>여권</span>
+                <span class="tab"><i class="ico"></i>나</span>
+              </nav>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="footer-note">
+        <h2 class="serif">v2에서 달라진 점</h2>
+        <p>
+          단순한 카드 나열을 줄이고, 화면마다 역할이 다르게 보이도록 했습니다. 홈은 감정적인 시작점, 촬영은 몰입형 카메라,
+          확인은 신뢰를 주는 수정 흐름, 맛 선택은 향미 휠, 여권은 수집과 다음 구매 힌트로 분리했습니다.
+          이 정도가 앱으로 갔을 때 덜 심심하고, 그래도 과한 게임 UI처럼 보이지 않는 중간 지점입니다.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,8 +1,22 @@
-import { Star, Flame, Droplets, Thermometer, Timer } from "lucide-react";
+import { BookOpen, Star } from "lucide-react";
 import type { TastingCardData } from "@/hooks/useTastingCards";
 
+export type PublicFeedCardData = Pick<
+  TastingCardData,
+  | "id"
+  | "title"
+  | "subtitle"
+  | "metric1"
+  | "metric2"
+  | "metric3"
+  | "tags"
+  | "ai_description"
+  | "footer_meta"
+  | "package_origin"
+>;
+
 type PublicFeedCardProps = {
-  card: TastingCardData;
+  card: PublicFeedCardData;
 };
 
 export default function PublicFeedCard({ card }: PublicFeedCardProps) {
@@ -33,16 +47,16 @@ export default function PublicFeedCard({ card }: PublicFeedCardProps) {
 
       <div className="bg-black/30 rounded-xl p-3 border border-white/5 mt-2">
         <p className="text-xs text-foreground/80 leading-relaxed italic line-clamp-3">
-          "{card.ai_description || "멋진 커피 경험입니다."}"
+          "{card.ai_description || "사용자가 확인해 공개한 커피 기억입니다."}"
         </p>
       </div>
-      
-      {/* Mini Brewing Stats (Placeholder for now, would pull from brewing_logs in real app) */}
+
       <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10 text-[10px] text-muted-foreground">
-        <div className="flex items-center gap-1.5"><Thermometer size={12} /> 92°C</div>
-        <div className="flex items-center gap-1.5"><Droplets size={12} /> Med</div>
-        <div className="flex items-center gap-1.5"><Timer size={12} /> 2:30</div>
-        <div className="flex items-center gap-1.5 text-primary-amber/70 font-bold"><Flame size={12} /> Save Recipe</div>
+        <div className="flex items-center gap-1.5">
+          <BookOpen size={12} />
+          공개된 향미 단서
+        </div>
+        <div className="font-bold text-primary-amber/80">내 기록에 참고</div>
       </div>
     </article>
   );

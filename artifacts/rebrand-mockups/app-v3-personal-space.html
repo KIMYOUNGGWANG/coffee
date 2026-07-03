@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hyangmi App V3 Personal Space</title>
+    <style>
+      @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+      @import url("https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&display=swap");
+
+      :root {
+        --ink: #2a1a12;
+        --soil: #493024;
+        --muted: #8f7867;
+        --paper: #fff8ec;
+        --cream: #f5ead8;
+        --linen: #e8d8c1;
+        --clay: #bd7650;
+        --peach: #efbb8f;
+        --sage: #8fa57d;
+        --leaf: #4e7452;
+        --blue: #7891a3;
+        --rose: #bd6d62;
+        --line: rgba(42, 26, 18, 0.14);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 15% 10%, rgba(239, 187, 143, .28), transparent 28%),
+          radial-gradient(circle at 90% 20%, rgba(143, 165, 125, .24), transparent 26%),
+          #d8c6b2;
+        color: var(--ink);
+        font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1, h2, h3, p { margin: 0; }
+      img { display: block; width: 100%; }
+      .serif { font-family: "Noto Serif KR", serif; }
+
+      .page {
+        width: min(100%, 1440px);
+        margin: 0 auto;
+        padding: 30px;
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: .9fr 1.1fr;
+        gap: 28px;
+        align-items: end;
+        margin-bottom: 28px;
+      }
+
+      .tag {
+        display: inline-flex;
+        width: fit-content;
+        border: 1px solid rgba(42, 26, 18, .14);
+        border-radius: 999px;
+        background: rgba(255, 248, 236, .58);
+        color: #734933;
+        padding: 8px 12px;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .intro h1 {
+        margin-top: 14px;
+        max-width: 760px;
+        font-size: clamp(42px, 5.6vw, 82px);
+        line-height: 1.05;
+        word-break: keep-all;
+      }
+
+      .intro p {
+        color: #654d3d;
+        font-size: 16px;
+        line-height: 1.82;
+        word-break: keep-all;
+      }
+
+      .board {
+        border: 1px solid var(--line);
+        background: rgba(255, 248, 236, .68);
+        box-shadow: 0 30px 90px rgba(42, 26, 18, .16);
+        margin-bottom: 34px;
+      }
+
+      .board-head {
+        display: grid;
+        grid-template-columns: .75fr 1.25fr;
+        gap: 28px;
+        align-items: end;
+        border-bottom: 1px solid var(--line);
+        padding: 26px 30px;
+      }
+
+      .board-head h2 {
+        margin-top: 10px;
+        font-size: 38px;
+        line-height: 1.1;
+      }
+
+      .board-head p {
+        color: #654d3d;
+        font-size: 14px;
+        line-height: 1.78;
+        word-break: keep-all;
+      }
+
+      .phones {
+        display: grid;
+        grid-template-columns: repeat(3, 390px);
+        gap: 26px;
+        justify-content: center;
+        padding: 34px;
+      }
+
+      .phone {
+        position: relative;
+        width: 390px;
+        height: 844px;
+        overflow: hidden;
+        border: 10px solid #23160f;
+        border-radius: 44px;
+        background: var(--paper);
+        box-shadow: 0 28px 70px rgba(42, 26, 18, .23);
+      }
+
+      .phone::before {
+        content: "";
+        position: absolute;
+        z-index: 20;
+        top: 10px;
+        left: 50%;
+        width: 112px;
+        height: 25px;
+        border-radius: 999px;
+        background: #23160f;
+        transform: translateX(-50%);
+      }
+
+      .screen {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+        padding: 44px 20px 94px;
+      }
+
+      .room {
+        background:
+          linear-gradient(90deg, rgba(42,26,18,.035) 1px, transparent 1px),
+          linear-gradient(rgba(42,26,18,.03) 1px, transparent 1px),
+          linear-gradient(180deg, #fff6e8 0%, #f0dfc9 100%);
+        background-size: 22px 22px, 22px 22px, auto;
+      }
+
+      .diary {
+        background:
+          radial-gradient(circle at 20% 8%, rgba(239,187,143,.44), transparent 30%),
+          linear-gradient(180deg, #fff9ee 0%, #f5ead8 100%);
+      }
+
+      .shelf {
+        background:
+          linear-gradient(180deg, #e9dbc8 0%, #fff7ec 52%, #ead9c1 100%);
+      }
+
+      .dark-corner {
+        background:
+          radial-gradient(circle at 70% 10%, rgba(239,187,143,.18), transparent 28%),
+          #271910;
+        color: #fff7ec;
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 40px;
+        margin-bottom: 18px;
+      }
+
+      .avatar {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border: 1px solid rgba(42,26,18,.2);
+        border-radius: 50%;
+        background: rgba(255,248,236,.72);
+        font-family: "Noto Serif KR", serif;
+        font-weight: 900;
+      }
+
+      .hello {
+        font-size: 31px;
+        line-height: 1.16;
+        word-break: keep-all;
+      }
+
+      .copy {
+        margin-top: 8px;
+        color: #654d3d;
+        font-size: 13px;
+        line-height: 1.7;
+        word-break: keep-all;
+      }
+
+      .mood-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      .mood {
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(255,248,236,.68);
+        padding: 12px 8px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .mood.active {
+        background: var(--soil);
+        color: #fff7ec;
+      }
+
+      .desk {
+        position: relative;
+        margin-top: 18px;
+        height: 292px;
+        overflow: hidden;
+        border-radius: 34px;
+        box-shadow: 0 18px 50px rgba(42,26,18,.18);
+      }
+
+      .desk img {
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .desk-card {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        left: 14px;
+        border: 1px solid rgba(255,255,255,.65);
+        border-radius: 24px;
+        background: rgba(255,248,236,.88);
+        padding: 14px;
+        backdrop-filter: blur(14px);
+      }
+
+      .desk-card b,
+      .note-card b,
+      .shelf-card b {
+        display: block;
+        font-size: 14px;
+      }
+
+      .desk-card small,
+      .note-card small,
+      .shelf-card small {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .personal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .tile {
+        min-height: 94px;
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        background: rgba(255,248,236,.72);
+        padding: 14px;
+      }
+
+      .tile.dark {
+        background: var(--soil);
+        color: #fff7ec;
+      }
+
+      .tile strong {
+        display: block;
+        margin-top: 11px;
+        font-size: 25px;
+      }
+
+      .tabs {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        left: 14px;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        min-height: 66px;
+        border: 1px solid rgba(42,26,18,.13);
+        border-radius: 28px;
+        background: rgba(255,248,236,.9);
+        box-shadow: 0 10px 32px rgba(42,26,18,.15);
+        backdrop-filter: blur(18px);
+      }
+
+      .tab {
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 900;
+      }
+
+      .tab.active { color: var(--ink); }
+      .icon {
+        width: 18px;
+        height: 18px;
+        margin-bottom: 4px;
+        border: 2px solid currentColor;
+        border-radius: 7px;
+      }
+
+      .date-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      .date-line span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .note-card {
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        background: rgba(255,248,236,.78);
+        padding: 17px;
+        box-shadow: 0 16px 38px rgba(42,26,18,.1);
+      }
+
+      .note-card + .note-card { margin-top: 12px; }
+
+      .hand {
+        margin-top: 14px;
+        border-left: 3px solid var(--clay);
+        padding-left: 12px;
+        color: #594133;
+        font-family: "Noto Serif KR", serif;
+        font-size: 18px;
+        line-height: 1.6;
+        word-break: keep-all;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 14px;
+      }
+
+      .chip {
+        border-radius: 999px;
+        background: rgba(189,118,80,.12);
+        color: #764a34;
+        padding: 7px 10px;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .shelf-hero {
+        position: relative;
+        height: 236px;
+        overflow: hidden;
+        border-radius: 34px;
+        background: var(--soil);
+        box-shadow: 0 18px 48px rgba(42,26,18,.18);
+      }
+
+      .shelf-hero img {
+        height: 100%;
+        object-fit: cover;
+        opacity: .9;
+      }
+
+      .shelf-hero::after {
+        content: "";
+        position: absolute;
+        inset: auto 20px 28px 20px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255,248,236,.35);
+        box-shadow: 0 18px 28px rgba(42,26,18,.32);
+      }
+
+      .shelf-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .shelf-card {
+        display: grid;
+        grid-template-columns: 54px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: rgba(255,248,236,.74);
+        padding: 12px;
+      }
+
+      .mini {
+        width: 54px;
+        height: 54px;
+        overflow: hidden;
+        border-radius: 17px;
+        background: var(--linen);
+      }
+
+      .mini img {
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .quote {
+        border: 1px solid rgba(255,248,236,.18);
+        border-radius: 30px;
+        background: rgba(255,248,236,.08);
+        padding: 18px;
+      }
+
+      .quote h2 {
+        font-size: 30px;
+        line-height: 1.18;
+      }
+
+      .quote p {
+        margin-top: 12px;
+        color: rgba(255,247,236,.72);
+        font-size: 14px;
+        line-height: 1.75;
+        word-break: keep-all;
+      }
+
+      .private-card {
+        margin-top: 16px;
+        border-radius: 32px;
+        background: #fff7ec;
+        color: var(--ink);
+        padding: 18px;
+      }
+
+      .private-card h3 {
+        font-size: 21px;
+        line-height: 1.35;
+      }
+
+      .privacy-row {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .privacy-row div {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 13px;
+        font-weight: 900;
+      }
+
+      .footer {
+        border: 1px solid var(--line);
+        background: rgba(255,248,236,.72);
+        padding: 24px;
+      }
+
+      .footer h2 { font-size: 30px; margin-bottom: 10px; }
+      .footer p {
+        color: #654d3d;
+        font-size: 15px;
+        line-height: 1.8;
+        word-break: keep-all;
+      }
+
+      @media (max-width: 1250px) {
+        .phones { grid-template-columns: 390px; }
+      }
+
+      @media (max-width: 760px) {
+        .page { padding: 14px; }
+        .intro, .board-head { grid-template-columns: 1fr; }
+        .phones { grid-template-columns: minmax(0, 1fr); padding: 14px; }
+        .phone { width: min(100%, 390px); margin: 0 auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="intro">
+        <div>
+          <span class="tag">Hyangmi App V3 · Personal Space</span>
+          <h1 class="serif">내 커피가 쌓이는, 조용한 개인 서랍.</h1>
+        </div>
+        <p>
+          v2가 더 앱답고 생동감 있는 방향이었다면, v3는 한 단계 더 개인화합니다.
+          앱이 “기능 모음”이 아니라 내 취향, 내 문장, 내 원두가 머무는 공간처럼 느껴지도록 홈을 방처럼, 기록을 일기처럼, 여권을 서랍처럼 설계했습니다.
+        </p>
+      </section>
+
+      <section class="board">
+        <header class="board-head">
+          <div>
+            <span class="tag">Personal Home</span>
+            <h2 class="serif">내 공간으로 시작</h2>
+          </div>
+          <p>
+            첫 화면에서 통계보다 “오늘의 나”를 먼저 보여줍니다. 무드, 최근 컵, 작은 위젯이 있어서 앱을 열었을 때 개인 공간에 들어온 느낌이 납니다.
+          </p>
+        </header>
+        <div class="phones">
+          <article class="phone">
+            <div class="screen room">
+              <div class="top">
+                <span class="avatar">김</span>
+                <span class="tag">내 커피룸</span>
+              </div>
+              <h2 class="hello serif">영광님, 오늘 커피는 어떤 기분이었나요?</h2>
+              <p class="copy">기록은 정확하지 않아도 괜찮아요. 나중에 다시 사고 싶은 단서만 남기면 됩니다.</p>
+              <div class="mood-row">
+                <div class="mood active">편안함</div>
+                <div class="mood">산뜻함</div>
+                <div class="mood">묵직함</div>
+              </div>
+              <div class="desk">
+                <img src="../../public/images/premium_coffee_brewing.png" alt="내 커피 공간" />
+                <div class="desk-card">
+                  <b>오늘 책상 위 컵</b>
+                  <small>Fritz Ethiopia · 복숭아 · 꿀 · 다시 살래요</small>
+                </div>
+              </div>
+              <div class="personal-grid">
+                <div class="tile dark"><span>바로 남기기</span><strong>사진<br />기록</strong></div>
+                <div class="tile"><span>이번 달 취향</span><strong>밝은<br />산미</strong></div>
+              </div>
+              <nav class="tabs">
+                <span class="tab active"><i class="icon"></i>룸</span>
+                <span class="tab"><i class="icon"></i>노트</span>
+                <span class="tab"><i class="icon"></i>서랍</span>
+                <span class="tab"><i class="icon"></i>나</span>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone">
+            <div class="screen diary">
+              <div class="date-line">
+                <b>오늘의 노트</b>
+                <span>6월 26일 금요일</span>
+              </div>
+              <h2 class="hello serif">맛보다 먼저, 기억하고 싶은 장면.</h2>
+              <div class="note-card">
+                <b>아침 창가에서 마신 컵</b>
+                <small>Fritz Ethiopia Sidama</small>
+                <p class="hand">처음엔 복숭아처럼 밝고, 식으면서 꿀차 같은 단맛이 남았다.</p>
+                <div class="tags">
+                  <span class="chip">복숭아</span>
+                  <span class="chip">꿀</span>
+                  <span class="chip">홍차</span>
+                  <span class="chip">아침</span>
+                </div>
+              </div>
+              <div class="note-card">
+                <b>내가 남긴 재구매 단서</b>
+                <small>다음 구매 때 볼 메모</small>
+                <p class="hand">아이스로 다시 마셔보기. 분쇄도는 한 칸 더 곱게.</p>
+              </div>
+              <nav class="tabs">
+                <span class="tab"><i class="icon"></i>룸</span>
+                <span class="tab active"><i class="icon"></i>노트</span>
+                <span class="tab"><i class="icon"></i>서랍</span>
+                <span class="tab"><i class="icon"></i>나</span>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone">
+            <div class="screen shelf">
+              <div class="top">
+                <span class="avatar">향</span>
+                <span class="tag">원두 서랍 12</span>
+              </div>
+              <h2 class="hello serif">다시 열어보고 싶은 원두들.</h2>
+              <div class="shelf-hero">
+                <img src="../../public/images/onboarding/private-espresso-coffee-bag.png" alt="원두 패키지" />
+              </div>
+              <div class="shelf-list">
+                <div class="shelf-card">
+                  <div class="mini"><img src="../../public/images/onboarding/private-espresso-coffee-bag.png" alt="" /></div>
+                  <div><b>Seongsu Blend</b><small>초콜릿 · 견과 · 비 오는 날</small></div>
+                  <strong>4.4</strong>
+                </div>
+                <div class="shelf-card">
+                  <div class="mini"><img src="../../public/images/premium_coffee_brewing.png" alt="" /></div>
+                  <div><b>Ethiopia Sidama</b><small>복숭아 · 꿀 · 아침</small></div>
+                  <strong>4.7</strong>
+                </div>
+                <div class="shelf-card">
+                  <div class="mini"><img src="../../public/images/onboarding/private-espresso-coffee-bag.png" alt="" /></div>
+                  <div><b>Colombia Huila</b><small>카라멜 · 오렌지 · 오후</small></div>
+                  <strong>4.1</strong>
+                </div>
+              </div>
+              <nav class="tabs">
+                <span class="tab"><i class="icon"></i>룸</span>
+                <span class="tab"><i class="icon"></i>노트</span>
+                <span class="tab active"><i class="icon"></i>서랍</span>
+                <span class="tab"><i class="icon"></i>나</span>
+              </nav>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="board">
+        <header class="board-head">
+          <div>
+            <span class="tag">Private Layer</span>
+            <h2 class="serif">개인 공간의 신뢰감</h2>
+          </div>
+          <p>
+            “나만의 공간”은 예쁜 것만으로는 부족합니다. 공유보다 보관, 분석보다 내 문장, 공개보다 비공개가 기본값이어야 합니다.
+          </p>
+        </header>
+        <div class="phones">
+          <article class="phone">
+            <div class="screen dark-corner">
+              <div class="top">
+                <span class="avatar" style="background:rgba(255,247,236,.1);border-color:rgba(255,247,236,.22);">향</span>
+                <span class="tag" style="background:rgba(255,247,236,.1);color:#fff7ec;border-color:rgba(255,247,236,.2);">조용한 모드</span>
+              </div>
+              <div class="quote">
+                <h2 class="serif">기록은 나에게 먼저 보여야 해요.</h2>
+                <p>공유 카드, 추천, 분석은 뒤에 둡니다. 기본은 내 노트, 내 서랍, 내 취향의 변화입니다.</p>
+              </div>
+              <div class="private-card">
+                <span class="tag">내 공간 설정</span>
+                <h3 class="serif" style="margin-top:12px;">공개하지 않는 커피 노트</h3>
+                <div class="privacy-row">
+                  <div>기본 저장: 비공개</div>
+                  <div>공유 전 미리보기</div>
+                  <div>추천은 내 기록 안에서만</div>
+                </div>
+              </div>
+              <nav class="tabs">
+                <span class="tab active"><i class="icon"></i>룸</span>
+                <span class="tab"><i class="icon"></i>노트</span>
+                <span class="tab"><i class="icon"></i>서랍</span>
+                <span class="tab"><i class="icon"></i>나</span>
+              </nav>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="footer">
+        <h2 class="serif">이 방향의 핵심</h2>
+        <p>
+          탭 이름부터 `홈/기록/여권`보다 더 개인적인 `룸/노트/서랍/나`로 바꿨습니다.
+          앱이 사용자를 평가하거나 분석하는 느낌보다, 사용자의 커피 취향을 조용히 보관하는 장소처럼 느껴지게 하는 방향입니다.
+          브릿지 앱으로 만들 때도 이 구조는 충분히 단순하고, 기존 기능을 얹기 쉽습니다.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

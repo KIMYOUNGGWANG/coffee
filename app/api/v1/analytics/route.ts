@@ -3,6 +3,13 @@ import type { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { analyticsEventSchema } from "@/lib/analytics-events";
 import { readStarterEnv } from "@/lib/env";
+import { checkRateLimit, readClientIdentity } from "@/lib/rate-limit";
+
+const analyticsRateLimit = {
+  key: "analytics",
+  limit: 60,
+  windowMs: 60_000,
+} as const;
 
 async function readAnalyticsBody(request: NextRequest): Promise<unknown> {
   try {
@@ -16,6 +23,14 @@ async function readAnalyticsBody(request: NextRequest): Promise<unknown> {
 }
 
 export async function POST(request: NextRequest) {
+  const rateLimit = checkRateLimit(readClientIdentity(request.headers), analyticsRateLimit);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: { code: 429, message: "Too many analytics events." } },
+      { status: 429, headers: { "Retry-After": rateLimit.retryAfterSeconds.toString() } },
+    );
+  }
+
   const body = await readAnalyticsBody(request);
   const parsedEvent = analyticsEventSchema.safeParse(body);
 

@@ -149,7 +149,7 @@ export default function DNAExportCard({
   tasteProfile,
   typeLabel,
 }: DNAExportCardProps) {
-  const favoriteOrigin = topOrigins[0]?.origin || "📍 커피 탐험 중";
+  const favoriteOrigin = topOrigins[0]?.origin || "커피 탐험 중";
 
   return (
     <div
@@ -164,7 +164,7 @@ export default function DNAExportCard({
       {/* Top Section */}
       <div className="flex flex-col items-center text-center">
         <span className="text-sm font-extrabold text-[#D4AF37] tracking-[0.4em] uppercase">
-          ☕ COFFEEDEX
+          COFFEEDEX
         </span>
         <div className="mt-8 h-[2px] w-20 bg-[#D4AF37]/50" />
         <h2 className="mt-10 text-4xl font-extrabold tracking-tight font-serif">

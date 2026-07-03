@@ -83,6 +83,21 @@ test.describe("Story image export", () => {
     await page.route("**/api/v1/subscription", async (route) => {
       await route.fulfill({ contentType: "application/json", body: JSON.stringify(subscriptionResponse) });
     });
+    await page.route("**/api/v1/shelf", async (route) => {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify({ data: [] }) });
+    });
+    await page.route("**/api/v1/coffee-dna", async (route) => {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify({ data: null }) });
+    });
+    await page.route("**/api/v1/rebuy-intelligence", async (route) => {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify({ data: null }) });
+    });
+    await page.route("**/api/v1/dial-in-coach", async (route) => {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify({ data: null }) });
+    });
+    await page.route("**/api/v1/analytics", async (route) => {
+      await route.fulfill({ contentType: "application/json", body: JSON.stringify({ received: true }) });
+    });
 
     await page.goto("/dashboard");
     await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();

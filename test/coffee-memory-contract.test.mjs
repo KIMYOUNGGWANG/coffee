@@ -38,6 +38,8 @@ test("Given a legacy card, When memory fields are parsed, Then compatibility def
   assert.deepEqual(coffeeMemorySchema.parse({}), {
     package_origin: null,
     package_process: null,
+    purchase_url: null,
+    purchase_note: null,
     repurchase_intent: "undecided",
     repurchase_reasons: [],
     scan_source: null,
@@ -52,6 +54,8 @@ test("Given a confirmed scanned memory, When parsed, Then strict package and pro
   const memory = {
     package_origin: "Ethiopia Sidama",
     package_process: "Washed",
+    purchase_url: null,
+    purchase_note: null,
     repurchase_intent: "again",
     repurchase_reasons: ["clean finish", "floral aroma"],
     scan_source: "gemini",

@@ -1,17 +1,28 @@
 import { createServerSupabase } from "@/lib/supabase/server";
 import PublicFeedCard from "@/components/PublicFeedCard";
-import type { TastingCardData } from "@/hooks/useTastingCards";
-import { Search, Compass } from "lucide-react";
+import type { PublicFeedCardData } from "@/components/PublicFeedCard";
+import { Search, Compass, ShieldCheck } from "lucide-react";
 
 export const revalidate = 60; // ISR cache for 60 seconds
 
 export default async function FeedPage() {
   const supabase = await createServerSupabase();
   
-  // Fetch public cards directly from Supabase
   const { data: cards, error } = await supabase
     .from("tasting_cards")
-    .select("*")
+    .select(`
+      id,
+      title,
+      subtitle,
+      metric1,
+      metric2,
+      metric3,
+      tags,
+      ai_description,
+      footer_meta,
+      package_origin,
+      created_at
+    `)
     .eq("is_public", true)
     .order("created_at", { ascending: false })
     .limit(20);
@@ -38,16 +49,27 @@ export default async function FeedPage() {
       </header>
 
       {error ? (
-        <div className="text-center py-10 text-red-400">Failed to load feed. Please try again later.</div>
+        <section
+          aria-live="polite"
+          className="rounded-3xl border border-white/10 bg-white/5 px-5 py-12 text-center shadow-sm"
+        >
+          <ShieldCheck size={34} className="mx-auto text-primary-amber/80" />
+          <h2 className="mt-4 break-keep font-serif text-xl font-black text-foreground">
+            공개 공유 카드를 잠시 불러오지 못했어요
+          </h2>
+          <p className="mx-auto mt-3 max-w-md break-keep text-sm font-semibold leading-6 text-muted-foreground">
+            내 비공개 기록과 원두 서랍에는 영향이 없습니다. 공개 공유 미리보기는 연결이 회복되면 다시 확인할 수 있어요.
+          </p>
+        </section>
       ) : !cards || cards.length === 0 ? (
-        <div className="text-center py-20">
+        <section className="rounded-3xl border border-white/10 bg-white/5 px-5 py-16 text-center shadow-sm">
           <Compass size={40} className="mx-auto text-white/20 mb-4" />
           <h2 className="text-lg font-bold text-foreground">아직 공개 공유 카드가 없어요</h2>
           <p className="text-sm text-muted-foreground mt-2">현재 CoffeeDex의 기본 기록은 개인 보관과 다시 찾기에 맞춰져 있습니다.</p>
-        </div>
+        </section>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {cards.map((card: TastingCardData) => (
+          {(cards as PublicFeedCardData[]).map((card) => (
             <PublicFeedCard key={card.id} card={card} />
           ))}
         </div>

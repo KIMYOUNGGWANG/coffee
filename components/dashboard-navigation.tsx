@@ -12,9 +12,9 @@ type DashboardNavigationProps = {
 };
 
 const navigationItems = [
-  { id: "shelf", label: "선반", icon: Library },
-  { id: "log", label: "기록", icon: NotebookTabs },
-  { id: "passport", label: "패스포트", icon: BookOpenText },
+  { id: "shelf", label: "서랍", icon: Library },
+  { id: "log", label: "노트", icon: NotebookTabs },
+  { id: "passport", label: "취향", icon: BookOpenText },
 ] as const satisfies readonly {
   readonly id: DashboardTab;
   readonly label: string;

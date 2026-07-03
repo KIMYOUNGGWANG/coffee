@@ -115,18 +115,16 @@ test.describe("Viral activation loop", () => {
     const onboardingCta = page.getByTestId("onboarding-first-card-cta");
     await expect(onboardingCta).toHaveAttribute(
       "href",
-      "/dashboard?intent=first_card&source=onboarding&mode=quick&taste_profile=sweet",
+      "/capture?intent=first_card&source=onboarding&mode=quick&taste_profile=sweet",
     );
 
     // When
     await onboardingCta.click();
 
     // Then
-    await expect(page.getByRole("button", { name: "빠른 커피 기록" })).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByText(/한국어 향미|향미 단어/)).toBeVisible();
-    await expect(page.getByTestId("taste-profile-prefill")).toContainText("달고 고소한 컵");
-    await expect(page.getByTestId("taste-profile-prefill-sweetness")).toHaveText("단맛 5");
-    await expect.poll(() => eventNames).toContain("first_card_cta_clicked");
+    await expect(page).toHaveURL(/\/capture\?intent=first_card/);
+    await expect(page.getByText("달고 고소한 컵으로 빠른 기록을 시작해요")).toBeVisible();
+    await expect(page.getByText("Honey")).toBeVisible();
   });
 
   test("routes public-card visitors through onboarding into first-card creation", async ({ page }) => {
@@ -150,13 +148,12 @@ test.describe("Viral activation loop", () => {
     const onboardingCta = page.getByRole("link", { name: "20초 빠른 기록 시작하기" });
     await expect(onboardingCta).toHaveAttribute(
       "href",
-      "/dashboard?intent=first_card&source=public_card&mode=quick&token=public-token-001",
+      "/capture?intent=first_card&source=public_card&mode=quick&token=public-token-001",
     );
     await onboardingCta.click();
 
     // Then
-    await expect(page.getByRole("button", { name: "빠른 커피 기록" })).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByText(/한국어 향미|향미 단어/)).toBeVisible();
-    await expect.poll(() => eventNames).toContain("first_card_cta_clicked");
+    await expect(page).toHaveURL(/\/capture\?intent=first_card/);
+    await expect(page.getByText("방금 본 커피처럼 빠른 기록을 시작해요")).toBeVisible();
   });
 });

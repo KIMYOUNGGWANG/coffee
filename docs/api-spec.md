@@ -55,9 +55,9 @@ PDF export, Stripe checkout and entitlements, story export, and public share rou
 Current capability is intentionally scoped to private coffee memory and retrieval:
 
 - personal tasting cards for cafes, home brews, and roasters such as Fritz, Terarosa, Momos, and Anthracite;
-- Quick Add Memory Mode for saving a confirmed private card from bean name, roaster, one-line note, repurchase intent, and optional Korean flavor helper chips without opening the full scan/manual wizard;
+- Quick Add Memory Mode for saving a confirmed private card from bean name, roaster, one-line note, and repurchase intent first; origin, process, flavor tags, and acidity/sweetness/body are optional detail fields rather than the default 20-second surface;
 - AI-assisted scan and note drafts that the user reviews before saving;
-- Korean flavor helper chips that let users choose approachable sensory words such as fruit, chocolate, honey, citrus, nutty, and floral notes without expert cupping vocabulary;
+- a 20-second default quick-record surface that keeps helper tags, package facts, and purchase clues out of the first screen unless the user opens optional details;
 - explicit repurchase memory and retrieval based on confirmed saved records;
 - private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
@@ -287,7 +287,7 @@ interface CreateCardResponse {
 }
 ```
 
-Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. It writes `confirmed: true`, `scanSource: "manual"`, the selected Korean flavor helper chips into `tags`, optional private purchase clues into `purchaseUrl` and `purchaseNote`, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
+Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. The default 20-second path writes `confirmed: true`, `scanSource: "manual"`, bean name, roaster, repurchase intent, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. Purchase clues, package facts, helper tags, and taste metrics are optional detail fields rather than the default quick-record surface. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
 
 ### `POST /api/v1/cards/ai-note`
 
@@ -349,7 +349,7 @@ interface ScanCoffeePackageResponse {
 
 The provider prompt is extraction-only: absent or unreadable claims remain `null`, uncertainty is field-specific, and no flavor or metric is inferred from other package facts. Provider failure returns manual-entry state, never fabricated fallback coffee data.
 
-An anonymous visitor may use one trial keyed from forwarded IP headers. This limiter is an in-memory, process-local MVP control: it resets with an instance restart, is not shared between instances, and is not production distributed rate limiting or a security boundary. Guest draft fields and corrections live in browser storage for less than 24 hours; expired or invalid drafts are removed when read. Raw image data is excluded from that local draft.
+An anonymous visitor may use one trial keyed from forwarded IP headers. This limiter is an in-memory, process-local MVP control. Guest scan, analytics, and support intake also have process-local request throttles to blunt obvious loops. These controls reset with an instance restart, are not shared between instances, and are not production distributed rate limiting or a security boundary. Guest draft fields and corrections live in browser storage for less than 24 hours; expired or invalid drafts are removed when read. Raw image data is excluded from that local draft.
 
 ### `GET /api/v1/profile/analytics`
 

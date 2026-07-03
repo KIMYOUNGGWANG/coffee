@@ -179,8 +179,8 @@ export default function DashboardClient({
     }
   };
 
-  const rebuySignal = rebuyIntelligence?.rebuyReminder.title ?? "재구매 신호 준비 중";
-  const dialInSignal = dialInCoach?.title ?? "오늘의 시작 레시피 준비 중";
+  const rebuySignal = rebuyIntelligence?.rebuyReminder?.title ?? "다시 살 단서를 모으는 중";
+  const dialInSignal = dialInCoach?.title ?? "오늘의 시작점을 고르는 중";
 
   return (
     <main className="coffee-app-shell min-h-screen text-foreground" data-testid={isDashboardReady ? "dashboard-ready" : undefined}>
@@ -197,9 +197,9 @@ export default function DashboardClient({
 
       <section className="mb-4 grid gap-3 sm:grid-cols-3" aria-label="CoffeeDex 오늘 요약">
         {[
-          { label: "저장한 기억", value: `${cards?.length ?? 0}개`, helper: "Taste Passport에 쌓인 커피", icon: BookOpenText },
-          { label: "다시 살 후보", value: rebuySignal, helper: "Rebuy Intelligence", icon: RefreshCcw },
-          { label: "오늘 시작점", value: dialInSignal, helper: "Dial-in Coach", icon: SlidersHorizontal },
+          { label: "내 노트", value: `${cards?.length ?? 0}개`, helper: "조용히 쌓인 커피 기억", icon: BookOpenText },
+          { label: "다시 살 단서", value: rebuySignal, helper: "최근 기록에서 꺼낸 힌트", icon: RefreshCcw },
+          { label: "오늘 시작점", value: dialInSignal, helper: "다음 컵을 위한 작은 기준", icon: SlidersHorizontal },
         ].map((item) => {
           const Icon = item.icon;
           return (

@@ -47,6 +47,16 @@ const feedbackOptions: readonly {
   { value: "balanced", label: "좋았다", simpleNote: "최근 컵이 좋아서 같은 레시피를 반복하고 싶어요.", rating: 5 },
 ];
 
+function hasDialInCoachData(data: DialInCoachData | undefined): data is DialInCoachData {
+  return Boolean(
+    data
+      && data.recipe
+      && data.suggestedLog
+      && Array.isArray(data.evidence)
+      && Array.isArray(data.adjustments),
+  );
+}
+
 async function saveFeedbackLog(data: DialInCoachData, feedback: (typeof feedbackOptions)[number]) {
   const response = await fetch("/api/v1/brewing-logs", {
     method: "POST",
@@ -85,7 +95,7 @@ export function DashboardDialInCoachPanel({
 
   if (isLoading) {
     return (
-      <section className="espresso-panel p-5" aria-label="Dial-in Coach">
+      <section className="espresso-panel p-5" aria-label="오늘 시작점">
         <div className="h-4 w-32 animate-pulse rounded-full bg-white/10" />
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           <div className="h-40 animate-pulse rounded-2xl bg-white/[0.055]" />
@@ -96,15 +106,15 @@ export function DashboardDialInCoachPanel({
     );
   }
 
-  if (error || !data) {
+  if (error || !hasDialInCoachData(data)) {
     return (
-      <section className="espresso-panel p-5" aria-label="Dial-in Coach">
+      <section className="espresso-panel p-5" aria-label="오늘 시작점">
         <div className="flex gap-3">
           <AlertTriangle className="mt-1 text-primary-amber" size={18} />
           <div>
             <h2 className="font-serif text-xl font-black">오늘의 시작 레시피를 불러오지 못했어요</h2>
             <p className="mt-1 text-sm font-semibold leading-6 text-[#FFF8EC]/58">
-              추출 캘린더는 그대로 사용할 수 있어요. 잠시 후 다시 열면 원두별 시작점을 계산합니다.
+              추출 캘린더는 그대로 사용할 수 있어요. 잠시 후 다시 열면 원두별 시작점을 이어서 보여드릴게요.
             </p>
           </div>
         </div>
@@ -141,15 +151,15 @@ export function DashboardDialInCoachPanel({
   };
 
   return (
-    <section className="espresso-panel p-4 sm:p-5" aria-label="Dial-in Coach">
+    <section className="espresso-panel p-4 sm:p-5" aria-label="오늘 시작점">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <span className="coffee-kicker">
             <SlidersHorizontal size={12} />
-            Dial-in Coach
+            오늘 시작점
           </span>
           <h2 className="mt-3 break-keep font-serif text-2xl font-black leading-tight sm:text-3xl">
-            오늘 첫 컵을 어디서 시작할지 정해드릴게요
+            오늘 첫 컵을 어디서 시작할까요
           </h2>
           <p className="mt-2 max-w-2xl break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">
             {data.problem}
@@ -171,7 +181,7 @@ export function DashboardDialInCoachPanel({
 
       <div className="mt-5 grid gap-3 lg:grid-cols-[1.1fr_0.9fr_1fr]">
         <div className="coffee-metric-card">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">Selected Bean</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">오늘 고른 원두</p>
           <p className="mt-3 break-keep text-lg font-black leading-6">{data.title}</p>
           <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.subtitle}</p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -186,7 +196,7 @@ export function DashboardDialInCoachPanel({
         <div className="coffee-metric-card">
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <Coffee size={13} />
-            Starting Recipe
+            시작 레시피
           </p>
           <div className="mt-4 grid grid-cols-2 gap-2 text-sm font-bold text-[#FFF8EC]/72">
             <span>원두 {data.recipe.coffeeAmount}g</span>
@@ -215,7 +225,7 @@ export function DashboardDialInCoachPanel({
         </div>
 
         <div className="coffee-metric-card">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">Next Moves</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">다음 조정</p>
           <div className="mt-3 space-y-3">
             {data.adjustments.slice(0, 3).map((adjustment) => (
               <div key={adjustment.trigger}>
@@ -230,10 +240,10 @@ export function DashboardDialInCoachPanel({
       <div className="mt-4 rounded-[1.35rem] border border-white/12 bg-white/[0.045] p-4">
         <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">Brew Failure Memory</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">컵 피드백</p>
             <h3 className="mt-1 break-keep text-base font-black text-[#FFF8EC]">방금 컵은 어땠나요?</h3>
             <p className="mt-1 break-keep text-xs font-semibold leading-5 text-[#FFF8EC]/58">
-              하나만 눌러두면 다음 추천에서 분쇄도, 물 온도, 비율, 시간을 한 변수씩 보정합니다.
+              하나만 눌러두면 다음 시작점에서 분쇄도, 물 온도, 비율, 시간을 한 변수씩 조정합니다.
             </p>
           </div>
           <div className="grid grid-cols-5 gap-1.5 sm:min-w-[21rem]">

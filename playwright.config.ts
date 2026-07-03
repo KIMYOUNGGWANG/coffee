@@ -14,6 +14,6 @@ export default defineConfig({
   webServer: {
     command: `${bundledNodePath} node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3000`,
     port: 3000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: process.env.PLAYWRIGHT_REUSE_SERVER === "1",
   },
 });

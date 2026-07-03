@@ -96,14 +96,17 @@ test("CoffeeDex pages lead with recall and repurchase within the scoped product 
   assertDoesNotShow(combinedPages, unsupportedVisibleCopyPattern, "visible pages");
 
   assert.match(homePage, /CoffeeDex/);
-  assert.match(homePage, /다시 사고 싶은 커피/);
+  assert.match(homePage, /다시 살 원두를/);
+  assert.match(homePage, /20초 만에 기억/);
   assert.match(dashboardClient, /DashboardShelfView/);
   assert.match(quickAddMemoryForm, /빠른 기록/);
-  assert.match(quickAddMemoryForm, /한국어 향미 단어/);
+  assert.match(quickAddMemoryForm, /기억이 사라지기 전에 원두, 로스터리, 다시 살 단서/);
   assert.match(quickAddMemoryForm, /다시 살래요/);
   assert.match(tastingCard, /다시 살 이유/);
   assert.match(cardDetailModal, /마지막 좋았던 추출/);
   assert.match(feedPage, /커뮤니티 기능은 아직 현재 제품 기능이 아닙니다/);
+  assert.match(feedPage, /공개 공유 카드를 잠시 불러오지 못했어요/);
+  assert.doesNotMatch(feedPage, /Failed to load feed|Please try again later|Save Recipe/);
   assert.doesNotMatch(feedPage, unsupportedCommunityClaimPattern);
   assert.match(dashboardAnalyticsPanel, /기록|스냅샷/);
   assert.match(dashboardUsagePanel, /기록|스냅샷/);
@@ -136,7 +139,7 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
   assert.match(apiSpec, /confirmed records/i);
   assert.match(apiSpec, /repurchaseBreakdown/);
   assert.match(apiSpec, /Quick Add Memory Mode/);
-  assert.match(apiSpec, /Korean flavor helper chips/);
+  assert.match(apiSpec, /default 20-second path/);
   assert.match(apiSpec, /private rebuy recall from `repurchase_intent` and `repurchase_reasons`/);
   assert.match(apiSpec, /last-good-brew recall requires brew-like metadata/);
   assert.doesNotMatch(apiSpec, /optional brew summary|brew summary|추출 요약/i);
@@ -149,7 +152,7 @@ test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", 
   assert.match(goldenFlows, /JSON and CSV/);
   assert.match(goldenFlows, /`DELETE \/api\/v1\/account`/);
   assert.match(goldenFlows, /Quick Add Memory Mode/);
-  assert.match(goldenFlows, /Korean flavor helper chips/);
+  assert.match(goldenFlows, /Save a 20-Second Quick Record/);
   assert.match(goldenFlows, /private rebuy recall from the user's own `repurchase_reasons`/);
   assert.match(goldenFlows, /Last-good-brew recall is shown only when `footer_meta.extraInfo` contains actual brew-like metadata/);
   assert.doesNotMatch(goldenFlows, /optional brew summary|brew summary|추출 요약/i);
@@ -182,6 +185,7 @@ test("CoffeeDex deploy guide matches the runtime env schema requiredness", () =>
     "SUPABASE_SERVICE_ROLE_KEY",
   ].sort();
   const schemaOptional = [
+    "ADMIN_EMAIL_ALLOWLIST",
     "AI_API_KEY",
     "NEXT_PUBLIC_POSTHOG_KEY",
     "NEXT_PUBLIC_SENTRY_DSN",

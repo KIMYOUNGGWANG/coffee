@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 const emptyCardsResponse = { data: [] } as const;
 const profileResponse = {
@@ -39,6 +40,24 @@ const loginRequiredResponse = {
   },
 } as const;
 
+async function mockDashboardAuxiliaryRoutes(page: Page): Promise<void> {
+  await page.route("**/api/v1/shelf", async (route) => {
+    await route.fulfill({ contentType: "application/json", body: JSON.stringify({ data: [] }) });
+  });
+  await page.route("**/api/v1/coffee-dna", async (route) => {
+    await route.fulfill({ contentType: "application/json", body: JSON.stringify({ data: null }) });
+  });
+  await page.route("**/api/v1/rebuy-intelligence", async (route) => {
+    await route.fulfill({ contentType: "application/json", body: JSON.stringify({ data: null }) });
+  });
+  await page.route("**/api/v1/dial-in-coach", async (route) => {
+    await route.fulfill({ contentType: "application/json", body: JSON.stringify({ data: null }) });
+  });
+  await page.route("**/api/v1/brewing-logs", async (route) => {
+    await route.fulfill({ contentType: "application/json", body: JSON.stringify({ data: [] }) });
+  });
+}
+
 test.describe("PaymentDialog checkout honesty", () => {
   test("keeps paid offers behind a secondary pricing disclosure on the landing page", async ({ page }) => {
     await page.route("**/api/v1/analytics", async (route) => {
@@ -55,6 +74,7 @@ test.describe("PaymentDialog checkout honesty", () => {
   });
 
   test("shows only lifecycle-safe products from the settings payment entry", async ({ page }) => {
+    await mockDashboardAuxiliaryRoutes(page);
     await page.route("**/api/v1/cards", async (route) => {
       await route.fulfill({
         contentType: "application/json",
@@ -105,6 +125,7 @@ test.describe("PaymentDialog checkout honesty", () => {
 
   test("routes checkout auth failures through the auth gate with product intent", async ({ page }) => {
     let checkoutCalls = 0;
+    await mockDashboardAuxiliaryRoutes(page);
 
     await page.route("**/api/v1/**", async (route) => {
       const pathname = new URL(route.request().url()).pathname;
@@ -132,6 +153,21 @@ test.describe("PaymentDialog checkout honesty", () => {
           await route.fulfill({
             contentType: "application/json",
             body: JSON.stringify(subscriptionResponse),
+          });
+          return;
+        case "/api/v1/shelf":
+        case "/api/v1/brewing-logs":
+          await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify({ data: [] }),
+          });
+          return;
+        case "/api/v1/coffee-dna":
+        case "/api/v1/rebuy-intelligence":
+        case "/api/v1/dial-in-coach":
+          await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify({ data: null }),
           });
           return;
         case "/api/v1/checkout":
@@ -173,6 +209,7 @@ test.describe("PaymentDialog checkout honesty", () => {
   test("shows checkout creation failures inline without native alert on mobile", async ({ page }) => {
     let checkoutCalls = 0;
     let nativeDialogMessage: string | null = null;
+    await mockDashboardAuxiliaryRoutes(page);
 
     page.on("dialog", async (dialog) => {
       nativeDialogMessage = dialog.message();
@@ -206,6 +243,21 @@ test.describe("PaymentDialog checkout honesty", () => {
           await route.fulfill({
             contentType: "application/json",
             body: JSON.stringify(subscriptionResponse),
+          });
+          return;
+        case "/api/v1/shelf":
+        case "/api/v1/brewing-logs":
+          await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify({ data: [] }),
+          });
+          return;
+        case "/api/v1/coffee-dna":
+        case "/api/v1/rebuy-intelligence":
+        case "/api/v1/dial-in-coach":
+          await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify({ data: null }),
           });
           return;
         case "/api/v1/checkout":

@@ -145,7 +145,7 @@ test.describe("CoffeeDex growth dashboard", () => {
     await expect(page.getByRole("button", { name: "원두 패키지 스캔하기" })).toBeVisible();
   });
 
-  test("quick add 빠른 기록 opens a one-screen Korean flavor memory path", async ({ page }) => {
+  test("quick add 빠른 기록 opens a four-field 20-second memory path", async ({ page }) => {
     // Given
     await mockDashboardApiRoutes(page);
 
@@ -156,7 +156,12 @@ test.describe("CoffeeDex growth dashboard", () => {
     const quickAddButton = page.getByRole("button", { name: /빠른 기록|빠른 커피 기록/ });
     await expect(quickAddButton).toBeVisible();
     await quickAddButton.click();
-    await expect(page.getByText(/한국어 향미|향미 단어/)).toBeVisible();
+    await expect(page.getByLabel("원두 이름")).toBeVisible();
+    await expect(page.getByLabel("로스터리")).toBeVisible();
+    await expect(page.getByText("다시 살까요?")).toBeVisible();
+    await expect(page.getByLabel("한 줄 메모")).toBeVisible();
+    await expect(page.getByText("사진 원본은 저장하지 않아요. 내 서랍에는 확인한 기록과 다시 살 단서만 비공개로 남아요.")).toBeVisible();
+    await expect(page.getByText(/한국어 향미|향미 단어/)).toHaveCount(0);
   });
 
   test("quick add private rebuy recall shows the saved reason and last-good-brew cue", async ({ page }) => {
@@ -167,7 +172,9 @@ test.describe("CoffeeDex growth dashboard", () => {
     await page.goto("/dashboard");
 
     // Then
-    await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ethiopia Guji" })).toHaveCount(1);
+    await expect(page.getByRole("link", { name: "원두 검색 열기" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "20초 기록 더 남기기" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Ethiopia Guji 상세 보기" })).toContainText("다시 살 이유");
     await expect(page.getByRole("button", { name: "Ethiopia Guji 상세 보기" })).toContainText("복숭아 단맛");
     await page.getByRole("button", { name: "Ethiopia Guji 상세 보기" }).click();
@@ -189,7 +196,8 @@ test.describe("CoffeeDex growth dashboard", () => {
     await expect(page.getByRole("button", { name: /마지막 좋았던 추출/ })).toContainText("V60 · 15g:250g · 92C");
     await page.getByRole("button", { name: "빠른 기록 남기기" }).click();
     await expect(page.getByRole("button", { name: "빠른 커피 기록" })).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByText(/한국어 향미|향미 단어/)).toBeVisible();
+    await expect(page.getByLabel("원두 이름")).toBeVisible();
+    await expect(page.getByText(/한국어 향미|향미 단어/)).toHaveCount(0);
   });
 
   test("promotes sharing after the first card exists", async ({ page }) => {
@@ -215,7 +223,7 @@ test.describe("CoffeeDex growth dashboard", () => {
     // Then
     await expect(page.getByRole("heading", { name: "기록과 온보딩 건강도" })).toBeVisible();
     await expect(page.getByText("게스트 저장 흐름 점검")).toBeVisible();
-    await expect(page.getByText("무료 AI 스캔 3 / 5")).toBeVisible();
+    await expect(page.getByText("무료 사진 판독 3 / 5")).toBeVisible();
     await expect(page.getByText("보유 크레딧 2개")).toBeVisible();
     await expect(page.getByText("PDF 기록북 미보유")).toBeVisible();
   });

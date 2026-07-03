@@ -39,7 +39,7 @@ export default function AIBrewingGuide({ card }: AIBrewingGuideProps) {
             <div className="w-6 h-6 rounded-full bg-primary-amber/20 flex items-center justify-center">
               <Sparkles size={12} className="text-primary-amber animate-pulse" />
             </div>
-            <h4 className="font-serif font-bold text-sm text-foreground">AI 맞춤 브루잉 가이드</h4>
+            <h4 className="font-serif font-bold text-sm text-foreground">맞춤 브루잉 가이드</h4>
           </div>
           <span className="text-[10px] text-muted-foreground bg-white/5 px-2 py-1 rounded-full border border-white/5 group-hover:bg-primary-amber/10 group-hover:text-primary-amber transition-colors">
             {isRevealed ? "숨기기" : "레시피 보기"}

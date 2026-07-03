@@ -69,8 +69,13 @@ test.describe("CoffeeDex product operations UX", () => {
 
     await page.goto("/");
     await expect(page.getByTestId("landing-pricing-section")).toBeVisible();
-    const primaryHeroCta = page.getByRole("link", { name: "첫 테이스팅 기록 시작" });
-    const heroCtaColors = await primaryHeroCta.evaluate((element) => {
+    await expect(page.getByRole("heading", { name: /다시 살 원두를 20초 만에 기억/ })).toBeVisible();
+    await expect(page.getByText("사진 원본은 저장하지 않고, 저장할 때만 로그인해요.")).toBeVisible();
+    const captureCtas = page.getByRole("link", { name: "20초 기록 시작" });
+    await expect(captureCtas).toHaveCount(2);
+    await expect(captureCtas.nth(0)).toHaveAttribute("href", "/capture");
+    await expect(captureCtas.nth(1)).toHaveAttribute("href", "/capture");
+    const heroCtaColors = await captureCtas.nth(1).evaluate((element) => {
       const styles = window.getComputedStyle(element);
       return {
         backgroundColor: styles.backgroundColor,

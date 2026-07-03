@@ -1,48 +1,37 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { Image, View, Text, Pressable } from 'react-native';
 import { router } from 'expo-router';
-import Animated, { 
-  useAnimatedStyle, 
-  withSpring, 
-  useSharedValue 
-} from 'react-native-reanimated';
+import { ChevronRight } from 'lucide-react-native';
 
 interface TastingCardProps {
+  id: string;
   title: string;
   subtitle: string;
+  repurchaseLabel: string;
 }
 
-export function TastingCard({ title, subtitle }: TastingCardProps) {
-  const scale = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: scale.value }],
-    };
-  });
-
+export function TastingCard({ id, title, subtitle, repurchaseLabel }: TastingCardProps) {
   return (
     <Pressable
+      className="mb-3 w-full flex-row items-center gap-3 rounded-[1.25rem] border border-[#2A1A12]/10 bg-room-paper p-3 active:opacity-80"
       onPress={() => {
-        router.push('/note/mock-1');
+        router.push(`/note/${encodeURIComponent(id)}`);
       }}
-      onPressIn={() => { scale.value = withSpring(0.95); }}
-      onPressOut={() => { scale.value = withSpring(1); }}
     >
-      <Animated.View 
-        className="w-full bg-[#111111] border border-white/10 rounded-[1.5rem] p-6 shadow-2xl mb-4"
-        style={animatedStyle}
-      >
-        <Text className="text-primary-amber text-xs font-bold uppercase tracking-widest mb-1">{subtitle}</Text>
-        <Text className="text-white text-2xl font-serif font-black">{title}</Text>
-        
-        <View className="mt-4 pt-4 border-t border-white/5 flex-row justify-between items-center">
-          <Text className="text-muted text-sm">탭하여 상세 보기</Text>
-          <View className="w-8 h-8 rounded-full bg-white/5 items-center justify-center">
-            <Text className="text-primary-amber">→</Text>
-          </View>
-        </View>
-      </Animated.View>
+      <Image
+        source={require("../assets/coffee-bag.png")}
+        className="rounded-2xl"
+        resizeMode="cover"
+        style={{ height: 56, width: 56 }}
+      />
+      <View className="min-w-0 flex-1">
+        <Text className="text-base font-extrabold text-room-espresso" numberOfLines={1}>{title}</Text>
+        <Text className="mt-1 text-xs font-bold text-muted" numberOfLines={1}>{subtitle}</Text>
+      </View>
+      <View className="items-end">
+        <Text className="text-xs font-black text-room-clay">{repurchaseLabel}</Text>
+        <ChevronRight color="#8F7867" size={17} />
+      </View>
     </Pressable>
   );
 }

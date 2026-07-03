@@ -79,7 +79,7 @@ export function DashboardOperationsSnapshot({
       helper: `${formatCount(confirmedCards)} 확정`,
     },
     {
-      label: "AI 스캔 사용",
+      label: "사진 판독 사용",
       value: `${scansUsed} / ${scanLimit}`,
       helper: savedScanRate > 0 ? `저장 전환 ${savedScanRate}%` : "게스트 저장 흐름 점검",
     },

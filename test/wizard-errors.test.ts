@@ -76,6 +76,21 @@ async function fulfillJson(route: Route, status: number, body: unknown): Promise
 }
 
 async function mockDashboardShell(page: Page, profileBody: typeof profileResponse | typeof paidCreditProfileResponse = profileResponse): Promise<void> {
+  await page.route("**/api/v1/shelf", async (route) => {
+    await fulfillJson(route, 200, { data: [] });
+  });
+  await page.route("**/api/v1/coffee-dna", async (route) => {
+    await fulfillJson(route, 200, { data: null });
+  });
+  await page.route("**/api/v1/rebuy-intelligence", async (route) => {
+    await fulfillJson(route, 200, { data: null });
+  });
+  await page.route("**/api/v1/dial-in-coach", async (route) => {
+    await fulfillJson(route, 200, { data: null });
+  });
+  await page.route("**/api/v1/brewing-logs", async (route) => {
+    await fulfillJson(route, 200, { data: [] });
+  });
   await page.route("**/api/v1/profile/analytics", async (route) => {
     await fulfillJson(route, 200, analyticsResponse);
   });
@@ -140,12 +155,12 @@ test.describe("CardCreatorWizard inline errors", () => {
     await advanceToAiNoteStep(page);
 
     // When: AI-note generation fails.
-    await page.getByRole("button", { name: "AI 한줄평 분석 생성" }).click();
+    await page.getByRole("button", { name: "향미 한줄평 초안 생성" }).click();
 
     // Then: the message is visible inline and disappears after a successful retry.
     await expect(page.getByRole("alert").filter({ hasText: "AI 테스트 실패" })).toBeVisible();
-    await page.getByRole("button", { name: "AI 한줄평 다시 시도" }).click();
-    await expect(page.getByRole("heading", { name: "4단계: AI 컵노트 확인 & 발행" })).toBeVisible();
+    await page.getByRole("button", { name: "향미 한줄평 다시 시도" }).click();
+    await expect(page.getByRole("heading", { name: "4단계: 향미 초안 확인 & 발행" })).toBeVisible();
     await expect(page.getByText("AI 테스트 실패")).toHaveCount(0);
     await expect(page.getByText("“복숭아와 꿀의 향이 균형 있게 이어지는 테스트 컵.”")).toBeVisible();
   });
@@ -174,8 +189,8 @@ test.describe("CardCreatorWizard inline errors", () => {
 
     await openWizard(page);
     await advanceToAiNoteStep(page);
-    await page.getByRole("button", { name: "AI 한줄평 분석 생성" }).click({ force: true });
-    await expect(page.getByRole("heading", { name: "4단계: AI 컵노트 확인 & 발행" })).toBeVisible();
+    await page.getByRole("button", { name: "향미 한줄평 초안 생성" }).click({ force: true });
+    await expect(page.getByRole("heading", { name: "4단계: 향미 초안 확인 & 발행" })).toBeVisible();
 
     // When: card submission fails.
     await page.getByRole("button", { name: "카드 발행 완료" }).click();
@@ -280,7 +295,7 @@ test.describe("CardCreatorWizard inline errors", () => {
 
     // Then: the API path is called and the wizard applies the scan result.
     await expect(page.getByPlaceholder("예: 에티오피아 예가체프")).toHaveValue("Credit Kenya");
-    await expect(page.getByText("월간 무료 AI 스캔 한도와 보유 크레딧을 모두 사용했습니다")).toHaveCount(0);
+    await expect(page.getByText("월간 무료 사진 판독 한도와 보유 크레딧을 모두 사용했습니다")).toHaveCount(0);
     expect(scanRequests).toBe(1);
   });
 });

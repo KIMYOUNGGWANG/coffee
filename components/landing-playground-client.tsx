@@ -40,7 +40,7 @@ const loadingStages = [
   "그린 빈 원산지 및 품종 감지 중...",
   "가공 방식과 최적 로스팅 정보 추출 중...",
   "SCA 향미 플레이버 휠 매칭 중...",
-  "AI 감성 컵 노트 한줄평 작성 완료!",
+  "향미 컵 노트 한줄평 초안 작성 완료",
 ];
 
 export default function LandingPlaygroundClient() {
@@ -196,7 +196,7 @@ export default function LandingPlaygroundClient() {
           <div className="bg-white/5 border border-white/10 p-4 rounded-xl relative">
             <span className="absolute -top-2 left-3 bg-black/80 px-2 text-[9px] font-bold text-primary-amber border border-white/10 rounded-full flex items-center gap-1">
               <Sparkles size={8} />
-              AI Cup Note
+              Flavor Note Draft
             </span>
             <p className="font-serif text-xs italic text-foreground/90 leading-relaxed pt-1">
               “{resultCard.aiDescription}”

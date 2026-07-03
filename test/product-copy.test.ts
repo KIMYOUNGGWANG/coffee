@@ -287,13 +287,13 @@ test.describe("CoffeeDex product copy", () => {
 
     // Then
     await expect(page.getByText("Korea-first Specialty Coffee Memory")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /한국 스페셜티 커피를/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /다시 살 원두를 20초 만에 기억/ })).toBeVisible();
     await expect(page.getByText("원두 라벨 스캔 초안")).toBeVisible();
     await expect(page.getByText("재구매 기억과 다음 행동")).toBeVisible();
     await expect(page.getByText("CoffeeDex 컵 노트를 지금 직접 테스트해 보세요")).toBeVisible();
-    await expect(page.getByText("디지털 진열장에 쌓이는 미각 아카이브")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Taste Finder 시작" })).toHaveAttribute("href", "/onboarding");
-    await expect(page.getByRole("link", { name: /30초 Taste Finder로 시작/ })).toHaveAttribute("href", "/onboarding");
+    await expect(page.getByText("좋았던 원두를 다시 찾는 기억장")).toBeVisible();
+    await expect(page.getByRole("link", { name: "20초 기록 시작" }).first()).toHaveAttribute("href", "/capture");
+    await expect(page.getByRole("link", { name: /Taste Finder로 맛 방향 고르기/ })).toHaveAttribute("href", "/onboarding");
     await expectNoUnsupportedVisibleCopy(page);
     await captureEvidenceScreenshot(page, screenshotPaths.home);
   });
@@ -324,13 +324,13 @@ test.describe("CoffeeDex product copy", () => {
   test("routes cold-start visitors from home into Taste Finder onboarding", async ({ page }) => {
     // Given / When
     await page.goto("/");
-    await page.getByRole("link", { name: /30초 Taste Finder로 시작/ }).click();
+    await page.getByRole("link", { name: /Taste Finder로 맛 방향 고르기/ }).click();
 
     // Then
     await expect(page).toHaveURL("/onboarding");
-    await expect(page.getByText("30-second Taste Finder")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "오늘의 취향은 어떤 방향인가요?" })).toBeVisible();
-    await expect(page.getByText("첫 Taste Card 미리보기")).toBeVisible();
+    await expect(page.getByText("Quick-record preset")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "빠른 기록의 맛 방향을 먼저 골라요" })).toBeVisible();
+    await expect(page.getByText("20초 기록 프리셋")).toBeVisible();
     await expect(page).not.toHaveURL(/\/auth|\/dashboard/);
   });
 
@@ -342,9 +342,9 @@ test.describe("CoffeeDex product copy", () => {
     await page.goto("/dashboard");
 
     // Then
-    await expect(page.getByText("내 원두 아카이브")).toBeVisible();
+    await expect(page.getByText("내 원두 서랍")).toBeVisible();
     await expect(page.getByText("개인 커피룸")).toBeVisible();
-    await expect(page.getByText("기억한 맛, 지금 가진 원두, 다음 구매 신호를 한 화면에서 이어봅니다.")).toBeVisible();
+    await expect(page.getByText(/기억한 맛과 다시 살 단서를 한곳에 모아둡니다/)).toBeVisible();
     await expect(page.getByText("Taste Passport", { exact: true })).toBeVisible();
     await expect(page.getByText("오늘의 향미 프로필")).toBeVisible();
     await expect(page.getByText("취향 지도")).toBeVisible();
@@ -358,12 +358,12 @@ test.describe("CoffeeDex product copy", () => {
     await page.goto("/onboarding");
 
     // Then
-    await expect(page.getByText("Private espresso concierge")).toBeVisible();
+    await expect(page.getByText("비공개 첫 기록")).toBeVisible();
     await expect(page.getByRole("heading", { name: "오늘의 취향으로 첫 기록을 시작해요" })).toBeVisible();
     await expect(page.getByText("밝은 산미")).toBeVisible();
     await expect(page.getByText("달콤한 균형")).toBeVisible();
     await expect(page.getByText("묵직한 바디")).toBeVisible();
-    await expect(page.getByText("첫 Taste Card 미리보기")).toBeVisible();
+    await expect(page.getByText("20초 기록 프리셋")).toBeVisible();
     await expectNoUnsupportedVisibleCopy(page);
     await captureEvidenceScreenshot(page, screenshotPaths.onboarding);
   });

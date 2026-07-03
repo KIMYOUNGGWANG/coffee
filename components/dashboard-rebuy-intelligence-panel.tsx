@@ -33,7 +33,7 @@ export function DashboardRebuyIntelligencePanel({
 }: DashboardRebuyIntelligencePanelProps) {
   if (isLoading) {
     return (
-      <section className="espresso-panel p-5" aria-label="Rebuy Intelligence">
+      <section className="espresso-panel p-5" aria-label="다시 살 단서">
         <div className="h-4 w-36 animate-pulse rounded-full bg-white/10" />
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
           {[0, 1, 2, 3, 4].map((index) => (
@@ -44,15 +44,22 @@ export function DashboardRebuyIntelligencePanel({
     );
   }
 
-  if (error || !data) {
+  if (
+    error
+    || !data?.rebuyReminder
+    || !data.tasteMatch
+    || !data.purchaseMemory
+    || !data.brewFailureMemory
+    || !data.featureScores?.[0]
+  ) {
     return (
-      <section className="espresso-panel p-5" aria-label="Rebuy Intelligence">
+      <section className="espresso-panel p-5" aria-label="다시 살 단서">
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-1 text-primary-amber" size={18} />
           <div>
             <h2 className="font-serif text-xl font-black">재구매 루프를 불러오지 못했어요</h2>
             <p className="mt-1 text-sm font-semibold leading-6 text-[#FFF8EC]/58">
-              카드와 원두 서랍은 그대로 사용할 수 있어요. 잠시 후 다시 열면 다음 행동을 계산합니다.
+              노트와 원두 서랍은 그대로 사용할 수 있어요. 잠시 후 다시 열면 다시 살 단서를 이어서 보여드릴게요.
             </p>
           </div>
         </div>
@@ -66,12 +73,12 @@ export function DashboardRebuyIntelligencePanel({
   const topScore = data.featureScores[0];
 
   return (
-    <section className="espresso-panel p-4 sm:p-5" aria-label="Rebuy Intelligence">
+    <section className="espresso-panel p-4 sm:p-5" aria-label="다시 살 단서">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <span className="coffee-kicker">
             <RefreshCcw size={12} />
-            Rebuy Intelligence
+            다시 살 단서
           </span>
           <h2 className="mt-3 break-keep font-serif text-2xl font-black leading-tight sm:text-3xl">
             다음에 다시 살 커피를 놓치지 않게
@@ -81,7 +88,7 @@ export function DashboardRebuyIntelligencePanel({
           </p>
         </div>
         <div className="coffee-metric-card">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">Top ROI</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">가장 강한 단서</p>
           <p className="mt-1 text-sm font-black text-[#FFF8EC]">{topScore.roi}점 · {topScore.reason}</p>
         </div>
       </div>
@@ -113,7 +120,7 @@ export function DashboardRebuyIntelligencePanel({
         >
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <ShoppingBag size={13} />
-            Rebuy Reminder
+            다시 살 후보
           </p>
           <p className="mt-3 break-keep text-base font-black leading-6">{data.rebuyReminder.title}</p>
           <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.rebuyReminder.subtitle}</p>
@@ -130,7 +137,7 @@ export function DashboardRebuyIntelligencePanel({
         >
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <Sparkles size={13} />
-            Taste Match
+            닮은 취향
           </p>
           <p className="mt-3 break-keep text-base font-black leading-6">{data.tasteMatch.matchTitle}</p>
           <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.tasteMatch.anchorTitle}</p>
@@ -145,13 +152,13 @@ export function DashboardRebuyIntelligencePanel({
         >
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <Search size={13} />
-            Bag To Rebuy
+            다시 찾을 원두
           </p>
           <p className="mt-3 break-keep text-base font-black leading-6">{data.purchaseMemory.title}</p>
           <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.purchaseMemory.subtitle}</p>
           <p className="mt-3 break-keep text-sm font-semibold leading-6 text-[#FFF8EC]/62">{data.purchaseMemory.reason}</p>
           <span className="mt-4 inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary-amber/30 px-3 text-xs font-black text-primary-amber">
-            재구매 검색 열기
+            원두 검색 열기
             <ExternalLink size={13} />
           </span>
         </button>
@@ -163,7 +170,7 @@ export function DashboardRebuyIntelligencePanel({
         >
           <p className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/80">
             <AlertTriangle size={13} />
-            Brew Failure
+            다음엔 다르게
           </p>
           <p className="mt-3 break-keep text-base font-black leading-6">{data.brewFailureMemory.title}</p>
           <p className="mt-1 truncate text-xs font-semibold text-[#FFF8EC]/45">{data.brewFailureMemory.subtitle}</p>

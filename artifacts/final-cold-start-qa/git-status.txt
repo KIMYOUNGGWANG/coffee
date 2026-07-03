@@ -1,0 +1,61 @@
+ M .agent/evidence/account-data-controls/failure-recoverable-mobile.png
+ M .agent/evidence/account-data-controls/happy-desktop.png
+ M .agent/evidence/account-data-controls/happy-mobile.png
+ M .agent/evidence/account-data-controls/happy-tablet.png
+ M DESIGN.md
+ M app/onboarding/page.tsx
+ M artifacts/guest-capture/mobile-auth-gate.png
+ M artifacts/guest-capture/mobile-editor.png
+ M artifacts/guest-capture/mobile-save-retry.png
+ M artifacts/passport-collage-state.png
+ M components/CardCreatorWizard.tsx
+ M components/card-creator-wizard-parts.tsx
+ M components/dashboard-client.tsx
+ M components/dashboard-dial-in-coach-panel.tsx
+ M components/dashboard-header.tsx
+ M components/dashboard-navigation.tsx
+ M components/dashboard-rebuy-intelligence-panel.tsx
+ M components/onboarding-taste-finder.tsx
+ M components/quick-add-memory-form.tsx
+ M mobile/app/(tabs)/_layout.tsx
+ M mobile/app/(tabs)/index.tsx
+ M mobile/app/(tabs)/passport.tsx
+ M mobile/app/(tabs)/scan.tsx
+ M mobile/app/(tabs)/settings.tsx
+ M mobile/app/_layout.tsx
+ M mobile/app/index.tsx
+ M mobile/app/note/[id].tsx
+ M mobile/app/note/create.tsx
+ M mobile/app/settings/notifications.tsx
+ M mobile/app/settings/privacy.tsx
+ M mobile/app/settings/profile.tsx
+ M mobile/components/TastingCard.tsx
+ M mobile/hooks/useTastingCards.ts
+ M mobile/tailwind.config.js
+ M next-env.d.ts
+?? .playwright-mcp/page-2026-06-30T01-55-48-180Z.yml
+?? .playwright-mcp/page-2026-06-30T01-57-28-605Z.yml
+?? .playwright-mcp/page-2026-06-30T01-59-39-883Z.yml
+?? .playwright-mcp/page-2026-06-30T02-34-35-578Z.yml
+?? .playwright-mcp/page-2026-06-30T02-35-01-962Z.yml
+?? .playwright-mcp/page-2026-06-30T02-45-16-664Z.yml
+?? .playwright-mcp/page-2026-06-30T14-39-45-361Z.yml
+?? artifacts/final-cold-start-qa/
+?? artifacts/memory-loop-qa/
+?? artifacts/pr8-local-qa/
+?? artifacts/pr8-preview-qa/
+?? artifacts/rebrand-mockups/
+?? artifacts/redesign-qa/
+?? artifacts/visual-qa/diff-create.json
+?? artifacts/visual-qa/diff-drawer.json
+?? artifacts/visual-qa/diff-me.json
+?? artifacts/visual-qa/diff-room.json
+?? artifacts/visual-qa/reference-create.png
+?? artifacts/visual-qa/reference-drawer.png
+?? artifacts/visual-qa/reference-me.png
+?? artifacts/visual-qa/reference-room.png
+?? mobile/assets/coffee-bag.png
+?? mobile/assets/coffee-room.png
+?? mobile/hooks/useCoffeeNotes.ts
+?? mobile/lib/coffee-notes.ts
+?? supabase/.temp/

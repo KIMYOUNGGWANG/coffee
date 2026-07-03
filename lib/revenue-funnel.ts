@@ -50,7 +50,7 @@ export const revenueOffers = [
     id: "premium",
     label: "CoffeeDex Premium",
     price: "$3.99/mo",
-    description: "월간 한도 없는 AI 원두 스캔과 취향 리캡",
+    description: "월간 한도 없는 원두 사진 판독과 취향 리캡",
   },
   {
     id: "credits",
