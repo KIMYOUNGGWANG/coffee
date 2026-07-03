@@ -1,0 +1,1 @@
+OAuth gate reached on Safari mobile-width session. URL host: accounts.google.com. Destination shown: ylblnuuewcarukavagcw.supabase.co. Account list intentionally not captured to avoid PII.

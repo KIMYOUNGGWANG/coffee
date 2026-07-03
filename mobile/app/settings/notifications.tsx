@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, Bell, Mail } from 'lucide-react-native';
 
 export default function NotificationsScreen() {
   const router = useRouter();
@@ -9,37 +9,48 @@ export default function NotificationsScreen() {
   const [weeklyDigest, setWeeklyDigest] = useState(false);
 
   return (
-    <View className="flex-1 bg-background pt-16">
-      <View className="px-4 pb-4 border-b border-white/5 flex-row items-center justify-between">
-        <Pressable onPress={() => router.back()} className="p-2 -ml-2">
-          <ArrowLeft color="#fff" size={24} />
+    <View className="flex-1 bg-background pt-14">
+      <View className="flex-row items-center justify-between px-5 pb-4">
+        <Pressable onPress={() => router.back()} className="h-11 w-11 items-center justify-center rounded-full border border-[#2A1A12]/10 bg-room-paper">
+          <ArrowLeft color="#2A1A12" size={20} />
         </Pressable>
-        <Text className="text-white font-bold text-lg">알림 설정</Text>
-        <View className="w-10" />
+        <View className="rounded-full border border-[#2A1A12]/10 bg-room-paper px-3 py-2">
+          <Text className="text-xs font-black text-room-cocoa">조용한 알림</Text>
+        </View>
       </View>
 
-      <View className="flex-1 px-4 pt-6">
-        <View className="bg-surface rounded-3xl border border-white/5 overflow-hidden shadow-lg p-6 mb-4 flex-row items-center justify-between">
-          <View>
-            <Text className="text-white font-bold text-lg mb-1">마케팅 및 추천 알림</Text>
-            <Text className="text-muted text-xs">내 취향에 맞는 새로운 원두 추천받기</Text>
+      <View className="flex-1 px-5 pt-2">
+        <Text className="mb-5 break-keep text-2xl font-extrabold leading-8 text-room-espresso">
+          알림
+        </Text>
+
+        <View className="mb-4 flex-row items-center justify-between rounded-[1.5rem] border border-[#2A1A12]/10 bg-room-paper p-5">
+          <View className="min-w-0 flex-1 flex-row items-start gap-3">
+            <Bell color="#BD7650" size={22} />
+            <View className="min-w-0 flex-1">
+              <Text className="mb-1 text-base font-black text-room-espresso">다시 살 원두</Text>
+              <Text className="break-keep text-xs font-bold leading-5 text-muted">서랍에 남겨둔 원두를 가끔 알려줍니다.</Text>
+            </View>
           </View>
           <Switch
-            trackColor={{ false: '#333', true: '#D4AF37' }}
-            thumbColor={'#fff'}
+            trackColor={{ false: '#E8D8C1', true: '#493024' }}
+            thumbColor={'#FFF8EC'}
             onValueChange={setPushEnabled}
             value={pushEnabled}
           />
         </View>
 
-        <View className="bg-surface rounded-3xl border border-white/5 overflow-hidden shadow-lg p-6 flex-row items-center justify-between">
-          <View>
-            <Text className="text-white font-bold text-lg mb-1">주간 테이스팅 요약</Text>
-            <Text className="text-muted text-xs">이번 주 내가 마신 커피 리포트 받기</Text>
+        <View className="flex-row items-center justify-between rounded-[1.5rem] border border-[#2A1A12]/10 bg-room-paper p-5">
+          <View className="min-w-0 flex-1 flex-row items-start gap-3">
+            <Mail color="#BD7650" size={22} />
+            <View className="min-w-0 flex-1">
+              <Text className="mb-1 text-base font-black text-room-espresso">주간 노트</Text>
+              <Text className="break-keep text-xs font-bold leading-5 text-muted">이번 주에 남긴 노트를 모아서 받습니다.</Text>
+            </View>
           </View>
           <Switch
-            trackColor={{ false: '#333', true: '#D4AF37' }}
-            thumbColor={'#fff'}
+            trackColor={{ false: '#E8D8C1', true: '#493024' }}
+            thumbColor={'#FFF8EC'}
             onValueChange={setWeeklyDigest}
             value={weeklyDigest}
           />

@@ -1,0 +1,16 @@
+[
+  {
+    "viewport": "mobile",
+    "url": "http://127.0.0.1:3000/auth?redirect=%2Fdashboard",
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/uiux-market-pass/dashboard-authenticated-mobile.png",
+    "hasProductLoopCopy": true,
+    "textSample": "COFFEEDEX CoffeeDex 계정으로 계속하기 Google 계정으로 로그인하면 방금 보던 커피 기록으로 이어집니다. Google로 계속하기 테스트 계정으로 바로 입장하기 (Mock)"
+  },
+  {
+    "viewport": "desktop",
+    "url": "http://127.0.0.1:3000/auth?redirect=%2Fdashboard",
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/uiux-market-pass/dashboard-authenticated-desktop.png",
+    "hasProductLoopCopy": true,
+    "textSample": "COFFEEDEX CoffeeDex 계정으로 계속하기 Google 계정으로 로그인하면 방금 보던 커피 기록으로 이어집니다. Google로 계속하기 테스트 계정으로 바로 입장하기 (Mock)"
+  }
+]
