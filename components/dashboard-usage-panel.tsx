@@ -41,7 +41,7 @@ export default function DashboardUsagePanel({ profile, onOpenPayment }: Dashboar
         <div className="grid gap-2 text-xs sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
             <Camera size={13} />
-            무료 AI 스캔 {scansUsed} / {scanLimit}
+            무료 사진 판독 {scansUsed} / {scanLimit}
           </span>
           <span className="font-bold text-foreground">{remainingScans(profile)}회 남음</span>
         </div>
@@ -63,11 +63,11 @@ export default function DashboardUsagePanel({ profile, onOpenPayment }: Dashboar
 
       <div className="space-y-2 text-xs">
         <div className="grid gap-1 border-b border-white/10 pb-2 text-muted-foreground sm:grid-cols-[minmax(0,1fr)_auto]">
-          <span>AI 라벨 스캔 보조</span>
+          <span>라벨 사진 판독 보조</span>
           <span className="font-bold text-foreground">크레딧/Premium</span>
         </div>
         <div className="grid gap-1 border-b border-white/10 pb-2 text-muted-foreground sm:grid-cols-[minmax(0,1fr)_auto]">
-          <span>기록 기반 AI 취향 리캡</span>
+          <span>기록 기반 취향 리캡</span>
           <span className="font-bold text-foreground">포함</span>
         </div>
         <div className="grid gap-1 pb-1 text-muted-foreground sm:grid-cols-[minmax(0,1fr)_auto]">

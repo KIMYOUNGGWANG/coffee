@@ -576,7 +576,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
               className="bg-[#D4AF37] hover:opacity-90 text-black rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 h-10 px-4 py-2 cursor-pointer border-none"
             >
               <ScanLine size={15} />
-              AI 스캔 등록
+              사진 판독 등록
             </button>
             <button
               onClick={() => setIsDialogOpen(true)}

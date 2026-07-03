@@ -118,7 +118,7 @@ export default function DashboardAnalyticsPanel({ analytics, isLoading }: Dashbo
                 <Coffee className="mb-3 h-8 w-8 text-white/20" aria-hidden="true" />
                 <p className="text-sm font-bold text-foreground">취향 분석을 위한 데이터가 부족합니다</p>
                 <p className="mt-1.5 break-keep text-[11px] leading-5 text-muted-foreground">
-                  방사형 차트와 AI 취향 요약을 보려면 최소 5개의 확정된 기록이 필요합니다.<br/>
+                  방사형 차트와 취향 요약을 보려면 최소 5개의 확정된 기록이 필요합니다.<br/>
                   (현재 {passport.sampleCount}개 / 5개)
                 </p>
               </div>

@@ -172,7 +172,6 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
     return "충전 필요";
   };
 
-  // Handle package image scanning/OCR via AI
   const handleFileScan = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileInput = event.currentTarget;
     const file = fileInput.files?.[0];
@@ -189,7 +188,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
       profile.credits <= 0;
 
     if (hasNoAvailableScan) {
-      setScanError("월간 무료 AI 스캔 한도와 보유 크레딧을 모두 사용했습니다. 크레딧을 충전하거나 프리미엄으로 업그레이드해주세요.");
+      setScanError("월간 무료 사진 판독 한도와 보유 크레딧을 모두 사용했습니다. 크레딧을 충전하거나 프리미엄으로 업그레이드해주세요.");
       setIsPaymentOpen(true);
       return;
     }
@@ -210,7 +209,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
           const data = scanResponse.data;
           const isFallbackScan = "source" in data && data.source === "fallback_mock";
           const confidencePercent = "confidence" in data && typeof data.confidence === "number" ? Math.round(data.confidence * 100) : null;
-          const scanLabel = isFallbackScan ? "내장 샘플 분석(실제 AI 판독 아님)" : "AI 판독";
+          const scanLabel = isFallbackScan ? "내장 샘플 판독" : "사진 판독";
 
           const scannedFormValues = {
             title: data.title || "",
@@ -234,7 +233,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
 
           setScanError(null);
           if (confidencePercent !== null && confidencePercent < 80) {
-            setScanWarningMessage(`AI 인식이 모호한 부분이 있습니다 (신뢰도 ${confidencePercent}%). 내용을 직접 확인하고 수정해주세요.`);
+            setScanWarningMessage(`사진에서 읽은 정보가 모호한 부분이 있습니다 (확인 필요 ${confidencePercent}%). 내용을 직접 확인하고 수정해주세요.`);
             setScanSuccessMessage(null);
           } else {
             setScanSuccessMessage(`${scanLabel} 초안입니다${confidencePercent ? ` (신뢰도 ${confidencePercent}%)` : ""}. 저장 전 자동 입력값을 확인하고 수정해주세요.`);
@@ -270,7 +269,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
       updateForm({ aiDescription: response.aiDescription });
       nextStep(); // Advance to final step showing preview
     } catch (error) {
-      setAiNoteError(getErrorMessage(error, "AI 컵노트 생성에 실패했습니다. 잠시 후 다시 시도해주세요."));
+      setAiNoteError(getErrorMessage(error, "향미 초안 생성에 실패했습니다. 잠시 후 다시 시도해주세요."));
     } finally {
       setIsGeneratingAiNote(false);
     }
@@ -455,11 +454,10 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                   </div>
                 )}
 
-                {/* AI Photo Scan Upload Panel */}
                 <div className="bg-white/5 border border-dashed border-primary-amber/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2">
                   <div className="flex items-center gap-2">
                     <Sparkles size={15} className="text-primary-amber animate-pulse" />
-                    <span className="text-xs font-bold text-foreground">AI 원두 패키지 사진 판독 (OCR)</span>
+                    <span className="text-xs font-bold text-foreground">원두 패키지 사진 판독 보조</span>
                   </div>
                   <p className="text-[10px] text-muted-foreground text-center leading-relaxed max-w-sm">
                     패키지 뒷면이나 라벨 사진을 올리면 로스터리, 원산지, 프로세싱, 테이스팅 노트를 카드 초안으로 채웁니다. 저장 전 모든 항목을 검토하고 수정할 수 있어요.
@@ -483,7 +481,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                   {isScanning && (
                     <div className="flex items-center gap-1.5 text-[10px] text-primary-amber font-semibold animate-pulse mt-1">
                       <Loader2 size={12} className="animate-spin" />
-                      <span>Gemini AI가 원두 라벨을 판독 중입니다...</span>
+                      <span>원두 라벨에서 기록 단서를 읽는 중입니다...</span>
                     </div>
                   )}
                   {scanError && (
@@ -782,18 +780,17 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
               </div>
             )}
 
-            {/* STEP 4: Review and Generate AI Note */}
             {wizardMode === "full" && step === 4 && (
               <div className="space-y-4 animate-in slide-in-from-right-5 duration-200">
-                <h3 className="font-serif font-bold text-foreground text-base">4단계: AI 컵노트 확인 & 발행</h3>
+                <h3 className="font-serif font-bold text-foreground text-base">4단계: 향미 초안 확인 & 발행</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  내가 기록한 커피 데이터와 일기를 바탕으로 AI가 SCA 전문 향미 휠 용어와 매칭하여 감성적인 컵 노트를 요약했습니다. 최종 결과를 확인하고 발행해주세요.
+                  내가 기록한 커피 데이터와 일기를 바탕으로 SCA 향미 휠 용어에 가까운 컵 노트 초안을 만들었습니다. 최종 결과를 확인하고 발행해주세요.
                 </p>
 
                 <div className="p-4 bg-white/5/40 border border-white/10 rounded-2xl">
-                  <span className="text-[10px] uppercase font-bold text-primary-amber tracking-wider">AI Cup Note Summary</span>
+                  <span className="text-[10px] uppercase font-bold text-primary-amber tracking-wider">Flavor note draft</span>
                   <p className="font-serif text-sm italic text-foreground mt-1 leading-relaxed">
-                    “{form.aiDescription || "향미 분석이 이루어지지 않았습니다. AI 재생성을 눌러주세요."}”
+                    “{form.aiDescription || "향미 초안이 아직 없습니다. 다시 생성을 눌러주세요."}”
                   </p>
                 </div>
 
@@ -811,7 +808,7 @@ export default function CardCreatorWizard({ isOpen, onClose, initialTasteProfile
                   ) : (
                     <>
                       <Sparkles size={14} />
-                      <span>{aiNoteError ? "AI 컵노트 다시 시도" : "AI 컵노트 재생성하기"}</span>
+                      <span>{aiNoteError ? "향미 초안 다시 시도" : "향미 초안 다시 생성"}</span>
                     </>
                   )}
                 </button>

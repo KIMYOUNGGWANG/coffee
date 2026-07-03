@@ -29,7 +29,7 @@ function generateLocalRecommendation(
   feedback?: "too_sour" | "too_bitter" | "too_watery" | "perfect"
 ): string {
   if (shelfItems.length === 0) {
-    return "현재 원두 선반이 비어 있습니다. 향미 원두 보관함에 맛있는 원두를 등록하고, 오늘 상황에 맞는 커스텀 AI 브루잉 가이드를 받아보세요! 먼저 마켓이나 로스터리에서 구한 원두를 선반에 올려두는 것부터 시작해보세요.";
+    return "현재 원두 선반이 비어 있습니다. 향미 원두 보관함에 맛있는 원두를 등록하면 오늘 상황에 맞는 브루잉 가이드를 받을 수 있습니다. 먼저 마켓이나 로스터리에서 구한 원두를 선반에 올려두는 것부터 시작해보세요.";
   }
 
   // Pick the first item to generate recommendation
@@ -38,16 +38,16 @@ function generateLocalRecommendation(
   
   if (feedback) {
     if (feedback === "too_sour") {
-      return `### 🍋 신맛 보정 튜닝 가이드
+      return `### 신맛 보정 튜닝 가이드
 **${beanTitle}** 원두 추출 결과, 신맛이 너무 강하게 느껴지셨군요. 다음 추출을 위한 보정 레시피 가이드라인입니다:
 
 *   **추출수 온도 조절:** 추출수 온도를 기존보다 **2°C 올려서** 추출해 보세요. 온도가 높아지면 단맛과 바디감 성분이 더 많이 추출되어 날카로운 신맛이 부드러워집니다.
 *   **분쇄도 조정:** 원두 분쇄도를 지금보다 **더 곱게(Finer)** 조절해 보세요. 물과의 접촉 면적이 넓어져 추출 효율이 향상됩니다.
 *   **추출 속도(푸어 페이스):** 물줄기를 평소보다 **천천히 흘려보내(Slower Pour)** 추출 시간을 늘려 깊은 맛 성분을 충분히 끌어내 보세요.
 
-> **바리스타의 한마디:** 온도를 높이고 푸어링 속도를 늦추어 밸런스 잡힌 브루잉을 경험해 보세요!`;
+	> **바리스타의 한마디:** 온도를 높이고 푸어링 속도를 늦추어 밸런스 잡힌 브루잉을 경험해 보세요.`;
     } else if (feedback === "too_bitter") {
-      return `### ☕ 쓴맛 보정 튜닝 가이드
+      return `### 쓴맛 보정 튜닝 가이드
 **${beanTitle}** 원두 추출 결과, 쓴맛이 너무 강하게 느껴지셨군요. 다음 추출을 위한 보정 레시피 가이드라인입니다:
 
 *   **추출수 온도 조절:** 추출수 온도를 기존보다 **2°C 낮추어** 추출해 보세요. 높은 온도로 인해 원두 표면에서 쓴맛 성분이 과하게 추출되는 것을 방지합니다.
@@ -56,7 +56,7 @@ function generateLocalRecommendation(
 
 > **바리스타의 한마디:** 온도를 낮추고 물을 시원하게 부어 쓴맛을 산뜻하게 걷어내 보세요.`;
     } else if (feedback === "too_watery") {
-      return `### 💧 싱겁고 연한 맛 보정 튜닝 가이드
+      return `### 싱겁고 연한 맛 보정 튜닝 가이드
 **${beanTitle}** 원두 추출 결과, 맛이 싱겁고 연하게 느껴지셨군요. 다음 추출을 위한 보정 레시피 가이드라인입니다:
 
 *   **추출 비율(Ratio) 조절:** 커피 가루 대비 추출수 용량 비율을 **더 좁혀서(Narrower Ratio)** 추출해 보세요. 원두의 고형분 농도를 높여 한층 진한 풍미를 선사합니다.
@@ -65,13 +65,13 @@ function generateLocalRecommendation(
 
 > **바리스타의 한마디:** 뜸 시간을 늘려 가스를 배출하고 분쇄도를 미세하게 조절해 진하게 내려보세요.`;
     } else if (feedback === "perfect") {
-      return `### 💛 완벽한 골든 레시피 도달 축하
-축하합니다! **${beanTitle}** 원두의 완벽한 맛 밸런스를 찾으셨군요.
+      return `### 골든 레시피 도달
+	**${beanTitle}** 원두의 좋은 맛 밸런스를 찾으셨군요.
 
 *   **레시피 매개변수 유효성 검증 완료:** 현재의 브루잉 매개변수(분쇄도, 추출수 온도, 추출 비율, 푸어링 페이스)는 향미 표현에 최적화된 상태로 확인되었습니다.
 *   **레시피 동결(Freeze):** 현재의 매개변수를 골든 레시피 표준 설정으로 성공적으로 고정했습니다. 앞으로 이 원두를 추출할 때 일관되게 최상의 컵을 구현하실 수 있습니다.
 
-> **바리스타의 한마디:** 홈 바리스타로서 나만의 완벽한 한 잔을 완성해낸 기쁨을 만끽하세요! 이 세팅은 맛의 변수가 가장 적은 상태로 고정됩니다.`;
+	> **바리스타의 한마디:** 이 세팅은 맛의 변수가 가장 적은 상태로 고정됩니다.`;
     }
   }
 
@@ -91,7 +91,7 @@ function generateLocalRecommendation(
   // If there are multiple items, suggest a blend option
   if (shelfItems.length >= 2) {
     const secondaryItem = shelfItems[1];
-    recommendationText += `\n\n💡 **스페셜 블렌딩 팁:** 보유 중이신 **${primaryItem.bean_name}**과 **${secondaryItem.bean_name}** 원두를 6:4 비율로 섞어 브루잉해 보세요. 새로운 복합적 아로마와 긴 여운을 만나보실 수 있습니다.`;
+    recommendationText += `\n\n**스페셜 블렌딩 팁:** 보유 중이신 **${primaryItem.bean_name}**과 **${secondaryItem.bean_name}** 원두를 6:4 비율로 섞어 브루잉해 보세요. 새로운 복합적 아로마와 긴 여운을 만나보실 수 있습니다.`;
   }
 
   return recommendationText;

@@ -127,7 +127,7 @@ export default function CoffeeDNACard({ dna, onShareClick, className }: CoffeeDN
             ) : (
               <div className="flex flex-col items-center justify-center text-center p-4 min-h-[140px] bg-white/[0.02] rounded-xl border border-white/5">
                 <p className="text-xs text-white/50 leading-relaxed">
-                  ☕ 테이스팅 카드를 만드시면<br />더 자세한 맛 프로필 분석이 제공됩니다.
+                  테이스팅 카드를 만드시면<br />더 자세한 맛 프로필 분석이 제공됩니다.
                 </p>
               </div>
             )}

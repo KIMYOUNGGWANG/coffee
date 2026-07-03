@@ -112,22 +112,22 @@ export async function GET(request: NextRequest) {
         .filter(Boolean)
     );
 
-    let typeLabel = "커피 탐험 시작 ☕";
+    let typeLabel = "커피 탐험 시작";
     if (totalBeans > 0) {
       if (acidCount > balanceCount && acidCount > bodyCount) {
-        typeLabel = "과일향 탐험가 🍊";
+        typeLabel = "과일향 탐험가";
       } else if (balanceCount > acidCount && balanceCount > bodyCount) {
-        typeLabel = "클래식 밸런스 ⚖️";
+        typeLabel = "클래식 밸런스";
       } else if (bodyCount > acidCount && bodyCount > balanceCount) {
-        typeLabel = "다크 로스트 마니아 🌑";
+        typeLabel = "다크 로스트 마니아";
       } else if (distinctOrigins.size >= 3) {
-        typeLabel = "세계 미각 여행자 🌍";
+        typeLabel = "세계 미각 여행자";
       } else {
         // Fallbacks based on individual counts
-        if (acidCount > 0) typeLabel = "과일향 탐험가 🍊";
-        else if (balanceCount > 0) typeLabel = "클래식 밸런스 ⚖️";
-        else if (bodyCount > 0) typeLabel = "다크 로스트 마니아 🌑";
-        else typeLabel = "세계 미각 여행자 🌍";
+        if (acidCount > 0) typeLabel = "과일향 탐험가";
+        else if (balanceCount > 0) typeLabel = "클래식 밸런스";
+        else if (bodyCount > 0) typeLabel = "다크 로스트 마니아";
+        else typeLabel = "세계 미각 여행자";
       }
     }
 

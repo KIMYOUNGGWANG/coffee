@@ -156,7 +156,7 @@ test.describe("AI Barista Quick Tuning Feedback Loop E2E", () => {
           if (method === "POST") {
             aiBaristaPayload = route.request().postDataJSON();
             await fulfillJson(route, {
-              recommendation: "### 🍋 신맛 보정 튜닝 가이드\n**[프릳츠 커피] 에티오피아 시다마** 원두 추출 결과, 신맛이 너무 강하게 느껴지셨군요.\n\n*   **추출수 온도 조절:** 온도를 **2°C 올려서** 추출해 보세요.\n*   **분쇄도 조정:** 지금보다 **더 곱게(Finer)** 조절해 보세요."
+              recommendation: "### 신맛 보정 튜닝 가이드\n**[프릳츠 커피] 에티오피아 시다마** 원두 추출 결과, 신맛이 너무 강하게 느껴지셨군요.\n\n*   **추출수 온도 조절:** 온도를 **2°C 올려서** 추출해 보세요.\n*   **분쇄도 조정:** 지금보다 **더 곱게(Finer)** 조절해 보세요."
             });
           } else {
             await fulfillJson(route, { data: {} });
@@ -195,7 +195,7 @@ test.describe("AI Barista Quick Tuning Feedback Loop E2E", () => {
     await page.getByRole("button", { name: "에티오피아 시다마 상세 보기" }).click();
 
     // 3. Verify modal is visible
-    await expect(page.getByText("AI Barista Tuning")).toBeVisible();
+    await expect(page.getByText("Brew Tuning")).toBeVisible();
     await expect(page.getByText("이 원두의 추출 맛은 어떤가요?")).toBeVisible();
 
     // 4. Click 'too_sour' feedback button
@@ -226,7 +226,7 @@ test.describe("AI Barista Quick Tuning Feedback Loop E2E", () => {
         brewTime: "165",
       },
       rating: 3,
-      simpleNote: "AI Barista Tuning: too_sour recommendation applied.",
+      simpleNote: "브루잉 조정값 적용: too_sour.",
     });
 
     // 9. Verify success checkmark is shown

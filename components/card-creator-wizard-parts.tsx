@@ -69,7 +69,7 @@ export function WizardFooter({
         </button>
         <div className="h-4 w-[1px] bg-white/10" />
         <div className="flex flex-col text-left">
-          <span className="text-[9px] text-muted-foreground/60 leading-none">AI 스캔 한도</span>
+          <span className="text-[9px] text-muted-foreground/60 leading-none">사진 판독 한도</span>
           <span className="text-xs font-extrabold text-primary-amber leading-tight">
             {compactScanAllowanceLabel}
           </span>
@@ -101,7 +101,7 @@ export function WizardFooter({
           ) : (
             <>
               <Sparkles size={14} />
-              {aiNoteError ? "AI 한줄평 다시 시도" : "AI 한줄평 분석 생성"}
+              {aiNoteError ? "향미 한줄평 다시 시도" : "향미 한줄평 초안 생성"}
             </>
           )}
         </button>

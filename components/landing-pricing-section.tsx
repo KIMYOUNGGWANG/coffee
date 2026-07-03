@@ -98,7 +98,7 @@ export default function LandingPricingSection() {
                   <span className="pb-1 text-xs font-black text-muted-foreground/60">{premiumProduct.cadence}</span>
                 </div>
                 <div className="mt-6 space-y-2 border-y border-white/10 py-4 text-xs font-bold text-muted-foreground/80">
-                  <p>AI 원두 스캔 한도 해제</p>
+                  <p>원두 라벨 사진 판독 한도 해제</p>
                   <p>기록 기반 취향 리포트</p>
                   <p>구독 취소 후 현재 결제 기간까지 이용</p>
                 </div>

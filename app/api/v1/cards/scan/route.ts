@@ -96,12 +96,12 @@ async function checkScanEntitlement(
 ): Promise<ScanEntitlementCheck> {
   const { data, error } = await supabase.rpc("increment_user_scan", { target_user_id: userId });
   if (error) {
-    return { kind: "blocked", response: jsonError(500, "AI 스캔 사용량 확인 중 오류가 발생했습니다.") };
+    return { kind: "blocked", response: jsonError(500, "사진 판독 사용량 확인 중 오류가 발생했습니다.") };
   }
 
   const parsed = scanEntitlementSchema.safeParse(data);
   if (!parsed.success) {
-    return { kind: "blocked", response: jsonError(500, "AI 스캔 사용량 응답 형식이 올바르지 않습니다.") };
+    return { kind: "blocked", response: jsonError(500, "사진 판독 사용량 응답 형식이 올바르지 않습니다.") };
   }
 
   if (!parsed.data.allowed) {
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch (error) {
     if (error instanceof Error) {
       console.error("CoffeeDex scan request failed:", error.message);
-      return jsonError(500, "AI 스캔 처리 중 오류가 발생했습니다.");
+      return jsonError(500, "사진 판독 처리 중 오류가 발생했습니다.");
     }
     throw error;
   }

@@ -117,7 +117,7 @@ test.describe("checkout return UX", () => {
     // Then
     const notice = page.getByTestId("checkout-return-notice");
     await expect(notice).toContainText("CoffeeDex 테이스팅 10팩 충전이 완료되었습니다");
-    await expect(notice).toContainText("추가 AI 스캔 크레딧");
+    await expect(notice).toContainText("추가 사진 판독 크레딧");
     await expect(page).toHaveURL(/\/dashboard$/);
   });
 

@@ -160,7 +160,7 @@ test.describe("CoffeeDex growth dashboard", () => {
     await expect(page.getByLabel("로스터리")).toBeVisible();
     await expect(page.getByText("다시 살까요?")).toBeVisible();
     await expect(page.getByLabel("한 줄 메모")).toBeVisible();
-    await expect(page.getByText("사진 원본은 저장하지 않아요. 저장할 때만 로그인하고, 비공개 기록으로 저장돼요.")).toBeVisible();
+    await expect(page.getByText("사진 원본은 저장하지 않아요. 내 서랍에는 확인한 기록과 다시 살 단서만 비공개로 남아요.")).toBeVisible();
     await expect(page.getByText(/한국어 향미|향미 단어/)).toHaveCount(0);
   });
 
@@ -223,7 +223,7 @@ test.describe("CoffeeDex growth dashboard", () => {
     // Then
     await expect(page.getByRole("heading", { name: "기록과 온보딩 건강도" })).toBeVisible();
     await expect(page.getByText("게스트 저장 흐름 점검")).toBeVisible();
-    await expect(page.getByText("무료 AI 스캔 3 / 5")).toBeVisible();
+    await expect(page.getByText("무료 사진 판독 3 / 5")).toBeVisible();
     await expect(page.getByText("보유 크레딧 2개")).toBeVisible();
     await expect(page.getByText("PDF 기록북 미보유")).toBeVisible();
   });

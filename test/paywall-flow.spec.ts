@@ -81,7 +81,7 @@ test.describe("Monetization Paywall Flow", () => {
       buffer: Buffer.from('mock-image-data-base64-string')
     });
 
-    await expect(page.getByText("월간 무료 AI 스캔 한도와 보유 크레딧을 모두 사용했습니다")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("월간 무료 사진 판독 한도와 보유 크레딧을 모두 사용했습니다")).toBeVisible({ timeout: 10000 });
     const paymentDialog = page.getByRole("dialog", { name: "추가 기능 및 결제" });
     await expect(paymentDialog).toBeVisible();
     await expect(paymentDialog.getByText("CoffeeDex Premium 구독 (월간)")).toBeVisible();

@@ -72,7 +72,7 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
               무료 스캔 횟수 초과
             </h2>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              이번 달 무료 AI 스캔 3회를 모두 사용하셨습니다.<br/>
+              이번 달 무료 사진 판독 3회를 모두 사용하셨습니다.<br/>
               Premium으로 업그레이드하고 무제한으로 즐겨보세요!
             </p>
           </div>
