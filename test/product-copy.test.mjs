@@ -105,6 +105,8 @@ test("CoffeeDex pages lead with recall and repurchase within the scoped product 
   assert.match(tastingCard, /다시 살 이유/);
   assert.match(cardDetailModal, /마지막 좋았던 추출/);
   assert.match(feedPage, /커뮤니티 기능은 아직 현재 제품 기능이 아닙니다/);
+  assert.match(feedPage, /공개 공유 카드를 잠시 불러오지 못했어요/);
+  assert.doesNotMatch(feedPage, /Failed to load feed|Please try again later|Save Recipe/);
   assert.doesNotMatch(feedPage, unsupportedCommunityClaimPattern);
   assert.match(dashboardAnalyticsPanel, /기록|스냅샷/);
   assert.match(dashboardUsagePanel, /기록|스냅샷/);

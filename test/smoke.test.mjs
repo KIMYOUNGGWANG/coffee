@@ -162,6 +162,8 @@ test("CoffeeDex pages and routes present the coffee memory product", () => {
   assert.match(quickAddMemoryForm, /빠른 기록/);
   assert.match(quickAddMemoryForm, /기억이 사라지기 전에 원두, 로스터리, 다시 살 단서/);
   assert.match(feedPage, /커뮤니티 기능은 아직 현재 제품 기능이 아닙니다/);
+  assert.match(feedPage, /공개 공유 카드를 잠시 불러오지 못했어요/);
+  assert.doesNotMatch(feedPage, /Failed to load feed|Please try again later|Save Recipe/);
   assert.doesNotMatch(feedPage, unsupportedCommunityClaimPattern);
   assert.match(onboardingPage, /CoffeeDex/);
   assert.match(onboardingPage, /한국 스페셜티 커피/);
