@@ -14,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import { AdminLaunchHealthPanel } from "@/components/admin-launch-health-panel";
+import { FigmaDashboardShell } from "@/components/figma-dashboard-shell";
 import type { LaunchHealth } from "@/lib/admin-launch-health";
 
 type AdminKpi = {
@@ -140,14 +141,14 @@ async function readApiError(response: Response): Promise<string> {
 
 function MetricPanel({ icon, kpi }: { readonly icon: ReactNode; readonly kpi: AdminKpi }) {
   return (
-    <div className="rounded-[26px] border border-white/10 bg-white/[0.045] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.26)]">
+    <div className="dashboard-panel p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#D4AF37]/80">{kpi.label}</p>
-          <p className="mt-3 text-3xl font-semibold tracking-tight text-white">{kpi.value.toLocaleString("ko-KR")}</p>
-          <p className="mt-2 text-sm leading-relaxed text-[#A3A3A3]">{kpi.helper}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-amber">{kpi.label}</p>
+          <p className="mt-3 text-3xl font-semibold tracking-tight text-foreground">{kpi.value.toLocaleString("ko-KR")}</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{kpi.helper}</p>
         </div>
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-black/35 text-[#D4AF37]">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] text-primary-amber">
           {icon}
         </div>
       </div>
@@ -158,24 +159,24 @@ function MetricPanel({ icon, kpi }: { readonly icon: ReactNode; readonly kpi: Ad
 function AccessMessage({ state, onRetry }: { readonly state: Extract<AdminState, { kind: "error" }>; readonly onRetry: () => void }) {
   const isAuthError = state.status === 401 || state.status === 403;
   return (
-    <main className="min-h-[100dvh] bg-black px-5 py-10 text-white">
-      <section className="mx-auto flex max-w-xl flex-col items-center justify-center rounded-[32px] border border-white/10 bg-white/[0.045] p-8 text-center shadow-[0_30px_100px_rgba(0,0,0,0.4)]">
+    <main className="min-h-[100dvh] bg-[var(--background)] px-5 py-10 text-foreground">
+      <section className="dashboard-panel mx-auto flex max-w-xl flex-col items-center justify-center p-8 text-center">
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D4AF37]/15 text-[#D4AF37]">
           <Lock className="h-7 w-7" aria-hidden="true" />
         </div>
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">관리자 접근이 필요합니다</h1>
-        <p className="mt-3 text-sm leading-7 text-[#A3A3A3]">{state.message}</p>
+        <p className="mt-3 text-sm leading-7 text-muted-foreground">{state.message}</p>
         <div className="mt-7 flex w-full flex-col gap-3 sm:flex-row">
           {isAuthError && (
             <a
-              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-[#D4AF37] px-5 text-sm font-semibold text-[#120B07] shadow-[0_12px_36px_rgba(212,175,55,0.18)] transition hover:bg-white"
+              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-primary-amber px-5 text-sm font-semibold text-[#120B07] shadow-[0_12px_36px_rgba(212,175,55,0.18)] transition hover:opacity-90"
               href="/auth?redirect=/admin"
             >
               Google로 로그인
             </a>
           )}
           <button
-            className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-white/15 px-5 text-sm font-semibold text-white transition hover:border-[#D4AF37]/70"
+            className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full border border-[var(--border)] px-5 text-sm font-semibold text-foreground transition hover:border-primary-amber/70"
             onClick={onRetry}
             type="button"
           >
@@ -233,8 +234,8 @@ export default function AdminDashboardClient() {
 
   if (state.kind === "loading") {
     return (
-      <main className="flex min-h-[100dvh] items-center justify-center bg-black px-5 text-white">
-        <div className="h-10 w-10 animate-spin rounded-full border border-white/15 border-t-[#D4AF37]" aria-label="관리자 데이터 로딩" />
+      <main className="flex min-h-[100dvh] items-center justify-center bg-[var(--background)] px-5 text-foreground">
+        <div className="h-10 w-10 animate-spin rounded-full border border-[var(--border)] border-t-primary-amber" aria-label="관리자 데이터 로딩" />
       </main>
     );
   }
@@ -247,25 +248,15 @@ export default function AdminDashboardClient() {
   const maxFunnelUsers = Math.max(1, ...overview.funnel.map((step) => step.users));
 
   return (
-    <main className="min-h-[100dvh] bg-black text-white">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <header className="flex flex-col gap-5 border-b border-white/10 pb-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/35 bg-[#D4AF37]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#D4AF37]">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-              CoffeeDex Operating Room
-            </p>
-            <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">관리자 대시보드</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#A3A3A3]">
-              출시 후 매일 확인할 KPI, activation funnel, 커피 메모리 상태, 재구매와 다이얼인 사용 흐름을 한 화면에 모았습니다.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <a className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 px-5 text-sm font-semibold text-white hover:border-[#D4AF37]/70" href="/dashboard">
+    <FigmaDashboardShell
+      activeHref="/dashboard"
+      actions={(
+        <div className="flex flex-col gap-3 sm:flex-row">
+            <a className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] px-5 text-sm font-semibold text-foreground hover:border-primary-amber/70" href="/dashboard">
               사용자 대시보드
             </a>
             <button
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black hover:bg-[#D4AF37]"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--surface-strong)] px-5 text-sm font-semibold text-[var(--accent-foreground)] hover:bg-[#372319]"
               onClick={() => void loadOverview()}
               type="button"
             >
@@ -273,7 +264,12 @@ export default function AdminDashboardClient() {
               새로고침
             </button>
           </div>
-        </header>
+      )}
+      description="출시 후 매일 확인할 KPI, activation funnel, 커피 메모리 상태, 재구매와 다이얼인 사용 흐름을 한 화면에 모았습니다."
+      eyebrow="CoffeeDex Operating Room"
+      title="관리자 대시보드"
+    >
+      <div className="mx-auto max-w-7xl">
 
         <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {overview.kpis.map((kpi, index) => {
@@ -285,13 +281,13 @@ export default function AdminDashboardClient() {
         <AdminLaunchHealthPanel health={overview.launchHealth} />
 
         <section className="mt-6 grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[30px] border border-white/10 bg-white/[0.045] p-5">
+          <div className="dashboard-panel p-5">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold">Activation Funnel</h2>
-                <p className="mt-1 text-sm text-[#A3A3A3]">첫 방문부터 재구매 루프까지의 이탈 구간을 봅니다.</p>
+                <p className="mt-1 text-sm text-muted-foreground">첫 방문부터 재구매 루프까지의 이탈 구간을 봅니다.</p>
               </div>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-[#A3A3A3]">{formatDate(overview.generatedAt)}</span>
+              <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1 text-xs text-muted-foreground">{formatDate(overview.generatedAt)}</span>
             </div>
             <div className="mt-5 space-y-4">
               {overview.funnel.map((step) => {
@@ -300,12 +296,12 @@ export default function AdminDashboardClient() {
                   <div key={step.label}>
                     <div className="flex items-center justify-between gap-3 text-sm">
                       <span className="font-semibold">{step.label}</span>
-                      <span className="text-[#D4AF37]">{step.users.toLocaleString("ko-KR")}명</span>
+                      <span className="text-primary-amber">{step.users.toLocaleString("ko-KR")}명</span>
                     </div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
-                      <div className="h-full rounded-full bg-[#D4AF37]" style={{ width }} />
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--surface-muted)]">
+                      <div className="h-full rounded-full bg-primary-amber" style={{ width }} />
                     </div>
-                    <p className="mt-1 text-xs text-[#A3A3A3]">{step.helper}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{step.helper}</p>
                   </div>
                 );
               })}
@@ -313,7 +309,7 @@ export default function AdminDashboardClient() {
           </div>
 
           <div className="grid gap-5">
-            <section className="rounded-[30px] border border-white/10 bg-[#120B07] p-5">
+            <section className="espresso-panel p-5">
               <h2 className="text-xl font-semibold">Coffee Memory 상태</h2>
               <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                 {[
@@ -324,25 +320,25 @@ export default function AdminDashboardClient() {
                   ["구매 단서", overview.memory.purchaseMemories],
                   ["스캔 초안", overview.memory.scanDrafts],
                 ].map(([label, value]) => (
-                  <div className="rounded-2xl bg-white/[0.055] p-4" key={label}>
-                    <p className="text-xs text-[#A3A3A3]">{label}</p>
+                  <div className="rounded-2xl bg-white/[0.08] p-4" key={label}>
+                    <p className="text-xs text-[#d9cabb]">{label}</p>
                     <p className="mt-2 text-2xl font-semibold">{Number(value).toLocaleString("ko-KR")}</p>
                   </div>
                 ))}
               </div>
             </section>
 
-            <section className="rounded-[30px] border border-[#D4AF37]/20 bg-[#D4AF37]/10 p-5">
+            <section className="dashboard-panel border-primary-amber/20 bg-primary-amber/10 p-5">
               <h2 className="text-xl font-semibold">Rebuy / Dial-in</h2>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                <p>후보 <b className="block text-2xl text-[#D4AF37]">{overview.rebuyDialIn.rebuyCandidates}</b></p>
-                <p>피드백 <b className="block text-2xl text-[#D4AF37]">{overview.rebuyDialIn.coachFeedbackLogs}</b></p>
+                <p>후보 <b className="block text-2xl text-primary-amber">{overview.rebuyDialIn.rebuyCandidates}</b></p>
+                <p>피드백 <b className="block text-2xl text-primary-amber">{overview.rebuyDialIn.coachFeedbackLogs}</b></p>
                 <p>다시 살래요 <b className="block text-xl">{overview.rebuyDialIn.willRebuy}</b></p>
                 <p>재구매 완료 <b className="block text-xl">{overview.rebuyDialIn.rebought}</b></p>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {overview.rebuyDialIn.feedbackBreakdown.map((item) => (
-                  <span className="rounded-full border border-white/10 bg-black/25 px-3 py-1 text-xs text-[#A3A3A3]" key={item.feedback}>
+                  <span className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-xs text-muted-foreground" key={item.feedback}>
                     {feedbackLabel(item.feedback)} {item.count}
                   </span>
                 ))}
@@ -351,17 +347,17 @@ export default function AdminDashboardClient() {
           </div>
         </section>
 
-        <section className="mt-6 overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.045]">
-          <div className="flex flex-col gap-3 border-b border-white/10 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <section className="dashboard-panel mt-6 overflow-hidden">
+          <div className="flex flex-col gap-3 border-b border-[var(--border)] p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-semibold">유저 / 계정 목록</h2>
-              <p className="mt-1 text-sm text-[#A3A3A3]">최근 생성 100명 기준, 개인 데이터 내용이 아니라 사용 상태만 봅니다.</p>
+              <p className="mt-1 text-sm text-muted-foreground">최근 생성 100명 기준, 개인 데이터 내용이 아니라 사용 상태만 봅니다.</p>
             </div>
-            <span className="text-sm text-[#A3A3A3]">관리자 {overview.operations.adminUsers}명</span>
+            <span className="text-sm text-muted-foreground">관리자 {overview.operations.adminUsers}명</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-sm">
-              <thead className="bg-white/[0.035] text-xs uppercase tracking-[0.14em] text-[#A3A3A3]">
+              <thead className="bg-[var(--surface-muted)]/45 text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 <tr>
                   <th className="px-5 py-3">계정</th>
                   <th className="px-5 py-3">메모리</th>
@@ -371,18 +367,18 @@ export default function AdminDashboardClient() {
                   <th className="px-5 py-3">최근 활동</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/10">
+              <tbody className="divide-y divide-[var(--border)]">
                 {overview.users.map((user) => (
                   <tr key={user.id}>
                     <td className="px-5 py-4">
                       <p className="font-semibold">{user.email ?? shortId(user.id)}</p>
-                      <p className="text-xs text-[#A3A3A3]">{user.isAdmin ? "admin" : user.isPremium ? "premium" : "standard"}</p>
+                      <p className="text-xs text-muted-foreground">{user.isAdmin ? "admin" : user.isPremium ? "premium" : "standard"}</p>
                     </td>
                     <td className="px-5 py-4">{user.cards} cards / {user.shelfItems} shelf</td>
                     <td className="px-5 py-4">{user.brewLogs}</td>
                     <td className="px-5 py-4">{user.purchaseMemories}</td>
                     <td className="px-5 py-4">{user.scansUsed}/{user.monthlyScanLimit}</td>
-                    <td className="px-5 py-4 text-[#A3A3A3]">{formatDate(user.latestActivityAt)}</td>
+                    <td className="px-5 py-4 text-muted-foreground">{formatDate(user.latestActivityAt)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -391,31 +387,31 @@ export default function AdminDashboardClient() {
         </section>
 
         <section className="mt-6 grid gap-5 xl:grid-cols-2">
-          <div className="rounded-[30px] border border-white/10 bg-white/[0.045] p-5">
+          <div className="dashboard-panel p-5">
             <h2 className="text-xl font-semibold">OAuth / API 저장 실패 로그</h2>
             <div className="mt-4 space-y-3">
               {overview.operations.recentFailures.length === 0 ? (
-                <p className="rounded-2xl bg-white/[0.04] p-4 text-sm text-[#A3A3A3]">최근 실패성 product event가 없습니다. OAuth provider 로그는 Supabase/Google 콘솔도 함께 봐야 합니다.</p>
+                <p className="dashboard-muted-panel p-4 text-sm text-muted-foreground">최근 실패성 product event가 없습니다. OAuth provider 로그는 Supabase/Google 콘솔도 함께 봐야 합니다.</p>
               ) : overview.operations.recentFailures.map((event) => (
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4" key={event.id}>
+                <div className="dashboard-muted-panel p-4" key={event.id}>
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-semibold">{event.eventName}</p>
-                    <span className="text-xs text-[#A3A3A3]">{formatDate(event.occurredAt)}</span>
+                    <span className="text-xs text-muted-foreground">{formatDate(event.occurredAt)}</span>
                   </div>
-                  <p className="mt-2 text-xs text-[#A3A3A3]">{event.path} · {event.userId ? shortId(event.userId) : "anonymous"}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">{event.path} · {event.userId ? shortId(event.userId) : "anonymous"}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-[30px] border border-white/10 bg-white/[0.045] p-5">
+          <div className="dashboard-panel p-5">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold">QA/test 데이터 정리</h2>
-                <p className="mt-1 text-sm leading-6 text-[#A3A3A3]">`qa`, `test`, `테스트` 마커가 있는 카드와 선반 후보만 정리합니다.</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">`qa`, `test`, `테스트` 마커가 있는 카드와 선반 후보만 정리합니다.</p>
               </div>
               <button
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#D4AF37] px-4 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-45"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary-amber px-4 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-45"
                 disabled={cleanupBusy || overview.qaCandidates.length === 0}
                 onClick={() => void cleanupQaData()}
                 type="button"
@@ -426,20 +422,20 @@ export default function AdminDashboardClient() {
             </div>
             <div className="mt-4 space-y-3">
               {overview.qaCandidates.length === 0 ? (
-                <p className="rounded-2xl bg-white/[0.04] p-4 text-sm text-[#A3A3A3]">정리 후보가 없습니다.</p>
+                <p className="dashboard-muted-panel p-4 text-sm text-muted-foreground">정리 후보가 없습니다.</p>
               ) : overview.qaCandidates.map((candidate) => (
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4" key={`${candidate.type}-${candidate.id}`}>
+                <div className="dashboard-muted-panel p-4" key={`${candidate.type}-${candidate.id}`}>
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-semibold">{candidate.label}</p>
-                    <span className="rounded-full bg-white/10 px-2 py-1 text-xs text-[#A3A3A3]">{candidate.type}</span>
+                    <span className="rounded-full bg-[var(--surface)] px-2 py-1 text-xs text-muted-foreground">{candidate.type}</span>
                   </div>
-                  <p className="mt-2 text-xs text-[#A3A3A3]">{shortId(candidate.userId)} · {formatDate(candidate.createdAt)}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">{shortId(candidate.userId)} · {formatDate(candidate.createdAt)}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
       </div>
-    </main>
+    </FigmaDashboardShell>
   );
 }

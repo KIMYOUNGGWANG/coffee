@@ -1,0 +1,182 @@
+[
+  {
+    "route": "/",
+    "viewport": "mobile",
+    "scores": {
+      "performance": 0,
+      "accessibility": 0,
+      "best-practices": 0,
+      "seo": 0
+    },
+    "metrics": {
+      "server-response-time": {
+        "score": null,
+        "title": "Initial server response time was short"
+      },
+      "first-contentful-paint": {
+        "score": null,
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": null,
+        "title": "Largest Contentful Paint"
+      },
+      "total-blocking-time": {
+        "score": null,
+        "title": "Total Blocking Time"
+      },
+      "speed-index": {
+        "score": null,
+        "title": "Speed Index"
+      },
+      "interactive": {
+        "score": null,
+        "title": "Time to Interactive"
+      },
+      "errors-in-console": {
+        "score": null,
+        "title": "No browser errors logged to the console"
+      },
+      "robots-txt": {
+        "score": null,
+        "title": "robots.txt is valid"
+      }
+    },
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/perf-audit-next-pass/lighthouse-static-features/landing-mobile.json"
+  },
+  {
+    "route": "/",
+    "viewport": "desktop",
+    "scores": {
+      "performance": 0,
+      "accessibility": 0,
+      "best-practices": 0,
+      "seo": 0
+    },
+    "metrics": {
+      "server-response-time": {
+        "score": null,
+        "title": "Initial server response time was short"
+      },
+      "first-contentful-paint": {
+        "score": null,
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": null,
+        "title": "Largest Contentful Paint"
+      },
+      "total-blocking-time": {
+        "score": null,
+        "title": "Total Blocking Time"
+      },
+      "speed-index": {
+        "score": null,
+        "title": "Speed Index"
+      },
+      "interactive": {
+        "score": null,
+        "title": "Time to Interactive"
+      },
+      "errors-in-console": {
+        "score": null,
+        "title": "No browser errors logged to the console"
+      },
+      "robots-txt": {
+        "score": null,
+        "title": "robots.txt is valid"
+      }
+    },
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/perf-audit-next-pass/lighthouse-static-features/landing-desktop.json"
+  },
+  {
+    "route": "/feed",
+    "viewport": "mobile",
+    "scores": {
+      "performance": 0,
+      "accessibility": 0,
+      "best-practices": 0,
+      "seo": 0
+    },
+    "metrics": {
+      "server-response-time": {
+        "score": null,
+        "title": "Initial server response time was short"
+      },
+      "first-contentful-paint": {
+        "score": null,
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": null,
+        "title": "Largest Contentful Paint"
+      },
+      "total-blocking-time": {
+        "score": null,
+        "title": "Total Blocking Time"
+      },
+      "speed-index": {
+        "score": null,
+        "title": "Speed Index"
+      },
+      "interactive": {
+        "score": null,
+        "title": "Time to Interactive"
+      },
+      "errors-in-console": {
+        "score": null,
+        "title": "No browser errors logged to the console"
+      },
+      "robots-txt": {
+        "score": null,
+        "title": "robots.txt is valid"
+      }
+    },
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/perf-audit-next-pass/lighthouse-static-features/feed-mobile.json"
+  },
+  {
+    "route": "/feed",
+    "viewport": "desktop",
+    "scores": {
+      "performance": 0,
+      "accessibility": 0,
+      "best-practices": 0,
+      "seo": 0
+    },
+    "metrics": {
+      "server-response-time": {
+        "score": null,
+        "title": "Initial server response time was short"
+      },
+      "first-contentful-paint": {
+        "score": null,
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": null,
+        "title": "Largest Contentful Paint"
+      },
+      "total-blocking-time": {
+        "score": null,
+        "title": "Total Blocking Time"
+      },
+      "speed-index": {
+        "score": null,
+        "title": "Speed Index"
+      },
+      "interactive": {
+        "score": null,
+        "title": "Time to Interactive"
+      },
+      "errors-in-console": {
+        "score": null,
+        "title": "No browser errors logged to the console"
+      },
+      "robots-txt": {
+        "score": null,
+        "title": "robots.txt is valid"
+      }
+    },
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/perf-audit-next-pass/lighthouse-static-features/feed-desktop.json"
+  }
+]

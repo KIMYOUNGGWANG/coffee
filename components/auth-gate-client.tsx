@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Coffee } from "lucide-react";
+import { FigmaDashboardShell } from "@/components/figma-dashboard-shell";
 import { Button } from "@/components/ui/button";
 import { createStarterBrowserClient } from "@/lib/supabase/browser";
 
@@ -83,11 +84,17 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
   };
 
   return (
-    <main
+    <div
       data-testid={isClientReady ? "auth-gate-ready" : undefined}
-      className="min-h-[100dvh] bg-[var(--background)] px-4 py-5 text-foreground sm:grid sm:place-items-center"
     >
-      <section className="mx-auto flex min-h-[calc(100dvh-2.5rem)] w-full max-w-md flex-col justify-center rounded-[1.75rem] border border-background-dark/10 bg-[#FFF8EC]/90 p-6 shadow-[0_24px_70px_rgba(73,48,36,0.16)] sm:min-h-0 md:p-8">
+      <FigmaDashboardShell
+        activeHref="/dashboard"
+        compact
+        description="Google 계정으로 로그인하면 방금 보던 커피 기록으로 이어집니다."
+        eyebrow="Account gate"
+        title="CoffeeDex 계정으로 계속하기"
+      >
+      <section className="dashboard-panel mx-auto flex w-full max-w-md flex-col justify-center p-6 md:p-8">
         <div className="space-y-3 text-center">
           <div className="mx-auto flex size-14 items-center justify-center rounded-[1.1rem] bg-primary-amber/16 text-background-dark ring-1 ring-primary-amber/24">
             <Coffee size={20} aria-hidden="true" />
@@ -151,6 +158,7 @@ export function AuthGateClient({ redirectTo, supabaseUrl, supabaseAnonKey }: Aut
           )}
         </div>
       </section>
-    </main>
+      </FigmaDashboardShell>
+    </div>
   );
 }

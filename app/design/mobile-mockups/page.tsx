@@ -51,33 +51,33 @@ const navItems = [
 
 export default function MobileMockupsPage() {
   return (
-    <main className="min-h-screen bg-[#0b0705] px-4 py-6 text-[#f7f1e8] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[var(--background)] px-4 py-6 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-start">
         <section className="order-2 lg:sticky lg:top-6 lg:order-1">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#d9a05b]/30 bg-[#d9a05b]/10 px-3 py-1.5 text-xs font-bold text-[#d9a05b]">
             <Sparkles size={14} aria-hidden="true" />
             CoffeeDex 모바일 기준안
           </div>
-          <h1 className="mt-4 font-serif text-4xl font-black leading-[1.05] text-[#f7f1e8] md:text-5xl">
+          <h1 className="mt-4 text-4xl font-black leading-[1.05] text-foreground md:text-5xl">
             향미 기록실
           </h1>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-[#f7f1e8]/68">
+          <p className="mt-4 max-w-xl text-sm font-semibold leading-6 text-muted-foreground">
             기존 다크 바 무드와 Taste Passport 문법은 유지하되, 분석 카드는 더 밝고 촉각적인 세라믹 표면으로
             정리했습니다. 이제 설명보다 실제 모바일 화면이 먼저 보이도록 구성했습니다.
           </p>
 
           <div className="mt-6 grid gap-3">
             {references.map((item) => (
-              <div key={item.label} className="rounded-xl border border-white/10 bg-white/[0.045] p-4">
+              <div key={item.label} className="dashboard-panel p-4">
                 <p className="text-xs font-black text-[#d9a05b]">{item.label}</p>
-                <p className="mt-2 text-sm leading-6 text-[#f7f1e8]/68">{item.copy}</p>
+                <p className="mt-2 text-sm font-semibold leading-6 text-muted-foreground">{item.copy}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-6 rounded-xl border border-[#d9a05b]/18 bg-[#d9a05b]/10 p-4">
             <p className="text-xs font-black text-[#d9a05b]">디자인 원칙</p>
-            <p className="mt-2 text-sm leading-6 text-[#f7f1e8]/72">
+            <p className="mt-2 text-sm font-semibold leading-6 text-muted-foreground">
               홈은 낮은 조도로 몰입시키고, 분석은 밝은 표면으로 분리합니다. 브랜드 기억감과 정보 가독성을 동시에 가져가기 위한 기준입니다.
             </p>
           </div>
