@@ -192,17 +192,19 @@ export function DashboardShelfView({
       )}
       <DashboardFirstSaveReward cards={cards} onQuickAdd={onQuickAdd} />
       <CoffeeShelfGrid onDataChange={onShelfDataChange} />
+      {(cards.length > 0 || rebuyIntelligence) && (
+        <DashboardRebuyIntelligencePanel
+          data={rebuyIntelligence}
+          cards={cards}
+          isLoading={isRebuyIntelligenceLoading}
+          error={rebuyIntelligenceError}
+          onQuickAdd={onQuickAdd}
+          onOpenLog={onOpenLog}
+          onSelectCard={onSelectCard}
+        />
+      )}
       {cards.length > 0 && (
         <>
-          <DashboardRebuyIntelligencePanel
-            data={rebuyIntelligence}
-            cards={cards}
-            isLoading={isRebuyIntelligenceLoading}
-            error={rebuyIntelligenceError}
-            onQuickAdd={onQuickAdd}
-            onOpenLog={onOpenLog}
-            onSelectCard={onSelectCard}
-          />
           <DashboardRetentionLoop cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />
         </>
       )}

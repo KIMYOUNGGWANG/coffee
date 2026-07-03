@@ -31,7 +31,7 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `GET` | `/api/v1/profile/analytics` | Return taste averages, top flavor tags, and an AI taste profile summary. |
 | `GET` | `/api/v1/shelf?include_finished=true\|false` | List owned coffee shelf items for freshness and rebuy timing. |
 | `POST` | `/api/v1/shelf` | Add a bean to the current user's private coffee shelf. |
-| `PATCH` | `/api/v1/shelf/:id` | Update one owned shelf item, including fill level or finished state. |
+| `PATCH` | `/api/v1/shelf/:id` | Update one owned shelf item, including fill level, finished state, or private rebuy action state. |
 | `DELETE` | `/api/v1/shelf/:id` | Delete one owned shelf item. |
 | `GET` | `/api/v1/rebuy-intelligence` | Derive the current user's Rebuy Intelligence loop from owned cards, shelf items, and brewing logs. |
 | `POST` | `/api/v1/checkout` | Create a Stripe Checkout session for premium, card credits, or PDF export. |
@@ -65,7 +65,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - private Shelf Runway estimates that derive cups remaining, likely run-out timing, and a suggested in-app rebuy reminder date from shelf weight, fill level, and opened date;
 - private Brew-to-Shelf consumption that turns each owned brewing log dose into an automatic shelf fill-level update, keeping Fresh Shelf, Shelf Runway, and Rebuy Intelligence current without a separate inventory chore;
 - private purchase memory through optional `purchase_url` and `purchase_note` fields on cards and shelf items, used only to reopen the user's own saved buying clue or fallback search;
-- private in-app rebuy reminder state on shelf items through `rebuy_priority`, `rebuy_reminder_date`, `rebuy_action`, and `rebuy_action_at`; this is a saved UI loop, not push delivery or an order flow;
+- private in-app rebuy reminder state on shelf items through `rebuy_priority`, `rebuy_reminder_date`, `rebuy_action`, and `rebuy_action_at`, including direct Rebuy Intelligence panel actions for `will_rebuy` and `rebought`; this is a saved UI loop, not push delivery or an order flow;
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
 - private Grind Memory inside Dial-in Coach, where the latest owned 4-5 star brew log for the selected shelf bean is surfaced as the last-good method, dose, water, temperature, grind setting, and brew time;
 - private Brew Failure Memory inside Dial-in Coach, where one-tap sour, bitter, weak, heavy, or balanced feedback is saved to `brewing_logs.coach_feedback` and changes the next recommended recipe;
@@ -184,7 +184,7 @@ Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `dr
 
 ### `GET /api/v1/rebuy-intelligence`
 
-Return a private action loop that helps the user decide what to drink, fix, or buy again next. The route reads only owner-scoped `tasting_cards`, `coffee_shelf_items`, and `brewing_logs`; it does not create community recommendations, partner referrals, marketplace listings, roaster orders, or persisted notification jobs.
+Return a private action loop that helps the user decide what to drink, fix, or buy again next. The route reads only owner-scoped `tasting_cards`, `coffee_shelf_items`, and `brewing_logs`; it does not create community recommendations, partner referrals, marketplace listings, roaster orders, or persisted notification jobs. When a returned insight includes `shelfItemId`, the dashboard may persist the user's direct rebuy action through `PATCH /api/v1/shelf/:id` by sending `rebuyAction`, optional `rebuyPriority`, and optional `rebuyReminderDate`.
 
 ```typescript
 interface RebuyIntelligenceResponse {
@@ -465,7 +465,7 @@ The profile surface preserves CoffeeDex paid and rate-limited compatibility feat
 | `purchase_note` | `text` | Nullable user-saved buying note. |
 | `rebuy_priority` | `text` | `normal`, `pinned`, or `paused`; controls in-app rebuy candidate priority. |
 | `rebuy_reminder_date` | `date` | Nullable next-buy date shown inside CoffeeDex. |
-| `rebuy_action` | `text` | `none`, `drank`, `will_rebuy`, or `rebought`; user action state for the loop. |
+| `rebuy_action` | `text` | `none`, `drank`, `will_rebuy`, or `rebought`; user action state for the loop. Rebuy Intelligence uses `will_rebuy` to pin a follow-up and `rebought` to mark the purchase completed. |
 | `rebuy_action_at` | `timestamptz` | Nullable timestamp for the latest rebuy action. |
 
 ### `brewing_logs`

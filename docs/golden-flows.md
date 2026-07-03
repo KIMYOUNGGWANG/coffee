@@ -58,9 +58,9 @@ Evidence surfaces: `/dashboard`, `POST /api/v1/brewing-logs`, `GET /api/v1/shelf
 
 ## Flow 4B. Follow Rebuy Intelligence
 
-Given a user has owned cards, shelf items, or brewing logs, when CoffeeDex opens the shelf dashboard, then it shows a private Rebuy Intelligence panel with five owner-data actions: a Next Cup plan for what to brew today, a rebuy timing reminder, a taste-match criterion from liked cards, a package or shelf based repurchase memory, and a brew-failure adjustment prompt. Saved purchase URLs and buying notes take precedence over generic search links. This is a personal memory loop only; it does not claim community recommendations, partner offers, marketplace listings, roaster orders, or background notification delivery.
+Given a user has owned cards, shelf items, or brewing logs, when CoffeeDex opens the shelf dashboard, then it shows a private Rebuy Intelligence panel with five owner-data actions: a Next Cup plan for what to brew today, a rebuy timing reminder, a taste-match criterion from liked cards, a package or shelf based repurchase memory, and a brew-failure adjustment prompt. Saved purchase URLs and buying notes take precedence over generic search links. If the selected loop points to an owned shelf item, the user can save an in-app rebuy action directly from the panel: `will_rebuy` pins the item for follow-up, and `rebought` clears the reminder after purchase. This is a personal memory loop only; it does not claim community recommendations, partner offers, marketplace listings, roaster orders, or background notification delivery.
 
-Evidence surfaces: `/dashboard`, `GET /api/v1/rebuy-intelligence`, `buildRebuyIntelligence`
+Evidence surfaces: `/dashboard`, `GET /api/v1/rebuy-intelligence`, `PATCH /api/v1/shelf/:id`, `buildRebuyIntelligence`, `DashboardRebuyIntelligencePanel`
 
 ## Flow 5. Review a Progressive Taste Snapshot
 
