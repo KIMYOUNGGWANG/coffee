@@ -136,6 +136,7 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
 
 test("CoffeeDex pages and routes present the coffee memory product", () => {
   const homePage = read("app/page.tsx");
+  const englishHomePage = read("app/en/page.tsx");
   const dashboardPage = read("app/dashboard/page.tsx");
   const dashboardClient = read("components/dashboard-client.tsx");
   const dashboardHeader = read("components/dashboard-header.tsx");
@@ -154,6 +155,11 @@ test("CoffeeDex pages and routes present the coffee memory product", () => {
   assert.match(homePage, /CoffeeDex/);
   assert.match(homePage, /다시 살 원두를/);
   assert.match(homePage, /20초 만에 기억/);
+  assert.match(homePage, /href="\/en"/);
+  assert.match(englishHomePage, /Remember coffees worth buying again/);
+  assert.match(englishHomePage, /Start a 20-sec record/);
+  assert.match(englishHomePage, /Marketplace, referral, roaster partnerships, and community feeds are future layers/);
+  assert.match(englishHomePage, /href="\/"/);
   assert.match(homePage, /Fritz Ethiopia Sidama/);
   assert.match(dashboardPage, /DashboardClient/);
   assert.match(dashboardHeader, /Private coffee room/);
