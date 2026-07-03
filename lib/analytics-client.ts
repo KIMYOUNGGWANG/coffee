@@ -7,7 +7,18 @@ function currentPath(): string {
   return globalThis.location.pathname;
 }
 
+function shouldDeliverAnalytics(): boolean {
+  if (process.env.NEXT_PUBLIC_ANALYTICS_ENABLED === "false") return false;
+  if (typeof globalThis.location === "undefined") return true;
+
+  const hostname = globalThis.location.hostname;
+  const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+  return !isLocalhost || process.env.NEXT_PUBLIC_ANALYTICS_ENABLED === "true";
+}
+
 export function trackAnalyticsEvent(eventName: AnalyticsEventName, properties: AnalyticsProperties = {}) {
+  if (!shouldDeliverAnalytics()) return;
+
   const payload = {
     eventName,
     occurredAt: new Date().toISOString(),

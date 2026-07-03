@@ -24,13 +24,21 @@ function transpileHook(source, fileName) {
 
 async function loadAnalyticsHookModule() {
   const sourcePath = path.join(projectRoot, "hooks/use-analytics-events.ts");
-  const source = readFileSync(sourcePath, "utf8").replace(
+  const analyticsClientPath = path.join(projectRoot, "lib/analytics-client.ts");
+  const tempDirectory = mkdtempSync(path.join(tmpdir(), "hyangmi-analytics-hook-"));
+  const analyticsClientCompiledPath = path.join(tempDirectory, "analytics-client.mjs");
+  const compiledPath = path.join(tempDirectory, "use-analytics-events.mjs");
+  const source = readFileSync(sourcePath, "utf8")
+    .replace(
     'import { useCallback } from "react";',
     "function useCallback(callback) { return callback; }",
-  );
-  const tempDirectory = mkdtempSync(path.join(tmpdir(), "hyangmi-analytics-hook-"));
-  const compiledPath = path.join(tempDirectory, "use-analytics-events.mjs");
+    )
+    .replace(
+      'import { trackAnalyticsEvent } from "@/lib/analytics-client";',
+      `import { trackAnalyticsEvent } from ${JSON.stringify(pathToFileURL(analyticsClientCompiledPath).href)};`,
+    );
 
+  writeFileSync(analyticsClientCompiledPath, transpileHook(readFileSync(analyticsClientPath, "utf8"), analyticsClientPath));
   writeFileSync(compiledPath, transpileHook(source, sourcePath));
 
   try {

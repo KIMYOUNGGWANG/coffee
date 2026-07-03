@@ -1,0 +1,206 @@
+[
+  {
+    "route": "/",
+    "viewport": "mobile",
+    "scores": {
+      "performance": 25,
+      "accessibility": 96,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "server-response-time": {
+        "score": 1,
+        "displayValue": "Root document took 10 ms",
+        "title": "Initial server response time was short"
+      },
+      "first-contentful-paint": {
+        "score": 0,
+        "displayValue": "12.0 s",
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": 0,
+        "displayValue": "13.1 s",
+        "title": "Largest Contentful Paint"
+      },
+      "total-blocking-time": {
+        "score": 0,
+        "displayValue": "18,210 ms",
+        "title": "Total Blocking Time"
+      },
+      "speed-index": {
+        "score": 0.04,
+        "displayValue": "12.0 s",
+        "title": "Speed Index"
+      },
+      "interactive": {
+        "score": 0,
+        "displayValue": "34.2 s",
+        "title": "Time to Interactive"
+      },
+      "errors-in-console": {
+        "score": 1,
+        "title": "No browser errors logged to the console"
+      },
+      "robots-txt": {
+        "score": 1,
+        "title": "robots.txt is valid"
+      }
+    },
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/perf-audit-next-pass/lighthouse-static-features-rerun/landing-mobile.json"
+  },
+  {
+    "route": "/",
+    "viewport": "desktop",
+    "scores": {
+      "performance": 27,
+      "accessibility": 96,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "server-response-time": {
+        "score": 1,
+        "displayValue": "Root document took 0 ms",
+        "title": "Initial server response time was short"
+      },
+      "first-contentful-paint": {
+        "score": 0.16,
+        "displayValue": "2.4 s",
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": 0,
+        "displayValue": "13.1 s",
+        "title": "Largest Contentful Paint"
+      },
+      "total-blocking-time": {
+        "score": 0,
+        "displayValue": "27,630 ms",
+        "title": "Total Blocking Time"
+      },
+      "speed-index": {
+        "score": 0,
+        "displayValue": "6.9 s",
+        "title": "Speed Index"
+      },
+      "interactive": {
+        "score": 0,
+        "displayValue": "35.4 s",
+        "title": "Time to Interactive"
+      },
+      "errors-in-console": {
+        "score": 1,
+        "title": "No browser errors logged to the console"
+      },
+      "robots-txt": {
+        "score": 1,
+        "title": "robots.txt is valid"
+      }
+    },
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/perf-audit-next-pass/lighthouse-static-features-rerun/landing-desktop.json"
+  },
+  {
+    "route": "/feed",
+    "viewport": "mobile",
+    "scores": {
+      "performance": 64,
+      "accessibility": 100,
+      "best-practices": 96,
+      "seo": 100
+    },
+    "metrics": {
+      "server-response-time": {
+        "score": 0,
+        "displayValue": "Root document took 820 ms",
+        "title": "Reduce initial server response time"
+      },
+      "first-contentful-paint": {
+        "score": 0.99,
+        "displayValue": "1.2 s",
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": 0.81,
+        "displayValue": "2.9 s",
+        "title": "Largest Contentful Paint"
+      },
+      "total-blocking-time": {
+        "score": 0.04,
+        "displayValue": "2,560 ms",
+        "title": "Total Blocking Time"
+      },
+      "speed-index": {
+        "score": 0.79,
+        "displayValue": "4.1 s",
+        "title": "Speed Index"
+      },
+      "interactive": {
+        "score": 0.79,
+        "displayValue": "4.8 s",
+        "title": "Time to Interactive"
+      },
+      "errors-in-console": {
+        "score": 0,
+        "title": "Browser errors were logged to the console"
+      },
+      "robots-txt": {
+        "score": 1,
+        "title": "robots.txt is valid"
+      }
+    },
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/perf-audit-next-pass/lighthouse-static-features-rerun/feed-mobile.json"
+  },
+  {
+    "route": "/feed",
+    "viewport": "desktop",
+    "scores": {
+      "performance": 44,
+      "accessibility": 100,
+      "best-practices": 96,
+      "seo": 100
+    },
+    "metrics": {
+      "server-response-time": {
+        "score": 0,
+        "displayValue": "Root document took 820 ms",
+        "title": "Reduce initial server response time"
+      },
+      "first-contentful-paint": {
+        "score": 0.88,
+        "displayValue": "1.0 s",
+        "title": "First Contentful Paint"
+      },
+      "largest-contentful-paint": {
+        "score": 0.39,
+        "displayValue": "2.8 s",
+        "title": "Largest Contentful Paint"
+      },
+      "total-blocking-time": {
+        "score": 0,
+        "displayValue": "2,700 ms",
+        "title": "Total Blocking Time"
+      },
+      "speed-index": {
+        "score": 0.08,
+        "displayValue": "4.1 s",
+        "title": "Speed Index"
+      },
+      "interactive": {
+        "score": 0.49,
+        "displayValue": "4.5 s",
+        "title": "Time to Interactive"
+      },
+      "errors-in-console": {
+        "score": 0,
+        "title": "Browser errors were logged to the console"
+      },
+      "robots-txt": {
+        "score": 1,
+        "title": "robots.txt is valid"
+      }
+    },
+    "file": "/Users/kim-young-gwang/Desktop/projects/dex/artifacts/perf-audit-next-pass/lighthouse-static-features-rerun/feed-desktop.json"
+  }
+]

@@ -83,7 +83,7 @@ export default function BillingSupportForm() {
   return (
     <form
       onSubmit={submitSupportRequest}
-      className="rounded-3xl border border-white/10 glass-card p-6 shadow-sm"
+      className="dashboard-panel p-6"
     >
       <div className="space-y-1">
         <p className="text-[11px] font-extrabold tracking-wide text-primary-amber">고객지원 접수</p>
@@ -100,7 +100,7 @@ export default function BillingSupportForm() {
             name="email"
             type="email"
             required
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary-amber"
+            className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary-amber"
             placeholder="minji@example.com"
           />
         </label>
@@ -109,7 +109,7 @@ export default function BillingSupportForm() {
           문의 유형
           <select
             name="category"
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary-amber"
+            className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary-amber"
           >
             {supportCategoryOrder.map((category) => (
               <option key={category} value={category}>
@@ -125,7 +125,7 @@ export default function BillingSupportForm() {
             name="message"
             required
             minLength={10}
-            className="min-h-32 rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary-amber"
+            className="min-h-32 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary-amber"
             placeholder="결제 실패 화면, 구독 취소 희망일, 환불 요청 사유를 적어주세요."
           />
         </label>
@@ -135,7 +135,7 @@ export default function BillingSupportForm() {
             체크아웃 세션 ID <span className="font-medium text-muted-foreground/60">선택</span>
             <input
               name="checkoutSessionId"
-              className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm outline-none focus:border-primary-amber text-foreground"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm outline-none focus:border-primary-amber text-foreground"
               placeholder="cs_test_..."
             />
           </label>
@@ -143,7 +143,7 @@ export default function BillingSupportForm() {
             구독 ID <span className="font-medium text-muted-foreground/60">선택</span>
             <input
               name="subscriptionId"
-              className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm outline-none focus:border-primary-amber text-foreground"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm outline-none focus:border-primary-amber text-foreground"
               placeholder="sub_..."
             />
           </label>

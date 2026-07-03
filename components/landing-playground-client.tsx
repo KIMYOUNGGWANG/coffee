@@ -82,7 +82,7 @@ export default function LandingPlaygroundClient() {
       <div className="flex items-center gap-2">
         <Sparkles size={14} className="text-primary-amber" />
         <span className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground">
-          AI 즉석 체험 플레이그라운드
+          향미 기록 체험 플레이그라운드
         </span>
       </div>
 
@@ -143,7 +143,7 @@ export default function LandingPlaygroundClient() {
           </div>
           <div className="space-y-1">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-primary-amber">
-              AI SCANNER RUNNING
+              기록 초안 준비 중
             </p>
             <p className="font-serif text-sm italic transition-all duration-300">
               {loadingStages[scanStep]}
@@ -164,7 +164,7 @@ export default function LandingPlaygroundClient() {
           <div className="flex flex-col gap-3 border-b border-white/10 pb-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <span className="text-[10px] font-bold text-primary-amber uppercase tracking-widest">
-                AI SCAN RESULT CARD
+                향미 기록 초안 카드
               </span>
               <h4 className="break-keep font-serif font-black text-lg leading-tight text-foreground mt-1">
                 {resultCard.title}
@@ -172,7 +172,7 @@ export default function LandingPlaygroundClient() {
               <p className="text-xs font-semibold text-foreground/60">{resultCard.roaster}</p>
             </div>
             <span className="bg-primary-amber/10 border border-primary-amber/30 text-primary-amber text-[9px] px-2 py-0.5 font-bold rounded-full">
-              Confidence 98%
+              저장 전 확인
             </span>
           </div>
 

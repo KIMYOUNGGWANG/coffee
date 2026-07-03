@@ -2,13 +2,32 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import PublicFeedCard from "@/components/PublicFeedCard";
 import type { PublicFeedCardData } from "@/components/PublicFeedCard";
 import { Search, Compass, ShieldCheck } from "lucide-react";
+import { FigmaDashboardShell } from "@/components/figma-dashboard-shell";
 
 export const revalidate = 60; // ISR cache for 60 seconds
+
+const publicFeedTimeoutMs = 800;
+
+type PublicFeedQueryResult = {
+  readonly data: PublicFeedCardData[] | null;
+  readonly error: { readonly message?: string } | null;
+};
+
+function publicFeedTimeout(): Promise<PublicFeedQueryResult> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        data: null,
+        error: { message: "Public feed request timed out." },
+      });
+    }, publicFeedTimeoutMs);
+  });
+}
 
 export default async function FeedPage() {
   const supabase = await createServerSupabase();
   
-  const { data: cards, error } = await supabase
+  const feedQuery = supabase
     .from("tasting_cards")
     .select(`
       id,
@@ -27,32 +46,35 @@ export default async function FeedPage() {
     .order("created_at", { ascending: false })
     .limit(20);
 
+  const { data: cards, error } = await Promise.race([
+    feedQuery,
+    publicFeedTimeout(),
+  ]) as PublicFeedQueryResult;
+
   return (
-    <main className="coffee-app-shell animate-in fade-in duration-500">
-      <header className="mb-8 mt-4 pt-safe">
-        <div className="flex items-center gap-3 mb-2">
-          <Compass size={28} className="text-primary-amber" />
-          <h1 className="font-serif text-3xl font-black tracking-tight text-foreground">공개 공유 미리보기</h1>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          커뮤니티 기능은 아직 현재 제품 기능이 아닙니다. CoffeeDex community is not a current product capability; 지금은 사용자가 직접 공개한 카드만 확인하는 보조 화면입니다.
-        </p>
-        
-        <div className="mt-6 relative max-w-md">
+    <FigmaDashboardShell
+      activeHref="/dashboard"
+      actions={<Compass aria-hidden="true" className="text-primary-amber" size={22} />}
+      description="커뮤니티 기능은 아직 현재 제품 기능이 아닙니다. 지금은 사용자가 직접 공개한 카드만 확인하는 보조 화면입니다."
+      eyebrow="Public preview"
+      title="공개 공유 미리보기"
+    >
+      <div className="mb-5 dashboard-panel p-4">
+        <div className="relative max-w-md">
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input 
             type="text" 
             aria-label="공개 공유 카드 검색"
             placeholder="원두, 로스터, 향미 검색"
-            className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-primary-amber transition-colors text-foreground"
+            className="min-h-12 w-full rounded-full border border-[var(--border)] bg-[var(--surface)] py-3 pl-10 pr-4 text-sm font-semibold text-foreground transition-colors focus:outline-none focus:border-primary-amber"
           />
         </div>
-      </header>
+      </div>
 
       {error ? (
         <section
           aria-live="polite"
-          className="rounded-3xl border border-white/10 bg-white/5 px-5 py-12 text-center shadow-sm"
+          className="dashboard-panel px-5 py-12 text-center"
         >
           <ShieldCheck size={34} className="mx-auto text-primary-amber/80" />
           <h2 className="mt-4 break-keep font-serif text-xl font-black text-foreground">
@@ -63,8 +85,8 @@ export default async function FeedPage() {
           </p>
         </section>
       ) : !cards || cards.length === 0 ? (
-        <section className="rounded-3xl border border-white/10 bg-white/5 px-5 py-16 text-center shadow-sm">
-          <Compass size={40} className="mx-auto text-white/20 mb-4" />
+        <section className="dashboard-panel px-5 py-16 text-center">
+          <Compass size={40} className="mx-auto mb-4 text-primary-amber/50" />
           <h2 className="text-lg font-bold text-foreground">아직 공개 공유 카드가 없어요</h2>
           <p className="text-sm text-muted-foreground mt-2">현재 CoffeeDex의 기본 기록은 개인 보관과 다시 찾기에 맞춰져 있습니다.</p>
         </section>
@@ -75,6 +97,6 @@ export default async function FeedPage() {
           ))}
         </div>
       )}
-    </main>
+    </FigmaDashboardShell>
   );
 }

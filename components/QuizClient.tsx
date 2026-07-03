@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AlertCircle, ChevronRight, Coffee, Home, Sparkles } from "lucide-react";
+import { AlertCircle, ChevronRight } from "lucide-react";
 import { z } from "zod";
 import confetti from "canvas-confetti";
 import { FlavorRadarChart } from "@/components/flavor-radar-chart";
+import { FigmaDashboardShell } from "@/components/figma-dashboard-shell";
 import { publicTastingCardSchema, type PublicTastingCard } from "@/lib/public-card";
 
 type QuizClientProps = {
@@ -89,22 +90,16 @@ export default function QuizClient({ token }: QuizClientProps) {
   };
 
   return (
-    <main className="min-h-screen bg-[#0D0A07] text-foreground p-4 md:p-10 flex flex-col items-center justify-center">
+    <FigmaDashboardShell
+      activeHref="/"
+      compact
+      description="친구가 남긴 공개 카드에서 메인 향미를 맞춰보고, 내 기록으로 이어가요."
+      eyebrow="Blind Tasting Quiz"
+      title="컵 안의 노트 맞히기"
+    >
       <div className="w-full max-w-md space-y-6">
-        <header className="flex items-center justify-between rounded-3xl border border-white/10 bg-white/5 px-5 py-4 shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary-amber text-[#0D0A07]">
-              <Coffee size={17} />
-            </div>
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-widest text-primary-amber">Blind Tasting Quiz</p>
-              <p className="font-serif text-sm font-bold">What's in the cup?</p>
-            </div>
-          </div>
-        </header>
-
         {state.kind === "loading" && (
-          <section className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-muted-foreground">
+          <section className="dashboard-panel p-10 text-center text-sm text-muted-foreground">
             퀴즈를 준비 중입니다...
           </section>
         )}
@@ -118,7 +113,7 @@ export default function QuizClient({ token }: QuizClientProps) {
         )}
 
         {state.kind === "ready" && (
-          <section className="overflow-hidden rounded-[2rem] border border-white/10 glass-card shadow-sm p-6 flex flex-col items-center text-center">
+          <section className="dashboard-panel flex flex-col items-center overflow-hidden p-6 text-center">
             <h1 className="font-serif text-2xl font-extrabold leading-tight text-foreground mb-2">
               친구가 마신 커피의 메인 노트는 무엇일까요?
             </h1>
@@ -126,7 +121,7 @@ export default function QuizClient({ token }: QuizClientProps) {
               {state.card.title} ({state.card.subtitle})
             </p>
 
-            <div className="relative w-full aspect-square bg-white/5 rounded-[2rem] flex flex-col items-center justify-center shadow-inner mb-8 overflow-hidden">
+            <div className="relative mb-8 flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-[2rem] bg-[var(--surface-muted)]/45 shadow-inner">
               <FlavorRadarChart 
                 metric1={state.card.metric1} 
                 metric2={state.card.metric2} 
@@ -136,7 +131,7 @@ export default function QuizClient({ token }: QuizClientProps) {
                 metric6={state.card.metric6 ?? 3}
               />
               {!hasGuessed && (
-                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] pointer-events-none flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center bg-[rgba(41,25,18,0.34)] backdrop-blur-[2px] pointer-events-none">
                   <span className="bg-primary-amber text-[#0D0A07] px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase shadow-xl">
                     Guess The Note
                   </span>
@@ -150,7 +145,7 @@ export default function QuizClient({ token }: QuizClientProps) {
                   <button 
                     key={i} 
                     onClick={() => handleGuess(opt)}
-                    className="w-full py-4 rounded-2xl border border-white/10 bg-white/5 text-foreground font-bold text-sm hover:bg-primary-amber/10 hover:border-primary-amber/30 transition-all shadow-sm"
+                    className="w-full rounded-2xl border border-[var(--border)] bg-[var(--surface)] py-4 text-sm font-bold text-foreground shadow-sm transition-all hover:border-primary-amber/30 hover:bg-primary-amber/10"
                   >
                     {opt}
                   </button>
@@ -159,7 +154,7 @@ export default function QuizClient({ token }: QuizClientProps) {
             ) : (
               <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <h2 className="text-2xl font-bold mb-2">
-                  {isCorrect ? "🎉 정답입니다!" : "아쉬워요!"}
+                  {isCorrect ? "정답입니다!" : "아쉬워요!"}
                 </h2>
                 <p className="text-sm text-foreground/80 mb-6">
                   실제 메인 노트는 <span className="font-extrabold text-primary-amber">{state.card.tags[0] || "스페셜티"}</span> 였습니다.
@@ -184,6 +179,6 @@ export default function QuizClient({ token }: QuizClientProps) {
           </section>
         )}
       </div>
-    </main>
+    </FigmaDashboardShell>
   );
 }

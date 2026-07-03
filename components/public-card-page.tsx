@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AlertCircle, ChevronRight, Coffee, CopyPlus, Home, Sparkles } from "lucide-react";
 import { z } from "zod";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
+import { FigmaDashboardShell } from "@/components/figma-dashboard-shell";
 import { buildOnboardingPublicCardHref } from "@/lib/activation-intent";
 import { coffeeDexBrand } from "@/lib/brand";
 import { publicTastingCardSchema, type PublicTastingCard } from "@/lib/public-card";
@@ -84,26 +85,22 @@ export default function PublicCardPage({ token }: PublicCardPageProps) {
   }, [token, trackEvent]);
 
   return (
-    <main className="min-h-screen bg-[#0D0A07] text-foreground p-4 md:p-10">
-      <div className="mx-auto max-w-4xl space-y-6">
-        <header className="flex items-center justify-between rounded-3xl border border-white/10 bg-white/5 px-5 py-4 shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-caramel text-cream">
-              <Coffee size={17} />
-            </div>
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-widest text-primary-amber">CoffeeDex 공개 테이스팅 카드</p>
-              <p className="font-serif text-sm font-bold">Korea-first coffee memory</p>
-            </div>
-          </div>
-          <Link href="/" className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-muted-foreground transition hover:text-foreground">
+    <FigmaDashboardShell
+      activeHref="/"
+      actions={(
+        <Link href="/" className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs font-bold text-muted-foreground transition hover:text-foreground">
             <Home size={13} />
             {coffeeDexBrand.name}
-          </Link>
-        </header>
+        </Link>
+      )}
+      description="공유받은 커피 기록을 확인하고, 같은 맛을 내 첫 기록의 힌트로 이어갈 수 있어요."
+      eyebrow="CoffeeDex 공개 테이스팅 카드"
+      title="공개 카드"
+    >
+      <div className="mx-auto max-w-4xl space-y-6">
 
         {state.kind === "loading" && (
-          <section className="rounded-3xl border border-white/10 bg-white p-10 text-center text-sm text-muted-foreground/80">
+          <section className="dashboard-panel p-10 text-center text-sm text-muted-foreground/80">
             공개 카드를 불러오는 중입니다.
           </section>
         )}
@@ -117,14 +114,14 @@ export default function PublicCardPage({ token }: PublicCardPageProps) {
         )}
 
         {state.kind === "ready" && (
-          <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-sm">
+          <section className="dashboard-panel overflow-hidden">
             <div className="grid gap-0 md:grid-cols-[0.95fr_1.05fr]">
-              <div className="min-h-[360px] bg-white/5 p-8 flex items-center justify-center">
+              <div className="flex min-h-[360px] items-center justify-center bg-[var(--surface-muted)]/45 p-8">
                 {state.card.image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={state.card.image_url} alt={state.card.title} className="max-h-[460px] w-full rounded-3xl object-cover shadow-md" />
                 ) : (
-                  <div className="flex h-64 w-full max-w-xs flex-col items-center justify-center rounded-3xl border border-white/10 bg-white text-primary-amber">
+                  <div className="flex h-64 w-full max-w-xs flex-col items-center justify-center rounded-3xl border border-[var(--border)] bg-[var(--surface)] text-primary-amber">
                     <Coffee size={54} strokeWidth={1.4} />
                     <span className="mt-3 text-xs font-bold uppercase tracking-widest">Bean Memory</span>
                   </div>
@@ -161,7 +158,7 @@ export default function PublicCardPage({ token }: PublicCardPageProps) {
         )}
 
         {state.kind === "ready" && (
-          <section className="rounded-3xl border border-white/10 bg-white px-5 py-4 shadow-sm">
+          <section className="dashboard-panel px-5 py-4">
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
               <div className="min-w-0">
                 <p className="inline-flex items-center gap-1.5 rounded-full border border-primary-amber/20 bg-primary-amber/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-primary-amber">
@@ -193,7 +190,7 @@ export default function PublicCardPage({ token }: PublicCardPageProps) {
                     tag_count: state.card.tags.length,
                   });
                 }}
-                className="inline-flex items-center justify-center gap-1.5 rounded-xl glass-card border border-white/10 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:glass-card border border-white/10/90"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[var(--surface-strong)] px-4 py-2.5 text-xs font-bold text-[var(--accent-foreground)] shadow-sm transition hover:bg-[#372319]"
               >
                 내 CoffeeDex Taste Card 만들기
                 <ChevronRight size={13} />
@@ -202,6 +199,6 @@ export default function PublicCardPage({ token }: PublicCardPageProps) {
           </section>
         )}
       </div>
-    </main>
+    </FigmaDashboardShell>
   );
 }

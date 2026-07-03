@@ -1,10 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect } from "react";
 import { ArrowRight, BookOpen, CheckCircle2, ChevronDown, Sparkles } from "lucide-react";
 import { checkoutProductCatalog, checkoutProductOrder, type CheckoutProductItemType } from "@/lib/commerce";
-import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
+import { LandingSectionViewTracker, TrackedLandingLink } from "@/components/landing-analytics-client";
 
 const pricingLabelByItemType = {
   premium_subscription: "월간 Premium",
@@ -30,13 +27,6 @@ function checkoutHref(itemType: CheckoutProductItemType): string {
 }
 
 export default function LandingPricingSection() {
-  const { trackEvent } = useAnalyticsEvents();
-
-  useEffect(() => {
-    trackEvent("landing_view");
-    trackEvent("pricing_viewed", { surface: "landing" });
-  }, [trackEvent]);
-
   const premiumProduct = checkoutProductCatalog.premium_subscription;
   const secondaryProducts = checkoutProductOrder.filter((itemType) => itemType !== "premium_subscription");
 
@@ -45,6 +35,7 @@ export default function LandingPricingSection() {
       data-testid="landing-pricing-section"
       className="border-y border-white/10 bg-black/20 py-8"
     >
+      <LandingSectionViewTracker eventName="pricing_viewed" properties={{ surface: "landing" }} />
       <details className="group mx-auto max-w-7xl px-4 md:px-8">
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-left marker:content-none">
           <span>
@@ -102,14 +93,15 @@ export default function LandingPricingSection() {
                   <p>기록 기반 취향 리포트</p>
                   <p>구독 취소 후 현재 결제 기간까지 이용</p>
                 </div>
-                <Link
+                <TrackedLandingLink
                   href={checkoutHref(premiumProduct.itemType)}
-                  onClick={() => trackEvent("pricing_cta_clicked", { itemType: premiumProduct.itemType, surface: "landing" })}
+                  eventName="pricing_cta_clicked"
+                  properties={{ itemType: premiumProduct.itemType, surface: "landing" }}
                   className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 border border-primary-amber bg-primary-amber px-4 text-sm font-black text-foreground transition hover:-translate-y-0.5"
                 >
                   {premiumProduct.ctaLabel}
                   <ArrowRight size={15} />
-                </Link>
+                </TrackedLandingLink>
               </div>
             </div>
           </article>
@@ -142,14 +134,15 @@ export default function LandingPricingSection() {
                     <span className="pb-1 text-xs font-black text-muted-foreground/60">{product.cadence}</span>
                   </div>
                   <p className="mt-4 text-sm font-semibold leading-7 text-muted-foreground/80">{product.description}</p>
-                  <Link
+                  <TrackedLandingLink
                     href={checkoutHref(product.itemType)}
-                    onClick={() => trackEvent("pricing_cta_clicked", { itemType: product.itemType, surface: "landing" })}
+                    eventName="pricing_cta_clicked"
+                    properties={{ itemType: product.itemType, surface: "landing" }}
                     className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 border border-white/10 bg-transparent px-4 text-xs font-black text-foreground transition hover:-translate-y-0.5 hover:bg-white/10"
                   >
                     {product.ctaLabel}
                     <ArrowRight size={13} />
-                  </Link>
+                  </TrackedLandingLink>
                 </article>
               );
             })}

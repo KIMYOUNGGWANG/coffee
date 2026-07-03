@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Camera, Coffee, Keyboard, LoaderCircle } from "lucide-react";
 import { z } from "zod";
 import { CoffeeMemoryEditor } from "@/components/coffee-memory-editor";
+import { FigmaDashboardShell } from "@/components/figma-dashboard-shell";
 import { Button } from "@/components/ui/button";
 import { buildAuthGateHref } from "@/lib/auth-redirect";
 import {
@@ -268,15 +269,20 @@ export function GuestCaptureClient() {
   };
 
   return (
-    <main className="min-h-screen bg-[#1a1a1a] px-4 py-6 text-[#F7F7F4] sm:py-10">
-      <div className="mx-auto w-full max-w-2xl">
-        <header className="mb-6 flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-xl bg-[#C58948] text-[#19140F]"><Coffee size={20} aria-hidden="true" /></span><span className="font-serif font-bold">CoffeeDex</span></header>
-        <section className="mb-6 rounded-3xl border border-white/10 bg-[#24201c] p-5 sm:p-7">
+    <FigmaDashboardShell
+      activeHref="/capture"
+      actions={<span className="grid size-10 place-items-center rounded-2xl bg-[var(--surface-strong)] text-[var(--accent-foreground)]"><Coffee size={18} aria-hidden="true" /></span>}
+      description="로그인 없이 짧게 기록하고, 내 CoffeeDex에 저장할 때만 계정이 필요합니다. 사진 원본은 저장하지 않아요."
+      eyebrow="Guest-first memory"
+      title="다시 살 원두를 20초 만에 남겨요"
+    >
+      <div className="mx-auto w-full max-w-3xl">
+        <section className="dashboard-panel mb-5 p-5 sm:p-7">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#C58948]">Guest-first memory</p>
-          <h1 className="mt-3 break-keep font-serif text-3xl font-bold leading-tight sm:text-4xl">다시 살 원두를 20초 만에 남겨요</h1>
-          <p className="mt-3 text-sm leading-6 text-[#F7F7F4]/65">로그인 없이 짧게 기록하고, 내 CoffeeDex에 저장할 때만 계정이 필요합니다. 사진 원본은 저장하지 않아요.</p>
+          <h2 className="mt-3 break-keep text-2xl font-black leading-tight sm:text-3xl">새 노트 시작</h2>
+          <p className="mt-3 text-sm font-semibold leading-6 text-muted-foreground">사진 기록으로 먼저 채우거나, 바로 내 문장으로 입력할 수 있어요.</p>
           {activationCopy(activation) && (
-            <p className="mt-4 rounded-2xl border border-[#C58948]/30 bg-[#C58948]/10 px-4 py-3 text-sm font-bold text-[#F7F7F4]">
+            <p className="mt-4 rounded-2xl border border-[#C58948]/30 bg-[#C58948]/10 px-4 py-3 text-sm font-bold text-foreground">
               {activationCopy(activation)}
             </p>
           )}
@@ -289,19 +295,19 @@ export function GuestCaptureClient() {
           )}
           {!editing && (
             <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
-              <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-4 text-sm font-semibold focus-within:ring-4 focus-within:ring-[#C58948]/30">
+              <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-semibold focus-within:ring-4 focus-within:ring-[#C58948]/30">
                 <Camera size={18} aria-hidden="true" />
                 <span className="min-w-0 truncate">{file?.name ?? "원두 패키지 사진 선택"}</span>
                 <input className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" aria-label="원두 패키지 사진 선택" onChange={(event) => setFile(event.target.files?.item(0) ?? null)} />
               </label>
               <Button className="min-h-12 rounded-xl bg-[#C58948] px-5 text-[#19140F]" disabled={pending} onClick={() => void runScan()}>{pending ? <LoaderCircle className="animate-spin motion-reduce:animate-none" size={18} aria-hidden="true" /> : <Camera size={18} aria-hidden="true" />}라벨 읽기</Button>
-              <Button className="min-h-12 rounded-xl border-white/15 sm:col-span-2" variant="outline" onClick={beginManualEntry}><Keyboard size={18} aria-hidden="true" />사진 없이 직접 입력</Button>
+              <Button className="min-h-12 rounded-xl border-[var(--border)] sm:col-span-2" variant="outline" onClick={beginManualEntry}><Keyboard size={18} aria-hidden="true" />사진 없이 직접 입력</Button>
             </div>
           )}
         </section>
-        {message && <p role="alert" className="mb-5 rounded-xl border border-[#DFA857]/40 bg-[#DFA857]/10 px-4 py-3 text-sm leading-6 text-[#F7F7F4]">{message}</p>}
+        {message && <p role="alert" className="mb-5 rounded-xl border border-[#DFA857]/40 bg-[#DFA857]/10 px-4 py-3 text-sm font-semibold leading-6 text-foreground">{message}</p>}
         {editing && <CoffeeMemoryEditor value={corrections} hasUncertainFacts={hasUncertainFacts} confirmed={confirmed} pending={pending} retrying={retrying} onChange={(value) => { setCorrections(value); setConfirmed(false); }} onConfirmChange={setConfirmed} onSave={save} />}
       </div>
-    </main>
+    </FigmaDashboardShell>
   );
 }
