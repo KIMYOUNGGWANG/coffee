@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { BookOpenText, RefreshCcw, SlidersHorizontal } from "lucide-react";
+import { BookOpenText, PencilLine, RefreshCcw } from "lucide-react";
 import DashboardCheckoutNotice from "@/components/dashboard-checkout-notice";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardDialInCoachPanel } from "@/components/dashboard-dial-in-coach-panel";
@@ -179,8 +179,9 @@ export default function DashboardClient({
     }
   };
 
+  const newestCard = cards?.[0];
   const rebuySignal = rebuyIntelligence?.rebuyReminder?.title ?? "다시 살 단서를 모으는 중";
-  const dialInSignal = dialInCoach?.title ?? "오늘의 시작점을 고르는 중";
+  const newestMemorySignal = newestCard ? `${newestCard.subtitle} · ${newestCard.title}` : "첫 원두를 20초로 남겨보세요";
 
   return (
     <main className="coffee-app-shell min-h-screen text-foreground" data-testid={isDashboardReady ? "dashboard-ready" : undefined}>
@@ -196,27 +197,48 @@ export default function DashboardClient({
       {checkoutNotice && <DashboardCheckoutNotice notice={checkoutNotice} onDismiss={dismissCheckoutNotice} />}
 
       <section className="mb-4 grid gap-3 sm:grid-cols-3" aria-label="CoffeeDex 오늘 요약">
-        {[
-          { label: "내 노트", value: `${cards?.length ?? 0}개`, helper: "조용히 쌓인 커피 기억", icon: BookOpenText },
-          { label: "다시 살 단서", value: rebuySignal, helper: "최근 기록에서 꺼낸 힌트", icon: RefreshCcw },
-          { label: "오늘 시작점", value: dialInSignal, helper: "다음 컵을 위한 작은 기준", icon: SlidersHorizontal },
-        ].map((item) => {
-          const Icon = item.icon;
-          return (
-            <article key={item.label} className="premium-shell">
-              <div className="premium-card flex min-h-28 items-start gap-3 p-4">
-                <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-background-dark text-[#FFF8EC] shadow-[0_12px_26px_rgba(73,48,36,0.18)]">
-                  <Icon aria-hidden="true" size={17} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">{item.label}</p>
-                  <p className="mt-2 line-clamp-2 break-keep text-sm font-black leading-5 text-background-dark">{item.value}</p>
-                  <p className="mt-1 text-[11px] font-bold text-muted-foreground">{item.helper}</p>
-                </div>
-              </div>
-            </article>
-          );
-        })}
+        <article className="premium-shell">
+          <div className="premium-card flex min-h-28 items-start gap-3 p-4">
+            <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-background-dark text-[#FFF8EC] shadow-[0_12px_26px_rgba(73,48,36,0.18)]">
+              <RefreshCcw aria-hidden="true" size={17} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">다시 살 후보</p>
+              <p className="mt-2 line-clamp-2 break-keep text-sm font-black leading-5 text-background-dark">{rebuySignal}</p>
+              <p className="mt-1 text-[11px] font-bold text-muted-foreground">최근 기록에서 꺼낸 재구매 단서</p>
+            </div>
+          </div>
+        </article>
+
+        <article className="premium-shell">
+          <div className="premium-card flex min-h-28 items-start gap-3 p-4">
+            <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-background-dark text-[#FFF8EC] shadow-[0_12px_26px_rgba(73,48,36,0.18)]">
+              <BookOpenText aria-hidden="true" size={17} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">최근 저장한 원두</p>
+              <p className="mt-2 line-clamp-2 break-keep text-sm font-black leading-5 text-background-dark">{newestMemorySignal}</p>
+              <p className="mt-1 text-[11px] font-bold text-muted-foreground">{cards?.length ?? 0}개의 비공개 기억</p>
+            </div>
+          </div>
+        </article>
+
+        <article className="premium-shell">
+          <button
+            type="button"
+            onClick={() => openWizard("dashboard_summary_quick_add", "quick")}
+            className="premium-card flex min-h-28 w-full items-start gap-3 p-4 text-left transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary-amber text-[#FFF8EC] shadow-[0_12px_26px_rgba(73,48,36,0.18)]">
+              <PencilLine aria-hidden="true" size={17} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">20초 기록</p>
+              <p className="mt-2 line-clamp-2 break-keep text-sm font-black leading-5 text-background-dark">원두와 로스터리만 먼저 저장</p>
+              <p className="mt-1 text-[11px] font-bold text-muted-foreground">좋았던 순간이 흐려지기 전에</p>
+            </div>
+          </button>
+        </article>
       </section>
 
       <section className="coffee-workspace min-w-0">

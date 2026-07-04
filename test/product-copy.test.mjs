@@ -99,6 +99,9 @@ test("CoffeeDex pages lead with recall and repurchase within the scoped product 
   assert.match(homePage, /다시 살 원두를/);
   assert.match(homePage, /20초 만에 기억/);
   assert.match(dashboardClient, /DashboardShelfView/);
+  assert.match(dashboardClient, /다시 살 후보/);
+  assert.match(dashboardClient, /최근 저장한 원두/);
+  assert.match(dashboardClient, /20초 기록/);
   assert.match(quickAddMemoryForm, /빠른 기록/);
   assert.match(quickAddMemoryForm, /기억이 사라지기 전에 원두, 로스터리, 다시 살 단서/);
   assert.match(quickAddMemoryForm, /다시 살래요/);

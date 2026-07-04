@@ -227,7 +227,16 @@ test("dashboard uses a mobile-first CoffeeDex app shell", () => {
   assert.match(dashboardNavigation, /서랍/);
   assert.match(dashboardNavigation, /취향/);
   assert.match(dashboardNavigation, /설정/);
+  assert.match(dashboardClient, /다시 살 후보/);
+  assert.match(dashboardClient, /최근 저장한 원두/);
+  assert.match(dashboardClient, /20초 기록/);
+  assert.match(dashboardShelfView, /다음에 이렇게 검색하세요/);
+  assert.match(dashboardShelfView, /다시 살 후보에 저장됨/);
   assert.match(dashboardShelfView, /CoffeeShelfGrid/);
+  assert.ok(
+    dashboardShelfView.indexOf("<DashboardRebuyIntelligencePanel") < dashboardShelfView.indexOf("<CoffeeShelfGrid"),
+    "Rebuy Intelligence should be declared before Fresh Shelf inventory on the shelf view",
+  );
   assert.match(coffeeShelfGrid, /evaluateFreshShelfStatus/);
   assert.match(coffeeShelfGrid, /freshShelfStatus\.label/);
   assert.match(coffeeShelfGrid, /freshShelfStatus\.reason/);
