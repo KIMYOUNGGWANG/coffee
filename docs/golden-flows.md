@@ -50,6 +50,12 @@ Given a user has a private rebuy candidate card, when they actually buy that bea
 
 Evidence surfaces: `/dashboard`, `POST /api/v1/shelf`, `buildRebuyShelfTransferPayload`, `DashboardRebuyTimingMemoryPanel`
 
+## Flow 3E. Rescue Missing Rebuy Clues
+
+Given a user has private cards marked `again` or `maybe`, when CoffeeDex opens the dashboard, then it derives a Rebuy Clue Rescue queue from existing owner-scoped card fields and highlights records that would be hard to buy again because purchase place, price, purchase link, or rebuy reason is missing. The panel shows the clue that is already saved, the missing clue labels, and actions to reopen the card or start the next quick record with better purchase clues. This is a private memory-completion loop only; it is not a badge, collection quest, marketplace recommendation, roaster order, referral, community review, or push notification.
+
+Evidence surfaces: `/dashboard`, `buildRebuyClueRescue`, `DashboardRebuyClueRescuePanel`
+
 ## Flow 4. Use Fresh Shelf Rebuy Timing
 
 Given a user has beans on the private shelf, when CoffeeDex renders the shelf card, then it derives a Korean next-action signal from roast date, opened date, fill level, and finished state: wait, drink now, finish soon, or rebuy. The card also derives a Peak Window cue from the owned roast/open dates so the user can see whether a bean is still resting, in its peak range, ready to finish now, or past its peak. The card also estimates Shelf Runway: grams left, cups remaining, likely run-out timing, and a suggested in-app rebuy reminder date from the user's own weight, fill level, and opened date. If the user saved a purchase link or buying note, the shelf keeps that private clue so the user can reopen it later; otherwise CoffeeDex falls back to a search URL. The user can also pin a bean as a personal rebuy candidate, apply the suggested next-buy date, and mark it as drank, will-rebuy, or rebought. This guidance is local product memory, not a push notification, roaster order, marketplace listing, or partner referral.
