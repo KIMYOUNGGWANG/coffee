@@ -385,6 +385,7 @@ export function useUpdateTastingCard() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["tasting-cards"] });
       queryClient.invalidateQueries({ queryKey: ["tasting-cards", data.id] });
+      queryClient.invalidateQueries({ queryKey: ["rebuy-intelligence"] });
     },
   });
 }

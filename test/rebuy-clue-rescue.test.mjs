@@ -128,3 +128,29 @@ test("Given complete rebuy cards, When rescue is built, Then it does not create 
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }
 });
+
+test("Given inline rescue form values, When patch is built, Then empty fields normalize and reasons stay unique", async () => {
+  const loaded = await loadRebuyClueRescueModule();
+  try {
+    const { buildRebuyClueRescuePatch } = loaded.module;
+    const result = buildRebuyClueRescuePatch(
+      {
+        repurchase_reasons: ["복숭아 단맛", "  기존 이유  ", "복숭아 단맛"],
+      },
+      {
+        purchaseNote: "  프릳츠 공식몰 200g 18,000원  ",
+        purchaseUrl: "   ",
+        rebuyReason: " 복숭아 단맛 ",
+      },
+    );
+
+    assert.deepEqual(result, {
+      confirmed: true,
+      purchaseNote: "프릳츠 공식몰 200g 18,000원",
+      purchaseUrl: null,
+      repurchaseReasons: ["복숭아 단맛", "기존 이유"],
+    });
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});

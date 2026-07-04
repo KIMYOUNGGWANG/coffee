@@ -30,6 +30,23 @@ export type RebuyClueRescue = {
   readonly candidates: readonly RebuyClueRescueCandidate[];
 };
 
+export type RebuyClueRescueForm = {
+  readonly purchaseNote: string;
+  readonly purchaseUrl: string;
+  readonly rebuyReason: string;
+};
+
+export type RebuyClueRescuePatchCard = {
+  readonly repurchase_reasons: readonly string[];
+};
+
+export type RebuyClueRescuePatch = {
+  readonly confirmed: true;
+  readonly purchaseNote: string | null;
+  readonly purchaseUrl: string | null;
+  readonly repurchaseReasons: readonly string[];
+};
+
 const clueLabels: Record<RebuyClueKey, string> = {
   purchase_place: "구매처",
   purchase_price: "가격",
@@ -146,5 +163,25 @@ export function buildRebuyClueRescue(
     summary: `${candidates.length}개 재구매 후보에 빠진 단서가 있어요. 구매처, 가격, 링크, 이유를 보강하면 다음 구매가 쉬워집니다.`,
     totalCandidates: candidates.length,
     candidates: candidates.slice(0, 3),
+  };
+}
+
+export function buildRebuyClueRescuePatch(
+  card: RebuyClueRescuePatchCard,
+  form: RebuyClueRescueForm,
+): RebuyClueRescuePatch {
+  const purchaseNote = form.purchaseNote.trim();
+  const purchaseUrl = form.purchaseUrl.trim();
+  const rebuyReason = form.rebuyReason.trim();
+  const existingReasons = card.repurchase_reasons.map((reason) => reason.trim()).filter(Boolean);
+  const repurchaseReasons = rebuyReason
+    ? Array.from(new Set([rebuyReason, ...existingReasons])).slice(0, 8)
+    : existingReasons.slice(0, 8);
+
+  return {
+    confirmed: true,
+    purchaseNote: purchaseNote || null,
+    purchaseUrl: purchaseUrl || null,
+    repurchaseReasons,
   };
 }

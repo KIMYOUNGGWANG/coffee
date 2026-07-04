@@ -1,8 +1,14 @@
 "use client";
 
-import { AlertCircle, BookOpenText, PencilLine } from "lucide-react";
-import type { TastingCardData } from "@/hooks/useTastingCards";
-import { buildRebuyClueRescue, type RebuyClueRescueCandidate } from "@/lib/rebuy-clue-rescue";
+import { useState } from "react";
+import { AlertCircle, BookOpenText, Check, Loader2, PencilLine, X } from "lucide-react";
+import { useUpdateTastingCard, type TastingCardData } from "@/hooks/useTastingCards";
+import {
+  buildRebuyClueRescue,
+  buildRebuyClueRescuePatch,
+  type RebuyClueRescueCandidate,
+  type RebuyClueRescueForm,
+} from "@/lib/rebuy-clue-rescue";
 
 type DashboardRebuyClueRescuePanelProps = {
   readonly cards: readonly TastingCardData[];
@@ -25,14 +31,53 @@ function findCard(cards: readonly TastingCardData[], candidate: RebuyClueRescueC
   return cards.find((card) => card.id === candidate.cardId) ?? null;
 }
 
+function buildInitialFormState(card: TastingCardData): RebuyClueRescueForm {
+  return {
+    purchaseNote: card.purchase_note ?? "",
+    purchaseUrl: card.purchase_url ?? "",
+    rebuyReason: card.repurchase_reasons.find((reason) => reason.trim().length > 0) ?? "",
+  };
+}
+
 export function DashboardRebuyClueRescuePanel({
   cards,
   onQuickAdd,
   onSelectCard,
 }: DashboardRebuyClueRescuePanelProps) {
   const rescue = buildRebuyClueRescue(cards);
+  const updateCardMutation = useUpdateTastingCard();
+  const [editingCardId, setEditingCardId] = useState<string | null>(null);
+  const [savedCardId, setSavedCardId] = useState<string | null>(null);
+  const [form, setForm] = useState<RebuyClueRescueForm>({ purchaseNote: "", purchaseUrl: "", rebuyReason: "" });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   if (cards.length === 0 || rescue.candidates.length === 0) return null;
+
+  function startEditing(card: TastingCardData | null) {
+    if (!card) {
+      onQuickAdd();
+      return;
+    }
+
+    setEditingCardId(card.id);
+    setSavedCardId(null);
+    setErrorMessage(null);
+    setForm(buildInitialFormState(card));
+  }
+
+  async function saveClues(card: TastingCardData) {
+    setErrorMessage(null);
+    try {
+      await updateCardMutation.mutateAsync({
+        id: card.id,
+        fields: buildRebuyClueRescuePatch(card, form),
+      });
+      setSavedCardId(card.id);
+      setEditingCardId(null);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "재구매 단서를 저장하지 못했습니다.");
+    }
+  }
 
   return (
     <section className="premium-shell mb-5" aria-label="재구매 단서 보강">
@@ -63,10 +108,13 @@ export function DashboardRebuyClueRescuePanel({
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           {rescue.candidates.map((candidate) => {
             const card = findCard(cards, candidate);
+            const isEditing = editingCardId === candidate.cardId;
+            const isSaving = updateCardMutation.isPending && updateCardMutation.variables?.id === candidate.cardId;
+            const isSaved = savedCardId === candidate.cardId;
             return (
               <article
                 key={candidate.cardId}
-                className="flex min-h-[230px] flex-col rounded-2xl border border-background-dark/10 bg-white p-4 shadow-sm"
+                className="flex min-h-[250px] flex-col rounded-2xl border border-background-dark/10 bg-white p-4 shadow-sm"
               >
                 <div className="flex items-start justify-between gap-3">
                   <span className={`inline-flex min-h-7 items-center rounded-full border px-2.5 text-[11px] font-black ${priorityClassName(candidate)}`}>
@@ -101,23 +149,100 @@ export function DashboardRebuyClueRescuePanel({
                 <p className="mt-3 break-keep text-sm font-bold leading-6 text-muted-foreground">
                   {candidate.rescuePrompt}
                 </p>
-                <div className="mt-auto grid gap-2 pt-4 sm:grid-cols-2">
-                  <button
-                    type="button"
-                    onClick={() => (card ? onSelectCard(card) : onQuickAdd())}
-                    className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#8C5E35]/20 px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5"
+                {isEditing && card ? (
+                  <form
+                    className="mt-4 space-y-3 rounded-2xl border border-primary-amber/20 bg-[#fffaf2] p-3"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      void saveClues(card);
+                    }}
                   >
-                    카드 열기
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onQuickAdd}
-                    className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-background-dark px-3 text-xs font-black text-[#fff8ec] transition hover:-translate-y-0.5"
-                  >
-                    <PencilLine size={13} />
-                    다음 기록에 단서 남기기
-                  </button>
-                </div>
+                    <div className="grid gap-2">
+                      <label className="text-[11px] font-black text-background-dark" htmlFor={`rescue-note-${card.id}`}>
+                        구매처 · 가격 메모
+                      </label>
+                      <input
+                        id={`rescue-note-${card.id}`}
+                        maxLength={160}
+                        value={form.purchaseNote}
+                        onChange={(event) => setForm((current) => ({ ...current, purchaseNote: event.target.value }))}
+                        placeholder="예: 프릳츠 공식몰 200g 18,000원"
+                        className="min-h-10 rounded-xl border border-background-dark/10 bg-white px-3 text-sm font-bold text-background-dark outline-none focus:border-primary-amber focus:ring-2 focus:ring-primary-amber/20"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <label className="text-[11px] font-black text-background-dark" htmlFor={`rescue-url-${card.id}`}>
+                        구매 링크
+                      </label>
+                      <input
+                        id={`rescue-url-${card.id}`}
+                        type="url"
+                        maxLength={500}
+                        value={form.purchaseUrl}
+                        onChange={(event) => setForm((current) => ({ ...current, purchaseUrl: event.target.value }))}
+                        placeholder="https://..."
+                        className="min-h-10 rounded-xl border border-background-dark/10 bg-white px-3 text-sm font-bold text-background-dark outline-none focus:border-primary-amber focus:ring-2 focus:ring-primary-amber/20"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <label className="text-[11px] font-black text-background-dark" htmlFor={`rescue-reason-${card.id}`}>
+                        다시 살 이유
+                      </label>
+                      <input
+                        id={`rescue-reason-${card.id}`}
+                        maxLength={80}
+                        value={form.rebuyReason}
+                        onChange={(event) => setForm((current) => ({ ...current, rebuyReason: event.target.value }))}
+                        placeholder="예: 식어도 복숭아 단맛이 선명했음"
+                        className="min-h-10 rounded-xl border border-background-dark/10 bg-white px-3 text-sm font-bold text-background-dark outline-none focus:border-primary-amber focus:ring-2 focus:ring-primary-amber/20"
+                      />
+                    </div>
+                    {errorMessage && (
+                      <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] font-bold leading-5 text-red-700">
+                        {errorMessage}
+                      </p>
+                    )}
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingCardId(null);
+                          setErrorMessage(null);
+                        }}
+                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-[#8C5E35]/20 px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5"
+                      >
+                        <X size={13} />
+                        닫기
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-background-dark px-3 text-xs font-black text-[#fff8ec] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        {isSaving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+                        {isSaving ? "저장 중" : "단서 저장"}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="mt-auto grid gap-2 pt-4 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={() => (card ? onSelectCard(card) : onQuickAdd())}
+                      className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#8C5E35]/20 px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5"
+                    >
+                      카드 열기
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => startEditing(card)}
+                      className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-background-dark px-3 text-xs font-black text-[#fff8ec] transition hover:-translate-y-0.5"
+                    >
+                      {isSaved ? <Check size={13} /> : <PencilLine size={13} />}
+                      {isSaved ? "보강 저장됨" : "여기서 보강"}
+                    </button>
+                  </div>
+                )}
               </article>
             );
           })}
