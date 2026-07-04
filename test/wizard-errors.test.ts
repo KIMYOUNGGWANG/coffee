@@ -107,7 +107,7 @@ async function mockDashboardShell(page: Page, profileBody: typeof profileRespons
 
 async function openWizard(page: Page): Promise<void> {
   await page.goto("/dashboard");
-  const createButton = page.getByRole("button", { name: "새로운 카드 기록하기" });
+  const createButton = page.getByRole("button", { name: "라벨 스캔으로 채우기" });
   const wizardHeading = page.getByRole("heading", { name: "새로운 테이스팅 카드" });
 
   await expect(createButton).toBeVisible();
