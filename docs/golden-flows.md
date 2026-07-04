@@ -6,7 +6,7 @@ These are the executable product truths protected by the smoke suite. CoffeeDex 
 
 Given a coffee drinker has a bag photo or knows the coffee details, when they review the editable draft, separate package claims from user-perceived taste, choose whether they would buy again, and confirm the record, then CoffeeDex can persist a private owner-scoped `tasting_cards` memory.
 
-Quick Add Memory Mode is the current one-screen capture path for the same private contract. The default 20-second surface shows only bean name, roaster, would-buy-again choice, and a one-line note; origin, process, flavor tags, and acidity/sweetness/body stay behind an optional detail disclosure. A nonblank one-line note is stored as note/description memory, but it is not last-good-brew evidence; blank notes do not generate fallback rebuy reasons or `footerMeta.extraInfo`.
+Quick Add Memory Mode is the current one-screen capture path for the same private contract. The default 20-second surface shows only bean name, roaster, would-buy-again choice, and a one-line note; purchase clues, origin, process, flavor tags, and acidity/sweetness/body stay behind optional detail disclosures. A nonblank one-line note is stored as note/description memory, but it is not last-good-brew evidence; blank notes do not generate fallback rebuy reasons or `footerMeta.extraInfo`.
 
 Evidence surfaces: `/capture`, `/onboarding`, `/dashboard`, `POST /api/v1/cards`
 
@@ -28,7 +28,7 @@ Evidence surfaces: `/dashboard`, `GET /api/v1/cards`
 
 ## Flow 3A. Save a 20-Second Quick Record
 
-Given a user wants to save a cup quickly, when they open Quick Add Memory Mode, then CoffeeDex shows bean name, roaster, whether they would buy again, and one-line note before optional detail fields. Purchase clues, flavor tags, package facts, and taste sliders stay outside the default quick-record surface.
+Given a user wants to save a cup quickly, when they open Quick Add Memory Mode, then CoffeeDex shows bean name, roaster, whether they would buy again, and one-line note before optional detail fields. If the user opens the purchase-clue disclosure, CoffeeDex can save a private purchase note such as store, price, or bag size, plus an optional purchase URL, so the later Rebuy Timing and Rebuy Intelligence surfaces can reopen that clue. Purchase clues, flavor tags, package facts, and taste sliders stay outside the default quick-record surface.
 
 Evidence surfaces: `/dashboard`, `QuickAddMemoryForm`, `POST /api/v1/cards`
 

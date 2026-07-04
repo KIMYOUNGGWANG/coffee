@@ -26,9 +26,12 @@ function loadQuickAddModule() {
       case "lucide-react":
         return {
           AlertCircle: () => null,
+          ChevronDown: () => null,
           Coffee: () => null,
+          Link2: () => null,
           Loader2: () => null,
           ShieldCheck: () => null,
+          ShoppingBag: () => null,
         };
       case "@/hooks/use-analytics-events":
         return { useAnalyticsEvents: () => ({ trackEvent: () => undefined }) };
@@ -119,8 +122,8 @@ test("Given quick add fields, When the user confirms again, Then the compact mem
   assert.equal(payload.repurchaseIntent, "again");
   assert.equal(payload.packageOrigin, null);
   assert.equal(payload.packageProcess, null);
-  assert.equal(payload.purchaseUrl, null);
-  assert.equal(payload.purchaseNote, null);
+  assert.equal(payload.purchaseUrl, "https://fritz.example/guji");
+  assert.equal(payload.purchaseNote, "공식몰 200g 옵션");
   assert.deepEqual(plain(payload.badges), ["20초 기록"]);
   assert.equal(payload.imageUrl, null);
   assert.deepEqual(plain(payload.repurchaseReasons), ["복숭아 단맛"]);
@@ -147,6 +150,22 @@ test("Given blank quick add note, When the user confirms again, Then no fallback
   assert.equal(payload.aiDescription, "Ethiopia Guji 빠른 기록");
   assert.deepEqual(plain(payload.repurchaseReasons), []);
   assert.equal(Object.hasOwn(payload.footerMeta, "extraInfo"), false);
+});
+
+test("Given blank quick add purchase clues, When the user confirms again, Then optional rebuy clues stay null", () => {
+  // Given
+  const { buildQuickAddMemoryPayload } = loadQuickAddModule();
+
+  // When
+  const payload = buildQuickAddMemoryPayload({
+    confirmed: true,
+    form: sampleForm({ purchaseUrl: "   ", purchaseNote: "   " }),
+    repurchaseIntent: "again",
+  });
+
+  // Then
+  assert.equal(payload.purchaseUrl, null);
+  assert.equal(payload.purchaseNote, null);
 });
 
 test("Given empty quick add title, When validation runs, Then it blocks submission with the Korean inline error", () => {

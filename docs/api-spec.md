@@ -55,9 +55,9 @@ PDF export, Stripe checkout and entitlements, story export, and public share rou
 Current capability is intentionally scoped to private coffee memory and retrieval:
 
 - personal tasting cards for cafes, home brews, and roasters such as Fritz, Terarosa, Momos, and Anthracite;
-- Quick Add Memory Mode for saving a confirmed private card from bean name, roaster, one-line note, and repurchase intent first; origin, process, flavor tags, and acidity/sweetness/body are optional detail fields rather than the default 20-second surface;
+- Quick Add Memory Mode for saving a confirmed private card from bean name, roaster, one-line note, and repurchase intent first; purchase clues, origin, process, flavor tags, and acidity/sweetness/body are optional detail fields rather than the default 20-second surface;
 - AI-assisted scan and note drafts that the user reviews before saving;
-- a 20-second default quick-record surface that keeps helper tags, package facts, and purchase clues out of the first screen unless the user opens optional details;
+- a 20-second default quick-record surface that keeps helper tags, package facts, and purchase clues out of the first screen unless the user opens optional details, where a purchase note can hold store, price, bag size, or buying context and a purchase URL can reopen the saved buying page later;
 - explicit repurchase memory and retrieval based on confirmed saved records;
 - private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
@@ -288,7 +288,7 @@ interface CreateCardResponse {
 }
 ```
 
-Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. The default 20-second path writes `confirmed: true`, `scanSource: "manual"`, bean name, roaster, repurchase intent, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. Purchase clues, package facts, helper tags, and taste metrics are optional detail fields rather than the default quick-record surface. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
+Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. The default 20-second path writes `confirmed: true`, `scanSource: "manual"`, bean name, roaster, repurchase intent, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. Purchase clues, package facts, helper tags, and taste metrics are optional detail fields rather than the default quick-record surface. When the user opens the purchase-clue disclosure, quick add may also write `purchaseUrl` and `purchaseNote` so future Rebuy Timing and Rebuy Intelligence surfaces can reopen the saved store, price, bag-size, or buying-link clue. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
 
 ### `POST /api/v1/cards/ai-note`
 
