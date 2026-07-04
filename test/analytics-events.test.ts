@@ -127,11 +127,14 @@ test.describe("CoffeeDex analytics events", () => {
     // Given
     const eventNames: string[] = [];
     await mockDashboardRoutes(page, eventNames);
+    await page.addInitScript(() => {
+      window.localStorage.setItem("coffeedex_analytics_test", "true");
+    });
 
     // When
     await page.goto("/dashboard");
     await expect(page.getByTestId("dashboard-ready")).toBeVisible();
-    await page.getByRole("button", { name: "원두 패키지 스캔하기" }).click();
+    await page.getByRole("button", { name: "20초 기록 시작" }).click();
 
     // Then
     await expect.poll(() => eventNames).toContain("dashboard_view");

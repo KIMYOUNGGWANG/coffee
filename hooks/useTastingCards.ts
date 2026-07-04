@@ -353,6 +353,8 @@ export function useCreateTastingCard() {
     onSuccess: () => {
       // Invalidate the cache to refresh card list dashboard
       queryClient.invalidateQueries({ queryKey: ["tasting-cards"] });
+      queryClient.invalidateQueries({ queryKey: ["rebuy-intelligence"] });
+      queryClient.invalidateQueries({ queryKey: ["taste-analytics"] });
     },
   });
 }

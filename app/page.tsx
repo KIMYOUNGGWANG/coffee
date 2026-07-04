@@ -30,6 +30,9 @@ export default function CoffeeDexHomePage() {
             <Link className="hidden text-sm font-bold tracking-wide text-muted-foreground transition-colors hover:text-foreground md:inline-flex" href="/onboarding">
               온보딩 가이드
             </Link>
+            <Link className="hidden text-sm font-bold tracking-wide text-muted-foreground transition-colors hover:text-foreground md:inline-flex" href="/en" hrefLang="en">
+              English
+            </Link>
             <Link className={cn(buttonVariants({ size: "sm" }), "shrink-0 rounded-full border-none bg-[var(--surface-strong)] px-5 py-4 text-xs font-bold !text-[var(--accent-foreground)] transition-all hover:bg-[#372319]")} href="/capture">
               20초 기록 시작
             </Link>

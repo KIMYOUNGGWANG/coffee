@@ -364,7 +364,7 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     await expect(page.getByRole("heading", { name: "다음에 다시 살 커피를 놓치지 않게" })).toBeVisible();
     await expect(page.getByText("Next Cup")).toBeVisible();
     await expect(page.getByRole("button", { name: /오늘 마무리 컵/ })).toBeVisible();
-    await expect(page.getByText("다시 살 후보")).toBeVisible();
+    await expect(page.getByRole("region", { name: "다시 살 단서" }).getByText("다시 살 후보")).toBeVisible();
     await expect(page.getByText("닮은 취향")).toBeVisible();
     await expect(page.getByText("다시 찾을 원두")).toBeVisible();
     await expect(page.getByRole("button", { name: /다음엔 다르게/ })).toBeVisible();
@@ -388,7 +388,7 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
       await expect(page.getByText("앱 내부 리마인더")).toBeVisible();
       await page.waitForTimeout(900);
     }
-    await page.getByText("다시 살래요").click({ force: true });
+    await page.getByTestId("rebuy-action-loop").getByRole("button", { name: "다시 살래요" }).click({ force: true });
 
     expect(patchBodies).toEqual([
       { rebuyPriority: "pinned" },

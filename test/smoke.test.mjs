@@ -28,6 +28,9 @@ const unsupportedCommunityClaimPattern = new RegExp(
 
 test("CoffeeDex package identity exposes the real app stack", () => {
   const packageJson = readJson("package.json");
+  const playwrightConfig = read("playwright.config.ts");
+  const readme = read("README.md");
+  const ciWorkflow = read(".github/workflows/ci.yml");
   const providersSource = read("components/providers.tsx");
   const tastingHooksSource = read("hooks/useTastingCards.ts");
   const browserClientSource = read("lib/supabase/browser.ts");
@@ -62,6 +65,17 @@ test("CoffeeDex package identity exposes the real app stack", () => {
   assert.match(tastingHooksSource, /\/api\/v1\/profile\/analytics/);
   assert.match(tastingHooksSource, /\/api\/v1\/cards\/scan/);
   assert.match(browserClientSource, /createBrowserClient/);
+  assert.match(playwrightConfig, /npx next start/);
+  assert.doesNotMatch(playwrightConfig, /\/Users\//);
+  assert.match(readme, /CoffeeDex/);
+  assert.match(readme, /좋았던 원두|coffees worth finding again/i);
+  assert.match(readme, /npm run validate:full/);
+  assert.match(ciWorkflow, /npm ci/);
+  assert.match(ciWorkflow, /npm run test:product-truth/);
+  assert.match(ciWorkflow, /npm run test:routes/);
+  assert.match(ciWorkflow, /npm run typecheck/);
+  assert.match(ciWorkflow, /npm run build/);
+  assert.doesNotMatch(ciWorkflow, /\/Users\//);
 });
 
 test("CoffeeDex docs cover memory contracts and golden flows", () => {
@@ -136,6 +150,7 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
 
 test("CoffeeDex pages and routes present the coffee memory product", () => {
   const homePage = read("app/page.tsx");
+  const englishHomePage = read("app/en/page.tsx");
   const dashboardPage = read("app/dashboard/page.tsx");
   const dashboardClient = read("components/dashboard-client.tsx");
   const dashboardHeader = read("components/dashboard-header.tsx");
@@ -154,6 +169,11 @@ test("CoffeeDex pages and routes present the coffee memory product", () => {
   assert.match(homePage, /CoffeeDex/);
   assert.match(homePage, /다시 살 원두를/);
   assert.match(homePage, /20초 만에 기억/);
+  assert.match(homePage, /href="\/en"/);
+  assert.match(englishHomePage, /Remember coffees worth buying again/);
+  assert.match(englishHomePage, /Start a 20-sec record/);
+  assert.match(englishHomePage, /Marketplace, referral, roaster partnerships, and community feeds are future layers/);
+  assert.match(englishHomePage, /href="\/"/);
   assert.match(homePage, /Fritz Ethiopia Sidama/);
   assert.match(dashboardPage, /DashboardClient/);
   assert.match(dashboardHeader, /Private coffee room/);
@@ -207,7 +227,16 @@ test("dashboard uses a mobile-first CoffeeDex app shell", () => {
   assert.match(dashboardNavigation, /서랍/);
   assert.match(dashboardNavigation, /취향/);
   assert.match(dashboardNavigation, /설정/);
+  assert.match(dashboardClient, /다시 살 후보/);
+  assert.match(dashboardClient, /최근 저장한 원두/);
+  assert.match(dashboardClient, /20초 기록/);
+  assert.match(dashboardShelfView, /다음에 이렇게 검색하세요/);
+  assert.match(dashboardShelfView, /다시 살 후보에 저장됨/);
   assert.match(dashboardShelfView, /CoffeeShelfGrid/);
+  assert.ok(
+    dashboardShelfView.indexOf("<DashboardRebuyIntelligencePanel") < dashboardShelfView.indexOf("<CoffeeShelfGrid"),
+    "Rebuy Intelligence should be declared before Fresh Shelf inventory on the shelf view",
+  );
   assert.match(coffeeShelfGrid, /evaluateFreshShelfStatus/);
   assert.match(coffeeShelfGrid, /freshShelfStatus\.label/);
   assert.match(coffeeShelfGrid, /freshShelfStatus\.reason/);

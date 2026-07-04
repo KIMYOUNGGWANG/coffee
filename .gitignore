@@ -16,8 +16,13 @@ node_modules/
 coverage/
 playwright-report/
 test-results/
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+public/swe-worker-*.js.map
 .omo/evidence/
 .omo/ulw-loop/
+artifacts/launch-readiness-final/
 .agents/
 .agent/scripts
 .agent/skills

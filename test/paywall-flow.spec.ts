@@ -72,7 +72,7 @@ test.describe("Monetization Paywall Flow", () => {
     
     await page.waitForTimeout(1000);
 
-    await page.getByRole("button", { name: "원두 패키지 스캔하기" }).first().click();
+    await page.getByRole("button", { name: "라벨 스캔으로 채우기" }).first().click();
 
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles({

@@ -65,6 +65,19 @@ function buildCoffeeSearchPhrase(card: TastingCardData): string {
   return query || "원두 이름 로스터리";
 }
 
+function getRepurchaseSaveLabel(card: TastingCardData): string {
+  switch (card.repurchase_intent) {
+    case "again":
+      return "다시 살 후보에 저장됨";
+    case "maybe":
+      return "고민할 원두로 저장됨";
+    case "no":
+      return "이번만 마신 기록으로 저장됨";
+    case "undecided":
+      return "비공개 기억으로 저장됨";
+  }
+}
+
 function DashboardFirstSaveReward({
   cards,
   onQuickAdd,
@@ -85,12 +98,15 @@ function DashboardFirstSaveReward({
     <section className="premium-shell mb-5" aria-label="저장 후 다음 구매 단서">
       <div className="premium-card grid gap-4 p-4 md:grid-cols-[1.05fr_0.95fr_1fr] md:p-5">
         <article className="rounded-2xl border border-primary-amber/20 bg-primary-amber/10 p-4">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">방금 남긴 재구매 단서</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">저장 완료</p>
           <p className="mt-2 break-keep text-xl font-black leading-tight text-background-dark">{firstCard.title}</p>
+          <p className="mt-2 inline-flex min-h-8 items-center rounded-full bg-background-dark px-3 text-xs font-black text-[#fff8ec]">
+            {getRepurchaseSaveLabel(firstCard)}
+          </p>
           <p className="mt-2 break-keep text-sm font-bold leading-6 text-muted-foreground">{rebuyReason}</p>
         </article>
         <article className="rounded-2xl border border-background-dark/10 bg-[#fffaf2] p-4">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">다음에 그대로 검색</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">다음에 이렇게 검색하세요</p>
           <p className="mt-2 break-keep text-sm font-black leading-6 text-background-dark">{keywords}</p>
           <p className="mt-2 rounded-xl border border-background-dark/10 bg-white px-3 py-2 font-mono text-xs font-black text-background-dark">
             {searchPhrase}
@@ -98,7 +114,7 @@ function DashboardFirstSaveReward({
         </article>
         <article className="rounded-2xl border border-background-dark/10 bg-white p-4">
           <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">지금 할 일</p>
-          <p className="mt-2 break-keep text-sm font-black leading-6 text-background-dark">마음에 들었으면 검색을 열고, 애매하면 다음 원두도 20초로 비교하세요.</p>
+          <p className="mt-2 break-keep text-sm font-black leading-6 text-background-dark">좋았던 원두는 바로 검색하고, 다음 원두도 20초 기록으로 비교하세요.</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <a
               className="inline-flex min-h-9 items-center rounded-full bg-background-dark px-3 text-xs font-black text-[#fff8ec] transition hover:-translate-y-0.5"
@@ -116,7 +132,7 @@ function DashboardFirstSaveReward({
               20초 기록 더 남기기
             </button>
           </div>
-          <p className="mt-2 text-xs font-semibold text-muted-foreground">이 화면이 CoffeeDex의 핵심입니다. 기억 대신 검색 가능한 단서를 남깁니다.</p>
+          <p className="mt-2 text-xs font-semibold text-muted-foreground">CoffeeDex는 원두 이름을 외우는 대신, 다시 찾을 단서를 남깁니다.</p>
         </article>
       </div>
     </section>
@@ -168,6 +184,18 @@ export function DashboardShelfView({
 }: DashboardShelfViewProps) {
   return (
     <>
+      <DashboardFirstSaveReward cards={cards} onQuickAdd={onQuickAdd} />
+      {(cards.length > 0 || rebuyIntelligence) && (
+        <DashboardRebuyIntelligencePanel
+          data={rebuyIntelligence}
+          cards={cards}
+          isLoading={isRebuyIntelligenceLoading}
+          error={rebuyIntelligenceError}
+          onQuickAdd={onQuickAdd}
+          onOpenLog={onOpenLog}
+          onSelectCard={onSelectCard}
+        />
+      )}
       {hasCards && (
         <DashboardShelfFilters
           searchQuery={searchQuery}
@@ -190,19 +218,7 @@ export function DashboardShelfView({
           onReset={onResetFilters}
         />
       )}
-      <DashboardFirstSaveReward cards={cards} onQuickAdd={onQuickAdd} />
       <CoffeeShelfGrid onDataChange={onShelfDataChange} />
-      {(cards.length > 0 || rebuyIntelligence) && (
-        <DashboardRebuyIntelligencePanel
-          data={rebuyIntelligence}
-          cards={cards}
-          isLoading={isRebuyIntelligenceLoading}
-          error={rebuyIntelligenceError}
-          onQuickAdd={onQuickAdd}
-          onOpenLog={onOpenLog}
-          onSelectCard={onSelectCard}
-        />
-      )}
       {cards.length > 0 && (
         <>
           <DashboardRetentionLoop cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />

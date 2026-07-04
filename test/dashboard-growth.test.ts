@@ -140,9 +140,10 @@ test.describe("CoffeeDex growth dashboard", () => {
     await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
 
     // Then
-    await expect(page.getByText("20초 안에 첫 기록")).toBeVisible();
-    await expect(page.getByText("첫 원두를 선반에 올려보세요.")).toBeVisible();
-    await expect(page.getByRole("button", { name: "원두 패키지 스캔하기" })).toBeVisible();
+    await expect(page.getByText("이름, 로스터리, 다시 살지만 남기세요.")).toBeVisible();
+    await expect(page.getByText("첫 기록은 20초면 충분합니다.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "20초 기록 시작" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "라벨 스캔으로 채우기" })).toBeVisible();
   });
 
   test("quick add 빠른 기록 opens a four-field 20-second memory path", async ({ page }) => {
@@ -153,11 +154,11 @@ test.describe("CoffeeDex growth dashboard", () => {
     await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
 
     // Then
-    const quickAddButton = page.getByRole("button", { name: /빠른 기록|빠른 커피 기록/ });
+    const quickAddButton = page.getByRole("button", { name: "20초 기록 시작" });
     await expect(quickAddButton).toBeVisible();
     await quickAddButton.click();
     await expect(page.getByLabel("원두 이름")).toBeVisible();
-    await expect(page.getByLabel("로스터리")).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "로스터리" })).toBeVisible();
     await expect(page.getByText("다시 살까요?")).toBeVisible();
     await expect(page.getByLabel("한 줄 메모")).toBeVisible();
     await expect(page.getByText("사진 원본은 저장하지 않아요. 내 서랍에는 확인한 기록과 다시 살 단서만 비공개로 남아요.")).toBeVisible();
