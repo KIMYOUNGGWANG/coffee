@@ -38,6 +38,12 @@ Given a user has private cards marked `again` or `maybe`, or cards with saved pu
 
 Evidence surfaces: `/dashboard`, `buildRebuyTimingMemory`, `DashboardRebuyTimingMemoryPanel`
 
+## Flow 3C. Explain My Rebuy Taste
+
+Given a user has private cards marked `again` or `maybe`, when they open the dashboard, then CoffeeDex derives a copyable Taste Rebuy Brief from the user's own liked cards, tags, acidity/sweetness/body scores, sample bean names, and saved rebuy reasons. The brief lets the user explain what they tend to buy again in Korean before searching, asking a barista, or choosing another bean. This is a private preference recall surface only; it is not AI marketplace recommendation, community taste matching, public profile, roaster ordering, or badge collection.
+
+Evidence surfaces: `/dashboard`, `buildRebuyTasteBrief`, `DashboardRebuyTasteBriefPanel`
+
 ## Flow 4. Use Fresh Shelf Rebuy Timing
 
 Given a user has beans on the private shelf, when CoffeeDex renders the shelf card, then it derives a Korean next-action signal from roast date, opened date, fill level, and finished state: wait, drink now, finish soon, or rebuy. The card also derives a Peak Window cue from the owned roast/open dates so the user can see whether a bean is still resting, in its peak range, ready to finish now, or past its peak. The card also estimates Shelf Runway: grams left, cups remaining, likely run-out timing, and a suggested in-app rebuy reminder date from the user's own weight, fill level, and opened date. If the user saved a purchase link or buying note, the shelf keeps that private clue so the user can reopen it later; otherwise CoffeeDex falls back to a search URL. The user can also pin a bean as a personal rebuy candidate, apply the suggested next-buy date, and mark it as drank, will-rebuy, or rebought. This guidance is local product memory, not a push notification, roaster order, marketplace listing, or partner referral.
