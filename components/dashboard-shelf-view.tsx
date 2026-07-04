@@ -4,6 +4,7 @@ import DashboardCardsSection from "@/components/dashboard-cards-section";
 import { DashboardFeaturedArchiveCard } from "@/components/dashboard-featured-archive-card";
 import { DashboardPassportSidebar } from "@/components/dashboard-passport-sidebar";
 import { DashboardRebuyIntelligencePanel } from "@/components/dashboard-rebuy-intelligence-panel";
+import { DashboardRebuyTimingMemoryPanel } from "@/components/dashboard-rebuy-timing-memory-panel";
 import { DashboardRetentionLoop } from "@/components/dashboard-retention-loop";
 import { DashboardShelfFilters } from "@/components/dashboard-shelf-filters";
 import CoffeeShelfGrid from "@/components/coffee-shelf-grid";
@@ -185,6 +186,7 @@ export function DashboardShelfView({
   return (
     <>
       <DashboardFirstSaveReward cards={cards} onQuickAdd={onQuickAdd} />
+      <DashboardRebuyTimingMemoryPanel cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />
       {(cards.length > 0 || rebuyIntelligence) && (
         <DashboardRebuyIntelligencePanel
           data={rebuyIntelligence}
