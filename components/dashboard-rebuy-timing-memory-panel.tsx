@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, Clock3, Copy, ExternalLink, RefreshCcw, Search, ShoppingBag } from "lucide-react";
 import type { TastingCardData } from "@/hooks/useTastingCards";
+import { buildRebuyShelfTransferPayload } from "@/lib/rebuy-shelf-transfer";
 import { buildRebuyTimingMemory, type RebuyTimingCandidate } from "@/lib/rebuy-timing-memory";
 
 type DashboardRebuyTimingMemoryPanelProps = {
@@ -30,13 +32,35 @@ function openExternal(url: string) {
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
+async function readJsonResponse(response: Response): Promise<unknown> {
+  const text = await response.text();
+  if (text.trim().length === 0) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
+
+function readErrorMessage(json: unknown, fallbackMessage: string): string {
+  if (!json || typeof json !== "object" || !("error" in json)) return fallbackMessage;
+  const error = (json as { error?: unknown }).error;
+  if (!error || typeof error !== "object" || !("message" in error)) return fallbackMessage;
+  const message = (error as { message?: unknown }).message;
+  return typeof message === "string" && message.trim().length > 0 ? message : fallbackMessage;
+}
+
 export function DashboardRebuyTimingMemoryPanel({
   cards,
   onQuickAdd,
   onSelectCard,
 }: DashboardRebuyTimingMemoryPanelProps) {
+  const queryClient = useQueryClient();
   const memory = buildRebuyTimingMemory(cards);
   const [copiedCardId, setCopiedCardId] = useState<string | null>(null);
+  const [savingShelfCardId, setSavingShelfCardId] = useState<string | null>(null);
+  const [savedShelfCardIds, setSavedShelfCardIds] = useState<readonly string[]>([]);
 
   async function copySearchPhrase(candidate: RebuyTimingCandidate) {
     try {
@@ -45,6 +69,34 @@ export function DashboardRebuyTimingMemoryPanel({
       window.setTimeout(() => setCopiedCardId((current) => (current === candidate.cardId ? null : current)), 1800);
     } catch {
       window.alert("검색 문장을 복사하지 못했습니다. 문장을 길게 눌러 직접 복사해주세요.");
+    }
+  }
+
+  async function startShelfMemory(card: TastingCardData | null, candidate: RebuyTimingCandidate) {
+    if (!card) {
+      onQuickAdd();
+      return;
+    }
+
+    try {
+      setSavingShelfCardId(candidate.cardId);
+      const response = await fetch("/api/v1/shelf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildRebuyShelfTransferPayload(card)),
+      });
+      const json = await readJsonResponse(response);
+
+      if (!response.ok) {
+        throw new Error(readErrorMessage(json, "재구매한 원두를 선반에 저장하지 못했습니다."));
+      }
+
+      setSavedShelfCardIds((current) => Array.from(new Set([...current, candidate.cardId])));
+      await queryClient.invalidateQueries({ queryKey: ["rebuy-intelligence"] });
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "재구매한 원두를 선반에 저장하지 못했습니다.");
+    } finally {
+      setSavingShelfCardId(null);
     }
   }
 
@@ -107,6 +159,8 @@ export function DashboardRebuyTimingMemoryPanel({
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           {memory.candidates.map((candidate) => {
             const card = findCard(cards, candidate);
+            const isSavingShelf = savingShelfCardId === candidate.cardId;
+            const isSavedShelf = savedShelfCardIds.includes(candidate.cardId);
             return (
               <article
                 key={candidate.cardId}
@@ -176,6 +230,15 @@ export function DashboardRebuyTimingMemoryPanel({
                     {candidate.actionLabel}
                   </button>
                 </div>
+                <button
+                  type="button"
+                  disabled={isSavingShelf || isSavedShelf}
+                  onClick={() => void startShelfMemory(card, candidate)}
+                  className="mt-2 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-primary-amber/30 bg-primary-amber/10 px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  <ShoppingBag size={13} />
+                  {isSavedShelf ? "선반 기억 시작됨" : isSavingShelf ? "선반에 저장 중" : "다시 샀음, 선반 시작"}
+                </button>
               </article>
             );
           })}
