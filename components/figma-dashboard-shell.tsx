@@ -33,7 +33,7 @@ export function FigmaDashboardShell({
 }: FigmaDashboardShellProps) {
   return (
     <main className="min-h-[100dvh] bg-[var(--background)] text-[var(--foreground)]">
-      <div className="mx-auto grid w-full max-w-[88rem] gap-4 px-3 py-3 md:grid-cols-[15.5rem_minmax(0,1fr)] md:px-5 md:py-5">
+      <div className="mx-auto grid w-full max-w-[88rem] gap-4 px-3 pb-[calc(7.25rem+env(safe-area-inset-bottom))] pt-3 md:grid-cols-[15.5rem_minmax(0,1fr)] md:px-5 md:pb-5 md:pt-5">
         <aside className="dashboard-rail">
           <Link href="/" className="dashboard-brand" aria-label={`${coffeeDexBrand.name} 홈`}>
             <span className="dashboard-brand-mark">

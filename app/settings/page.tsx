@@ -4,7 +4,6 @@ import { CreditCard, Settings } from "lucide-react";
 
 import { AccountDataControls } from "@/components/account-data-controls";
 import { FigmaDashboardShell } from "@/components/figma-dashboard-shell";
-import { SettingsBottomNavigation } from "@/components/settings-bottom-navigation";
 import { SettingsUsageBilling } from "@/components/settings-usage-billing";
 
 export const metadata: Metadata = {
@@ -47,7 +46,6 @@ export default function SettingsPage() {
       </section>
 
       <AccountDataControls />
-      <SettingsBottomNavigation />
     </FigmaDashboardShell>
   );
 }
