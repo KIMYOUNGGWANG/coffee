@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Check, Clock3, Copy, ExternalLink, RefreshCcw, Search, ShoppingBag } from "lucide-react";
 import type { TastingCardData } from "@/hooks/useTastingCards";
+import { buildRebuyPaceMemory } from "@/lib/rebuy-pace-memory";
 import { buildRebuyPurchaseMemory } from "@/lib/rebuy-purchase-memory";
 import { buildRebuyShelfTransferPayload } from "@/lib/rebuy-shelf-transfer";
 import { buildRebuyTimingMemory, type RebuyTimingCandidate } from "@/lib/rebuy-timing-memory";
@@ -163,6 +164,7 @@ export function DashboardRebuyTimingMemoryPanel({
             const isSavingShelf = savingShelfCardId === candidate.cardId;
             const isSavedShelf = savedShelfCardIds.includes(candidate.cardId);
             const purchaseMemory = buildRebuyPurchaseMemory(card?.purchase_note ?? null);
+            const paceMemory = buildRebuyPaceMemory(card?.purchase_note ?? null, candidate.daysSince);
             return (
               <article
                 key={candidate.cardId}
@@ -200,6 +202,20 @@ export function DashboardRebuyTimingMemoryPanel({
                           {label}
                         </span>
                       ))}
+                    </div>
+                  )}
+                  {paceMemory.hasCue && (
+                    <div className="mt-2 rounded-2xl border border-primary-amber/20 bg-white px-3 py-2">
+                      <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">
+                        <Clock3 size={12} />
+                        소진 감각
+                      </p>
+                      <p className="mt-1 break-keep text-xs font-black leading-5 text-background-dark">
+                        {paceMemory.cupsLabel} · {paceMemory.timingLabel}
+                      </p>
+                      <p className="mt-0.5 text-[10px] font-bold text-muted-foreground">
+                        {paceMemory.detailLabel}
+                      </p>
                     </div>
                   )}
                 </div>

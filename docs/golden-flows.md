@@ -34,9 +34,9 @@ Evidence surfaces: `/dashboard`, `QuickAddMemoryForm`, `POST /api/v1/cards`
 
 ## Flow 3B. Revisit Rebuy Timing Memory
 
-Given a user has private cards marked `again` or `maybe`, or cards with saved purchase clues, when they open the dashboard, then CoffeeDex derives a Rebuy Timing Memory panel from the user's own card dates, roaster/bean labels, repurchase reasons, purchase URL, and buying note. The panel groups candidates as fresh memory, time to re-check, or easy-to-forget overdue memory, exposes a copyable search phrase built from the user's saved roaster, bean, purchase note, and tags, and turns purchase notes into private purchase-memory chips such as store, price, and bag size when those clues are present. It opens either the saved card or the user's saved purchase/search clue. This is a private recall surface only; it is not a collection badge, public recommendation, marketplace listing, roaster order, referral, or push notification.
+Given a user has private cards marked `again` or `maybe`, or cards with saved purchase clues, when they open the dashboard, then CoffeeDex derives a Rebuy Timing Memory panel from the user's own card dates, roaster/bean labels, repurchase reasons, purchase URL, and buying note. The panel groups candidates as fresh memory, time to re-check, or easy-to-forget overdue memory, exposes a copyable search phrase built from the user's saved roaster, bean, purchase note, and tags, turns purchase notes into private purchase-memory chips such as store, price, and bag size when those clues are present, and derives a conservative bag-to-cup pace cue from saved bag size plus days since the memory. It opens either the saved card or the user's saved purchase/search clue. This is a private recall surface only; it is not a collection badge, public recommendation, marketplace listing, roaster order, referral, or push notification.
 
-Evidence surfaces: `/dashboard`, `buildRebuyTimingMemory`, `buildRebuyPurchaseMemory`, `DashboardRebuyTimingMemoryPanel`
+Evidence surfaces: `/dashboard`, `buildRebuyTimingMemory`, `buildRebuyPurchaseMemory`, `buildRebuyPaceMemory`, `DashboardRebuyTimingMemoryPanel`
 
 ## Flow 3C. Explain My Rebuy Taste
 
