@@ -67,10 +67,10 @@ export function AccountDataControls() {
   }
 
   return (
-    <div className="mx-auto grid max-w-4xl items-start gap-5 lg:grid-cols-2">
-      <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.22)] sm:p-6">
+    <div className="grid items-start gap-4 lg:grid-cols-2">
+      <section className="dashboard-panel p-5 sm:p-6">
         <div className="grid gap-3 sm:grid-cols-[2.75rem_minmax(0,1fr)]">
-          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-primary-amber/10 text-primary-amber">
+          <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-primary-amber/25 bg-primary-amber/10 text-primary-amber">
             <Download aria-hidden="true" size={20} />
           </span>
           <div className="min-w-0">
@@ -93,7 +93,7 @@ export function AccountDataControls() {
           </a>
           <a
             href="/api/v1/export?format=csv"
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 text-sm font-extrabold text-foreground transition-[background-color,transform] hover:bg-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring)] active:scale-[0.98]"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-extrabold text-foreground transition-[background-color,transform] hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--ring)] active:scale-[0.98]"
           >
             <FileSpreadsheet aria-hidden="true" size={18} />
             CSV 내려받기
@@ -101,7 +101,7 @@ export function AccountDataControls() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-[color:var(--danger)]/40 bg-[color:var(--danger)]/[0.06] p-5 sm:p-6" aria-labelledby="delete-account-title">
+      <section className="rounded-3xl border border-[color:var(--danger)]/35 bg-[color:var(--danger)]/[0.06] p-5 shadow-[0_18px_50px_rgba(73,48,36,0.08)] sm:p-6" aria-labelledby="delete-account-title">
         <div className="grid gap-3 sm:grid-cols-[2.75rem_minmax(0,1fr)]">
           <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[color:var(--danger)]/15 text-[color:var(--danger)]">
             <ShieldAlert aria-hidden="true" size={20} />
@@ -116,11 +116,11 @@ export function AccountDataControls() {
           커피 기록과 계정 정보가 영구 삭제되며 되돌릴 수 없습니다. 로그아웃과는 별개의 작업입니다.
         </p>
 
-        <div className="mt-5 rounded-2xl border border-white/10 bg-black/15 p-4">
+        <div className="mt-5 rounded-2xl border border-[color:var(--danger)]/20 bg-[color:var(--surface)]/70 p-4">
           <label htmlFor="account-deletion-confirmation" className="block text-sm font-bold">
             아래 확인 문구를 정확히 입력하세요.
           </label>
-          <code className="mt-2 block break-all rounded-lg bg-black/20 px-3 py-2 text-xs text-primary-amber">
+          <code className="mt-2 block break-all rounded-lg border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-2 text-xs font-bold text-primary-amber">
             {ACCOUNT_DELETION_CONFIRMATION}
           </code>
           <input
@@ -129,7 +129,7 @@ export function AccountDataControls() {
             onChange={(event) => setConfirmation(event.target.value)}
             disabled={isDeleted}
             autoComplete="off"
-            className="mt-3 min-h-12 w-full rounded-xl border border-white/15 bg-background-dark px-3 text-base text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground focus:border-primary-amber focus:ring-4 focus:ring-[var(--ring)] disabled:opacity-60"
+            className="mt-3 min-h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-base text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground focus:border-primary-amber focus:ring-4 focus:ring-[var(--ring)] disabled:opacity-60"
             placeholder="확인 문구 입력"
           />
 
@@ -145,7 +145,7 @@ export function AccountDataControls() {
           </label>
         </div>
 
-        {errorMessage && <p role="alert" className="mt-4 rounded-xl border border-[color:var(--danger)]/30 bg-black/15 px-4 py-3 text-sm text-foreground">{errorMessage}</p>}
+        {errorMessage && <p role="alert" className="mt-4 rounded-xl border border-[color:var(--danger)]/30 bg-[color:var(--surface)]/70 px-4 py-3 text-sm text-foreground">{errorMessage}</p>}
         {isDeleted && <p role="status" className="mt-4 rounded-xl border border-[color:var(--success)]/40 bg-[color:var(--success)]/10 px-4 py-3 text-sm text-foreground">계정 삭제가 완료되었습니다.</p>}
 
         <Button
