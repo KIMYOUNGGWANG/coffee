@@ -28,6 +28,9 @@ const unsupportedCommunityClaimPattern = new RegExp(
 
 test("CoffeeDex package identity exposes the real app stack", () => {
   const packageJson = readJson("package.json");
+  const playwrightConfig = read("playwright.config.ts");
+  const readme = read("README.md");
+  const ciWorkflow = read(".github/workflows/ci.yml");
   const providersSource = read("components/providers.tsx");
   const tastingHooksSource = read("hooks/useTastingCards.ts");
   const browserClientSource = read("lib/supabase/browser.ts");
@@ -62,6 +65,17 @@ test("CoffeeDex package identity exposes the real app stack", () => {
   assert.match(tastingHooksSource, /\/api\/v1\/profile\/analytics/);
   assert.match(tastingHooksSource, /\/api\/v1\/cards\/scan/);
   assert.match(browserClientSource, /createBrowserClient/);
+  assert.match(playwrightConfig, /npx next start/);
+  assert.doesNotMatch(playwrightConfig, /\/Users\//);
+  assert.match(readme, /CoffeeDex/);
+  assert.match(readme, /좋았던 원두|coffees worth finding again/i);
+  assert.match(readme, /npm run validate:full/);
+  assert.match(ciWorkflow, /npm ci/);
+  assert.match(ciWorkflow, /npm run test:product-truth/);
+  assert.match(ciWorkflow, /npm run test:routes/);
+  assert.match(ciWorkflow, /npm run typecheck/);
+  assert.match(ciWorkflow, /npm run build/);
+  assert.doesNotMatch(ciWorkflow, /\/Users\//);
 });
 
 test("CoffeeDex docs cover memory contracts and golden flows", () => {
