@@ -22,11 +22,18 @@ function transpile(source, fileName) {
 async function loadRebuyShelfTransferModule() {
   const tempDirectory = mkdtempSync(path.join(tmpdir(), "coffeedex-rebuy-shelf-transfer-"));
   const sourcePath = path.join(projectRoot, "lib/rebuy-shelf-transfer.ts");
+  const purchaseMemorySourcePath = path.join(projectRoot, "lib/rebuy-purchase-memory.ts");
 
   assert.equal(existsSync(sourcePath), true);
+  assert.equal(existsSync(purchaseMemorySourcePath), true);
+  writeFileSync(
+    path.join(tempDirectory, "rebuy-purchase-memory.mjs"),
+    transpile(readFileSync(purchaseMemorySourcePath, "utf8"), purchaseMemorySourcePath),
+  );
   writeFileSync(
     path.join(tempDirectory, "rebuy-shelf-transfer.mjs"),
-    transpile(readFileSync(sourcePath, "utf8"), sourcePath),
+    transpile(readFileSync(sourcePath, "utf8"), sourcePath)
+      .replace('from "./rebuy-purchase-memory";', 'from "./rebuy-purchase-memory.mjs";'),
   );
 
   try {

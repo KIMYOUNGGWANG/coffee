@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Check, Clock3, Copy, ExternalLink, RefreshCcw, Search, ShoppingBag } from "lucide-react";
 import type { TastingCardData } from "@/hooks/useTastingCards";
+import { buildRebuyPurchaseMemory } from "@/lib/rebuy-purchase-memory";
 import { buildRebuyShelfTransferPayload } from "@/lib/rebuy-shelf-transfer";
 import { buildRebuyTimingMemory, type RebuyTimingCandidate } from "@/lib/rebuy-timing-memory";
 
@@ -161,6 +162,7 @@ export function DashboardRebuyTimingMemoryPanel({
             const card = findCard(cards, candidate);
             const isSavingShelf = savingShelfCardId === candidate.cardId;
             const isSavedShelf = savedShelfCardIds.includes(candidate.cardId);
+            const purchaseMemory = buildRebuyPurchaseMemory(card?.purchase_note ?? null);
             return (
               <article
                 key={candidate.cardId}
@@ -191,6 +193,15 @@ export function DashboardRebuyTimingMemoryPanel({
                   <p className="mt-1 line-clamp-2 break-keep text-xs font-bold leading-5 text-background-dark">
                     {candidate.purchaseCue}
                   </p>
+                  {purchaseMemory.hasStructuredMemory && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {purchaseMemory.summaryLabels.map((label) => (
+                        <span key={label} className="rounded-full border border-background-dark/10 bg-white px-2 py-1 text-[10px] font-black text-background-dark/75">
+                          {label}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="mt-3 rounded-2xl border border-primary-amber/20 bg-[#fff8ec] p-3">
                   <div className="flex items-start justify-between gap-3">

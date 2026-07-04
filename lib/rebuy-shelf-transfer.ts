@@ -1,3 +1,5 @@
+import { readPurchaseBagWeight } from "./rebuy-purchase-memory";
+
 export type RebuyShelfTransferCard = {
   readonly id: string;
   readonly title: string;
@@ -29,8 +31,6 @@ export type RebuyShelfTransferPayload = {
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const WEIGHT_PATTERN = /(\d+(?:\.\d+)?)\s?(kg|킬로|g|그램|그람)/i;
-
 function isNonBlank(value: string | null | undefined): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
@@ -40,17 +40,6 @@ function normalize(value: string | null | undefined): string | null {
   return value.trim();
 }
 
-function readBagWeight(purchaseNote: string | null): number {
-  const match = purchaseNote?.match(WEIGHT_PATTERN);
-  if (!match) return 200;
-
-  const amount = Number.parseFloat(match[1] ?? "");
-  const unit = match[2]?.toLowerCase();
-  const grams = unit === "kg" || unit === "킬로" ? amount * 1000 : amount;
-  if (!Number.isFinite(grams)) return 200;
-  return Math.round(Math.min(1000, Math.max(50, grams)));
-}
-
 export function buildRebuyShelfTransferPayload(card: RebuyShelfTransferCard): RebuyShelfTransferPayload {
   return {
     roasterName: normalize(card.subtitle) ?? "기록한 로스터리",
@@ -58,7 +47,7 @@ export function buildRebuyShelfTransferPayload(card: RebuyShelfTransferCard): Re
     origin: normalize(card.package_origin) ?? normalize(card.footer_meta?.origin),
     roastDate: null,
     openedDate: null,
-    totalWeight: readBagWeight(card.purchase_note),
+    totalWeight: readPurchaseBagWeight(card.purchase_note) ?? 200,
     fillLevel: 100,
     tastingCardId: UUID_PATTERN.test(card.id) ? card.id : null,
     purchaseUrl: normalize(card.purchase_url),
