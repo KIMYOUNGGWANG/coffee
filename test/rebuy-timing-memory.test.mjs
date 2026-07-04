@@ -94,6 +94,9 @@ test("Given saved rebuy memories, When timing memory is built, Then overdue dire
     assert.equal(result.candidates[0].cardId, "card-direct");
     assert.equal(result.candidates[0].stage, "overdue");
     assert.equal(result.candidates[0].hasDirectPurchaseClue, true);
+    assert.match(result.candidates[0].searchPhrase, /Anthracite/);
+    assert.match(result.candidates[0].searchPhrase, /Colombia El Paraiso/);
+    assert.match(result.candidates[0].searchPhrase, /공식몰 200g 옵션/);
     assert.equal(result.candidates[0].searchUrl, "https://example.com/colombia");
     assert.match(result.summary, /2개 후보/);
   } finally {

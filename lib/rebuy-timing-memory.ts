@@ -28,6 +28,7 @@ export type RebuyTimingCandidate = {
   readonly daysSince: number;
   readonly reason: string;
   readonly purchaseCue: string;
+  readonly searchPhrase: string;
   readonly searchUrl: string;
   readonly actionLabel: string;
   readonly hasDirectPurchaseClue: boolean;
@@ -88,10 +89,16 @@ function actionLabelFor(stage: RebuyTimingStage, hasDirectPurchaseClue: boolean)
   return "원두 검색하기";
 }
 
-function buildSearchUrl(card: RebuyTimingMemoryCard): string {
-  const query = [card.subtitle, card.title, ...card.tags.slice(0, 2), "원두 구매"]
+function buildSearchPhrase(card: RebuyTimingMemoryCard): string {
+  return [card.subtitle, card.title, card.purchase_note, ...card.tags.slice(0, 2), "원두 구매"]
     .filter(isNonBlank)
-    .join(" ");
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildSearchUrl(card: RebuyTimingMemoryCard): string {
+  const query = buildSearchPhrase(card);
   return `https://www.google.com/search?q=${encodeURIComponent(query || "원두 구매")}`;
 }
 
@@ -145,6 +152,7 @@ export function buildRebuyTimingMemory(
       const daysSince = daysBetween(now, memoryTime);
       const stage = stageFor(daysSince);
       const hasDirectPurchaseClue = isNonBlank(card.purchase_url) || isNonBlank(card.purchase_note);
+      const searchPhrase = buildSearchPhrase(card) || purchaseCueFor(card);
       const searchUrl = isNonBlank(card.purchase_url) ? card.purchase_url : buildSearchUrl(card);
 
       return {
@@ -159,6 +167,7 @@ export function buildRebuyTimingMemory(
           daysSince,
           reason: reasonFor(card, daysSince),
           purchaseCue: purchaseCueFor(card),
+          searchPhrase,
           searchUrl,
           actionLabel: actionLabelFor(stage, hasDirectPurchaseClue),
           hasDirectPurchaseClue,

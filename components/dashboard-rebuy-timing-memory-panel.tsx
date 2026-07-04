@@ -1,6 +1,7 @@
 "use client";
 
-import { Clock3, ExternalLink, RefreshCcw, Search, ShoppingBag } from "lucide-react";
+import { useState } from "react";
+import { Check, Clock3, Copy, ExternalLink, RefreshCcw, Search, ShoppingBag } from "lucide-react";
 import type { TastingCardData } from "@/hooks/useTastingCards";
 import { buildRebuyTimingMemory, type RebuyTimingCandidate } from "@/lib/rebuy-timing-memory";
 
@@ -35,6 +36,17 @@ export function DashboardRebuyTimingMemoryPanel({
   onSelectCard,
 }: DashboardRebuyTimingMemoryPanelProps) {
   const memory = buildRebuyTimingMemory(cards);
+  const [copiedCardId, setCopiedCardId] = useState<string | null>(null);
+
+  async function copySearchPhrase(candidate: RebuyTimingCandidate) {
+    try {
+      await navigator.clipboard.writeText(candidate.searchPhrase);
+      setCopiedCardId(candidate.cardId);
+      window.setTimeout(() => setCopiedCardId((current) => (current === candidate.cardId ? null : current)), 1800);
+    } catch {
+      window.alert("검색 문장을 복사하지 못했습니다. 문장을 길게 눌러 직접 복사해주세요.");
+    }
+  }
 
   if (cards.length === 0) return null;
 
@@ -125,6 +137,27 @@ export function DashboardRebuyTimingMemoryPanel({
                   <p className="mt-1 line-clamp-2 break-keep text-xs font-bold leading-5 text-background-dark">
                     {candidate.purchaseCue}
                   </p>
+                </div>
+                <div className="mt-3 rounded-2xl border border-primary-amber/20 bg-[#fff8ec] p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">
+                        다음 검색 문장
+                      </p>
+                      <p className="mt-1 line-clamp-2 break-keep text-xs font-bold leading-5 text-background-dark">
+                        {candidate.searchPhrase}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void copySearchPhrase(candidate)}
+                      className="inline-flex min-h-8 shrink-0 items-center justify-center gap-1 rounded-full border border-[#8C5E35]/20 bg-white px-2.5 text-[11px] font-black text-background-dark transition hover:-translate-y-0.5"
+                      aria-label={`${candidate.title} 검색 문장 복사`}
+                    >
+                      {copiedCardId === candidate.cardId ? <Check size={12} /> : <Copy size={12} />}
+                      {copiedCardId === candidate.cardId ? "복사됨" : "복사"}
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-auto grid gap-2 pt-4 sm:grid-cols-2">
                   <button
