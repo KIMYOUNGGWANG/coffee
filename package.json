@@ -11,7 +11,7 @@
     "test:smoke": "node --test test/smoke.test.mjs",
     "test:mobile-bridge": "node --test test/mobile-bridge-contract.test.mjs",
     "test:product-truth": "node --test test/product-copy.test.mjs test/smoke.test.mjs test/brand-contract.test.mjs test/brand-leak.test.mjs",
-    "test:routes": "node --test test/profile-route.test.mjs test/export-route.test.mjs test/account-route.test.mjs test/admin-route.test.mjs test/analytics-ownership-route.test.mjs test/checkout-api-contract.test.mjs test/pdf-route.test.mjs test/credit-lifecycle.test.mjs test/scan-trust.test.mjs test/memory-crud-contract.test.mjs test/shelf-consumption.test.mjs test/brewing-logs-route.test.mjs test/dial-in-coach-route.test.mjs test/rebuy-intelligence-route.test.mjs test/rebuy-calendar-funnel.test.mjs test/rebuy-calendar-route.test.mjs test/stripe-webhook-idempotency.test.mjs test/subscription-lifecycle.test.mjs",
+    "test:routes": "node --test test/profile-route.test.mjs test/export-route.test.mjs test/account-route.test.mjs test/admin-route.test.mjs test/analytics-ownership-route.test.mjs test/checkout-api-contract.test.mjs test/pdf-route.test.mjs test/credit-lifecycle.test.mjs test/scan-trust.test.mjs test/memory-crud-contract.test.mjs test/shelf-consumption.test.mjs test/brewing-logs-route.test.mjs test/dial-in-coach-route.test.mjs test/rebuy-intelligence-route.test.mjs test/rebuy-calendar-funnel.test.mjs test/rebuy-calendar-route.test.mjs test/rebuy-calendar-return-route.test.mjs test/stripe-webhook-idempotency.test.mjs test/subscription-lifecycle.test.mjs",
     "test:e2e": "playwright test",
     "validate:full": "npm run test:product-truth && npm run test:routes && npm run typecheck && npm run build && npm run test:e2e"
   },

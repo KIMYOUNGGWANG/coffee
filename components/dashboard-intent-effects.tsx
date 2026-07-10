@@ -51,13 +51,12 @@ export default function DashboardIntentEffects({
   const isCardsBlocked = isCardsLoading || !!cardsError || !!cardsFailureReason;
 
   useEffect(() => {
-    if (hasHandledReturnSource || initialReturnSource.kind !== "rebuy_calendar") return;
+    if (hasHandledReturnSource || initialReturnSource.kind !== "rebuy_calendar" || isCardsBlocked) return;
 
     trackEvent("rebuy_calendar_returned", { source: initialReturnSource.source });
     onCalendarReturn();
     setHasHandledReturnSource(true);
-    removeDashboardSearchParams(["source"]);
-  }, [hasHandledReturnSource, initialReturnSource, onCalendarReturn, trackEvent]);
+  }, [hasHandledReturnSource, initialReturnSource, isCardsBlocked, onCalendarReturn, trackEvent]);
 
   useEffect(() => {
     if (

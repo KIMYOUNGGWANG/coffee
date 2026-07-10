@@ -95,7 +95,7 @@ async function fulfillJson(route: Route, body: unknown, status = 200): Promise<v
   });
 }
 
-async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[]): Promise<void> {
+async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[], rebuyReturnDelayMs = 0): Promise<void> {
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
     const pathname = new URL(request.url()).pathname;
@@ -112,6 +112,19 @@ async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[]): Pro
         return;
       case "/api/v1/rebuy-intelligence":
         await fulfillJson(route, rebuyIntelligenceResponse);
+        return;
+      case "/api/v1/shelf/rebuy-return":
+        if (rebuyReturnDelayMs > 0) {
+          await new Promise((resolve) => setTimeout(resolve, rebuyReturnDelayMs));
+        }
+        await fulfillJson(route, {
+          data: {
+            id: "93493987-4800-4b7c-836f-c0a35f39244e",
+            roasterName: "프릳츠 커피",
+            beanName: "에티오피아 시다마",
+            rebuyAction: "none",
+          },
+        });
         return;
       case "/api/v1/cards":
       case "/api/v1/brewing-logs":
@@ -157,4 +170,57 @@ test("saves a Rebuy Intelligence action without opening the shelf item", async (
     { rebuyAction: "will_rebuy", rebuyPriority: "pinned" },
     { rebuyAction: "rebought", rebuyPriority: "normal", rebuyReminderDate: null },
   ]);
+});
+
+test("saves an exact private bean decision after a calendar return", async ({ page }) => {
+  const patchBodies: unknown[] = [];
+  await mockDashboardRoutes(page, patchBodies);
+
+  await page.goto(`${dashboardUrl}?source=rebuy_calendar&rebuy_token=f70cfec8-51f9-4667-a80f-ca38bfbc2b6d`, { waitUntil: "domcontentloaded" });
+
+  await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+  await expect(page.getByTestId("rebuy-calendar-return-cue")).toContainText("프릳츠 커피 · 에티오피아 시다마");
+  await page.getByTestId("rebuy-calendar-return-cue").getByRole("button", { name: "다시 살래요" }).click();
+
+  await expect.poll(() => patchBodies).toEqual([
+    { rebuyAction: "will_rebuy", rebuyPriority: "pinned" },
+  ]);
+  await expect(page.getByTestId("rebuy-calendar-return-cue")).toBeHidden();
+  await expect(page).toHaveURL(/\/dashboard$/);
+});
+
+test("keeps the exact calendar return decision usable on a mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const patchBodies: unknown[] = [];
+  await mockDashboardRoutes(page, patchBodies);
+
+  await page.goto(`${dashboardUrl}?source=rebuy_calendar&rebuy_token=f70cfec8-51f9-4667-a80f-ca38bfbc2b6d`, { waitUntil: "domcontentloaded" });
+
+  const cue = page.getByTestId("rebuy-calendar-return-cue");
+  await expect(cue).toContainText("프릳츠 커피 · 에티오피아 시다마");
+  const reboughtButton = cue.getByRole("button", { name: "다시 샀음" });
+  await expect(reboughtButton).toBeVisible();
+  await expect(reboughtButton).toHaveCSS("min-height", "44px");
+  expect(await reboughtButton.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.left >= 0 && rect.right <= window.innerWidth && rect.bottom <= window.innerHeight;
+  })).toBe(true);
+
+  await reboughtButton.click();
+  await expect.poll(() => patchBodies).toEqual([
+    { rebuyAction: "rebought", rebuyPriority: "normal", rebuyReminderDate: null },
+  ]);
+});
+
+test("removes the opaque token after a dismissed calendar return cue finishes loading", async ({ page }) => {
+  const patchBodies: unknown[] = [];
+  await mockDashboardRoutes(page, patchBodies, 250);
+
+  await page.goto(`${dashboardUrl}?source=rebuy_calendar&rebuy_token=f70cfec8-51f9-4667-a80f-ca38bfbc2b6d`, { waitUntil: "domcontentloaded" });
+
+  const cue = page.getByTestId("rebuy-calendar-return-cue");
+  await expect(cue).toContainText("캘린더의 원두 기억을 꺼내는 중이에요.");
+  await cue.getByRole("button", { name: "캘린더 복귀 안내 닫기" }).click();
+  await expect(cue).toBeHidden();
+  await expect(page).toHaveURL(/\/dashboard$/);
 });

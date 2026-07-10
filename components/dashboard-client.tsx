@@ -14,6 +14,9 @@ import { DashboardShelfView } from "@/components/dashboard-shelf-view";
 import DailyBrewingCalendar from "@/components/daily-brewing-calendar";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import { useDashboardCheckoutReturn } from "@/hooks/use-dashboard-checkout-return";
+import { useRebuyCalendarReturn } from "@/hooks/use-rebuy-calendar-return";
+import { useUpdateShelfRebuyState } from "@/hooks/use-shelf-rebuy-state";
+import type { ShelfRebuyAction } from "@/hooks/use-shelf-rebuy-state";
 import { useDeleteTastingCard, useDialInCoach, useRebuyIntelligence, useTasteAnalytics, useTastingCards, useUserProfile } from "@/hooks/useTastingCards";
 import type { CardCreatorWizardMode } from "@/components/CardCreatorWizard";
 import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
@@ -30,6 +33,14 @@ type DashboardClientProps = {
   readonly initialCheckoutNotice: CheckoutNotice | null;
   readonly initialReturnSource: DashboardReturnSource;
 };
+
+function removeCalendarReturnSearchParams(): void {
+  const searchParams = new URLSearchParams(globalThis.location.search);
+  searchParams.delete("source");
+  searchParams.delete("rebuy_token");
+  const nextSearch = searchParams.toString();
+  globalThis.history.replaceState(null, "", nextSearch ? `/dashboard?${nextSearch}` : "/dashboard");
+}
 
 export default function DashboardClient({
   initialActivationIntent,
@@ -55,10 +66,14 @@ export default function DashboardClient({
   const [selectedDetailCard, setSelectedDetailCard] = useState<TastingCardData | null>(null);
   const [selectedShareCard, setSelectedShareCard] = useState<TastingCardData | null>(null);
   const [isCalendarReturnCueVisible, setIsCalendarReturnCueVisible] = useState(false);
+  const [hasHandledCalendarReturn, setHasHandledCalendarReturn] = useState(false);
 
   const [activeTab, setActiveTab] = useState<DashboardTab>("shelf");
   const [shelfRefreshTrigger, setShelfRefreshTrigger] = useState(0);
   const { checkoutNotice, dismissCheckoutNotice } = useDashboardCheckoutReturn(initialCheckoutNotice);
+  const calendarReturnToken = initialReturnSource.kind === "rebuy_calendar" ? initialReturnSource.returnToken : null;
+  const calendarReturnItemQuery = useRebuyCalendarReturn(calendarReturnToken);
+  const updateShelfRebuyStateMutation = useUpdateShelfRebuyState();
 
   const triggerShelfRefresh = () => setShelfRefreshTrigger(prev => prev + 1);
 
@@ -124,6 +139,18 @@ export default function DashboardClient({
     const currentPath = `${globalThis.location.pathname}${globalThis.location.search}`;
     globalThis.location.assign(buildAuthGateHref(currentPath));
   }, [isDashboardAuthRequired]);
+
+  useEffect(() => {
+    if (
+      initialReturnSource.kind !== "rebuy_calendar"
+      || !hasHandledCalendarReturn
+      || isLoading
+      || isDashboardAuthRequired
+      || (calendarReturnToken !== null && calendarReturnItemQuery.isLoading)
+    ) return;
+
+    removeCalendarReturnSearchParams();
+  }, [calendarReturnItemQuery.isLoading, calendarReturnToken, hasHandledCalendarReturn, initialReturnSource.kind, isDashboardAuthRequired, isLoading]);
 
   const openWizard = (source: string, mode: CardCreatorWizardMode = "full") => {
     trackEvent("first_card_cta_clicked", { source, mode });
@@ -194,6 +221,23 @@ export default function DashboardClient({
       globalThis.document.querySelector<HTMLElement>("[data-testid='rebuy-action-loop']")?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   };
+  const saveCalendarReturnDecision = async (rebuyAction: Extract<ShelfRebuyAction, "will_rebuy" | "rebought">) => {
+    const shelfItem = calendarReturnItemQuery.data;
+    if (!shelfItem) return;
+
+    try {
+      await updateShelfRebuyStateMutation.mutateAsync({
+        shelfItemId: shelfItem.id,
+        rebuyAction,
+        rebuyPriority: rebuyAction === "will_rebuy" ? "pinned" : "normal",
+        ...(rebuyAction === "rebought" ? { rebuyReminderDate: null } : {}),
+      });
+      trackEvent("rebuy_action_saved", { action: rebuyAction, source: "rebuy_calendar_return" });
+      setIsCalendarReturnCueVisible(false);
+    } catch (error: unknown) {
+      window.alert(error instanceof Error ? error.message : "재구매 상태를 저장하지 못했습니다.");
+    }
+  };
 
   return (
     <main className="coffee-app-shell min-h-screen text-foreground" data-testid={isDashboardReady ? "dashboard-ready" : undefined}>
@@ -207,7 +251,16 @@ export default function DashboardClient({
       />
 
       {checkoutNotice && <DashboardCheckoutNotice notice={checkoutNotice} onDismiss={dismissCheckoutNotice} />}
-      {isCalendarReturnCueVisible && <DashboardRebuyCalendarReturnCue onDismiss={() => setIsCalendarReturnCueVisible(false)} onOpenDecision={openCalendarReturnDecision} />}
+      {isCalendarReturnCueVisible && (
+        <DashboardRebuyCalendarReturnCue
+          onDismiss={() => setIsCalendarReturnCueVisible(false)}
+          onOpenDecision={openCalendarReturnDecision}
+          item={calendarReturnItemQuery.data}
+          isLoadingItem={calendarReturnToken !== null && calendarReturnItemQuery.isLoading}
+          isSaving={updateShelfRebuyStateMutation.isPending}
+          onSaveDecision={saveCalendarReturnDecision}
+        />
+      )}
 
       <section className="mb-4 grid gap-3 sm:grid-cols-3" aria-label="CoffeeDex 오늘 요약">
         <article className="premium-shell">
@@ -352,7 +405,10 @@ export default function DashboardClient({
         onScan={() => openWizard("mobile_scan_action")}
         onOpenWizard={openActivationWizard}
         onOpenPayment={resumePayment}
-        onCalendarReturn={() => setIsCalendarReturnCueVisible(true)}
+        onCalendarReturn={() => {
+          setHasHandledCalendarReturn(true);
+          setIsCalendarReturnCueVisible(true);
+        }}
         onCloseWizard={closeWizard}
         onClosePayment={closePayment}
         onCloseDetail={() => setSelectedDetailCard(null)}

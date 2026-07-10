@@ -40,7 +40,7 @@ The current runtime schema accepts these variables as optional. Configure them f
 
 ## Supabase Checklist
 
-- Apply the database migrations for `tasting_cards`, coffee-memory/provenance fields, product events, profile credits/access fields, scan limits, shelf items, brewing logs, and brewing notes.
+- Apply the database migrations for `tasting_cards`, coffee-memory/provenance fields, product events, profile credits/access fields, scan limits, shelf items, brewing logs, and brewing notes. Before releasing the calendar return flow, confirm `20260710000000_add_shelf_rebuy_return_tokens.sql` and `20260710001000_expand_rebuy_calendar_product_events.sql` are applied together.
 - Confirm row-level security keeps `tasting_cards.user_id` scoped to the authenticated user.
 - Confirm profile defaults provide one free credit, PDF access off, premium off, zero scans used, and the configured monthly scan limit.
 - Confirm Storage has the upload bucket named by `STORAGE_BUCKET_UPLOADS`.

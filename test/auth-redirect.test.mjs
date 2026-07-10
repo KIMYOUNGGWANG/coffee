@@ -48,6 +48,14 @@ test("Given a dashboard redirect, When sanitizing auth redirect, Then dashboard 
   );
 });
 
+test("Given an opaque calendar return, When authentication interrupts the visit, Then the private return context survives the auth redirect", async () => {
+  const { buildAuthGateHref, sanitizeAuthRedirect } = await loadAuthRedirectModule();
+  const redirect = "/dashboard?source=rebuy_calendar&rebuy_token=f70cfec8-51f9-4667-a80f-ca38bfbc2b6d";
+
+  assert.equal(sanitizeAuthRedirect(redirect), redirect);
+  assert.equal(buildAuthGateHref(redirect), `/auth?redirect=${encodeURIComponent(redirect)}`);
+});
+
 test("Given unsafe redirect values, When sanitizing auth redirect, Then they fall back to dashboard", async () => {
   // Given
   const { sanitizeAuthRedirect } = await loadAuthRedirectModule();

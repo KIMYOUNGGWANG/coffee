@@ -24,6 +24,7 @@ export type RebuyCalendarShelfItem = {
 export type BuildRebuyReminderCalendarInput = {
   readonly shelfItem: RebuyCalendarShelfItem;
   readonly origin: string;
+  readonly returnToken: string;
   readonly now?: Date;
 };
 
@@ -31,7 +32,9 @@ export function buildRebuyReminderCalendar(input: BuildRebuyReminderCalendarInpu
   const reminderDate = requireReminderDate(input.shelfItem.rebuy_reminder_date);
   const nextDate = addOneUtcDay(reminderDate);
   const label = shelfItemLabel(input.shelfItem);
-  const dashboardUrl = new URL("/dashboard?source=rebuy_calendar", input.origin).toString();
+  const dashboardUrl = new URL("/dashboard", input.origin);
+  dashboardUrl.searchParams.set("source", "rebuy_calendar");
+  dashboardUrl.searchParams.set("rebuy_token", input.returnToken);
   const now = input.now ?? new Date();
   const lines = [
     "BEGIN:VCALENDAR",
@@ -45,8 +48,8 @@ export function buildRebuyReminderCalendar(input: BuildRebuyReminderCalendarInpu
     `DTSTART;VALUE=DATE:${formatAllDayDate(reminderDate)}`,
     `DTEND;VALUE=DATE:${formatAllDayDate(nextDate)}`,
     `SUMMARY:${escapeCalendarText(`원두 재구매 리마인더 - ${label}`)}`,
-    `DESCRIPTION:${escapeCalendarText(`${label} 재구매를 떠올릴 시간입니다.\nCoffeeDex 대시보드에서 기억을 이어가세요: ${dashboardUrl}`)}`,
-    `URL:${dashboardUrl}`,
+    `DESCRIPTION:${escapeCalendarText(`${label} 재구매를 떠올릴 시간입니다.\nCoffeeDex 대시보드에서 기억을 이어가세요: ${dashboardUrl.toString()}`)}`,
+    `URL:${dashboardUrl.toString()}`,
     "END:VEVENT",
     "END:VCALENDAR",
   ];

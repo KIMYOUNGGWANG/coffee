@@ -34,7 +34,7 @@ export async function GET(request: Request, { params }: RouteContext): Promise<R
 
     const { data, error } = await supabase
       .from("coffee_shelf_items")
-      .select("id,roaster_name,bean_name,rebuy_reminder_date")
+      .select("id,roaster_name,bean_name,rebuy_reminder_date,rebuy_return_token")
       .eq("id", id)
       .eq("user_id", user.id)
       .single();
@@ -63,6 +63,7 @@ export async function GET(request: Request, { params }: RouteContext): Promise<R
     const calendarText = buildRebuyReminderCalendar({
       shelfItem,
       origin: request.url,
+      returnToken: data.rebuy_return_token,
     });
 
     return new Response(calendarText, {

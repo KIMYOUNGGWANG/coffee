@@ -47,10 +47,31 @@ test("Given rebuy calendar source, When dashboard return source is parsed, Then 
 
     const result = readDashboardReturnSourceFromRecord({
       source: "rebuy_calendar",
+      rebuy_token: "f70cfec8-51f9-4667-a80f-ca38bfbc2b6d",
       utm_source: "qa",
     });
 
-    assert.deepEqual(result, { kind: "rebuy_calendar", source: "rebuy_calendar" });
+    assert.deepEqual(result, {
+      kind: "rebuy_calendar",
+      source: "rebuy_calendar",
+      returnToken: "f70cfec8-51f9-4667-a80f-ca38bfbc2b6d",
+    });
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("Given a calendar source without a valid opaque token, When dashboard return source is parsed, Then it keeps the generic private return cue", async () => {
+  const loaded = await loadDashboardReturnSourceModule();
+  try {
+    const { readDashboardReturnSourceFromRecord } = loaded.module;
+
+    const result = readDashboardReturnSourceFromRecord({
+      source: "rebuy_calendar",
+      rebuy_token: "shelf-private-id-123",
+    });
+
+    assert.deepEqual(result, { kind: "rebuy_calendar", source: "rebuy_calendar", returnToken: null });
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }

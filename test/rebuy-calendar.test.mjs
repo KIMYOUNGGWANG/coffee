@@ -71,6 +71,7 @@ test("Given an owned shelf reminder, When building a private rebuy reminder cale
         roaster_name: "Fritz; Seoul",
       }),
       origin: "https://coffeedex.example/current/path?ignored=true",
+      returnToken: "f70cfec8-51f9-4667-a80f-ca38bfbc2b6d",
       now: new Date("2026-07-01T12:34:56.789Z"),
     });
     const lines = unfoldCalendarLines(calendarText);
@@ -93,7 +94,12 @@ test("Given an owned shelf reminder, When building a private rebuy reminder cale
     );
     assert.equal(calendarText.includes("Fritz\\; Seoul"), true);
     assert.equal(calendarText.includes("\\, 시다마\\n워시드"), true);
-    assert.equal(calendarText.includes("https://coffeedex.example/dashboard?source=rebuy_calendar"), true);
+    assert.equal(
+      lines.some((line) => line.includes(
+        "https://coffeedex.example/dashboard?source=rebuy_calendar&rebuy_token=f70cfec8-51f9-4667-a80f-ca38bfbc2b6d",
+      )),
+      true,
+    );
     assert.equal(calendarText.includes("shelf-private-id-123"), false);
     assert.equal(calendarText.includes("user_id"), false);
     assert.equal(calendarText.includes("analytics"), false);

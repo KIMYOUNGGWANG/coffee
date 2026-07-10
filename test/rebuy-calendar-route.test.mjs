@@ -44,7 +44,8 @@ const state = {
     user_id: "owner-1",
     roaster_name: "Fritz",
     bean_name: "에티오피아 시다마",
-    rebuy_reminder_date: "2026-07-15"
+    rebuy_reminder_date: "2026-07-15",
+    rebuy_return_token: "f70cfec8-51f9-4667-a80f-ca38bfbc2b6d"
   },
   error: null,
   calls: []
@@ -148,7 +149,7 @@ test("Given an authenticated owner, When exporting a rebuy reminder, Then authen
       /^attachment; filename="coffeedex-rebuy-reminder-2026-07-15\.ics"$/,
     );
     assert.match(body, /BEGIN:VEVENT/);
-    assert.match(body, /\/dashboard\?source=rebuy_calendar/);
+    assert.match(body.replaceAll("\r\n ", ""), /\/dashboard\?source=rebuy_calendar&rebuy_token=f70cfec8-51f9-4667-a80f-ca38bfbc2b6d/);
     assert.equal(body.includes("owner-1"), false);
     assert.equal(body.includes("shelf-private-id-123"), false);
     assert.equal(body.includes("analytics"), false);
@@ -157,7 +158,7 @@ test("Given an authenticated owner, When exporting a rebuy reminder, Then authen
       {
         method: "select",
         table: "coffee_shelf_items",
-        columns: "id,roaster_name,bean_name,rebuy_reminder_date",
+        columns: "id,roaster_name,bean_name,rebuy_reminder_date,rebuy_return_token",
       },
       { method: "eq", table: "coffee_shelf_items", column: "id", value: "shelf-private-id-123" },
       { method: "eq", table: "coffee_shelf_items", column: "user_id", value: "owner-1" },
@@ -194,6 +195,7 @@ test("Given invalid access or reminderless rows, When exporting, Then it rejects
         roaster_name: "Fritz",
         bean_name: "에티오피아 시다마",
         rebuy_reminder_date: null,
+        rebuy_return_token: "f70cfec8-51f9-4667-a80f-ca38bfbc2b6d",
       },
     });
 
