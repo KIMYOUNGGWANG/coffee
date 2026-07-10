@@ -33,17 +33,20 @@ test("Given owner-linked calendar events, When an owner returns and later saves 
 
   try {
     const result = funnel.module.buildRebuyCalendarFunnel({
+      now: new Date("2026-07-10T12:00:00.000Z"),
       events: [
         { event_name: "rebuy_calendar_export_clicked", occurred_at: "2026-07-10T09:00:00.000Z", user_id: "user-1" },
         { event_name: "rebuy_calendar_returned", occurred_at: "2026-07-10T10:00:00.000Z", user_id: "user-1" },
         { event_name: "rebuy_calendar_export_clicked", occurred_at: "2026-07-10T09:10:00.000Z", user_id: "user-2" },
         { event_name: "rebuy_calendar_returned", occurred_at: "2026-07-10T08:00:00.000Z", user_id: "user-3" },
         { event_name: "rebuy_calendar_export_clicked", occurred_at: "2026-07-10T09:20:00.000Z", user_id: null },
+        { event_name: "rebuy_calendar_export_clicked", occurred_at: "2026-06-01T09:00:00.000Z", user_id: "user-expired" },
       ],
       shelfItems: [
         { user_id: "user-1", rebuy_action: "rebought", rebuy_action_at: "2026-07-10T11:00:00.000Z" },
         { user_id: "user-2", rebuy_action: "will_rebuy", rebuy_action_at: "2026-07-10T08:00:00.000Z" },
         { user_id: "user-3", rebuy_action: "rebought", rebuy_action_at: "2026-07-10T12:00:00.000Z" },
+        { user_id: "user-expired", rebuy_action: "rebought", rebuy_action_at: "2026-07-10T12:00:00.000Z" },
       ],
     });
 
@@ -52,6 +55,8 @@ test("Given owner-linked calendar events, When an owner returns and later saves 
       returnedUsers: 1,
       decidedUsers: 1,
       unattributedEvents: 1,
+      windowDays: 14,
+      windowStart: "2026-06-26T12:00:00.000Z",
     });
   } finally {
     funnel.cleanup();

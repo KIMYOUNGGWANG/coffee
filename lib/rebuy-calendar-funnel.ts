@@ -15,7 +15,12 @@ export type RebuyCalendarFunnel = {
   readonly returnedUsers: number;
   readonly decidedUsers: number;
   readonly unattributedEvents: number;
+  readonly windowDays: 14;
+  readonly windowStart: string;
 };
+
+const WINDOW_DAYS = 14 as const;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 function timestamp(value: string): number | null {
   const parsed = new Date(value).getTime();
@@ -39,9 +44,13 @@ function earliestEventByUser(events: readonly CalendarEvent[], eventName: string
 export function buildRebuyCalendarFunnel(input: {
   readonly events: readonly CalendarEvent[];
   readonly shelfItems: readonly RebuyDecision[];
+  readonly now?: Date;
 }): RebuyCalendarFunnel {
-  const exportedAtByUser = earliestEventByUser(input.events, "rebuy_calendar_export_clicked");
-  const returnedAtByUser = earliestEventByUser(input.events, "rebuy_calendar_returned");
+  const now = input.now ?? new Date();
+  const windowStartTime = now.getTime() - WINDOW_DAYS * DAY_MS;
+  const windowEvents = input.events.filter((event) => (timestamp(event.occurred_at) ?? -Infinity) >= windowStartTime);
+  const exportedAtByUser = earliestEventByUser(windowEvents, "rebuy_calendar_export_clicked");
+  const returnedAtByUser = earliestEventByUser(windowEvents, "rebuy_calendar_returned");
   const returnedUsers = new Map(
     Array.from(returnedAtByUser.entries()).filter(([userId, returnedAt]) => {
       const exportedAt = exportedAtByUser.get(userId);
@@ -63,9 +72,11 @@ export function buildRebuyCalendarFunnel(input: {
     exportedUsers: exportedAtByUser.size,
     returnedUsers: returnedUsers.size,
     decidedUsers: decidedUsers.size,
-    unattributedEvents: input.events.filter((event) => (
+    unattributedEvents: windowEvents.filter((event) => (
       (event.event_name === "rebuy_calendar_export_clicked" || event.event_name === "rebuy_calendar_returned")
       && event.user_id === null
     )).length,
+    windowDays: WINDOW_DAYS,
+    windowStart: new Date(windowStartTime).toISOString(),
   };
 }

@@ -94,6 +94,8 @@ type AdminOverview = {
     readonly returnedUsers: number;
     readonly decidedUsers: number;
     readonly unattributedEvents: number;
+    readonly windowDays: 14;
+    readonly windowStart: string;
   };
   readonly users: readonly AdminUser[];
   readonly operations: {
@@ -352,7 +354,7 @@ export default function AdminDashboardClient() {
             </section>
             <section className="dashboard-panel p-5">
               <h2 className="text-xl font-semibold">Rebuy Calendar Funnel</h2>
-              <p className="mt-1 text-sm text-muted-foreground">캘린더 저장 후 CoffeeDex로 돌아와 재구매 결정을 남긴 흐름입니다.</p>
+              <p className="mt-1 text-sm text-muted-foreground">최근 {overview.rebuyCalendarFunnel.windowDays}일의 캘린더 저장 후 복귀·재구매 결정 흐름입니다.</p>
               <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
                 <p>저장 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.exportedUsers}</b></p>
                 <p>복귀 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.returnedUsers}</b></p>

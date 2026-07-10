@@ -405,12 +405,19 @@ test("Given an allowlisted admin, When overview is requested, Then operating KPI
     assert.equal(body.data.kpis.find((kpi) => kpi.label === "전체 유저").value, 1);
     assert.equal(body.data.memory.purchaseMemories, 2);
     assert.equal(body.data.rebuyDialIn.coachFeedbackLogs, 1);
-    assert.deepEqual(body.data.rebuyCalendarFunnel, {
+    assert.deepEqual({
+      exportedUsers: body.data.rebuyCalendarFunnel.exportedUsers,
+      returnedUsers: body.data.rebuyCalendarFunnel.returnedUsers,
+      decidedUsers: body.data.rebuyCalendarFunnel.decidedUsers,
+      unattributedEvents: body.data.rebuyCalendarFunnel.unattributedEvents,
+    }, {
       exportedUsers: 1,
       returnedUsers: 1,
       decidedUsers: 1,
       unattributedEvents: 0,
     });
+    assert.equal(body.data.rebuyCalendarFunnel.windowDays, 14);
+    assert.match(body.data.rebuyCalendarFunnel.windowStart, /^\d{4}-\d{2}-\d{2}T/);
     assert.equal(body.data.operations.recentFailures[0].eventName, "scan_failed");
     assert.equal(body.data.launchHealth.status, "p0");
     assert.equal(body.data.launchHealth.summary.qaExcludedEvents, 1);
