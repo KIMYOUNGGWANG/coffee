@@ -19,6 +19,7 @@ import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/a
 import { buildAuthGateHref, isAuthRequiredError } from "@/lib/auth-redirect";
 import type { CheckoutIntent, CheckoutItemType, CheckoutNotice } from "@/lib/checkout-return";
 import { filterDashboardCards, type RepurchaseFilter } from "@/lib/dashboard-card-filter";
+import type { DashboardReturnSource } from "@/lib/dashboard-return-source";
 import type { TasteProfileKey } from "@/lib/taste-profile";
 import type { TastingCardData } from "@/hooks/useTastingCards";
 
@@ -26,12 +27,14 @@ type DashboardClientProps = {
   readonly initialActivationIntent: DashboardActivationIntent;
   readonly initialCheckoutIntent: CheckoutIntent;
   readonly initialCheckoutNotice: CheckoutNotice | null;
+  readonly initialReturnSource: DashboardReturnSource;
 };
 
 export default function DashboardClient({
   initialActivationIntent,
   initialCheckoutIntent,
   initialCheckoutNotice,
+  initialReturnSource,
 }: DashboardClientProps) {
   const { trackEvent } = useAnalyticsEvents();
   const [isWizardOpen, setIsWizardOpen] = useState(false);
@@ -323,6 +326,7 @@ export default function DashboardClient({
         activeTab={activeTab}
         initialActivationIntent={initialActivationIntent}
         initialCheckoutIntent={initialCheckoutIntent}
+        initialReturnSource={initialReturnSource}
         isCardsLoading={isLoading}
         cardsError={error}
         cardsFailureReason={cardsFailureReason}

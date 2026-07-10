@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Archive, Bell, CheckCircle2, Clock3, ExternalLink, Pin, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Archive, Bell, Clock3, ExternalLink, Pin, Sparkles, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { evaluateFreshPeakWindow, evaluateFreshShelfStatus } from "@/lib/fresh-shelf";
 import { evaluateShelfRunway } from "@/lib/shelf-runway";
+import { ShelfRebuyReminderControls } from "@/components/shelf/ShelfRebuyReminderControls";
 
 // Exporting the type here so it can be used, or we could keep it in coffee-shelf-grid.
 // We'll define it here for convenience.
@@ -223,74 +224,7 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                 <ExternalLink size={12} className="shrink-0" />
              </a>
 
-             <div className="space-y-2 rounded-md border border-[#D4AF37]/15 bg-[#D4AF37]/5 p-3 text-[10px]">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 font-bold text-[#D4AF37]">
-                      <Bell size={12} />
-                      앱 내부 리마인더
-                    </div>
-                    <p className="mt-1 truncate text-white/50">
-                      {item.rebuy_reminder_date ? `${item.rebuy_reminder_date}에 다시 보기` : "다음 구매 타이밍을 저장하세요."}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onUpdateReminderState(item.id, { rebuyPriority: isPinnedForRebuy ? "normal" : "pinned" })}
-                    className={cn(
-                      "flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-md border px-3 py-2 font-bold transition-colors cursor-pointer",
-                      isPinnedForRebuy
-                        ? "border-[#D4AF37]/50 bg-[#D4AF37]/20 text-[#D4AF37]"
-                        : "border-white/10 bg-white/5 text-white/60 hover:text-white",
-                    )}
-                  >
-                    <Pin size={12} />
-                    {isPinnedForRebuy ? "고정됨" : "고정"}
-                  </button>
-                </div>
-                <input
-                  type="date"
-                  value={item.rebuy_reminder_date ?? ""}
-                  onChange={(event) => onUpdateReminderState(item.id, { rebuyReminderDate: event.target.value || null })}
-                  className="min-h-[44px] w-full rounded-md border border-white/10 bg-black/30 px-3 py-2 text-[11px] text-white outline-none focus:border-[#D4AF37]/50"
-                  aria-label="재구매 예정일"
-                />
-                <div className="grid grid-cols-3 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => onUpdateReminderState(item.id, { rebuyAction: "drank" })}
-                    className={cn(
-                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 transition-colors cursor-pointer",
-                      item.rebuy_action === "drank" ? "border-white/30 bg-white/15 text-white" : "border-white/10 bg-white/5 text-white/55 hover:text-white",
-                    )}
-                  >
-                    <CheckCircle2 size={12} />
-                    마셨음
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onUpdateReminderState(item.id, { rebuyAction: "will_rebuy", rebuyPriority: "pinned" })}
-                    className={cn(
-                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 transition-colors cursor-pointer",
-                      item.rebuy_action === "will_rebuy" ? "border-[#D4AF37]/50 bg-[#D4AF37]/20 text-[#D4AF37]" : "border-[#D4AF37]/20 bg-[#D4AF37]/5 text-[#D4AF37]/75 hover:text-[#D4AF37]",
-                    )}
-                  >
-                    <Bell size={12} />
-                    다시 살래요
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onUpdateReminderState(item.id, { rebuyAction: "rebought", rebuyPriority: "normal", rebuyReminderDate: null })}
-                    className={cn(
-                      "flex min-h-[44px] items-center justify-center gap-1 rounded-md border px-2 py-2 transition-colors cursor-pointer",
-                      item.rebuy_action === "rebought" ? "border-[#4d7c54]/50 bg-[#4d7c54]/20 text-[#9fca9a]" : "border-white/10 bg-white/5 text-white/55 hover:text-white",
-                    )}
-                  >
-                    <RotateCcw size={12} />
-                    완료
-                  </button>
-                </div>
-             </div>
+             <ShelfRebuyReminderControls item={item} isPinnedForRebuy={isPinnedForRebuy} onUpdateReminderState={onUpdateReminderState} />
 
              <div className="space-y-2">
                 <div className="flex justify-between items-center text-[10px] min-h-[24px]">

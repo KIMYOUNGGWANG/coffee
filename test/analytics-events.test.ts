@@ -73,6 +73,8 @@ const memoryEventNames = [
   "share_card_clicked",
   "ai_scan_success",
   "rebuy_action_saved",
+  "rebuy_calendar_export_clicked",
+  "rebuy_calendar_returned",
 ] as const;
 
 test("pins legacy commerce/share and validated-memory event names", () => {
@@ -86,7 +88,17 @@ async function fulfillJson(route: Route, body: unknown): Promise<void> {
   });
 }
 
-async function mockDashboardRoutes(page: Page, eventNames: string[]): Promise<void> {
+type AnalyticsPostBody = {
+  readonly eventName?: string;
+  readonly path?: string;
+  readonly properties?: unknown;
+};
+
+function isAnalyticsPostBody(value: unknown): value is AnalyticsPostBody {
+  return typeof value === "object" && value !== null;
+}
+
+async function mockDashboardRoutes(page: Page, eventNames: string[], eventPayloads: AnalyticsPostBody[] = []): Promise<void> {
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
     const pathname = new URL(request.url()).pathname;
@@ -105,9 +117,10 @@ async function mockDashboardRoutes(page: Page, eventNames: string[]): Promise<vo
         await fulfillJson(route, subscriptionResponse);
         return;
       case "/api/v1/analytics": {
-        const body = request.postDataJSON() as { readonly eventName?: string };
-        if (typeof body.eventName === "string") {
+        const body = request.postDataJSON();
+        if (isAnalyticsPostBody(body) && typeof body.eventName === "string") {
           eventNames.push(body.eventName);
+          eventPayloads.push(body);
         }
         await fulfillJson(route, { received: true });
         return;
@@ -139,5 +152,37 @@ test.describe("CoffeeDex analytics events", () => {
     // Then
     await expect.poll(() => eventNames).toContain("dashboard_view");
     await expect.poll(() => eventNames).toContain("first_card_cta_clicked");
+  });
+
+  test("tracks privacy-safe rebuy calendar return source", async ({ page }) => {
+    // Given
+    const eventNames: string[] = [];
+    const eventPayloads: AnalyticsPostBody[] = [];
+    await mockDashboardRoutes(page, eventNames, eventPayloads);
+    await page.addInitScript(() => {
+      window.localStorage.setItem("coffeedex_analytics_test", "true");
+    });
+
+    // When
+    await page.goto("/dashboard?source=rebuy_calendar&utm_source=qa");
+    await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+
+    // Then
+    await expect.poll(() => eventPayloads.find((payload) => payload.eventName === "rebuy_calendar_returned")).toMatchObject({
+      eventName: "rebuy_calendar_returned",
+      path: "/dashboard",
+      properties: { source: "rebuy_calendar" },
+    });
+    expect(eventPayloads.find((payload) => payload.eventName === "rebuy_calendar_returned")?.properties).toEqual({
+      source: "rebuy_calendar",
+    });
+    await expect(page).toHaveURL(/\/dashboard\?utm_source=qa$/);
+
+    // When
+    await page.goto("/dashboard?source=public_card");
+    await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+
+    // Then
+    await expect.poll(() => eventNames.filter((eventName) => eventName === "rebuy_calendar_returned")).toHaveLength(1);
   });
 });

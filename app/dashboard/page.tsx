@@ -1,6 +1,7 @@
 import DashboardClient from "@/components/dashboard-client";
 import { readActivationIntentFromRecord } from "@/lib/activation-intent";
 import { readCheckoutIntentFromRecord, readCheckoutNoticeFromRecord } from "@/lib/checkout-return";
+import { readDashboardReturnSourceFromRecord } from "@/lib/dashboard-return-source";
 
 type DashboardPageProps = {
   readonly searchParams: Promise<Record<string, string | readonly string[] | undefined>>;
@@ -13,6 +14,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       initialActivationIntent={readActivationIntentFromRecord(resolvedSearchParams)}
       initialCheckoutIntent={readCheckoutIntentFromRecord(resolvedSearchParams)}
       initialCheckoutNotice={readCheckoutNoticeFromRecord(resolvedSearchParams)}
+      initialReturnSource={readDashboardReturnSourceFromRecord(resolvedSearchParams)}
     />
   );
 }

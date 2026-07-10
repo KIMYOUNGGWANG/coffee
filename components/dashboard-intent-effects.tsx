@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { AnalyticsEventName } from "@/lib/analytics-events";
 import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import type { CheckoutIntent, CheckoutItemType } from "@/lib/checkout-return";
+import type { DashboardReturnSource } from "@/lib/dashboard-return-source";
 import type { TasteProfileKey } from "@/lib/taste-profile";
 
 type AnalyticsProperties = Record<string, string | number | boolean | null>;
@@ -12,6 +13,7 @@ type TrackEvent = (eventName: AnalyticsEventName, properties?: AnalyticsProperti
 type DashboardIntentEffectsProps = {
   readonly initialActivationIntent: DashboardActivationIntent;
   readonly initialCheckoutIntent: CheckoutIntent;
+  readonly initialReturnSource: DashboardReturnSource;
   readonly isCardsLoading: boolean;
   readonly cardsError: unknown;
   readonly cardsFailureReason: unknown;
@@ -33,6 +35,7 @@ function removeDashboardSearchParams(paramNames: readonly string[]): void {
 export default function DashboardIntentEffects({
   initialActivationIntent,
   initialCheckoutIntent,
+  initialReturnSource,
   isCardsLoading,
   cardsError,
   cardsFailureReason,
@@ -42,7 +45,16 @@ export default function DashboardIntentEffects({
 }: DashboardIntentEffectsProps) {
   const [hasHandledActivationIntent, setHasHandledActivationIntent] = useState(false);
   const [hasHandledCheckoutIntent, setHasHandledCheckoutIntent] = useState(false);
+  const [hasHandledReturnSource, setHasHandledReturnSource] = useState(false);
   const isCardsBlocked = isCardsLoading || !!cardsError || !!cardsFailureReason;
+
+  useEffect(() => {
+    if (hasHandledReturnSource || initialReturnSource.kind !== "rebuy_calendar") return;
+
+    trackEvent("rebuy_calendar_returned", { source: initialReturnSource.source });
+    setHasHandledReturnSource(true);
+    removeDashboardSearchParams(["source"]);
+  }, [hasHandledReturnSource, initialReturnSource, trackEvent]);
 
   useEffect(() => {
     if (
