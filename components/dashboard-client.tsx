@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { BookOpenText, PencilLine, RefreshCcw } from "lucide-react";
 import DashboardCheckoutNotice from "@/components/dashboard-checkout-notice";
+import { DashboardRebuyCalendarReturnCue } from "@/components/dashboard-rebuy-calendar-return-cue";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardDialInCoachPanel } from "@/components/dashboard-dial-in-coach-panel";
 import type { DashboardTab } from "@/components/dashboard-navigation";
@@ -53,6 +54,7 @@ export default function DashboardClient({
   const [isDashboardReady, setIsDashboardReady] = useState(false);
   const [selectedDetailCard, setSelectedDetailCard] = useState<TastingCardData | null>(null);
   const [selectedShareCard, setSelectedShareCard] = useState<TastingCardData | null>(null);
+  const [isCalendarReturnCueVisible, setIsCalendarReturnCueVisible] = useState(false);
 
   const [activeTab, setActiveTab] = useState<DashboardTab>("shelf");
   const [shelfRefreshTrigger, setShelfRefreshTrigger] = useState(0);
@@ -185,6 +187,13 @@ export default function DashboardClient({
   const newestCard = cards?.[0];
   const rebuySignal = rebuyIntelligence?.rebuyReminder?.title ?? "다시 살 단서를 모으는 중";
   const newestMemorySignal = newestCard ? `${newestCard.subtitle} · ${newestCard.title}` : "첫 원두를 20초로 남겨보세요";
+  const openCalendarReturnDecision = () => {
+    setActiveTab("shelf");
+    setIsCalendarReturnCueVisible(false);
+    globalThis.requestAnimationFrame(() => {
+      globalThis.document.querySelector<HTMLElement>("[data-testid='rebuy-action-loop']")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  };
 
   return (
     <main className="coffee-app-shell min-h-screen text-foreground" data-testid={isDashboardReady ? "dashboard-ready" : undefined}>
@@ -198,6 +207,7 @@ export default function DashboardClient({
       />
 
       {checkoutNotice && <DashboardCheckoutNotice notice={checkoutNotice} onDismiss={dismissCheckoutNotice} />}
+      {isCalendarReturnCueVisible && <DashboardRebuyCalendarReturnCue onDismiss={() => setIsCalendarReturnCueVisible(false)} onOpenDecision={openCalendarReturnDecision} />}
 
       <section className="mb-4 grid gap-3 sm:grid-cols-3" aria-label="CoffeeDex 오늘 요약">
         <article className="premium-shell">
@@ -342,6 +352,7 @@ export default function DashboardClient({
         onScan={() => openWizard("mobile_scan_action")}
         onOpenWizard={openActivationWizard}
         onOpenPayment={resumePayment}
+        onCalendarReturn={() => setIsCalendarReturnCueVisible(true)}
         onCloseWizard={closeWizard}
         onClosePayment={closePayment}
         onCloseDetail={() => setSelectedDetailCard(null)}

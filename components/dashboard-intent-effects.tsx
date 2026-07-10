@@ -19,6 +19,7 @@ type DashboardIntentEffectsProps = {
   readonly cardsFailureReason: unknown;
   readonly onOpenWizard: (tasteProfile: TasteProfileKey | null, mode: DashboardActivationMode) => void;
   readonly onOpenPayment: (itemType: CheckoutItemType) => void;
+  readonly onCalendarReturn: () => void;
   readonly trackEvent: TrackEvent;
 };
 
@@ -41,6 +42,7 @@ export default function DashboardIntentEffects({
   cardsFailureReason,
   onOpenWizard,
   onOpenPayment,
+  onCalendarReturn,
   trackEvent,
 }: DashboardIntentEffectsProps) {
   const [hasHandledActivationIntent, setHasHandledActivationIntent] = useState(false);
@@ -52,9 +54,10 @@ export default function DashboardIntentEffects({
     if (hasHandledReturnSource || initialReturnSource.kind !== "rebuy_calendar") return;
 
     trackEvent("rebuy_calendar_returned", { source: initialReturnSource.source });
+    onCalendarReturn();
     setHasHandledReturnSource(true);
     removeDashboardSearchParams(["source"]);
-  }, [hasHandledReturnSource, initialReturnSource, trackEvent]);
+  }, [hasHandledReturnSource, initialReturnSource, onCalendarReturn, trackEvent]);
 
   useEffect(() => {
     if (

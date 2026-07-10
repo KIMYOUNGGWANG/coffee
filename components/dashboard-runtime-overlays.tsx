@@ -32,6 +32,7 @@ type DashboardRuntimeOverlaysProps = {
   readonly onScan: () => void;
   readonly onOpenWizard: (tasteProfile: TasteProfileKey | null, mode: DashboardActivationMode) => void;
   readonly onOpenPayment: (itemType: CheckoutItemType) => void;
+  readonly onCalendarReturn: () => void;
   readonly onCloseWizard: () => void;
   readonly onClosePayment: () => void;
   readonly onCloseDetail: () => void;
@@ -59,6 +60,7 @@ export function DashboardRuntimeOverlays({
   onScan,
   onOpenWizard,
   onOpenPayment,
+  onCalendarReturn,
   onCloseWizard,
   onClosePayment,
   onCloseDetail,
@@ -78,6 +80,7 @@ export function DashboardRuntimeOverlays({
         cardsFailureReason={cardsFailureReason}
         onOpenWizard={onOpenWizard}
         onOpenPayment={onOpenPayment}
+        onCalendarReturn={onCalendarReturn}
         trackEvent={trackEvent}
       />
       <DashboardModals

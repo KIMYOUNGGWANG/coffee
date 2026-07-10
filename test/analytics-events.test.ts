@@ -168,6 +168,8 @@ test.describe("CoffeeDex analytics events", () => {
     await expect(page.getByTestId("dashboard-ready")).toBeVisible();
 
     // Then
+    await expect(page.getByTestId("rebuy-calendar-return-cue")).toBeVisible();
+    await expect(page.getByRole("button", { name: "재구매 결정 열기" })).toBeVisible();
     await expect.poll(() => eventPayloads.find((payload) => payload.eventName === "rebuy_calendar_returned")).toMatchObject({
       eventName: "rebuy_calendar_returned",
       path: "/dashboard",
