@@ -199,7 +199,7 @@ The browser tracks privacy-safe `rebuy_calendar_export_clicked` and `rebuy_calen
 
 ### `GET /api/v1/shelf/rebuy-return?token=:opaque_uuid`
 
-This authenticated owner-only lookup resolves the exact shelf memory referenced by a calendar return token. It rechecks both `rebuy_return_token` and `user_id`, returns only `id`, `roasterName`, `beanName`, and `rebuyAction`, and sends `Cache-Control: private, no-store`. Invalid tokens return `400`; anonymous callers receive `401`; non-owned or missing rows receive `404`. The dashboard removes `source` and `rebuy_token` from the address bar after the return is handled, then sends any direct decision through `PATCH /api/v1/shelf/:id`. This route is private recall only, not a public lookup, order, notification, or marketplace surface.
+This authenticated owner-only lookup resolves the exact shelf memory referenced by a calendar return token. It rechecks both `rebuy_return_token` and `user_id`, returns only `id`, `roasterName`, `beanName`, `purchaseUrl`, `purchaseNote`, and `rebuyAction`, and sends `Cache-Control: private, no-store`. Invalid tokens return `400`; anonymous callers receive `401`; non-owned or missing rows receive `404`. The dashboard removes `source` and `rebuy_token` from the address bar after the return is handled, then lets the user open their saved buying link or, when none exists, explicitly open a generic bean search. Direct decisions still use `PATCH /api/v1/shelf/:id`. `rebuy_purchase_clue_opened` records only `source` and whether the user opened a saved link or search; it never includes the link, note, bean, roaster, or token. This route is private recall only, not a public lookup, order, notification, or marketplace surface.
 
 ### `GET /api/v1/rebuy-intelligence`
 

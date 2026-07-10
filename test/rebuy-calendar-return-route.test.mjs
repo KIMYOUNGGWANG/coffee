@@ -18,7 +18,7 @@ function writeRuntimeMocks(tempDirectory) {
 export class NextResponse extends Response { static json(body, init = {}) { const headers = new Headers(init.headers); headers.set("content-type", "application/json"); return new NextResponse(JSON.stringify(body), { ...init, headers }); } }
 `);
   writeFileSync(path.join(tempDirectory, "supabase.mjs"), `
-const state = { authenticated: true, row: { id: "93493987-4800-4b7c-836f-c0a35f39244e", roaster_name: "프릳츠", bean_name: "에티오피아 시다마", rebuy_action: "none" }, error: null, calls: [] };
+const state = { authenticated: true, row: { id: "93493987-4800-4b7c-836f-c0a35f39244e", roaster_name: "프릳츠", bean_name: "에티오피아 시다마", purchase_url: "https://fritz.example/sidama", purchase_note: "프릳츠 공식몰 200g 18,000원", rebuy_action: "none" }, error: null, calls: [] };
 export function configure(next) { Object.assign(state, next); state.calls = []; }
 export function readCalls() { return structuredClone(state.calls); }
 class Query { select(columns) { state.calls.push({ method: "select", columns }); return this; } eq(column, value) { state.calls.push({ method: "eq", column, value }); return this; } single() { state.calls.push({ method: "single" }); return Promise.resolve({ data: state.row, error: state.error }); } }
@@ -48,10 +48,10 @@ test("Given a signed-in owner and opaque calendar token, When returning to Coffe
     const response = await loaded.route.GET(new Request(`https://coffeedex.example/api/v1/shelf/rebuy-return?token=${token}`));
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("cache-control"), "private, no-store");
-    assert.deepEqual(await response.json(), { data: { id: "93493987-4800-4b7c-836f-c0a35f39244e", roasterName: "프릳츠", beanName: "에티오피아 시다마", rebuyAction: "none" } });
+    assert.deepEqual(await response.json(), { data: { id: "93493987-4800-4b7c-836f-c0a35f39244e", roasterName: "프릳츠", beanName: "에티오피아 시다마", purchaseUrl: "https://fritz.example/sidama", purchaseNote: "프릳츠 공식몰 200g 18,000원", rebuyAction: "none" } });
     assert.deepEqual(loaded.supabase.readCalls(), [
       { method: "from", table: "coffee_shelf_items" },
-      { method: "select", columns: "id,roaster_name,bean_name,rebuy_action" },
+      { method: "select", columns: "id,roaster_name,bean_name,purchase_url,purchase_note,rebuy_action" },
       { method: "eq", column: "rebuy_return_token", value: token },
       { method: "eq", column: "user_id", value: "owner-1" },
       { method: "single" },

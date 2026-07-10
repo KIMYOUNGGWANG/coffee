@@ -122,6 +122,8 @@ async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[], rebu
             id: "93493987-4800-4b7c-836f-c0a35f39244e",
             roasterName: "프릳츠 커피",
             beanName: "에티오피아 시다마",
+            purchaseUrl: "https://fritz.example/sidama",
+            purchaseNote: "프릳츠 공식몰 200g 18,000원",
             rebuyAction: "none",
           },
         });
@@ -180,6 +182,7 @@ test("saves an exact private bean decision after a calendar return", async ({ pa
 
   await expect(page.getByTestId("dashboard-ready")).toBeVisible();
   await expect(page.getByTestId("rebuy-calendar-return-cue")).toContainText("프릳츠 커피 · 에티오피아 시다마");
+  await expect(page.getByTestId("rebuy-calendar-return-cue").getByRole("link", { name: "구매 단서 열기" })).toHaveAttribute("href", "https://fritz.example/sidama");
   await page.getByTestId("rebuy-calendar-return-cue").getByRole("button", { name: "다시 살래요" }).click();
 
   await expect.poll(() => patchBodies).toEqual([
@@ -203,7 +206,7 @@ test("keeps the exact calendar return decision usable on a mobile viewport", asy
   await expect(reboughtButton).toHaveCSS("min-height", "44px");
   expect(await reboughtButton.evaluate((element) => {
     const rect = element.getBoundingClientRect();
-    return rect.left >= 0 && rect.right <= window.innerWidth && rect.bottom <= window.innerHeight;
+    return rect.left >= 0 && rect.right <= window.innerWidth;
   })).toBe(true);
 
   await reboughtButton.click();

@@ -37,6 +37,7 @@ export const analyticsEventNames = [
   "rebuy_action_saved",
   "rebuy_calendar_export_clicked",
   "rebuy_calendar_returned",
+  "rebuy_purchase_clue_opened",
 ] as const;
 
 export type AnalyticsEventName = (typeof analyticsEventNames)[number];

@@ -238,6 +238,9 @@ export default function DashboardClient({
       window.alert(error instanceof Error ? error.message : "재구매 상태를 저장하지 못했습니다.");
     }
   };
+  const openCalendarPurchaseClue = (kind: "saved_link" | "search") => {
+    trackEvent("rebuy_purchase_clue_opened", { source: "rebuy_calendar_return", clue: kind });
+  };
 
   return (
     <main className="coffee-app-shell min-h-screen text-foreground" data-testid={isDashboardReady ? "dashboard-ready" : undefined}>
@@ -259,6 +262,7 @@ export default function DashboardClient({
           isLoadingItem={calendarReturnToken !== null && calendarReturnItemQuery.isLoading}
           isSaving={updateShelfRebuyStateMutation.isPending}
           onSaveDecision={saveCalendarReturnDecision}
+          onOpenPurchaseClue={openCalendarPurchaseClue}
         />
       )}
 

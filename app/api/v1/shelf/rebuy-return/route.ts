@@ -24,7 +24,7 @@ export async function GET(request: Request): Promise<Response> {
 
     const { data, error } = await supabase
       .from("coffee_shelf_items")
-      .select("id,roaster_name,bean_name,rebuy_action")
+      .select("id,roaster_name,bean_name,purchase_url,purchase_note,rebuy_action")
       .eq("rebuy_return_token", token.data)
       .eq("user_id", user.id)
       .single();
@@ -46,6 +46,8 @@ export async function GET(request: Request): Promise<Response> {
           id: data.id,
           roasterName: data.roaster_name,
           beanName: data.bean_name,
+          purchaseUrl: data.purchase_url,
+          purchaseNote: data.purchase_note,
           rebuyAction: data.rebuy_action,
         },
       },
