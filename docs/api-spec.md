@@ -33,6 +33,7 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `POST` | `/api/v1/shelf` | Add a bean to the current user's private coffee shelf. |
 | `PATCH` | `/api/v1/shelf/:id` | Update one owned shelf item, including fill level, finished state, or private rebuy action state. |
 | `DELETE` | `/api/v1/shelf/:id` | Delete one owned shelf item. |
+| `GET` | `/api/v1/shelf/:id/rebuy-calendar` | Download one owned rebuy reminder as a private iCalendar file. |
 | `GET` | `/api/v1/rebuy-intelligence` | Derive the current user's Rebuy Intelligence loop from owned cards, shelf items, and brewing logs. |
 | `POST` | `/api/v1/checkout` | Create a Stripe Checkout session for premium, card credits, or PDF export. |
 | `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive as a PDF download. |
@@ -70,6 +71,7 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - private Taste Rebuy Brief on the dashboard that turns the user's own `again`/`maybe` cards, tags, acidity/sweetness/body scores, sample bean names, and saved rebuy reasons into a copyable Korean preference sentence for asking, searching, or choosing the next rebuy candidate;
 - private Rebuy-to-Shelf Transfer on the dashboard that lets a user-confirmed card rebuy create a new `coffee_shelf_items` memory through `POST /api/v1/shelf`, carrying over roaster, bean, origin, purchase URL, buying note, parsed bag weight, and `rebuy_action: "rebought"` without creating an order or marketplace transaction;
 - private in-app rebuy reminder state on shelf items through `rebuy_priority`, `rebuy_reminder_date`, `rebuy_action`, and `rebuy_action_at`, including direct Rebuy Intelligence panel actions for `will_rebuy` and `rebought`; this is a saved UI loop, not push delivery or an order flow;
+- a user-initiated private calendar export for one owned shelf item's saved `rebuy_reminder_date`, delivered as `text/calendar` and linked back to `/dashboard?source=rebuy_calendar`; it is not push, a background notification, a roaster order, or a marketplace flow;
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
 - private Grind Memory inside Dial-in Coach, where the latest owned 4-5 star brew log for the selected shelf bean is surfaced as the last-good method, dose, water, temperature, grind setting, and brew time;
 - private Brew Failure Memory inside Dial-in Coach, where one-tap sour, bitter, weak, heavy, or balanced feedback is saved to `brewing_logs.coach_feedback` and changes the next recommended recipe;
@@ -185,6 +187,12 @@ interface CoffeeShelfItem {
 ```
 
 Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. Peak Window guidance is also derived at render time from the same owned shelf dates and returns `unknown`, `resting`, `peak`, `enjoy_now`, or `fading` as a private drink-timing cue; it is not persisted. The saved rebuy reminder fields only keep app-internal state for pinned candidates, next-buy dates, and completed/drank/will-rebuy actions. Dashboard Rebuy-to-Shelf Transfer uses the same `POST /api/v1/shelf` contract with `rebuyAction: "rebought"`, `wantAgain: true`, optional source `tastingCardId`, and a `totalWeight` parsed from the card's buying note when available. It does not create push notifications, roaster orders, partner offers, or marketplace transactions.
+
+### `GET /api/v1/shelf/:id/rebuy-calendar`
+
+This user-initiated private calendar export is authenticated owner-only and available for a shelf item that has `rebuy_reminder_date`. The route returns `text/calendar; charset=utf-8` with private, no-store caching and an all-day iCalendar event that contains the remembered roaster/bean label and a return link to `/dashboard?source=rebuy_calendar`. Anonymous callers receive `401`, missing or non-owned rows receive `404`, and an owned row without a saved reminder date receives `400`.
+
+The browser tracks privacy-safe `rebuy_calendar_export_clicked` and `rebuy_calendar_returned` events with source values only; no bean name, roaster, ID, note, URL, or date is sent in analytics. The feature is an evidence-bounded inference from forgetting/timing pain, not direct first-person demand for `.ics` files.
 
 ### `GET /api/v1/rebuy-intelligence`
 
