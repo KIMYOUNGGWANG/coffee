@@ -18,6 +18,7 @@ const isDirectTestFile = path.resolve(process.argv[1] ?? "") === fileURLToPath(i
 if (isDirectTestFile) test("Given a valid memory event, When it is delivered, Then the service-role route persists bounded scalar data", async () => {
   const fixture = await loadAnalyticsRoute();
   fixture.store.resetAnalyticsState();
+  fixture.session.setAnalyticsUser({ id: "user-analytics" });
 
   try {
     const response = await fixture.route.POST(analyticsRequest());
@@ -31,7 +32,7 @@ if (isDirectTestFile) test("Given a valid memory event, When it is delivered, Th
       event_name: "card_saved",
       occurred_at: "2026-06-18T12:00:00.000Z",
       path: "/dashboard",
-      user_id: null,
+      user_id: "user-analytics",
       anonymous_id: "guest-session-7",
       properties: { capture_method: "scan", corrected_field_count: 2, confirmed: true },
     });
@@ -60,6 +61,7 @@ if (isDirectTestFile) test("Given an already persisted event ID, When it is deli
 if (isDirectTestFile) test("Given a legacy event without identifiers, When delivered, Then it persists with a server event ID", async () => {
   const fixture = await loadAnalyticsRoute();
   fixture.store.resetAnalyticsState();
+  fixture.session.setAnalyticsUser(null);
 
   try {
     const response = await fixture.route.POST(analyticsRequest({

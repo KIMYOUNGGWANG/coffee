@@ -89,6 +89,12 @@ type AdminOverview = {
       readonly count: number;
     }[];
   };
+  readonly rebuyCalendarFunnel: {
+    readonly exportedUsers: number;
+    readonly returnedUsers: number;
+    readonly decidedUsers: number;
+    readonly unattributedEvents: number;
+  };
   readonly users: readonly AdminUser[];
   readonly operations: {
     readonly adminUsers: number;
@@ -343,6 +349,20 @@ export default function AdminDashboardClient() {
                   </span>
                 ))}
               </div>
+            </section>
+            <section className="dashboard-panel p-5">
+              <h2 className="text-xl font-semibold">Rebuy Calendar Funnel</h2>
+              <p className="mt-1 text-sm text-muted-foreground">캘린더 저장 후 CoffeeDex로 돌아와 재구매 결정을 남긴 흐름입니다.</p>
+              <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                <p>저장 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.exportedUsers}</b></p>
+                <p>복귀 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.returnedUsers}</b></p>
+                <p>결정 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.decidedUsers}</b></p>
+              </div>
+              <p className="mt-4 text-xs leading-5 text-muted-foreground">
+                {overview.rebuyCalendarFunnel.unattributedEvents > 0
+                  ? `이전 익명 이벤트 ${overview.rebuyCalendarFunnel.unattributedEvents}건은 퍼널에 포함하지 않습니다.`
+                  : "로그인 소유자 기준으로만 집계합니다. 원두명·가격·메모는 분석에 저장하지 않습니다."}
+              </p>
             </section>
           </div>
         </section>

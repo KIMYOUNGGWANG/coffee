@@ -57,7 +57,7 @@ The current runtime schema accepts these variables as optional. Configure them f
 
 ## Privacy And Analytics Boundary
 
-- Product events contain allowlisted operational fields such as event name, path, surface, session identifier, and attribution/checkout identifiers. Do not add raw images, tasting notes, package claims, or arbitrary user payloads.
+- Product events contain allowlisted operational fields such as event name, path, surface, session identifier, and attribution/checkout identifiers. For authenticated activity, the server may attach the current account ID to the service-only event row so aggregate private-retention funnels can be measured; do not add raw images, tasting notes, package claims, purchase details, or arbitrary user payloads.
 - Account deletion anonymizes product-event ownership and redacts Stripe event identifiers/payloads before deleting owned product data. Retained rows are limited to audit, dispute, security, and aggregate operational needs.
 - The current deletion implementation does not delete Storage objects; deployment and legal copy must not claim storage cleanup until an executable cleanup contract exists.
 

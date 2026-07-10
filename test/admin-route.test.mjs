@@ -201,6 +201,11 @@ export function createAdminSupabase() {
     path.join(tempDirectory, "admin-launch-health.mjs"),
     transpile(readFileSync(launchHealthSourcePath, "utf8"), launchHealthSourcePath),
   );
+  const calendarFunnelSourcePath = path.join(projectRoot, "lib/rebuy-calendar-funnel.ts");
+  writeFileSync(
+    path.join(tempDirectory, "rebuy-calendar-funnel.mjs"),
+    transpile(readFileSync(calendarFunnelSourcePath, "utf8"), calendarFunnelSourcePath),
+  );
 
   for (const [fileName, routePath] of [
     ["overview.mjs", "app/api/v1/admin/overview/route.ts"],
@@ -211,6 +216,7 @@ export function createAdminSupabase() {
       .replaceAll('"next/server"', '"./next-server.mjs"')
       .replaceAll('"@/lib/api-errors"', '"./api-errors.mjs"')
       .replaceAll('"@/lib/admin-launch-health"', '"./admin-launch-health.mjs"')
+      .replaceAll('"@/lib/rebuy-calendar-funnel"', '"./rebuy-calendar-funnel.mjs"')
       .replaceAll('"@/lib/admin"', '"./admin.mjs"')
       .replaceAll('"@/lib/supabase/admin"', '"./supabase-admin.mjs"')
       .replaceAll('"zod"', '"./zod.mjs"');
@@ -283,6 +289,7 @@ const adminRows = {
       rebuy_action: "will_rebuy",
       rebuy_priority: "pinned",
       rebuy_reminder_date: "2026-07-04",
+      rebuy_action_at: isoMinutesAgo(380),
     },
   ],
   brewing_logs: [
@@ -334,6 +341,24 @@ const adminRows = {
       anonymous_id: "qa-session",
       properties: { qa: true },
     },
+    {
+      event_id: "event-5",
+      event_name: "rebuy_calendar_export_clicked",
+      occurred_at: isoMinutesAgo(420),
+      path: "/dashboard",
+      user_id: "user-1",
+      anonymous_id: null,
+      properties: { source: "shelf_reminder" },
+    },
+    {
+      event_id: "event-6",
+      event_name: "rebuy_calendar_returned",
+      occurred_at: isoMinutesAgo(400),
+      path: "/dashboard",
+      user_id: "user-1",
+      anonymous_id: null,
+      properties: { source: "rebuy_calendar" },
+    },
   ],
   stripe_events: [
     {
@@ -380,6 +405,12 @@ test("Given an allowlisted admin, When overview is requested, Then operating KPI
     assert.equal(body.data.kpis.find((kpi) => kpi.label === "전체 유저").value, 1);
     assert.equal(body.data.memory.purchaseMemories, 2);
     assert.equal(body.data.rebuyDialIn.coachFeedbackLogs, 1);
+    assert.deepEqual(body.data.rebuyCalendarFunnel, {
+      exportedUsers: 1,
+      returnedUsers: 1,
+      decidedUsers: 1,
+      unattributedEvents: 0,
+    });
     assert.equal(body.data.operations.recentFailures[0].eventName, "scan_failed");
     assert.equal(body.data.launchHealth.status, "p0");
     assert.equal(body.data.launchHealth.summary.qaExcludedEvents, 1);
