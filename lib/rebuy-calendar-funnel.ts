@@ -13,6 +13,7 @@ type RebuyDecision = {
 export type RebuyCalendarFunnel = {
   readonly exportedUsers: number;
   readonly returnedUsers: number;
+  readonly purchaseClueUsers: number;
   readonly decidedUsers: number;
   readonly unattributedEvents: number;
   readonly windowDays: 14;
@@ -57,6 +58,15 @@ export function buildRebuyCalendarFunnel(input: {
       return exportedAt !== undefined && returnedAt >= exportedAt;
     }),
   );
+  const purchaseClueAtByUser = earliestEventByUser(windowEvents, "rebuy_purchase_clue_opened");
+  const purchaseClueUsers = new Set(
+    Array.from(purchaseClueAtByUser.entries())
+      .filter(([userId, openedAt]) => {
+        const returnedAt = returnedUsers.get(userId);
+        return returnedAt !== undefined && openedAt >= returnedAt;
+      })
+      .map(([userId]) => userId),
+  );
   const decidedUsers = new Set<string>();
 
   for (const shelfItem of input.shelfItems) {
@@ -71,9 +81,10 @@ export function buildRebuyCalendarFunnel(input: {
   return {
     exportedUsers: exportedAtByUser.size,
     returnedUsers: returnedUsers.size,
+    purchaseClueUsers: purchaseClueUsers.size,
     decidedUsers: decidedUsers.size,
     unattributedEvents: windowEvents.filter((event) => (
-      (event.event_name === "rebuy_calendar_export_clicked" || event.event_name === "rebuy_calendar_returned")
+      (event.event_name === "rebuy_calendar_export_clicked" || event.event_name === "rebuy_calendar_returned" || event.event_name === "rebuy_purchase_clue_opened")
       && event.user_id === null
     )).length,
     windowDays: WINDOW_DAYS,

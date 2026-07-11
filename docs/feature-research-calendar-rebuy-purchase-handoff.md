@@ -16,4 +16,4 @@ The prior calendar-return evidence ledger establishes repeated purchase and scat
 | Add another purchase-clue form on calendar return | 2 | 3 | 3 | 2 | 2 | 2.7 | 3 | Reject: duplicates Rebuy Clue Rescue |
 | Generic weekly purchase suggestions | 3 | 3 | 3 | 3 | 3 | 3.0 | 2 | Later |
 
-Measure `rebuy_purchase_clue_opened` using only `source` and `clue` (`saved_link` or `search`). Revisit if calendar-return users rarely open the clue after enough production volume; the current evidence confidence remains moderate because CoffeeDex has no customer analytics or interviews.
+Measure `rebuy_purchase_clue_opened` using only `source` and `clue` (`saved_link` or `search`). The admin funnel counts only owner-linked clue opens that occurred after a calendar return. Revisit if calendar-return users rarely open the clue after enough production volume; the current evidence confidence remains moderate because CoffeeDex has no customer analytics or interviews.

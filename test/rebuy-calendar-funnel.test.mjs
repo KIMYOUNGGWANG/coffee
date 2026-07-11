@@ -37,6 +37,7 @@ test("Given owner-linked calendar events, When an owner returns and later saves 
       events: [
         { event_name: "rebuy_calendar_export_clicked", occurred_at: "2026-07-10T09:00:00.000Z", user_id: "user-1" },
         { event_name: "rebuy_calendar_returned", occurred_at: "2026-07-10T10:00:00.000Z", user_id: "user-1" },
+        { event_name: "rebuy_purchase_clue_opened", occurred_at: "2026-07-10T10:05:00.000Z", user_id: "user-1" },
         { event_name: "rebuy_calendar_export_clicked", occurred_at: "2026-07-10T09:10:00.000Z", user_id: "user-2" },
         { event_name: "rebuy_calendar_returned", occurred_at: "2026-07-10T08:00:00.000Z", user_id: "user-3" },
         { event_name: "rebuy_calendar_export_clicked", occurred_at: "2026-07-10T09:20:00.000Z", user_id: null },
@@ -53,6 +54,7 @@ test("Given owner-linked calendar events, When an owner returns and later saves 
     assert.deepEqual(result, {
       exportedUsers: 2,
       returnedUsers: 1,
+      purchaseClueUsers: 1,
       decidedUsers: 1,
       unattributedEvents: 1,
       windowDays: 14,

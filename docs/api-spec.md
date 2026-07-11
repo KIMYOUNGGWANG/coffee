@@ -102,7 +102,7 @@ Returns aggregate operational data for the current deployment:
 - Activation Funnel from profile creation through dashboard visits, first memory, purchase clue, brew log, Brew Failure Memory, and Rebuy loop;
 - user/account list with counts and last-activity timestamps;
 - Coffee Memory, Rebuy Intelligence, Dial-in Coach usage summaries;
-- Rebuy Calendar Funnel from private calendar export through dashboard return to a later `will_rebuy` or `rebought` shelf decision by the same authenticated owner;
+- Rebuy Calendar Funnel from private calendar export through dashboard return, explicit purchase-clue open, and a later `will_rebuy` or `rebought` shelf decision by the same authenticated owner;
 - recent failure-like product events and QA/test cleanup candidates.
 
 The route reads up to bounded recent rows with the service-role key after admin authorization. It must not expose raw tasting notes, package images, or marketplace-like ordering data. Calendar funnel events are linked server-side to the current authenticated owner only for aggregate operator counts; raw bean, roaster, price, date, note, URL, and card/shelf identifiers remain out of event properties.

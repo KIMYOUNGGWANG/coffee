@@ -408,11 +408,13 @@ test("Given an allowlisted admin, When overview is requested, Then operating KPI
     assert.deepEqual({
       exportedUsers: body.data.rebuyCalendarFunnel.exportedUsers,
       returnedUsers: body.data.rebuyCalendarFunnel.returnedUsers,
+      purchaseClueUsers: body.data.rebuyCalendarFunnel.purchaseClueUsers,
       decidedUsers: body.data.rebuyCalendarFunnel.decidedUsers,
       unattributedEvents: body.data.rebuyCalendarFunnel.unattributedEvents,
     }, {
       exportedUsers: 1,
       returnedUsers: 1,
+      purchaseClueUsers: 0,
       decidedUsers: 1,
       unattributedEvents: 0,
     });
