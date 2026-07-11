@@ -61,7 +61,7 @@ function card(overrides = {}) {
   };
 }
 
-test("Given a rebuy card, When shelf transfer payload is built, Then it starts a rebought shelf memory", async () => {
+test("Given a rebuy card, When shelf transfer payload is built, Then it starts an active shelf memory for the new bag", async () => {
   const loaded = await loadRebuyShelfTransferModule();
   try {
     const { buildRebuyShelfTransferPayload } = loaded.module;
@@ -74,7 +74,7 @@ test("Given a rebuy card, When shelf transfer payload is built, Then it starts a
     assert.equal(payload.tastingCardId, "550e8400-e29b-41d4-a716-446655440000");
     assert.equal(payload.purchaseUrl, "https://example.com/colombia");
     assert.equal(payload.purchaseNote, "공식몰 250g 옵션");
-    assert.equal(payload.rebuyAction, "rebought");
+    assert.equal(payload.rebuyAction, "none");
     assert.equal(payload.wantAgain, true);
     assert.equal(payload.rating, 5);
   } finally {

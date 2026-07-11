@@ -46,7 +46,7 @@ Evidence surfaces: `/dashboard`, `buildRebuyTasteBrief`, `DashboardRebuyTasteBri
 
 ## Flow 3D. Turn A Rebuy Into Shelf Memory
 
-Given a user has a private rebuy candidate card, when they actually buy that bean again from the remembered clue, then CoffeeDex can start a new private shelf memory from the existing card's roaster, bean name, origin, purchase URL, buying note, and parsed bag weight. The new shelf row is marked as `rebought` so Fresh Shelf, Shelf Runway, and Rebuy Intelligence can continue the next retention loop. This is a user-confirmed memory transfer only; it does not place an order, create a marketplace transaction, notify a roaster, or publish the purchase.
+Given a user has a private rebuy candidate card, when they actually buy that bean again from the remembered clue, then CoffeeDex can start a new private shelf memory from the existing card's roaster, bean name, origin, purchase URL, buying note, and parsed bag weight. The new shelf row starts with `rebuy_action: "none"` and a full fill level, so Fresh Shelf, Shelf Runway, and Rebuy Intelligence can continue the next retention loop as a current bag. The original card preserves the user's repurchase preference. This is a user-confirmed memory transfer only; it does not place an order, create a marketplace transaction, notify a roaster, or publish the purchase.
 
 Evidence surfaces: `/dashboard`, `POST /api/v1/shelf`, `buildRebuyShelfTransferPayload`, `DashboardRebuyTimingMemoryPanel`
 

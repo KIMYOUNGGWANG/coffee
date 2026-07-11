@@ -25,7 +25,7 @@ export type RebuyShelfTransferPayload = {
   readonly purchaseUrl: string | null;
   readonly purchaseNote: string | null;
   readonly rebuyPriority: "normal";
-  readonly rebuyAction: "rebought";
+  readonly rebuyAction: "none";
   readonly rating: 5 | null;
   readonly wantAgain: true;
 };
@@ -53,7 +53,7 @@ export function buildRebuyShelfTransferPayload(card: RebuyShelfTransferCard): Re
     purchaseUrl: normalize(card.purchase_url),
     purchaseNote: normalize(card.purchase_note),
     rebuyPriority: "normal",
-    rebuyAction: "rebought",
+    rebuyAction: "none",
     rating: card.repurchase_intent === "again" ? 5 : null,
     wantAgain: true,
   };
