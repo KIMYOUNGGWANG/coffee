@@ -26,11 +26,13 @@ export type RebuyShelfTransferPayload = {
   readonly purchaseNote: string | null;
   readonly rebuyPriority: "normal";
   readonly rebuyAction: "none";
+  readonly rebuySourceShelfItemId: string | null;
   readonly rating: 5 | null;
   readonly wantAgain: true;
 };
 
 export type RebuyShelfReplenishSource = {
+  readonly id: string;
   readonly roasterName: string | null;
   readonly beanName: string | null;
   readonly origin: string | null;
@@ -64,6 +66,7 @@ export function buildRebuyShelfTransferPayload(card: RebuyShelfTransferCard): Re
     purchaseNote: normalize(card.purchase_note),
     rebuyPriority: "normal",
     rebuyAction: "none",
+    rebuySourceShelfItemId: null,
     rating: card.repurchase_intent === "again" ? 5 : null,
     wantAgain: true,
   };
@@ -83,6 +86,7 @@ export function buildRebuyShelfReplenishPayload(source: RebuyShelfReplenishSourc
     purchaseNote: normalize(source.purchaseNote),
     rebuyPriority: "normal",
     rebuyAction: "none",
+    rebuySourceShelfItemId: UUID_PATTERN.test(source.id) ? source.id : null,
     rating: 5,
     wantAgain: true,
   };

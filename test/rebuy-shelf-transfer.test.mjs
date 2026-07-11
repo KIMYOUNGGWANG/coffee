@@ -75,6 +75,7 @@ test("Given a rebuy card, When shelf transfer payload is built, Then it starts a
     assert.equal(payload.purchaseUrl, "https://example.com/colombia");
     assert.equal(payload.purchaseNote, "공식몰 250g 옵션");
     assert.equal(payload.rebuyAction, "none");
+    assert.equal(payload.rebuySourceShelfItemId, null);
     assert.equal(payload.wantAgain, true);
     assert.equal(payload.rating, 5);
   } finally {
@@ -110,6 +111,7 @@ test("Given an owned shelf memory after a confirmed rebuy, When a new bag payloa
   try {
     const { buildRebuyShelfReplenishPayload } = loaded.module;
     const payload = buildRebuyShelfReplenishPayload({
+      id: "93493987-4800-4b7c-836f-c0a35f39244e",
       roasterName: "프릳츠 커피",
       beanName: "에티오피아 시다마",
       origin: "Ethiopia Sidama Washed",
@@ -132,6 +134,7 @@ test("Given an owned shelf memory after a confirmed rebuy, When a new bag payloa
       purchaseNote: "프릳츠 공식몰 200g 18,000원",
       rebuyPriority: "normal",
       rebuyAction: "none",
+      rebuySourceShelfItemId: "93493987-4800-4b7c-836f-c0a35f39244e",
       rating: 5,
       wantAgain: true,
     });

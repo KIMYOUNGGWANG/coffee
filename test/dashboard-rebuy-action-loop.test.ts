@@ -236,6 +236,7 @@ test("starts a separate active shelf memory only after an explicit calendar-retu
     purchaseNote: "프릳츠 공식몰 200g 18,000원",
     rebuyPriority: "normal",
     rebuyAction: "none",
+    rebuySourceShelfItemId: "93493987-4800-4b7c-836f-c0a35f39244e",
     rating: 5,
     wantAgain: true,
   }]);
