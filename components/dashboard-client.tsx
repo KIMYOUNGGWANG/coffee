@@ -251,8 +251,10 @@ export default function DashboardClient({
     if (!shelfItem) return;
 
     try {
-      await startRebuyShelfMemoryMutation.mutateAsync(buildRebuyShelfReplenishPayload(shelfItem));
-      trackEvent("rebuy_shelf_memory_started", { source: "rebuy_calendar_return" });
+      const result = await startRebuyShelfMemoryMutation.mutateAsync(buildRebuyShelfReplenishPayload(shelfItem));
+      if (!result.reused) {
+        trackEvent("rebuy_shelf_memory_started", { source: "rebuy_calendar_return" });
+      }
       triggerShelfRefresh();
       setIsCalendarReturnCueVisible(false);
     } catch (error: unknown) {

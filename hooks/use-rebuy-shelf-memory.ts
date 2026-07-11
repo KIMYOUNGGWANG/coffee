@@ -9,6 +9,13 @@ const responseErrorSchema = z.object({
   }).optional(),
 });
 
+const responseSchema = z.object({
+  data: z.unknown(),
+  reused: z.boolean().optional().default(false),
+});
+
+export type RebuyShelfMemoryResult = Readonly<z.infer<typeof responseSchema>>;
+
 async function readJsonResponse(response: Response): Promise<unknown> {
   const text = await response.text();
   if (text.trim().length === 0) return {};
@@ -29,7 +36,7 @@ function getResponseErrorMessage(json: unknown): string {
 export function useStartRebuyShelfMemory() {
   const queryClient = useQueryClient();
 
-  return useMutation<unknown, Error, RebuyShelfTransferPayload>({
+  return useMutation<RebuyShelfMemoryResult, Error, RebuyShelfTransferPayload>({
     mutationFn: async (payload) => {
       const response = await fetch("/api/v1/shelf", {
         method: "POST",
@@ -42,7 +49,12 @@ export function useStartRebuyShelfMemory() {
         throw new Error(getResponseErrorMessage(json));
       }
 
-      return json;
+      const parsed = responseSchema.safeParse(json);
+      if (!parsed.success) {
+        throw new Error("새 원두 저장 결과를 확인하지 못했습니다.");
+      }
+
+      return parsed.data;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["rebuy-intelligence"] });
