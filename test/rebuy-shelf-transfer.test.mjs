@@ -104,3 +104,38 @@ test("Given a non-uuid demo card, When shelf transfer payload is built, Then it 
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }
 });
+
+test("Given an owned shelf memory after a confirmed rebuy, When a new bag payload is built, Then it starts the new bag without copying a completed rebuy state", async () => {
+  const loaded = await loadRebuyShelfTransferModule();
+  try {
+    const { buildRebuyShelfReplenishPayload } = loaded.module;
+    const payload = buildRebuyShelfReplenishPayload({
+      roasterName: "프릳츠 커피",
+      beanName: "에티오피아 시다마",
+      origin: "Ethiopia Sidama Washed",
+      totalWeight: 200,
+      tastingCardId: null,
+      purchaseUrl: "https://fritz.example/sidama",
+      purchaseNote: "프릳츠 공식몰 200g 18,000원",
+    });
+
+    assert.deepEqual(payload, {
+      roasterName: "프릳츠 커피",
+      beanName: "에티오피아 시다마",
+      origin: "Ethiopia Sidama Washed",
+      roastDate: null,
+      openedDate: null,
+      totalWeight: 200,
+      fillLevel: 100,
+      tastingCardId: null,
+      purchaseUrl: "https://fritz.example/sidama",
+      purchaseNote: "프릳츠 공식몰 200g 18,000원",
+      rebuyPriority: "normal",
+      rebuyAction: "none",
+      rating: 5,
+      wantAgain: true,
+    });
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});

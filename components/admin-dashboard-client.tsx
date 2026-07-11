@@ -94,6 +94,7 @@ type AdminOverview = {
     readonly returnedUsers: number;
     readonly purchaseClueUsers: number;
     readonly decidedUsers: number;
+    readonly shelfMemoryUsers: number;
     readonly unattributedEvents: number;
     readonly windowDays: 14;
     readonly windowStart: string;
@@ -355,12 +356,13 @@ export default function AdminDashboardClient() {
             </section>
             <section className="dashboard-panel p-5">
               <h2 className="text-xl font-semibold">Rebuy Calendar Funnel</h2>
-              <p className="mt-1 text-sm text-muted-foreground">최근 {overview.rebuyCalendarFunnel.windowDays}일의 캘린더 저장 후 복귀·구매 단서·재구매 결정 흐름입니다.</p>
-              <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+              <p className="mt-1 text-sm text-muted-foreground">최근 {overview.rebuyCalendarFunnel.windowDays}일의 캘린더 저장 후 복귀·구매 단서·재구매 결정·새 봉투 시작 흐름입니다.</p>
+              <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-5">
                 <p>저장 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.exportedUsers}</b></p>
                 <p>복귀 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.returnedUsers}</b></p>
                 <p>구매 단서 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.purchaseClueUsers}</b></p>
                 <p>결정 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.decidedUsers}</b></p>
+                <p>새 봉투 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.shelfMemoryUsers}</b></p>
               </div>
               <p className="mt-4 text-xs leading-5 text-muted-foreground">
                 {overview.rebuyCalendarFunnel.unattributedEvents > 0

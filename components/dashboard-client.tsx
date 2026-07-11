@@ -15,12 +15,14 @@ import DailyBrewingCalendar from "@/components/daily-brewing-calendar";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import { useDashboardCheckoutReturn } from "@/hooks/use-dashboard-checkout-return";
 import { useRebuyCalendarReturn } from "@/hooks/use-rebuy-calendar-return";
+import { useStartRebuyShelfMemory } from "@/hooks/use-rebuy-shelf-memory";
 import { useUpdateShelfRebuyState } from "@/hooks/use-shelf-rebuy-state";
 import type { ShelfRebuyAction } from "@/hooks/use-shelf-rebuy-state";
 import { useDeleteTastingCard, useDialInCoach, useRebuyIntelligence, useTasteAnalytics, useTastingCards, useUserProfile } from "@/hooks/useTastingCards";
 import type { CardCreatorWizardMode } from "@/components/CardCreatorWizard";
 import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import { buildAuthGateHref, isAuthRequiredError } from "@/lib/auth-redirect";
+import { buildRebuyShelfReplenishPayload } from "@/lib/rebuy-shelf-transfer";
 import type { CheckoutIntent, CheckoutItemType, CheckoutNotice } from "@/lib/checkout-return";
 import { filterDashboardCards, type RepurchaseFilter } from "@/lib/dashboard-card-filter";
 import type { DashboardReturnSource } from "@/lib/dashboard-return-source";
@@ -66,6 +68,7 @@ export default function DashboardClient({
   const [selectedDetailCard, setSelectedDetailCard] = useState<TastingCardData | null>(null);
   const [selectedShareCard, setSelectedShareCard] = useState<TastingCardData | null>(null);
   const [isCalendarReturnCueVisible, setIsCalendarReturnCueVisible] = useState(false);
+  const [hasCalendarReturnConfirmedRebuy, setHasCalendarReturnConfirmedRebuy] = useState(false);
   const [hasHandledCalendarReturn, setHasHandledCalendarReturn] = useState(false);
 
   const [activeTab, setActiveTab] = useState<DashboardTab>("shelf");
@@ -74,6 +77,7 @@ export default function DashboardClient({
   const calendarReturnToken = initialReturnSource.kind === "rebuy_calendar" ? initialReturnSource.returnToken : null;
   const calendarReturnItemQuery = useRebuyCalendarReturn(calendarReturnToken);
   const updateShelfRebuyStateMutation = useUpdateShelfRebuyState();
+  const startRebuyShelfMemoryMutation = useStartRebuyShelfMemory();
 
   const triggerShelfRefresh = () => setShelfRefreshTrigger(prev => prev + 1);
 
@@ -233,9 +237,26 @@ export default function DashboardClient({
         ...(rebuyAction === "rebought" ? { rebuyReminderDate: null } : {}),
       });
       trackEvent("rebuy_action_saved", { action: rebuyAction, source: "rebuy_calendar_return" });
-      setIsCalendarReturnCueVisible(false);
+      if (rebuyAction === "rebought") {
+        setHasCalendarReturnConfirmedRebuy(true);
+      } else {
+        setIsCalendarReturnCueVisible(false);
+      }
     } catch (error: unknown) {
       window.alert(error instanceof Error ? error.message : "재구매 상태를 저장하지 못했습니다.");
+    }
+  };
+  const startCalendarReturnNewBag = async () => {
+    const shelfItem = calendarReturnItemQuery.data;
+    if (!shelfItem) return;
+
+    try {
+      await startRebuyShelfMemoryMutation.mutateAsync(buildRebuyShelfReplenishPayload(shelfItem));
+      trackEvent("rebuy_shelf_memory_started", { source: "rebuy_calendar_return" });
+      triggerShelfRefresh();
+      setIsCalendarReturnCueVisible(false);
+    } catch (error: unknown) {
+      window.alert(error instanceof Error ? error.message : "새 원두를 선반에 저장하지 못했습니다.");
     }
   };
   const openCalendarPurchaseClue = (kind: "saved_link" | "search") => {
@@ -260,8 +281,10 @@ export default function DashboardClient({
           onOpenDecision={openCalendarReturnDecision}
           item={calendarReturnItemQuery.data}
           isLoadingItem={calendarReturnToken !== null && calendarReturnItemQuery.isLoading}
-          isSaving={updateShelfRebuyStateMutation.isPending}
+          isSaving={updateShelfRebuyStateMutation.isPending || startRebuyShelfMemoryMutation.isPending}
+          hasConfirmedRebuy={hasCalendarReturnConfirmedRebuy || calendarReturnItemQuery.data?.rebuyAction === "rebought"}
           onSaveDecision={saveCalendarReturnDecision}
+          onStartNewBag={startCalendarReturnNewBag}
           onOpenPurchaseClue={openCalendarPurchaseClue}
         />
       )}

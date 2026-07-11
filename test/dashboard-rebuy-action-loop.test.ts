@@ -95,7 +95,14 @@ async function fulfillJson(route: Route, body: unknown, status = 200): Promise<v
   });
 }
 
-async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[], rebuyReturnDelayMs = 0): Promise<void> {
+type DashboardRouteOptions = {
+  readonly rebuyReturnDelayMs?: number;
+  readonly shelfPostBodies?: unknown[];
+};
+
+async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[], options: DashboardRouteOptions = {}): Promise<void> {
+  const { rebuyReturnDelayMs = 0, shelfPostBodies = [] } = options;
+
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
     const pathname = new URL(request.url()).pathname;
@@ -108,6 +115,11 @@ async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[], rebu
 
     switch (pathname) {
       case "/api/v1/shelf":
+        if (request.method() === "POST") {
+          shelfPostBodies.push(JSON.parse(request.postData() ?? "{}"));
+          await fulfillJson(route, { data: { id: "shelf-new-sidama" } }, 201);
+          return;
+        }
         await fulfillJson(route, shelfResponse);
         return;
       case "/api/v1/rebuy-intelligence":
@@ -122,6 +134,9 @@ async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[], rebu
             id: "93493987-4800-4b7c-836f-c0a35f39244e",
             roasterName: "프릳츠 커피",
             beanName: "에티오피아 시다마",
+            origin: "Ethiopia Sidama Washed",
+            totalWeight: 200,
+            tastingCardId: null,
             purchaseUrl: "https://fritz.example/sidama",
             purchaseNote: "프릳츠 공식몰 200g 18,000원",
             rebuyAction: "none",
@@ -192,6 +207,41 @@ test("saves an exact private bean decision after a calendar return", async ({ pa
   await expect(page).toHaveURL(/\/dashboard$/);
 });
 
+test("starts a separate active shelf memory only after an explicit calendar-return rebuy confirmation", async ({ page }) => {
+  const patchBodies: unknown[] = [];
+  const shelfPostBodies: unknown[] = [];
+  await mockDashboardRoutes(page, patchBodies, { shelfPostBodies });
+
+  await page.goto(`${dashboardUrl}?source=rebuy_calendar&rebuy_token=f70cfec8-51f9-4667-a80f-ca38bfbc2b6d`, { waitUntil: "domcontentloaded" });
+
+  const cue = page.getByTestId("rebuy-calendar-return-cue");
+  await expect(cue).toContainText("프릳츠 커피 · 에티오피아 시다마");
+  await cue.getByRole("button", { name: "다시 샀음" }).click();
+  await expect.poll(() => patchBodies).toEqual([
+    { rebuyAction: "rebought", rebuyPriority: "normal", rebuyReminderDate: null },
+  ]);
+
+  await expect(cue).toContainText("새 봉투도 선반에 담아 다음 재구매 시점을 이어가세요.");
+  await cue.getByRole("button", { name: "새 봉투도 선반에 담기" }).click();
+  await expect.poll(() => shelfPostBodies).toEqual([{
+    roasterName: "프릳츠 커피",
+    beanName: "에티오피아 시다마",
+    origin: "Ethiopia Sidama Washed",
+    roastDate: null,
+    openedDate: null,
+    totalWeight: 200,
+    fillLevel: 100,
+    tastingCardId: null,
+    purchaseUrl: "https://fritz.example/sidama",
+    purchaseNote: "프릳츠 공식몰 200g 18,000원",
+    rebuyPriority: "normal",
+    rebuyAction: "none",
+    rating: 5,
+    wantAgain: true,
+  }]);
+  await expect(cue).toBeHidden();
+});
+
 test("keeps the exact calendar return decision usable on a mobile viewport", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   const patchBodies: unknown[] = [];
@@ -213,11 +263,17 @@ test("keeps the exact calendar return decision usable on a mobile viewport", asy
   await expect.poll(() => patchBodies).toEqual([
     { rebuyAction: "rebought", rebuyPriority: "normal", rebuyReminderDate: null },
   ]);
+  const continuationButton = cue.getByRole("button", { name: "새 봉투도 선반에 담기" });
+  await expect(continuationButton).toBeVisible();
+  expect(await continuationButton.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.left >= 0 && rect.right <= window.innerWidth;
+  })).toBe(true);
 });
 
 test("removes the opaque token after a dismissed calendar return cue finishes loading", async ({ page }) => {
   const patchBodies: unknown[] = [];
-  await mockDashboardRoutes(page, patchBodies, 250);
+  await mockDashboardRoutes(page, patchBodies, { rebuyReturnDelayMs: 250 });
 
   await page.goto(`${dashboardUrl}?source=rebuy_calendar&rebuy_token=f70cfec8-51f9-4667-a80f-ca38bfbc2b6d`, { waitUntil: "domcontentloaded" });
 

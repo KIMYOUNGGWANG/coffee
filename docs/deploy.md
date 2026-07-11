@@ -102,7 +102,7 @@ Use `/admin` as the first daily operating room after production deploy. The dash
 1. Open `/admin` with an operator account backed by `profiles.is_admin = true` or the temporary `ADMIN_EMAIL_ALLOWLIST`.
 2. Confirm the Launch Health panel is `정상`. If it shows `P0 확인 필요`, pause launch/promo activity until the failing category is understood.
 3. Review 24h and 7d counts for Google OAuth, card save, shelf save, brewing log save, scan, checkout, and Stripe webhook.
-4. Check Activation Funnel for obvious drops: profile creation to dashboard visit, first memory, purchase clue, brew log, Brew Failure Memory, and Rebuy loop.
+4. Check Activation Funnel for obvious drops: profile creation to dashboard visit, first memory, purchase clue, brew log, Brew Failure Memory, and Rebuy loop. In Rebuy Calendar Funnel, compare return, decision, and 새 봉투 stages; a decision-to-new-bag drop means users are not carrying a confirmed rebuy into the next active shelf memory.
 5. Review OAuth/API failure logs and `stripe_events.processing_status = failed` rows. Record only event ids, timestamps, category, and operator action.
 6. Confirm QA/test candidates are expected. Clean only explicit `qa`, `test`, `테스트`, or `mock` rows from `/admin`; never use QA cleanup as account deletion.
 

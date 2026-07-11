@@ -5,6 +5,9 @@ export type RebuyCalendarReturnItem = {
   readonly id: string;
   readonly roasterName: string | null;
   readonly beanName: string | null;
+  readonly origin: string | null;
+  readonly totalWeight: number | null;
+  readonly tastingCardId: string | null;
   readonly purchaseUrl: string | null;
   readonly purchaseNote: string | null;
   readonly rebuyAction: "none" | "drank" | "will_rebuy" | "rebought";
@@ -15,6 +18,9 @@ const responseSchema = z.object({
     id: z.string().uuid(),
     roasterName: z.string().nullable(),
     beanName: z.string().nullable(),
+    origin: z.string().nullable(),
+    totalWeight: z.number().int().positive().nullable(),
+    tastingCardId: z.string().uuid().nullable(),
     purchaseUrl: z.string().url().nullable(),
     purchaseNote: z.string().nullable(),
     rebuyAction: z.enum(["none", "drank", "will_rebuy", "rebought"]),

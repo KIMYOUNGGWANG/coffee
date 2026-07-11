@@ -410,12 +410,14 @@ test("Given an allowlisted admin, When overview is requested, Then operating KPI
       returnedUsers: body.data.rebuyCalendarFunnel.returnedUsers,
       purchaseClueUsers: body.data.rebuyCalendarFunnel.purchaseClueUsers,
       decidedUsers: body.data.rebuyCalendarFunnel.decidedUsers,
+      shelfMemoryUsers: body.data.rebuyCalendarFunnel.shelfMemoryUsers,
       unattributedEvents: body.data.rebuyCalendarFunnel.unattributedEvents,
     }, {
       exportedUsers: 1,
       returnedUsers: 1,
       purchaseClueUsers: 0,
       decidedUsers: 1,
+      shelfMemoryUsers: 0,
       unattributedEvents: 0,
     });
     assert.equal(body.data.rebuyCalendarFunnel.windowDays, 14);

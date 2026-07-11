@@ -15,6 +15,7 @@ export type RebuyCalendarFunnel = {
   readonly returnedUsers: number;
   readonly purchaseClueUsers: number;
   readonly decidedUsers: number;
+  readonly shelfMemoryUsers: number;
   readonly unattributedEvents: number;
   readonly windowDays: 14;
   readonly windowStart: string;
@@ -78,13 +79,24 @@ export function buildRebuyCalendarFunnel(input: {
     }
   }
 
+  const shelfMemoryAtByUser = earliestEventByUser(windowEvents, "rebuy_shelf_memory_started");
+  const shelfMemoryUsers = new Set(
+    Array.from(shelfMemoryAtByUser.entries())
+      .filter(([userId, startedAt]) => {
+        const returnedAt = returnedUsers.get(userId);
+        return returnedAt !== undefined && startedAt >= returnedAt;
+      })
+      .map(([userId]) => userId),
+  );
+
   return {
     exportedUsers: exportedAtByUser.size,
     returnedUsers: returnedUsers.size,
     purchaseClueUsers: purchaseClueUsers.size,
     decidedUsers: decidedUsers.size,
+    shelfMemoryUsers: shelfMemoryUsers.size,
     unattributedEvents: windowEvents.filter((event) => (
-      (event.event_name === "rebuy_calendar_export_clicked" || event.event_name === "rebuy_calendar_returned" || event.event_name === "rebuy_purchase_clue_opened")
+      (event.event_name === "rebuy_calendar_export_clicked" || event.event_name === "rebuy_calendar_returned" || event.event_name === "rebuy_purchase_clue_opened" || event.event_name === "rebuy_shelf_memory_started")
       && event.user_id === null
     )).length,
     windowDays: WINDOW_DAYS,

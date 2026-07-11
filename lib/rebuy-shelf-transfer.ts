@@ -30,6 +30,16 @@ export type RebuyShelfTransferPayload = {
   readonly wantAgain: true;
 };
 
+export type RebuyShelfReplenishSource = {
+  readonly roasterName: string | null;
+  readonly beanName: string | null;
+  readonly origin: string | null;
+  readonly totalWeight: number | null;
+  readonly tastingCardId: string | null;
+  readonly purchaseUrl: string | null;
+  readonly purchaseNote: string | null;
+};
+
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 function isNonBlank(value: string | null | undefined): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -55,6 +65,25 @@ export function buildRebuyShelfTransferPayload(card: RebuyShelfTransferCard): Re
     rebuyPriority: "normal",
     rebuyAction: "none",
     rating: card.repurchase_intent === "again" ? 5 : null,
+    wantAgain: true,
+  };
+}
+
+export function buildRebuyShelfReplenishPayload(source: RebuyShelfReplenishSource): RebuyShelfTransferPayload {
+  return {
+    roasterName: normalize(source.roasterName) ?? "기록한 로스터리",
+    beanName: normalize(source.beanName) ?? "다시 산 원두",
+    origin: normalize(source.origin),
+    roastDate: null,
+    openedDate: null,
+    totalWeight: typeof source.totalWeight === "number" && Number.isInteger(source.totalWeight) && source.totalWeight > 0 ? source.totalWeight : 200,
+    fillLevel: 100,
+    tastingCardId: source.tastingCardId && UUID_PATTERN.test(source.tastingCardId) ? source.tastingCardId : null,
+    purchaseUrl: normalize(source.purchaseUrl),
+    purchaseNote: normalize(source.purchaseNote),
+    rebuyPriority: "normal",
+    rebuyAction: "none",
+    rating: 5,
     wantAgain: true,
   };
 }
