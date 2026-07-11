@@ -6,7 +6,7 @@ These are the executable product truths protected by the smoke suite. CoffeeDex 
 
 Given a coffee drinker has a bag photo or knows the coffee details, when they review the editable draft, separate package claims from user-perceived taste, choose whether they would buy again, and confirm the record, then CoffeeDex can persist a private owner-scoped `tasting_cards` memory.
 
-Quick Add Memory Mode is the current one-screen capture path for the same private contract. The default 20-second surface shows only bean name, roaster, would-buy-again choice, and a one-line note; origin, process, flavor tags, and acidity/sweetness/body stay behind an optional detail disclosure. A nonblank one-line note is stored as note/description memory, but it is not last-good-brew evidence; blank notes do not generate fallback rebuy reasons or `footerMeta.extraInfo`.
+Quick Add Memory Mode is the current one-screen capture path for the same private contract. The default 20-second surface shows only bean name, roaster, would-buy-again choice, and a one-line note; purchase clues, origin, process, flavor tags, and acidity/sweetness/body stay behind optional detail disclosures. A nonblank one-line note is stored as note/description memory, but it is not last-good-brew evidence; blank notes do not generate fallback rebuy reasons or `footerMeta.extraInfo`.
 
 Evidence surfaces: `/capture`, `/onboarding`, `/dashboard`, `POST /api/v1/cards`
 
@@ -28,9 +28,27 @@ Evidence surfaces: `/dashboard`, `GET /api/v1/cards`
 
 ## Flow 3A. Save a 20-Second Quick Record
 
-Given a user wants to save a cup quickly, when they open Quick Add Memory Mode, then CoffeeDex shows bean name, roaster, whether they would buy again, and one-line note before optional detail fields. Purchase clues, flavor tags, package facts, and taste sliders stay outside the default quick-record surface.
+Given a user wants to save a cup quickly, when they open Quick Add Memory Mode, then CoffeeDex shows bean name, roaster, whether they would buy again, and one-line note before optional detail fields. If the user opens the purchase-clue disclosure, CoffeeDex can save a private purchase note such as store, price, or bag size, plus an optional purchase URL, so the later Rebuy Timing and Rebuy Intelligence surfaces can reopen that clue. Purchase clues, flavor tags, package facts, and taste sliders stay outside the default quick-record surface.
 
 Evidence surfaces: `/dashboard`, `QuickAddMemoryForm`, `POST /api/v1/cards`
+
+## Flow 3B. Revisit Rebuy Timing Memory
+
+Given a user has private cards marked `again` or `maybe`, or cards with saved purchase clues, when they open the dashboard, then CoffeeDex derives a Rebuy Timing Memory panel from the user's own card dates, roaster/bean labels, repurchase reasons, purchase URL, and buying note. The panel groups candidates as fresh memory, time to re-check, or easy-to-forget overdue memory, exposes a copyable search phrase built from the user's saved roaster, bean, purchase note, and tags, turns purchase notes into private purchase-memory chips such as store, price, and bag size when those clues are present, and derives a conservative bag-to-cup pace cue from saved bag size plus days since the memory. It opens either the saved card or the user's saved purchase/search clue. This is a private recall surface only; it is not a collection badge, public recommendation, marketplace listing, roaster order, referral, or push notification.
+
+Evidence surfaces: `/dashboard`, `buildRebuyTimingMemory`, `buildRebuyPurchaseMemory`, `buildRebuyPaceMemory`, `DashboardRebuyTimingMemoryPanel`
+
+## Flow 3C. Explain My Rebuy Taste
+
+Given a user has private cards marked `again` or `maybe`, when they open the dashboard, then CoffeeDex derives a copyable Taste Rebuy Brief from the user's own liked cards, tags, acidity/sweetness/body scores, sample bean names, and saved rebuy reasons. The brief lets the user explain what they tend to buy again in Korean before searching, asking a barista, or choosing another bean. This is a private preference recall surface only; it is not AI marketplace recommendation, community taste matching, public profile, roaster ordering, or badge collection.
+
+Evidence surfaces: `/dashboard`, `buildRebuyTasteBrief`, `DashboardRebuyTasteBriefPanel`
+
+## Flow 3D. Turn A Rebuy Into Shelf Memory
+
+Given a user has a private rebuy candidate card, when they actually buy that bean again from the remembered clue, then CoffeeDex can start a new private shelf memory from the existing card's roaster, bean name, origin, purchase URL, buying note, and parsed bag weight. The new shelf row is marked as `rebought` so Fresh Shelf, Shelf Runway, and Rebuy Intelligence can continue the next retention loop. This is a user-confirmed memory transfer only; it does not place an order, create a marketplace transaction, notify a roaster, or publish the purchase.
+
+Evidence surfaces: `/dashboard`, `POST /api/v1/shelf`, `buildRebuyShelfTransferPayload`, `DashboardRebuyTimingMemoryPanel`
 
 ## Flow 4. Use Fresh Shelf Rebuy Timing
 

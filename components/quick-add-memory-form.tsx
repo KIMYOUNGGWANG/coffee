@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Coffee, Loader2, ShieldCheck } from "lucide-react";
+import { AlertCircle, ChevronDown, Coffee, Link2, Loader2, ShieldCheck, ShoppingBag } from "lucide-react";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import { useCreateTastingCard } from "@/hooks/useTastingCards";
 import type { CreateTastingCardInput } from "@/hooks/useTastingCards";
@@ -54,6 +54,8 @@ export function buildQuickAddMemoryPayload(input: BuildQuickAddMemoryPayloadInpu
   const roaster = input.form.subtitle.trim();
   const oneLineNote = input.form.rawNote.trim();
   const repurchaseReasons = oneLineNote ? [oneLineNote] : [];
+  const purchaseUrl = input.form.purchaseUrl.trim();
+  const purchaseNote = input.form.purchaseNote.trim();
 
   return {
     category: "coffee",
@@ -76,8 +78,8 @@ export function buildQuickAddMemoryPayload(input: BuildQuickAddMemoryPayloadInpu
     },
     packageOrigin: null,
     packageProcess: null,
-    purchaseUrl: null,
-    purchaseNote: null,
+    purchaseUrl: purchaseUrl || null,
+    purchaseNote: purchaseNote || null,
     repurchaseIntent: input.repurchaseIntent,
     repurchaseReasons,
     scanSource: "manual",
@@ -207,6 +209,52 @@ export function QuickAddMemoryForm({
             ))}
           </div>
         </div>
+
+        <details className="rounded-2xl border border-[#fff8ec]/12 bg-[#fff8ec]/7 p-3">
+          <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-3 text-xs font-black text-[#fff8ec] marker:content-none">
+            <span className="inline-flex items-center gap-2">
+              <ShoppingBag size={14} className="text-primary-amber" />
+              구매 단서 남기기
+            </span>
+            <ChevronDown size={15} aria-hidden="true" />
+          </summary>
+          <div className="mt-3 grid gap-3 border-t border-[#fff8ec]/12 pt-3 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="quick-purchase-note" className="text-xs font-black text-[#fff8ec]">
+                구매처 · 가격 메모
+              </label>
+              <input
+                id="quick-purchase-note"
+                type="text"
+                placeholder="예: 프릳츠 공식몰 200g 18,000원"
+                maxLength={160}
+                value={form.purchaseNote}
+                onChange={(event) => updateForm({ purchaseNote: event.target.value })}
+                className={quickFieldClassName}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="quick-purchase-url" className="text-xs font-black text-[#fff8ec]">
+                구매 링크
+              </label>
+              <div className="relative">
+                <Link2 size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#7c6d61]" />
+                <input
+                  id="quick-purchase-url"
+                  type="url"
+                  placeholder="https://..."
+                  maxLength={500}
+                  value={form.purchaseUrl}
+                  onChange={(event) => updateForm({ purchaseUrl: event.target.value })}
+                  className={`${quickFieldClassName} w-full pl-9`}
+                />
+              </div>
+            </div>
+            <p className="break-keep text-[11px] font-semibold leading-5 text-[#d8c8b6] sm:col-span-2">
+              링크나 가격은 공개되지 않고, 다음에 같은 원두를 찾을 때 내 구매 단서로만 열립니다.
+            </p>
+          </div>
+        </details>
 
         {validationError && (
           <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] leading-relaxed text-red-700">

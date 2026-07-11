@@ -36,6 +36,7 @@ The current runtime schema accepts these variables as optional. Configure them f
 | `NEXT_PUBLIC_SENTRY_DSN` | Optional Sentry DSN for production error reporting when enabled. |
 | `ADMIN_EMAIL_ALLOWLIST` | Optional comma/space separated bootstrap allowlist for `/admin`. Prefer `profiles.is_admin` once the first operator is created. |
 | `AI_API_KEY` | Optional AI provider key for tasting notes and package scans; routes must fall back or return manual-entry states when it is absent. |
+| `COFFEEDEX_ENABLE_SERWIST_BUILD` | Optional service-worker build switch. Keep unset for local/CI verification; set to `true` only when validating the Serwist bundle on a compatible Next.js/Webpack runtime. |
 
 ## Supabase Checklist
 

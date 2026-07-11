@@ -55,9 +55,9 @@ PDF export, Stripe checkout and entitlements, story export, and public share rou
 Current capability is intentionally scoped to private coffee memory and retrieval:
 
 - personal tasting cards for cafes, home brews, and roasters such as Fritz, Terarosa, Momos, and Anthracite;
-- Quick Add Memory Mode for saving a confirmed private card from bean name, roaster, one-line note, and repurchase intent first; origin, process, flavor tags, and acidity/sweetness/body are optional detail fields rather than the default 20-second surface;
+- Quick Add Memory Mode for saving a confirmed private card from bean name, roaster, one-line note, and repurchase intent first; purchase clues, origin, process, flavor tags, and acidity/sweetness/body are optional detail fields rather than the default 20-second surface;
 - AI-assisted scan and note drafts that the user reviews before saving;
-- a 20-second default quick-record surface that keeps helper tags, package facts, and purchase clues out of the first screen unless the user opens optional details;
+- a 20-second default quick-record surface that keeps helper tags, package facts, and purchase clues out of the first screen unless the user opens optional details, where a purchase note can hold store, price, bag size, or buying context and a purchase URL can reopen the saved buying page later;
 - explicit repurchase memory and retrieval based on confirmed saved records;
 - private rebuy recall from `repurchase_intent` and `repurchase_reasons`, while last-good-brew recall requires brew-like metadata or provenance in `footer_meta.extraInfo`;
 - private Fresh Shelf tracking that derives wait, drink-now, finish-soon, and rebuy timing from roast date, opened date, remaining fill level, and finished state;
@@ -65,6 +65,9 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - private Shelf Runway estimates that derive cups remaining, likely run-out timing, and a suggested in-app rebuy reminder date from shelf weight, fill level, and opened date;
 - private Brew-to-Shelf consumption that turns each owned brewing log dose into an automatic shelf fill-level update, keeping Fresh Shelf, Shelf Runway, and Rebuy Intelligence current without a separate inventory chore;
 - private purchase memory through optional `purchase_url` and `purchase_note` fields on cards and shelf items, used only to reopen the user's own saved buying clue or fallback search;
+- private Rebuy Timing Memory on the dashboard that ranks card-only `again`/`maybe` memories and saved purchase clues by last memory date, so users can re-open the card or buying/search clue before the bean name, roaster, or reason fades, with a copyable search phrase, private purchase-memory chips derived from the user's saved roaster, bean, purchase note, price, bag size, and tags, and a conservative bag-to-cup pace cue when a saved bag size can estimate whether the rebuy window has likely arrived;
+- private Taste Rebuy Brief on the dashboard that turns the user's own `again`/`maybe` cards, tags, acidity/sweetness/body scores, sample bean names, and saved rebuy reasons into a copyable Korean preference sentence for asking, searching, or choosing the next rebuy candidate;
+- private Rebuy-to-Shelf Transfer on the dashboard that lets a user-confirmed card rebuy create a new `coffee_shelf_items` memory through `POST /api/v1/shelf`, carrying over roaster, bean, origin, purchase URL, buying note, parsed bag weight, and `rebuy_action: "rebought"` without creating an order or marketplace transaction;
 - private in-app rebuy reminder state on shelf items through `rebuy_priority`, `rebuy_reminder_date`, `rebuy_action`, and `rebuy_action_at`, including direct Rebuy Intelligence panel actions for `will_rebuy` and `rebought`; this is a saved UI loop, not push delivery or an order flow;
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
 - private Grind Memory inside Dial-in Coach, where the latest owned 4-5 star brew log for the selected shelf bean is surfaced as the last-good method, dose, water, temperature, grind setting, and brew time;
@@ -180,7 +183,7 @@ interface CoffeeShelfItem {
 }
 ```
 
-Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. Peak Window guidance is also derived at render time from the same owned shelf dates and returns `unknown`, `resting`, `peak`, `enjoy_now`, or `fading` as a private drink-timing cue; it is not persisted. The saved rebuy reminder fields only keep app-internal state for pinned candidates, next-buy dates, and completed/drank/will-rebuy actions. They do not create push notifications, roaster orders, partner offers, or marketplace transactions.
+Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. Peak Window guidance is also derived at render time from the same owned shelf dates and returns `unknown`, `resting`, `peak`, `enjoy_now`, or `fading` as a private drink-timing cue; it is not persisted. The saved rebuy reminder fields only keep app-internal state for pinned candidates, next-buy dates, and completed/drank/will-rebuy actions. Dashboard Rebuy-to-Shelf Transfer uses the same `POST /api/v1/shelf` contract with `rebuyAction: "rebought"`, `wantAgain: true`, optional source `tastingCardId`, and a `totalWeight` parsed from the card's buying note when available. It does not create push notifications, roaster orders, partner offers, or marketplace transactions.
 
 ### `GET /api/v1/rebuy-intelligence`
 
@@ -287,7 +290,7 @@ interface CreateCardResponse {
 }
 ```
 
-Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. The default 20-second path writes `confirmed: true`, `scanSource: "manual"`, bean name, roaster, repurchase intent, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. Purchase clues, package facts, helper tags, and taste metrics are optional detail fields rather than the default quick-record surface. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
+Quick Add Memory Mode uses this same `POST /api/v1/cards` contract. The default 20-second path writes `confirmed: true`, `scanSource: "manual"`, bean name, roaster, repurchase intent, and a nonblank one-line note into `aiDescription` and `footerMeta.extraInfo`; if the note is blank, it does not generate fallback `repurchaseReasons` or `footerMeta.extraInfo`. Purchase clues, package facts, helper tags, and taste metrics are optional detail fields rather than the default quick-record surface. When the user opens the purchase-clue disclosure, quick add may also write `purchaseUrl` and `purchaseNote` so future Rebuy Timing and Rebuy Intelligence surfaces can reopen the saved store, price, bag-size, or buying-link clue. A one-line note may support private note/rebuy recall when explicitly saved, but last-good-brew recall requires actual brew metadata such as method, ratio, temperature, or grams. It does not create a roaster order, partner offer, marketplace listing, or community recommendation.
 
 ### `POST /api/v1/cards/ai-note`
 
