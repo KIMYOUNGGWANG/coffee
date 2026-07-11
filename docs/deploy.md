@@ -40,7 +40,7 @@ The current runtime schema accepts these variables as optional. Configure them f
 
 ## Supabase Checklist
 
-- Apply the database migrations for `tasting_cards`, coffee-memory/provenance fields, product events, profile credits/access fields, scan limits, shelf items, brewing logs, and brewing notes.
+- Apply the database migrations for `tasting_cards`, coffee-memory/provenance fields, product events, profile credits/access fields, scan limits, shelf items, brewing logs, and brewing notes. Before releasing the calendar return flow, confirm `20260710000000_add_shelf_rebuy_return_tokens.sql`, `20260710001000_expand_rebuy_calendar_product_events.sql`, and `20260710002000_add_rebuy_purchase_clue_event.sql` are applied together.
 - Confirm row-level security keeps `tasting_cards.user_id` scoped to the authenticated user.
 - Confirm profile defaults provide one free credit, PDF access off, premium off, zero scans used, and the configured monthly scan limit.
 - Confirm Storage has the upload bucket named by `STORAGE_BUCKET_UPLOADS`.
@@ -57,7 +57,7 @@ The current runtime schema accepts these variables as optional. Configure them f
 
 ## Privacy And Analytics Boundary
 
-- Product events contain allowlisted operational fields such as event name, path, surface, session identifier, and attribution/checkout identifiers. Do not add raw images, tasting notes, package claims, or arbitrary user payloads.
+- Product events contain allowlisted operational fields such as event name, path, surface, session identifier, and attribution/checkout identifiers. For authenticated activity, the server may attach the current account ID to the service-only event row so aggregate private-retention funnels can be measured; do not add raw images, tasting notes, package claims, purchase details, or arbitrary user payloads.
 - Account deletion anonymizes product-event ownership and redacts Stripe event identifiers/payloads before deleting owned product data. Retained rows are limited to audit, dispute, security, and aggregate operational needs.
 - The current deletion implementation does not delete Storage objects; deployment and legal copy must not claim storage cleanup until an executable cleanup contract exists.
 
@@ -102,7 +102,7 @@ Use `/admin` as the first daily operating room after production deploy. The dash
 1. Open `/admin` with an operator account backed by `profiles.is_admin = true` or the temporary `ADMIN_EMAIL_ALLOWLIST`.
 2. Confirm the Launch Health panel is `정상`. If it shows `P0 확인 필요`, pause launch/promo activity until the failing category is understood.
 3. Review 24h and 7d counts for Google OAuth, card save, shelf save, brewing log save, scan, checkout, and Stripe webhook.
-4. Check Activation Funnel for obvious drops: profile creation to dashboard visit, first memory, purchase clue, brew log, Brew Failure Memory, and Rebuy loop.
+4. Check Activation Funnel for obvious drops: profile creation to dashboard visit, first memory, purchase clue, brew log, Brew Failure Memory, and Rebuy loop. In Rebuy Calendar Funnel, use the comparable conversion rates and `가장 큰 병목` label: `저장→복귀` diagnoses calendar recall, `복귀→결정` diagnoses decision clarity, and `재구매 완료→새 봉투` diagnoses whether a confirmed rebuy continues into the next active shelf memory. `분모 없음` and `표본 수집 중` are not drops.
 5. Review OAuth/API failure logs and `stripe_events.processing_status = failed` rows. Record only event ids, timestamps, category, and operator action.
 6. Confirm QA/test candidates are expected. Clean only explicit `qa`, `test`, `테스트`, or `mock` rows from `/admin`; never use QA cleanup as account deletion.
 

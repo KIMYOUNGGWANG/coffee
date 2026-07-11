@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { analyticsEventSchema } from "@/lib/analytics-events";
 import { readStarterEnv } from "@/lib/env";
 import { checkRateLimit, readClientIdentity } from "@/lib/rate-limit";
+import { createServerSupabase } from "@/lib/supabase/server";
 
 const analyticsRateLimit = {
   key: "analytics",
@@ -19,6 +20,16 @@ async function readAnalyticsBody(request: NextRequest): Promise<unknown> {
       return {};
     }
     throw error;
+  }
+}
+
+async function readAuthenticatedAnalyticsUserId(): Promise<string | null> {
+  try {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.auth.getUser();
+    return error || !data.user ? null : data.user.id;
+  } catch {
+    return null;
   }
 }
 
@@ -42,6 +53,7 @@ export async function POST(request: NextRequest) {
   }
 
   const event = parsedEvent.data;
+  const userId = await readAuthenticatedAnalyticsUserId();
 
   try {
     const env = readStarterEnv(process.env);
@@ -60,7 +72,7 @@ export async function POST(request: NextRequest) {
       event_name: event.eventName,
       occurred_at: event.occurredAt,
       path: event.path,
-      user_id: null,
+      user_id: userId,
       anonymous_id: event.anonymousId ?? null,
       properties: event.properties,
     });

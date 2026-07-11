@@ -9,6 +9,7 @@ import {
 } from "@/lib/admin-launch-health";
 import { createAdminDataClient, requireAdmin } from "@/lib/admin";
 import { AdminSupabaseConfigurationError } from "@/lib/supabase/admin";
+import { buildRebuyCalendarFunnel } from "@/lib/rebuy-calendar-funnel";
 
 type ProfileRow = {
   readonly id: string;
@@ -44,9 +45,10 @@ type ShelfItemRow = {
   readonly is_finished: boolean | null;
   readonly purchase_url: string | null;
   readonly purchase_note: string | null;
-  readonly rebuy_action: string | null;
+  readonly rebuy_action: "none" | "drank" | "will_rebuy" | "rebought" | null;
   readonly rebuy_priority: string | null;
   readonly rebuy_reminder_date: string | null;
+  readonly rebuy_action_at: string | null;
 };
 
 type BrewingLogRow = {
@@ -131,7 +133,7 @@ export async function GET() {
         .then((result) => queryResult<TastingCardRow>(result)),
       supabase
         .from("coffee_shelf_items")
-        .select("id,user_id,roaster_name,bean_name,created_at,fill_level,is_finished,purchase_url,purchase_note,rebuy_action,rebuy_priority,rebuy_reminder_date")
+        .select("id,user_id,roaster_name,bean_name,created_at,fill_level,is_finished,purchase_url,purchase_note,rebuy_action,rebuy_priority,rebuy_reminder_date,rebuy_action_at")
         .order("created_at", { ascending: false })
         .limit(1000)
         .then((result) => queryResult<ShelfItemRow>(result)),
@@ -182,6 +184,7 @@ export async function GET() {
     ]);
     const feedbackLogs = logs.filter((log) => Boolean(log.coach_feedback));
     const rebuyItems = shelfItems.filter(isRebuySignal);
+    const rebuyCalendarFunnel = buildRebuyCalendarFunnel({ events: realEvents, shelfItems });
     const errorEvents = realEvents.filter((event) => event.event_name.includes("failed") || event.event_name.includes("support"));
     const adminUsers = profiles.filter((profile) => profile.is_admin === true).length;
     const launchHealth = buildLaunchHealth({ events, stripeEvents, now });
@@ -261,6 +264,7 @@ export async function GET() {
             count: feedbackLogs.filter((log) => log.coach_feedback === feedback).length,
           })),
         },
+        rebuyCalendarFunnel,
         users,
         operations: {
           adminUsers,

@@ -80,6 +80,7 @@ The bridge app should not feel like a web landing page or an AI scanner. It shou
 - `sage`: `#8FA57D`
 - `leaf`: `#4E7452`
 - `line`: `rgba(42, 26, 18, 0.14)`
+- Native icon and activity-indicator props consume the same palette through `mobile/lib/theme.ts#ROOM_COLORS`; do not repeat raw color literals in product screens.
 
 ### Mobile Components
 - **Room card**: warm paper surface, 24-32px radius, one meaningful image or note.
@@ -87,6 +88,7 @@ The bridge app should not feel like a web landing page or an AI scanner. It shou
 - **Bean drawer row**: image thumbnail, coffee name, memory tags, rating or repurchase signal.
 - **Private panel**: dark espresso surface used sparingly for privacy/trust moments only.
 - **Mood chips**: three to four tactile choices, active chip filled with `soil`.
+- **Coffee Note detail**: a compact centered `Coffee Note` header leads into one dominant paper hero for the saved `느낌`, followed by one memory explanation panel, secondary truth-only chips, and a single three-fact strip for roaster, date, and repurchase intent. Adapt the supplied Beer Note reference's overview-to-focus hierarchy, but never copy its pink palette, beer fields, favorite action, product image, or metadata CoffeeDex did not save. Keep edit and two-step delete actions below the remembered content; every header/action target remains at least 44px.
 
 ### Mobile Copy Rules
 - Prefer direct Korean: `마신 커피`, `새 노트`, `원두 서랍`, `알림`, `내 정보`.

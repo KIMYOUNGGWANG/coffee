@@ -23,6 +23,7 @@ const createShelfItemSchema = z.object({
   rebuyPriority: rebuyPrioritySchema,
   rebuyReminderDate: rebuyReminderDateSchema,
   rebuyAction: rebuyActionSchema,
+  rebuySourceShelfItemId: z.string().uuid().optional().nullable(),
   rating: z.number().int().min(1).max(5).optional().nullable(),
   wantAgain: z.boolean().optional().nullable(),
 });
@@ -96,6 +97,35 @@ export async function POST(request: NextRequest) {
     }
 
     const validatedData = result.data;
+    const rebuySourceShelfItemId = validatedData.rebuySourceShelfItemId ?? null;
+
+    if (rebuySourceShelfItemId) {
+      const { data: sourceItem, error: sourceError } = await supabase
+        .from("coffee_shelf_items")
+        .select("id")
+        .eq("id", rebuySourceShelfItemId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (sourceError) {
+        return NextResponse.json({ error: { code: 500, message: "재구매 원본을 확인하지 못했습니다.", details: sourceError.message } }, { status: 500 });
+      }
+      if (!sourceItem) {
+        return NextResponse.json({ error: { code: 404, message: "재구매 원본을 찾을 수 없습니다." } }, { status: 404 });
+      }
+
+      const { data: existingItem, error: existingError } = await supabase
+        .from("coffee_shelf_items")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("rebuy_source_shelf_item_id", rebuySourceShelfItemId)
+        .maybeSingle();
+
+      if (existingError) {
+        return NextResponse.json({ error: { code: 500, message: "기존 재구매 기록을 확인하지 못했습니다.", details: existingError.message } }, { status: 500 });
+      }
+      if (existingItem) return NextResponse.json({ data: existingItem, reused: true });
+    }
 
     const { data, error } = await supabase
       .from("coffee_shelf_items")
@@ -115,12 +145,24 @@ export async function POST(request: NextRequest) {
         rebuy_priority: validatedData.rebuyPriority ?? "normal",
         rebuy_reminder_date: validatedData.rebuyReminderDate ?? null,
         rebuy_action: validatedData.rebuyAction ?? "none",
+        rebuy_source_shelf_item_id: rebuySourceShelfItemId,
         rebuy_action_at: validatedData.rebuyAction && validatedData.rebuyAction !== "none" ? new Date().toISOString() : null,
         rating: validatedData.rating || null,
         want_again: validatedData.wantAgain ?? false,
       })
       .select()
       .single();
+
+    if (error?.code === "23505" && rebuySourceShelfItemId) {
+      const { data: existingItem } = await supabase
+        .from("coffee_shelf_items")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("rebuy_source_shelf_item_id", rebuySourceShelfItemId)
+        .maybeSingle();
+
+      if (existingItem) return NextResponse.json({ data: existingItem, reused: true });
+    }
 
     if (error) {
       return NextResponse.json(
@@ -129,7 +171,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ data }, { status: 201 });
+    return NextResponse.json({ data, reused: false }, { status: 201 });
   } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: 500, message: "서버 내부 오류가 발생했습니다.", details: getErrorMessage(error) } },

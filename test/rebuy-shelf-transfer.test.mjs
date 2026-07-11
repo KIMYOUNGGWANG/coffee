@@ -61,7 +61,7 @@ function card(overrides = {}) {
   };
 }
 
-test("Given a rebuy card, When shelf transfer payload is built, Then it starts a rebought shelf memory", async () => {
+test("Given a rebuy card, When shelf transfer payload is built, Then it starts an active shelf memory for the new bag", async () => {
   const loaded = await loadRebuyShelfTransferModule();
   try {
     const { buildRebuyShelfTransferPayload } = loaded.module;
@@ -74,7 +74,8 @@ test("Given a rebuy card, When shelf transfer payload is built, Then it starts a
     assert.equal(payload.tastingCardId, "550e8400-e29b-41d4-a716-446655440000");
     assert.equal(payload.purchaseUrl, "https://example.com/colombia");
     assert.equal(payload.purchaseNote, "공식몰 250g 옵션");
-    assert.equal(payload.rebuyAction, "rebought");
+    assert.equal(payload.rebuyAction, "none");
+    assert.equal(payload.rebuySourceShelfItemId, null);
     assert.equal(payload.wantAgain, true);
     assert.equal(payload.rating, 5);
   } finally {
@@ -100,6 +101,43 @@ test("Given a non-uuid demo card, When shelf transfer payload is built, Then it 
     assert.equal(payload.totalWeight, 1000);
     assert.equal(payload.purchaseUrl, null);
     assert.equal(payload.rating, null);
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("Given an owned shelf memory after a confirmed rebuy, When a new bag payload is built, Then it starts the new bag without copying a completed rebuy state", async () => {
+  const loaded = await loadRebuyShelfTransferModule();
+  try {
+    const { buildRebuyShelfReplenishPayload } = loaded.module;
+    const payload = buildRebuyShelfReplenishPayload({
+      id: "93493987-4800-4b7c-836f-c0a35f39244e",
+      roasterName: "프릳츠 커피",
+      beanName: "에티오피아 시다마",
+      origin: "Ethiopia Sidama Washed",
+      totalWeight: 200,
+      tastingCardId: null,
+      purchaseUrl: "https://fritz.example/sidama",
+      purchaseNote: "프릳츠 공식몰 200g 18,000원",
+    });
+
+    assert.deepEqual(payload, {
+      roasterName: "프릳츠 커피",
+      beanName: "에티오피아 시다마",
+      origin: "Ethiopia Sidama Washed",
+      roastDate: null,
+      openedDate: null,
+      totalWeight: 200,
+      fillLevel: 100,
+      tastingCardId: null,
+      purchaseUrl: "https://fritz.example/sidama",
+      purchaseNote: "프릳츠 공식몰 200g 18,000원",
+      rebuyPriority: "normal",
+      rebuyAction: "none",
+      rebuySourceShelfItemId: "93493987-4800-4b7c-836f-c0a35f39244e",
+      rating: 5,
+      wantAgain: true,
+    });
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }

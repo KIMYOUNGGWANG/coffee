@@ -71,6 +71,20 @@ export function createClient() {
 }`,
   );
   writeFileSync(
+    path.join(tempDirectory, "mock-server-supabase.mjs"),
+    `let user = null;
+export function setAnalyticsUser(nextUser) { user = nextUser; }
+export async function createServerSupabase() {
+  return {
+    auth: {
+      getUser() {
+        return Promise.resolve({ data: { user }, error: user ? null : { message: "anonymous" } });
+      },
+    },
+  };
+}`,
+  );
+  writeFileSync(
     path.join(tempDirectory, "analytics-events.mjs"),
     transpile(read("lib/analytics-events.ts"), schemaPath),
   );
@@ -90,12 +104,14 @@ export function checkRateLimit() {
     .replaceAll('"@/lib/analytics-events"', '"./analytics-events.mjs"')
     .replaceAll('"@/lib/env"', '"./mock-env.mjs"')
     .replaceAll('"@/lib/rate-limit"', '"./mock-rate-limit.mjs"')
+    .replaceAll('"@/lib/supabase/server"', '"./mock-server-supabase.mjs"')
     .replaceAll('"@supabase/supabase-js"', '"./mock-supabase.mjs"');
   writeFileSync(path.join(tempDirectory, "route.mjs"), transpile(routeSource, routePath));
 
   return {
     route: await import(pathToFileURL(path.join(tempDirectory, "route.mjs"))),
     store: await import(pathToFileURL(path.join(tempDirectory, "mock-supabase.mjs"))),
+    session: await import(pathToFileURL(path.join(tempDirectory, "mock-server-supabase.mjs"))),
     cleanup: () => rmSync(tempDirectory, { force: true, recursive: true }),
   };
 }

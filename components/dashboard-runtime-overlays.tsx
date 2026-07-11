@@ -6,6 +6,7 @@ import { DashboardMobileNavigation, type DashboardTab } from "@/components/dashb
 import { DashboardScanAction } from "@/components/dashboard-scan-action";
 import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import type { CheckoutIntent, CheckoutItemType } from "@/lib/checkout-return";
+import type { DashboardReturnSource } from "@/lib/dashboard-return-source";
 import type { TasteProfileKey } from "@/lib/taste-profile";
 import type { TastingCardData } from "@/hooks/useTastingCards";
 import type { useAnalyticsEvents } from "@/hooks/use-analytics-events";
@@ -15,6 +16,7 @@ type DashboardRuntimeOverlaysProps = {
   readonly activeTab: DashboardTab;
   readonly initialActivationIntent: DashboardActivationIntent;
   readonly initialCheckoutIntent: CheckoutIntent;
+  readonly initialReturnSource: DashboardReturnSource;
   readonly isCardsLoading: boolean;
   readonly cardsError: unknown;
   readonly cardsFailureReason: unknown;
@@ -30,6 +32,7 @@ type DashboardRuntimeOverlaysProps = {
   readonly onScan: () => void;
   readonly onOpenWizard: (tasteProfile: TasteProfileKey | null, mode: DashboardActivationMode) => void;
   readonly onOpenPayment: (itemType: CheckoutItemType) => void;
+  readonly onCalendarReturn: () => void;
   readonly onCloseWizard: () => void;
   readonly onClosePayment: () => void;
   readonly onCloseDetail: () => void;
@@ -41,6 +44,7 @@ export function DashboardRuntimeOverlays({
   activeTab,
   initialActivationIntent,
   initialCheckoutIntent,
+  initialReturnSource,
   isCardsLoading,
   cardsError,
   cardsFailureReason,
@@ -56,6 +60,7 @@ export function DashboardRuntimeOverlays({
   onScan,
   onOpenWizard,
   onOpenPayment,
+  onCalendarReturn,
   onCloseWizard,
   onClosePayment,
   onCloseDetail,
@@ -69,11 +74,13 @@ export function DashboardRuntimeOverlays({
       <DashboardIntentEffects
         initialActivationIntent={initialActivationIntent}
         initialCheckoutIntent={initialCheckoutIntent}
+        initialReturnSource={initialReturnSource}
         isCardsLoading={isCardsLoading}
         cardsError={cardsError}
         cardsFailureReason={cardsFailureReason}
         onOpenWizard={onOpenWizard}
         onOpenPayment={onOpenPayment}
+        onCalendarReturn={onCalendarReturn}
         trackEvent={trackEvent}
       />
       <DashboardModals

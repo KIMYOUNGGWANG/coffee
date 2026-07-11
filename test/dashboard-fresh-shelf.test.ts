@@ -1,5 +1,6 @@
+import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
-import type { Page, Route } from "@playwright/test";
+import type { Page, Route, TestInfo } from "@playwright/test";
 
 const dashboardUrl = `${process.env.COFFEEDEX_E2E_BASE_URL ?? ""}/dashboard`;
 
@@ -21,29 +22,40 @@ type MobileFreshShelfMetrics = {
   readonly scrollWidth: number;
 };
 
-const shelfResponse = {
-  data: [
-    {
-      bean_name: "에티오피아 시다마",
-      fill_level: 8,
-      id: "shelf-sidama",
-      is_finished: false,
-      opened_date: "2026-06-10",
-      origin: "Ethiopia Sidama Washed",
-      roast_date: "2026-06-01",
-      roaster_name: "프릳츠 커피",
-      tasting_card_id: null,
-      tasting_cards: null,
-      total_weight: 200,
-      purchase_url: "https://fritz.example/sidama",
-      purchase_note: "Fritz 공식몰 200g 옵션",
-      rebuy_priority: "normal",
-      rebuy_reminder_date: null,
-      rebuy_action: "none",
-      rebuy_action_at: null,
-    },
-  ],
+const shelfItemResponse = {
+  bean_name: "에티오피아 시다마",
+  fill_level: 8,
+  id: "shelf-sidama",
+  is_finished: false,
+  opened_date: "2026-06-10",
+  origin: "Ethiopia Sidama Washed",
+  roast_date: "2026-06-01",
+  roaster_name: "프릳츠 커피",
+  tasting_card_id: null,
+  tasting_cards: null,
+  total_weight: 200,
+  purchase_url: "https://fritz.example/sidama",
+  purchase_note: "Fritz 공식몰 200g 옵션",
+  rebuy_priority: "normal",
+  rebuy_reminder_date: null,
+  rebuy_action: "none",
+  rebuy_action_at: null,
 } as const;
+
+const shelfResponse = {
+  data: [shelfItemResponse],
+} as const;
+
+function buildShelfResponse(rebuyReminderDate: string | null) {
+  return {
+    data: [
+      {
+        ...shelfItemResponse,
+        rebuy_reminder_date: rebuyReminderDate,
+      },
+    ],
+  };
+}
 
 const emptyCardsResponse = { data: [] } as const;
 
@@ -231,9 +243,34 @@ async function fulfillJson(route: Route, body: unknown, status = 200): Promise<v
   });
 }
 
-async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[] = []): Promise<void> {
+async function mockDashboardRoutes(
+  page: Page,
+  shelfPatchBodies: unknown[] = [],
+  shelfBody: unknown = shelfResponse,
+  analyticsBodies: unknown[] = [],
+): Promise<void> {
   await page.route("**/api/v1/**", async (route) => {
     const requestUrl = new URL(route.request().url());
+
+    if (requestUrl.pathname === "/api/v1/shelf/shelf-sidama/rebuy-calendar" && route.request().method() === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "text/calendar; charset=utf-8",
+        headers: {
+          "Content-Disposition": 'attachment; filename="coffeedex-rebuy-shelf-sidama.ics"',
+        },
+        body: [
+          "BEGIN:VCALENDAR",
+          "VERSION:2.0",
+          "BEGIN:VEVENT",
+          "SUMMARY:CoffeeDex 재구매 리마인더",
+          "DTSTART;VALUE=DATE:20260715",
+          "END:VEVENT",
+          "END:VCALENDAR",
+        ].join("\r\n"),
+      });
+      return;
+    }
 
     if (requestUrl.pathname.startsWith("/api/v1/shelf/") && route.request().method() === "PATCH") {
       shelfPatchBodies.push(route.request().postDataJSON());
@@ -243,7 +280,7 @@ async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[] = [])
 
     switch (requestUrl.pathname) {
       case "/api/v1/shelf":
-        await fulfillJson(route, shelfResponse);
+        await fulfillJson(route, shelfBody);
         return;
       case "/api/v1/cards":
         await fulfillJson(route, emptyCardsResponse);
@@ -267,6 +304,7 @@ async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[] = [])
         await fulfillJson(route, subscriptionResponse);
         return;
       case "/api/v1/analytics":
+        analyticsBodies.push(route.request().postDataJSON());
         await fulfillJson(route, { received: true });
         return;
       default:
@@ -394,6 +432,53 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
       { rebuyPriority: "pinned" },
       { rebuyAction: "will_rebuy", rebuyPriority: "pinned" },
     ]);
+  });
+
+  test("exports an in-app rebuy reminder to calendar", async ({ page }, testInfo: TestInfo) => {
+    const analyticsBodies: unknown[] = [];
+    await mockDashboardRoutes(page, [], buildShelfResponse("2026-07-15"), analyticsBodies);
+    await page.addInitScript(() => {
+      window.localStorage.setItem("coffeedex_analytics_test", "true");
+    });
+
+    await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
+    await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+    await page.getByRole("heading", { name: "에티오피아 시다마" }).click();
+    await expect(page.getByRole("link", { name: "캘린더에 저장" })).toBeVisible();
+    await page.waitForTimeout(850);
+    await page.getByRole("link", { name: "캘린더에 저장" }).scrollIntoViewIfNeeded();
+    await page.getByTestId("shelf-rebuy-reminder-controls").screenshot({
+      path: testInfo.outputPath("rebuy-calendar-desktop.png"),
+    });
+
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByRole("link", { name: "캘린더에 저장" }).click();
+    const download = await downloadPromise;
+    const downloadPath = await download.path();
+
+    expect(download.suggestedFilename()).toMatch(/\.ics$/);
+    expect(downloadPath).not.toBeNull();
+    if (!downloadPath) {
+      throw new Error("Calendar export download path was unavailable.");
+    }
+    await expect.poll(() => analyticsBodies).toContainEqual(expect.objectContaining({
+      eventName: "rebuy_calendar_export_clicked",
+      path: "/dashboard",
+      properties: { source: "shelf_reminder" },
+    }));
+    await expect(readFile(downloadPath, "utf8")).resolves.toContain("BEGIN:VCALENDAR");
+  });
+
+  test("hides calendar export without a saved rebuy date", async ({ page }, testInfo: TestInfo) => {
+    await mockDashboardRoutes(page, [], buildShelfResponse(null));
+    await page.setViewportSize({ width: 375, height: 812 });
+
+    await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
+    await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+    await page.getByRole("heading", { name: "에티오피아 시다마" }).click();
+
+    await expect(page.getByRole("link", { name: "캘린더에 저장" })).toHaveCount(0);
+    await page.screenshot({ path: testInfo.outputPath("rebuy-calendar-mobile-empty.png"), fullPage: true });
   });
 
   test("keeps the mobile shelf within the viewport and away from fixed controls", async ({ page }) => {

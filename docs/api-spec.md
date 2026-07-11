@@ -33,6 +33,8 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `POST` | `/api/v1/shelf` | Add a bean to the current user's private coffee shelf. |
 | `PATCH` | `/api/v1/shelf/:id` | Update one owned shelf item, including fill level, finished state, or private rebuy action state. |
 | `DELETE` | `/api/v1/shelf/:id` | Delete one owned shelf item. |
+| `GET` | `/api/v1/shelf/:id/rebuy-calendar` | Download one owned rebuy reminder as a private iCalendar file. |
+| `GET` | `/api/v1/shelf/rebuy-return?token=:opaque_uuid` | Resolve the exact owned shelf memory after a private calendar return. |
 | `GET` | `/api/v1/rebuy-intelligence` | Derive the current user's Rebuy Intelligence loop from owned cards, shelf items, and brewing logs. |
 | `POST` | `/api/v1/checkout` | Create a Stripe Checkout session for premium, card credits, or PDF export. |
 | `GET` | `/api/v1/pdf` | Return the current user's CoffeeDex home-cafe archive as a PDF download. |
@@ -41,7 +43,7 @@ The public health endpoint lives outside this contract at `/api/health`.
 | `GET` | `/api/v1/dial-in-coach` | Derive a concrete first-cup recipe and next adjustments from owned shelf beans and brew logs. |
 | `POST` | `/api/v1/brewing-logs` | Record a new brewing log with extraction parameters and notes for a shelf item. |
 | `GET` | `/api/v1/brewing-logs` | Fetch the current user's history of brewing logs. |
-| `GET` | `/api/v1/admin/overview` | Admin-only operating dashboard summary for KPI, activation, memory, rebuy, Dial-in, failure logs, and QA/test candidates. |
+| `GET` | `/api/v1/admin/overview` | Admin-only operating dashboard summary for KPI, activation, calendar-return rebuy funnel, memory, rebuy, Dial-in, failure logs, and QA/test candidates. |
 | `POST` | `/api/v1/admin/qa-cleanup` | Admin-only cleanup action for rows explicitly marked as QA/test data. |
 
 `POST /api/v1/brewing-logs` accepts optional `coachFeedback` values of `too_sour`, `too_bitter`, `too_weak`, `too_heavy`, or `balanced`. Dial-in Coach reads the existing `brewing_logs.coach_feedback` field as private Brew Failure Memory and uses it to adjust the next recipe; no new public recipe feed, marketplace, or community comparison is created. When the request includes both an owned `shelfItemId` and `parameters.coffeeAmount`, the route also decreases that owned shelf item's `fill_level` from the logged dose and marks it finished at 0%. The response includes optional `shelfConsumption` metadata for the private Brew-to-Shelf loop.
@@ -66,9 +68,12 @@ Current capability is intentionally scoped to private coffee memory and retrieva
 - private Brew-to-Shelf consumption that turns each owned brewing log dose into an automatic shelf fill-level update, keeping Fresh Shelf, Shelf Runway, and Rebuy Intelligence current without a separate inventory chore;
 - private purchase memory through optional `purchase_url` and `purchase_note` fields on cards and shelf items, used only to reopen the user's own saved buying clue or fallback search;
 - private Rebuy Timing Memory on the dashboard that ranks card-only `again`/`maybe` memories and saved purchase clues by last memory date, so users can re-open the card or buying/search clue before the bean name, roaster, or reason fades, with a copyable search phrase, private purchase-memory chips derived from the user's saved roaster, bean, purchase note, price, bag size, and tags, and a conservative bag-to-cup pace cue when a saved bag size can estimate whether the rebuy window has likely arrived;
+- private Rebuy Clue Rescue on the dashboard that derives a queue of `again`/`maybe` cards missing purchase place, price, purchase link, or rebuy reason, so users can reopen the card or save those missing clues inline through `PATCH /api/v1/cards/:id` before that bean becomes hard to buy again;
 - private Taste Rebuy Brief on the dashboard that turns the user's own `again`/`maybe` cards, tags, acidity/sweetness/body scores, sample bean names, and saved rebuy reasons into a copyable Korean preference sentence for asking, searching, or choosing the next rebuy candidate;
-- private Rebuy-to-Shelf Transfer on the dashboard that lets a user-confirmed card rebuy create a new `coffee_shelf_items` memory through `POST /api/v1/shelf`, carrying over roaster, bean, origin, purchase URL, buying note, parsed bag weight, and `rebuy_action: "rebought"` without creating an order or marketplace transaction;
+- private Rebuy-to-Shelf Transfer on the dashboard that lets a user-confirmed card rebuy create a new active `coffee_shelf_items` memory through `POST /api/v1/shelf`, carrying over roaster, bean, origin, purchase URL, buying note, and parsed bag weight with `rebuy_action: "none"`; a confirmed calendar-return rebuy offers the same new-bag step only after an explicit second confirmation, without creating an order or marketplace transaction;
 - private in-app rebuy reminder state on shelf items through `rebuy_priority`, `rebuy_reminder_date`, `rebuy_action`, and `rebuy_action_at`, including direct Rebuy Intelligence panel actions for `will_rebuy` and `rebought`; this is a saved UI loop, not push delivery or an order flow;
+- a user-initiated private calendar export for one owned shelf item's saved `rebuy_reminder_date`, delivered as `text/calendar` and linked back to `/dashboard?source=rebuy_calendar`; it is not push, a background notification, a roaster order, or a marketplace flow;
+- an owner-scoped calendar-return decision that uses an opaque shelf token only to recover the exact private bean after authentication, then lets the user save `will_rebuy` or `rebought` through the existing shelf PATCH contract; after `rebought`, the user may explicitly add a separate new active bag through the existing `POST /api/v1/shelf` contract; the token is not a shelf ID, is not sent to analytics, and never bypasses owner filtering;
 - private Dial-in Coach guidance that turns shelf beans and recent brew outcomes into a starting recipe and one-variable adjustment plan;
 - private Grind Memory inside Dial-in Coach, where the latest owned 4-5 star brew log for the selected shelf bean is surfaced as the last-good method, dose, water, temperature, grind setting, and brew time;
 - private Brew Failure Memory inside Dial-in Coach, where one-tap sour, bitter, weak, heavy, or balanced feedback is saved to `brewing_logs.coach_feedback` and changes the next recommended recipe;
@@ -97,9 +102,10 @@ Returns aggregate operational data for the current deployment:
 - Activation Funnel from profile creation through dashboard visits, first memory, purchase clue, brew log, Brew Failure Memory, and Rebuy loop;
 - user/account list with counts and last-activity timestamps;
 - Coffee Memory, Rebuy Intelligence, Dial-in Coach usage summaries;
+- Rebuy Calendar Funnel from private calendar export through dashboard return, explicit purchase-clue open, a later `will_rebuy` or `rebought` shelf decision, and an explicit next-bag shelf start by the same authenticated owner; it reports owner-counts plus `저장→복귀`, `복귀→결정`, and `재구매 완료→새 봉투` conversion rates, and identifies the lowest comparable stage as the operating bottleneck;
 - recent failure-like product events and QA/test cleanup candidates.
 
-The route reads up to bounded recent rows with the service-role key after admin authorization. It must not expose raw tasting notes, package images, or marketplace-like ordering data.
+The route reads up to bounded recent rows with the service-role key after admin authorization. It must not expose raw tasting notes, package images, or marketplace-like ordering data. Calendar funnel events are linked server-side to the current authenticated owner only for aggregate operator counts; raw bean, roaster, price, date, note, URL, and card/shelf identifiers remain out of event properties.
 
 The response includes `launchHealth`, which separates Google OAuth, card save, shelf save, brewing log save, scan, checkout, and Stripe webhook health over the last 24 hours and 7 days. Product events marked with QA/test/mock indicators are excluded from operating counts. Stripe webhook health also reads `stripe_events.processing_status = failed`; any failed webhook in the last 24 hours is treated as P0.
 
@@ -183,7 +189,19 @@ interface CoffeeShelfItem {
 }
 ```
 
-Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. Peak Window guidance is also derived at render time from the same owned shelf dates and returns `unknown`, `resting`, `peak`, `enjoy_now`, or `fading` as a private drink-timing cue; it is not persisted. The saved rebuy reminder fields only keep app-internal state for pinned candidates, next-buy dates, and completed/drank/will-rebuy actions. Dashboard Rebuy-to-Shelf Transfer uses the same `POST /api/v1/shelf` contract with `rebuyAction: "rebought"`, `wantAgain: true`, optional source `tastingCardId`, and a `totalWeight` parsed from the card's buying note when available. It does not create push notifications, roaster orders, partner offers, or marketplace transactions.
+Fresh Shelf guidance is advisory product copy. Current labels are `waiting`, `drink_now`, `finish_soon`, and `rebuy`, rendered in Korean as shelf-card action signals. Peak Window guidance is also derived at render time from the same owned shelf dates and returns `unknown`, `resting`, `peak`, `enjoy_now`, or `fading` as a private drink-timing cue; it is not persisted. The saved rebuy reminder fields only keep app-internal state for pinned candidates, next-buy dates, and completed/drank/will-rebuy actions. Dashboard Rebuy-to-Shelf Transfer uses the same `POST /api/v1/shelf` contract with `rebuyAction: "none"`, `wantAgain: true`, optional source `tastingCardId`, and a `totalWeight` parsed from the card's buying note when available. The new bag is active from its first day, so Fresh Shelf, Shelf Runway, and Rebuy Intelligence can use it; the original card still preserves the user's repurchase preference. It does not create push notifications, roaster orders, partner offers, or marketplace transactions.
+
+### `GET /api/v1/shelf/:id/rebuy-calendar`
+
+This user-initiated private calendar export is authenticated owner-only and available for a shelf item that has `rebuy_reminder_date`. The route returns `text/calendar; charset=utf-8` with private, no-store caching and an all-day iCalendar event that contains the remembered roaster/bean label and a return link to `/dashboard?source=rebuy_calendar&rebuy_token=:opaque_uuid`. The URL never contains a shelf ID. Anonymous callers receive `401`, missing or non-owned rows receive `404`, and an owned row without a saved reminder date receives `400`.
+
+The browser tracks privacy-safe `rebuy_calendar_export_clicked` and `rebuy_calendar_returned` events with source values only; no bean name, roaster, ID, note, URL, or date is sent in analytics. The feature is an evidence-bounded inference from forgetting/timing pain, not direct first-person demand for `.ics` files.
+
+### `GET /api/v1/shelf/rebuy-return?token=:opaque_uuid`
+
+This authenticated owner-only lookup resolves the exact shelf memory referenced by a calendar return token. It rechecks both `rebuy_return_token` and `user_id`, returns only the identifiers and memory fields needed to display the bean and prefill a later explicit new-bag save: `id`, `roasterName`, `beanName`, `origin`, `totalWeight`, `tastingCardId`, `purchaseUrl`, `purchaseNote`, and `rebuyAction`. It sends `Cache-Control: private, no-store`. Invalid tokens return `400`; anonymous callers receive `401`; non-owned or missing rows receive `404`. The dashboard removes `source` and `rebuy_token` from the address bar after the return is handled, then lets the user open their saved buying link or, when none exists, explicitly open a generic bean search. Direct decisions still use `PATCH /api/v1/shelf/:id`. After the user saves `rebought`, a separate explicit action can create a new active shelf row with `rebuyAction: "none"`; it is never auto-created. `rebuy_purchase_clue_opened` records only `source` and whether the user opened a saved link or search, and `rebuy_shelf_memory_started` records only `source`; neither includes a link, note, bean, roaster, token, shelf ID, or URL. This route is private recall only, not a public lookup, order, notification, or marketplace surface.
+
+The explicit new-bag POST carries the owned source shelf ID. A retry for that same source returns the already-created successor rather than making a duplicate.
 
 ### `GET /api/v1/rebuy-intelligence`
 
