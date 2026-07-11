@@ -410,6 +410,7 @@ test("Given an allowlisted admin, When overview is requested, Then operating KPI
       returnedUsers: body.data.rebuyCalendarFunnel.returnedUsers,
       purchaseClueUsers: body.data.rebuyCalendarFunnel.purchaseClueUsers,
       decidedUsers: body.data.rebuyCalendarFunnel.decidedUsers,
+      reboughtUsers: body.data.rebuyCalendarFunnel.reboughtUsers,
       shelfMemoryUsers: body.data.rebuyCalendarFunnel.shelfMemoryUsers,
       unattributedEvents: body.data.rebuyCalendarFunnel.unattributedEvents,
     }, {
@@ -417,10 +418,17 @@ test("Given an allowlisted admin, When overview is requested, Then operating KPI
       returnedUsers: 1,
       purchaseClueUsers: 0,
       decidedUsers: 1,
+      reboughtUsers: 0,
       shelfMemoryUsers: 0,
       unattributedEvents: 0,
     });
     assert.equal(body.data.rebuyCalendarFunnel.windowDays, 14);
+    assert.deepEqual(body.data.rebuyCalendarFunnel.rates, {
+      returnAfterExportPercent: 100,
+      decisionAfterReturnPercent: 100,
+      newBagAfterReboughtPercent: null,
+    });
+    assert.equal(body.data.rebuyCalendarFunnel.bottleneck, "insufficient_data");
     assert.match(body.data.rebuyCalendarFunnel.windowStart, /^\d{4}-\d{2}-\d{2}T/);
     assert.equal(body.data.operations.recentFailures[0].eventName, "scan_failed");
     assert.equal(body.data.launchHealth.status, "p0");

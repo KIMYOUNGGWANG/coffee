@@ -10,12 +10,21 @@ type RebuyDecision = {
   readonly rebuy_action_at: string | null;
 };
 
+export type RebuyCalendarFunnelBottleneck = "return" | "decision" | "new_bag" | "insufficient_data";
+
 export type RebuyCalendarFunnel = {
   readonly exportedUsers: number;
   readonly returnedUsers: number;
   readonly purchaseClueUsers: number;
   readonly decidedUsers: number;
+  readonly reboughtUsers: number;
   readonly shelfMemoryUsers: number;
+  readonly rates: {
+    readonly returnAfterExportPercent: number | null;
+    readonly decisionAfterReturnPercent: number | null;
+    readonly newBagAfterReboughtPercent: number | null;
+  };
+  readonly bottleneck: RebuyCalendarFunnelBottleneck;
   readonly unattributedEvents: number;
   readonly windowDays: 14;
   readonly windowStart: string;
@@ -41,6 +50,11 @@ function earliestEventByUser(events: readonly CalendarEvent[], eventName: string
   }
 
   return earliest;
+}
+
+function percentage(numerator: number, denominator: number): number | null {
+  if (denominator === 0) return null;
+  return Math.round((numerator / denominator) * 100);
 }
 
 export function buildRebuyCalendarFunnel(input: {
@@ -69,6 +83,7 @@ export function buildRebuyCalendarFunnel(input: {
       .map(([userId]) => userId),
   );
   const decidedUsers = new Set<string>();
+  const reboughtAtByUser = new Map<string, number>();
 
   for (const shelfItem of input.shelfItems) {
     if (shelfItem.rebuy_action !== "will_rebuy" && shelfItem.rebuy_action !== "rebought") continue;
@@ -76,6 +91,12 @@ export function buildRebuyCalendarFunnel(input: {
     const decidedAt = shelfItem.rebuy_action_at ? timestamp(shelfItem.rebuy_action_at) : null;
     if (returnedAt !== undefined && decidedAt !== null && decidedAt >= returnedAt) {
       decidedUsers.add(shelfItem.user_id);
+      if (shelfItem.rebuy_action === "rebought") {
+        const existingReboughtAt = reboughtAtByUser.get(shelfItem.user_id);
+        if (existingReboughtAt === undefined || decidedAt < existingReboughtAt) {
+          reboughtAtByUser.set(shelfItem.user_id, decidedAt);
+        }
+      }
     }
   }
 
@@ -83,18 +104,43 @@ export function buildRebuyCalendarFunnel(input: {
   const shelfMemoryUsers = new Set(
     Array.from(shelfMemoryAtByUser.entries())
       .filter(([userId, startedAt]) => {
-        const returnedAt = returnedUsers.get(userId);
-        return returnedAt !== undefined && startedAt >= returnedAt;
+        const reboughtAt = reboughtAtByUser.get(userId);
+        return reboughtAt !== undefined && startedAt >= reboughtAt;
       })
       .map(([userId]) => userId),
   );
+  const rates = {
+    returnAfterExportPercent: percentage(returnedUsers.size, exportedAtByUser.size),
+    decisionAfterReturnPercent: percentage(decidedUsers.size, returnedUsers.size),
+    newBagAfterReboughtPercent: percentage(shelfMemoryUsers.size, reboughtAtByUser.size),
+  };
+  let bottleneck: RebuyCalendarFunnelBottleneck = "insufficient_data";
+  if (
+    rates.returnAfterExportPercent !== null
+    && rates.decisionAfterReturnPercent !== null
+    && rates.newBagAfterReboughtPercent !== null
+  ) {
+    if (
+      rates.returnAfterExportPercent <= rates.decisionAfterReturnPercent
+      && rates.returnAfterExportPercent <= rates.newBagAfterReboughtPercent
+    ) {
+      bottleneck = "return";
+    } else if (rates.decisionAfterReturnPercent <= rates.newBagAfterReboughtPercent) {
+      bottleneck = "decision";
+    } else {
+      bottleneck = "new_bag";
+    }
+  }
 
   return {
     exportedUsers: exportedAtByUser.size,
     returnedUsers: returnedUsers.size,
     purchaseClueUsers: purchaseClueUsers.size,
     decidedUsers: decidedUsers.size,
+    reboughtUsers: reboughtAtByUser.size,
     shelfMemoryUsers: shelfMemoryUsers.size,
+    rates,
+    bottleneck,
     unattributedEvents: windowEvents.filter((event) => (
       (event.event_name === "rebuy_calendar_export_clicked" || event.event_name === "rebuy_calendar_returned" || event.event_name === "rebuy_purchase_clue_opened" || event.event_name === "rebuy_shelf_memory_started")
       && event.user_id === null

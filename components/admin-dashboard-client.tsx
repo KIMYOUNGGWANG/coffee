@@ -94,7 +94,14 @@ type AdminOverview = {
     readonly returnedUsers: number;
     readonly purchaseClueUsers: number;
     readonly decidedUsers: number;
+    readonly reboughtUsers: number;
     readonly shelfMemoryUsers: number;
+    readonly rates: {
+      readonly returnAfterExportPercent: number | null;
+      readonly decisionAfterReturnPercent: number | null;
+      readonly newBagAfterReboughtPercent: number | null;
+    };
+    readonly bottleneck: "return" | "decision" | "new_bag" | "insufficient_data";
     readonly unattributedEvents: number;
     readonly windowDays: 14;
     readonly windowStart: string;
@@ -127,6 +134,21 @@ function formatDate(value: string | null): string {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
+}
+
+function funnelBottleneckLabel(stage: AdminOverview["rebuyCalendarFunnel"]["bottleneck"]): string {
+  const labels = {
+    return: "저장 후 복귀",
+    decision: "복귀 후 결정",
+    new_bag: "재구매 완료 후 새 봉투",
+    insufficient_data: "표본 수집 중",
+  } as const;
+
+  return labels[stage];
+}
+
+function formatFunnelRate(rate: number | null, prefix: string): string {
+  return rate === null ? "분모 없음" : `${prefix} ${rate}%`;
 }
 
 function shortId(value: string): string {
@@ -357,18 +379,20 @@ export default function AdminDashboardClient() {
             <section className="dashboard-panel p-5">
               <h2 className="text-xl font-semibold">Rebuy Calendar Funnel</h2>
               <p className="mt-1 text-sm text-muted-foreground">최근 {overview.rebuyCalendarFunnel.windowDays}일의 캘린더 저장 후 복귀·구매 단서·재구매 결정·새 봉투 시작 흐름입니다.</p>
-              <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-5">
+              <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3 xl:grid-cols-6">
                 <p>저장 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.exportedUsers}</b></p>
-                <p>복귀 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.returnedUsers}</b></p>
+                <p>복귀 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.returnedUsers}</b><span className="text-xs text-muted-foreground">{formatFunnelRate(overview.rebuyCalendarFunnel.rates.returnAfterExportPercent, "저장 후")}</span></p>
                 <p>구매 단서 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.purchaseClueUsers}</b></p>
-                <p>결정 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.decidedUsers}</b></p>
-                <p>새 봉투 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.shelfMemoryUsers}</b></p>
+                <p>결정 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.decidedUsers}</b><span className="text-xs text-muted-foreground">{formatFunnelRate(overview.rebuyCalendarFunnel.rates.decisionAfterReturnPercent, "복귀 후")}</span></p>
+                <p>재구매 완료 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.reboughtUsers}</b></p>
+                <p>새 봉투 <b className="block text-2xl text-primary-amber">{overview.rebuyCalendarFunnel.shelfMemoryUsers}</b><span className="text-xs text-muted-foreground">{formatFunnelRate(overview.rebuyCalendarFunnel.rates.newBagAfterReboughtPercent, "완료 후")}</span></p>
               </div>
               <p className="mt-4 text-xs leading-5 text-muted-foreground">
                 {overview.rebuyCalendarFunnel.unattributedEvents > 0
                   ? `이전 익명 이벤트 ${overview.rebuyCalendarFunnel.unattributedEvents}건은 퍼널에 포함하지 않습니다.`
                   : "로그인 소유자 기준으로만 집계합니다. 원두명·가격·메모는 분석에 저장하지 않습니다."}
               </p>
+              <p className="mt-2 text-xs font-semibold text-background-dark">가장 큰 병목 · {funnelBottleneckLabel(overview.rebuyCalendarFunnel.bottleneck)}</p>
             </section>
           </div>
         </section>
