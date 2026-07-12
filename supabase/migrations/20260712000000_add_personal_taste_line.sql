@@ -6,7 +6,7 @@ alter table public.profiles
 
 alter table public.profiles
   add constraint profiles_personal_taste_line_length_check
-  check (personal_taste_line is null or char_length(personal_taste_line) between 1 and 160);
+  check (personal_taste_line is null or char_length(btrim(personal_taste_line)) between 1 and 160);
 
 create or replace function public.update_personal_taste_line(new_personal_taste_line text)
 returns table (
