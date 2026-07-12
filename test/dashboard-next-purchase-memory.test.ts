@@ -122,9 +122,10 @@ async function mockRoutes(page: Page, events: EventPayload[], profileUpdates: un
   });
 }
 
-test("Given an automatic taste brief, When the user rewrites it in their own words, Then the private line is saved and copied without its text entering analytics", async ({ page }) => {
+test("Given an automatic taste brief, When the user rewrites it in their own words, Then the private line is saved and copied without its text entering analytics", async ({ page }, testInfo: TestInfo) => {
   const events: EventPayload[] = [];
   const profileUpdates: unknown[] = [];
+  await page.setViewportSize({ width: 360, height: 800 });
   await mockRoutes(page, events, profileUpdates);
   await page.addInitScript(() => {
     window.localStorage.setItem("coffeedex_analytics_test", "true");
@@ -147,6 +148,7 @@ test("Given an automatic taste brief, When the user rewrites it in their own wor
     personalTasteLine: "밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.",
   });
   await expect(panel.getByText("밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.", { exact: true })).toBeVisible();
+  await panel.screenshot({ path: testInfo.outputPath("personal-taste-line-panel-360.png") });
   await panel.getByRole("button", { name: "내 취향 문장 복사" }).click();
   await expect(panel.getByRole("button", { name: "내 취향 문장 복사" })).toContainText("복사됨");
   expect(await page.evaluate(() => window.localStorage.getItem("coffeedex_test_clipboard"))).toBe("밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.");
