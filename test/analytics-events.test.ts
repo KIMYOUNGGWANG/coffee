@@ -77,6 +77,7 @@ const memoryEventNames = [
   "rebuy_calendar_returned",
   "rebuy_purchase_clue_opened",
   "rebuy_shelf_memory_started",
+  "next_purchase_memory_opened",
 ] as const;
 
 test("pins legacy commerce/share and validated-memory event names", () => {

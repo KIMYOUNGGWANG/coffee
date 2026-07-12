@@ -45,6 +45,7 @@ function card(overrides = {}) {
     id: "card-fritz",
     title: "Ethiopia Sidama",
     subtitle: "Fritz",
+    image_url: "https://images.example/fritz-sidama.jpg",
     tags: ["floral", "honey"],
     repurchase_intent: "again",
     repurchase_reasons: ["꽃향과 단맛이 좋아 다시 사고 싶었음"],
@@ -74,6 +75,8 @@ test("Given saved rebuy memories, When timing memory is built, Then overdue dire
           id: "card-direct",
           title: "Colombia El Paraiso",
           subtitle: "Anthracite",
+          image_url: "https://images.example/anthracite-colombia.jpg",
+          tags: ["floral", "peach"],
           purchase_url: "https://example.com/colombia",
           purchase_note: "공식몰 200g 옵션",
           footer_meta: { date: "2026-04-20" },
@@ -82,9 +85,17 @@ test("Given saved rebuy memories, When timing memory is built, Then overdue dire
           id: "card-no",
           title: "One Time Blend",
           subtitle: "Cafe",
+          image_url: "https://images.example/one-time.jpg",
           repurchase_intent: "no",
           repurchase_reasons: [],
+          purchase_url: "https://example.com/one-time",
           footer_meta: { date: "2026-03-01" },
+        }),
+        card({
+          id: "card-no-photo",
+          title: "Invisible Favorite",
+          image_url: null,
+          purchase_url: "https://example.com/invisible",
         }),
       ],
       new Date("2026-06-30T00:00:00.000Z"),
@@ -92,12 +103,18 @@ test("Given saved rebuy memories, When timing memory is built, Then overdue dire
 
     assert.equal(result.totalCandidates, 2);
     assert.equal(result.candidates[0].cardId, "card-direct");
+    assert.equal(result.candidates[0].imageUrl, "https://images.example/anthracite-colombia.jpg");
     assert.equal(result.candidates[0].stage, "overdue");
     assert.equal(result.candidates[0].hasDirectPurchaseClue, true);
     assert.match(result.candidates[0].searchPhrase, /Anthracite/);
     assert.match(result.candidates[0].searchPhrase, /Colombia El Paraiso/);
     assert.match(result.candidates[0].searchPhrase, /공식몰 200g 옵션/);
     assert.equal(result.candidates[0].searchUrl, "https://example.com/colombia");
+    assert.deepEqual(result.choiceConditions, ["floral", "honey", "peach"]);
+    assert.equal(result.evidenceLabel, "2개의 다시 살 기록에서 확인한 취향 단서");
+    assert.equal(result.candidates.find((candidate) => candidate.cardId === "card-fresh")?.actionLabel, "원두 검색하기");
+    assert.equal(result.candidates.some((candidate) => candidate.cardId === "card-no"), false);
+    assert.equal(result.candidates.some((candidate) => candidate.cardId === "card-no-photo"), false);
     assert.match(result.summary, /2개 후보/);
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
@@ -122,6 +139,7 @@ test("Given only undecided memories, When timing memory is built, Then it asks f
 
     assert.equal(result.totalCandidates, 0);
     assert.equal(result.candidates.length, 0);
+    assert.deepEqual(result.choiceConditions, []);
     assert.match(result.summary, /다시 살 원두/);
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
