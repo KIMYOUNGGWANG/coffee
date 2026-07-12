@@ -22,6 +22,10 @@ test("Given a private taste line, When its contract is inspected, Then storage a
   assert.match(migration, /grant execute on function public\.update_personal_taste_line\(text\) to authenticated/);
   assert.match(migration, /'taste_preference_saved', 'taste_preference_copied'/);
   assert.match(hardeningMigration, /drop policy if exists "Users can update their own profile"/);
+  const blankCleanupIndex = hardeningMigration.indexOf("update public.profiles");
+  const trimmedConstraintIndex = hardeningMigration.indexOf("add constraint profiles_personal_taste_line_length_check");
+  assert.ok(blankCleanupIndex >= 0 && blankCleanupIndex < trimmedConstraintIndex);
+  assert.match(hardeningMigration, /btrim\(personal_taste_line\) = ''/);
   assert.match(hardeningMigration, /where profile\.id = auth\.uid\(\)/);
   assert.match(hardeningMigration, /char_length\(btrim\(personal_taste_line\)\) between 1 and 160/);
   assert.match(hardeningMigration, /revoke all on function public\.update_personal_taste_line\(text\) from public/);
