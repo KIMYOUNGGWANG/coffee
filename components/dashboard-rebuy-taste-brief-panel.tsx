@@ -30,7 +30,7 @@ export function DashboardRebuyTasteBriefPanel({
 
   const savedLine = personalTasteLine?.trim() || null;
   const visibleLine = savedLine ?? brief.preferenceLine;
-  const copyText = savedLine ?? brief.orderPhrase;
+  const copyText = visibleLine;
 
   function startEditing() {
     setDraft(visibleLine);

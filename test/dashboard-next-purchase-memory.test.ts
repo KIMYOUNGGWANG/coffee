@@ -130,13 +130,15 @@ test("Given an automatic taste brief, When the user rewrites it in their own wor
     window.localStorage.setItem("coffeedex_analytics_test", "true");
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
-      value: { writeText: async () => undefined },
+      value: { writeText: async (value: string) => window.localStorage.setItem("coffeedex_test_clipboard", value) },
     });
   });
 
   await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
   const panel = page.getByRole("region", { name: "재구매 취향 문장" });
   await expect(panel).toBeVisible();
+  const automaticLine = await panel.getByText("기록에서 만든 초안").locator("xpath=following-sibling::p").textContent();
+  expect(automaticLine).toBeTruthy();
   await panel.getByRole("button", { name: "내 말로 고치기" }).click();
   await panel.getByRole("textbox", { name: "내 취향 문장" }).fill("밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.");
   await panel.getByRole("button", { name: "내 취향으로 저장" }).click();
@@ -147,6 +149,14 @@ test("Given an automatic taste brief, When the user rewrites it in their own wor
   await expect(panel.getByText("밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.", { exact: true })).toBeVisible();
   await panel.getByRole("button", { name: "내 취향 문장 복사" }).click();
   await expect(panel.getByRole("button", { name: "내 취향 문장 복사" })).toContainText("복사됨");
+  expect(await page.evaluate(() => window.localStorage.getItem("coffeedex_test_clipboard"))).toBe("밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.");
+
+  await panel.getByRole("button", { name: "내 말로 고치기" }).click();
+  await panel.getByRole("button", { name: "자동 문장 사용" }).click();
+  await expect.poll(() => profileUpdates.at(-1)).toEqual({ personalTasteLine: null });
+  await expect(panel.getByText(automaticLine ?? "", { exact: true })).toBeVisible();
+  await panel.getByRole("button", { name: "내 취향 문장 복사" }).click();
+  expect(await page.evaluate(() => window.localStorage.getItem("coffeedex_test_clipboard"))).toBe(automaticLine);
 
   await expect.poll(() => events.find((event) => event.eventName === "taste_preference_saved")).toMatchObject({
     properties: { mode: "custom", source: "rebuy_taste_brief" },
@@ -154,6 +164,10 @@ test("Given an automatic taste brief, When the user rewrites it in their own wor
   const serializedEvents = JSON.stringify(events);
   expect(serializedEvents).not.toContain("밝은 산미는 좋지만");
   expect(serializedEvents).not.toContain("발효향");
+  expect(events).toContainEqual(expect.objectContaining({
+    eventName: "taste_preference_saved",
+    properties: { mode: "auto", source: "rebuy_taste_brief" },
+  }));
 });
 
 test("Given liked photo memories, When the dashboard opens a purchase clue, Then it shows personal conditions and tracks no coffee identity", async ({ page }, testInfo: TestInfo) => {
