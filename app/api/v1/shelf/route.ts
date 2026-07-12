@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getErrorMessage } from "@/lib/api-errors";
+import { buildRebuyContinuity, type RebuyContinuitySource } from "@/lib/rebuy-continuity";
 import { z } from "zod";
 
 const purchaseUrlSchema = z.string().trim().url().max(500).optional().nullable();
@@ -99,10 +100,11 @@ export async function POST(request: NextRequest) {
     const validatedData = result.data;
     const rebuySourceShelfItemId = validatedData.rebuySourceShelfItemId ?? null;
 
+    let rebuySource: RebuyContinuitySource | null = null;
     if (rebuySourceShelfItemId) {
       const { data: sourceItem, error: sourceError } = await supabase
         .from("coffee_shelf_items")
-        .select("id")
+        .select("id,rebuy_sequence")
         .eq("id", rebuySourceShelfItemId)
         .eq("user_id", user.id)
         .maybeSingle();
@@ -113,6 +115,7 @@ export async function POST(request: NextRequest) {
       if (!sourceItem) {
         return NextResponse.json({ error: { code: 404, message: "재구매 원본을 찾을 수 없습니다." } }, { status: 404 });
       }
+      rebuySource = sourceItem;
 
       const { data: existingItem, error: existingError } = await supabase
         .from("coffee_shelf_items")
@@ -127,6 +130,7 @@ export async function POST(request: NextRequest) {
       if (existingItem) return NextResponse.json({ data: existingItem, reused: true });
     }
 
+    const rebuyContinuity = buildRebuyContinuity(rebuySource);
     const { data, error } = await supabase
       .from("coffee_shelf_items")
       .insert({
@@ -146,6 +150,8 @@ export async function POST(request: NextRequest) {
         rebuy_reminder_date: validatedData.rebuyReminderDate ?? null,
         rebuy_action: validatedData.rebuyAction ?? "none",
         rebuy_source_shelf_item_id: rebuySourceShelfItemId,
+        purchase_date: rebuyContinuity.purchaseDate,
+        rebuy_sequence: rebuyContinuity.rebuySequence,
         rebuy_action_at: validatedData.rebuyAction && validatedData.rebuyAction !== "none" ? new Date().toISOString() : null,
         rating: validatedData.rating || null,
         want_again: validatedData.wantAgain ?? false,
