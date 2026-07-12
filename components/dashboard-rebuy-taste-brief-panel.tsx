@@ -1,29 +1,76 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, MessageCircle, Sparkles } from "lucide-react";
+import { Check, Copy, MessageCircle, PencilLine, Sparkles } from "lucide-react";
+import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import type { TastingCardData } from "@/hooks/useTastingCards";
 import { buildRebuyTasteBrief } from "@/lib/rebuy-taste-brief";
 
 type DashboardRebuyTasteBriefPanelProps = {
   readonly cards: readonly TastingCardData[];
+  readonly personalTasteLine: string | null;
+  readonly isSaving: boolean;
+  readonly onSavePersonalTasteLine: (line: string | null) => Promise<void>;
 };
 
-export function DashboardRebuyTasteBriefPanel({ cards }: DashboardRebuyTasteBriefPanelProps) {
+export function DashboardRebuyTasteBriefPanel({
+  cards,
+  personalTasteLine,
+  isSaving,
+  onSavePersonalTasteLine,
+}: DashboardRebuyTasteBriefPanelProps) {
   const brief = buildRebuyTasteBrief(cards);
   const [isCopied, setIsCopied] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const { trackEvent } = useAnalyticsEvents();
 
   if (!brief) return null;
 
-  async function copyOrderPhrase() {
-    if (!brief) return;
+  const savedLine = personalTasteLine?.trim() || null;
+  const visibleLine = savedLine ?? brief.preferenceLine;
+  const copyText = savedLine ?? brief.orderPhrase;
 
+  function startEditing() {
+    setDraft(visibleLine);
+    setSaveError(null);
+    setIsEditing(true);
+  }
+
+  async function saveLine(line: string | null) {
     try {
-      await navigator.clipboard.writeText(brief.orderPhrase);
+      await onSavePersonalTasteLine(line);
+      trackEvent("taste_preference_saved", {
+        source: "rebuy_taste_brief",
+        mode: line ? "custom" : "auto",
+      });
+      setSaveError(null);
+      setIsEditing(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setSaveError(error.message);
+        return;
+      }
+      throw error;
+    }
+  }
+
+  async function copyOrderPhrase() {
+    try {
+      await navigator.clipboard.writeText(copyText);
+      trackEvent("taste_preference_copied", {
+        source: "rebuy_taste_brief",
+        mode: savedLine ? "custom" : "auto",
+      });
       setIsCopied(true);
       window.setTimeout(() => setIsCopied(false), 1800);
-    } catch {
-      window.alert("취향 문장을 복사하지 못했습니다. 문장을 길게 눌러 직접 복사해주세요.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        window.alert("취향 문장을 복사하지 못했습니다. 문장을 길게 눌러 직접 복사해주세요.");
+        return;
+      }
+      throw error;
     }
   }
 
@@ -68,20 +115,75 @@ export function DashboardRebuyTasteBriefPanel({ cards }: DashboardRebuyTasteBrie
                 {brief.preferenceLine}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => void copyOrderPhrase()}
-              className="inline-flex min-h-9 shrink-0 items-center justify-center gap-1 rounded-full border border-[#8C5E35]/20 bg-white px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5"
-              aria-label="취향 주문 문장 복사"
-            >
-              {isCopied ? <Check size={13} /> : <Copy size={13} />}
-              {isCopied ? "복사됨" : "복사"}
-            </button>
+            <div className="flex shrink-0 flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={startEditing}
+                className="inline-flex min-h-11 items-center justify-center gap-1 rounded-full border border-[#8C5E35]/20 bg-white px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5"
+                aria-label="내 말로 고치기"
+              >
+                <PencilLine size={13} />
+                고치기
+              </button>
+              <button
+                type="button"
+                onClick={() => void copyOrderPhrase()}
+                className="inline-flex min-h-11 items-center justify-center gap-1 rounded-full border border-[#8C5E35]/20 bg-white px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5"
+                aria-label="내 취향 문장 복사"
+              >
+                {isCopied ? <Check size={13} /> : <Copy size={13} />}
+                {isCopied ? "복사됨" : "복사"}
+              </button>
+            </div>
           </div>
 
-          <p className="mt-3 rounded-2xl border border-background-dark/10 bg-white px-3 py-3 text-xs font-bold leading-5 text-background-dark">
-            {brief.orderPhrase}
-          </p>
+          {isEditing ? (
+            <div className="mt-3 rounded-2xl border border-primary-amber/25 bg-white p-3">
+              <label htmlFor="personal-taste-line" className="text-[11px] font-black text-background-dark">
+                내 취향 문장
+              </label>
+              <textarea
+                id="personal-taste-line"
+                aria-label="내 취향 문장"
+                value={draft}
+                maxLength={160}
+                rows={3}
+                onChange={(event) => setDraft(event.target.value)}
+                className="mt-2 w-full resize-none rounded-xl border border-background-dark/15 bg-[#fffaf2] px-3 py-3 text-sm font-bold leading-6 text-background-dark outline-none transition focus:border-primary-amber"
+              />
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[10px] font-bold text-muted-foreground">{draft.length}/160 · 원두 이름보다 내가 느낀 기준으로 적어보세요.</span>
+                <div className="flex flex-wrap gap-2">
+                  {savedLine && (
+                    <button
+                      type="button"
+                      disabled={isSaving}
+                      onClick={() => void saveLine(null)}
+                      className="min-h-11 rounded-full border border-background-dark/15 px-3 text-xs font-black text-background-dark disabled:opacity-50"
+                    >
+                      자동 문장 사용
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    disabled={isSaving || draft.trim().length === 0 || draft.trim() === savedLine}
+                    onClick={() => void saveLine(draft.trim())}
+                    className="min-h-11 rounded-full bg-background-dark px-4 text-xs font-black text-[#fff8ec] disabled:opacity-50"
+                  >
+                    {isSaving ? "저장 중" : "내 취향으로 저장"}
+                  </button>
+                </div>
+              </div>
+              {saveError && <p role="alert" className="mt-2 text-xs font-bold text-red-700">{saveError}</p>}
+            </div>
+          ) : (
+            <div className="mt-3 rounded-2xl border border-background-dark/10 bg-white px-3 py-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.14em] text-primary-amber">
+                {savedLine ? "내가 저장한 표현" : "기록에서 만든 초안"}
+              </p>
+              <p className="mt-1 break-keep text-sm font-bold leading-6 text-background-dark">{visibleLine}</p>
+            </div>
+          )}
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {brief.sampleCards.map((sample) => (
