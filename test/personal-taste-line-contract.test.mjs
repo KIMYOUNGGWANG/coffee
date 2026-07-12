@@ -11,6 +11,7 @@ test("Given a private taste line, When its contract is inspected, Then storage a
   const route = readFileSync(path.join(projectRoot, "app/api/v1/profile/route.ts"), "utf8");
   const migration = readFileSync(path.join(projectRoot, "supabase/migrations/20260712000000_add_personal_taste_line.sql"), "utf8");
   const hardeningMigration = readFileSync(path.join(projectRoot, "supabase/migrations/20260712001000_harden_personal_taste_line.sql"), "utf8");
+  const normalizationMigration = readFileSync(path.join(projectRoot, "supabase/migrations/20260712002000_normalize_personal_taste_line_rpc.sql"), "utf8");
 
   // When / Then
   assert.match(route, /personalTasteLine: z\.string\(\)\.trim\(\)\.min\(1\)\.max\(160\)\.nullable\(\)/);
@@ -30,4 +31,9 @@ test("Given a private taste line, When its contract is inspected, Then storage a
   assert.match(hardeningMigration, /char_length\(btrim\(personal_taste_line\)\) between 1 and 160/);
   assert.match(hardeningMigration, /revoke all on function public\.update_personal_taste_line\(text\) from public/);
   assert.match(hardeningMigration, /grant execute on function public\.update_personal_taste_line\(text\) to authenticated/);
+  assert.match(normalizationMigration, /set personal_taste_line = btrim\(personal_taste_line\)/);
+  assert.match(normalizationMigration, /normalized_taste_line := btrim\(new_personal_taste_line\)/);
+  assert.match(normalizationMigration, /char_length\(normalized_taste_line\) not between 1 and 160/);
+  assert.match(normalizationMigration, /errcode = '23514'/);
+  assert.match(normalizationMigration, /set personal_taste_line = normalized_taste_line/);
 });
