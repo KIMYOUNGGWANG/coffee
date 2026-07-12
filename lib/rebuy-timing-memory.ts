@@ -2,6 +2,7 @@ export type RebuyTimingMemoryCard = {
   readonly id: string;
   readonly title: string;
   readonly subtitle: string;
+  readonly image_url: string | null;
   readonly tags: readonly string[];
   readonly repurchase_intent: "again" | "maybe" | "no" | "undecided";
   readonly repurchase_reasons: readonly string[];
@@ -23,6 +24,7 @@ export type RebuyTimingCandidate = {
   readonly cardId: string;
   readonly title: string;
   readonly subtitle: string;
+  readonly imageUrl: string | null;
   readonly stage: RebuyTimingStage;
   readonly stageLabel: string;
   readonly daysSince: number;
@@ -38,6 +40,8 @@ export type RebuyTimingMemory = {
   readonly totalCandidates: number;
   readonly summary: string;
   readonly candidates: readonly RebuyTimingCandidate[];
+  readonly choiceConditions: readonly string[];
+  readonly evidenceLabel: string;
 };
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -83,9 +87,8 @@ function labelFor(stage: RebuyTimingStage): string {
   }
 }
 
-function actionLabelFor(stage: RebuyTimingStage, hasDirectPurchaseClue: boolean): string {
+function actionLabelFor(hasDirectPurchaseClue: boolean): string {
   if (hasDirectPurchaseClue) return "구매 단서 열기";
-  if (stage === "fresh") return "카드 다시 보기";
   return "원두 검색하기";
 }
 
@@ -131,13 +134,31 @@ function candidateScore(card: RebuyTimingMemoryCard, stage: RebuyTimingStage): n
   }[stage];
   const purchaseClueScore = isNonBlank(card.purchase_url) || isNonBlank(card.purchase_note) ? 18 : 0;
   const reasonScore = card.repurchase_reasons.some(isNonBlank) ? 8 : 0;
+  const photoScore = isNonBlank(card.image_url) ? 24 : 0;
 
-  return intentScore + stageScore + purchaseClueScore + reasonScore;
+  return intentScore + stageScore + purchaseClueScore + reasonScore + photoScore;
 }
 
 function isRebuyCandidate(card: RebuyTimingMemoryCard): boolean {
-  if (card.repurchase_intent === "again" || card.repurchase_intent === "maybe") return true;
-  return isNonBlank(card.purchase_url) || isNonBlank(card.purchase_note);
+  if (card.confirmed_at === null || card.confirmed_at === undefined) return false;
+  if (!isNonBlank(card.image_url)) return false;
+  return card.repurchase_intent === "again" || card.repurchase_intent === "maybe";
+}
+
+function buildChoiceConditions(cards: readonly RebuyTimingMemoryCard[]): readonly string[] {
+  const counts = new Map<string, number>();
+  for (const card of cards) {
+    for (const tag of card.tags) {
+      const label = tag.trim();
+      if (label.length === 0) continue;
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+  }
+
+  return Array.from(counts.entries())
+    .sort((first, second) => second[1] - first[1] || first[0].localeCompare(second[0]))
+    .slice(0, 3)
+    .map(([label]) => label);
 }
 
 export function buildRebuyTimingMemory(
@@ -145,8 +166,8 @@ export function buildRebuyTimingMemory(
   now: Date = new Date(),
   limit = 3,
 ): RebuyTimingMemory {
-  const ranked = cards
-    .filter(isRebuyCandidate)
+  const sourceCards = cards.filter(isRebuyCandidate);
+  const ranked = sourceCards
     .map((card) => {
       const memoryTime = bestMemoryTime(card);
       const daysSince = daysBetween(now, memoryTime);
@@ -159,9 +180,10 @@ export function buildRebuyTimingMemory(
         score: candidateScore(card, stage),
         memoryTime,
         candidate: {
-          cardId: card.id,
-          title: card.title,
-          subtitle: card.subtitle,
+            cardId: card.id,
+            title: card.title,
+            subtitle: card.subtitle,
+            imageUrl: isNonBlank(card.image_url) ? card.image_url : null,
           stage,
           stageLabel: labelFor(stage),
           daysSince,
@@ -169,7 +191,7 @@ export function buildRebuyTimingMemory(
           purchaseCue: purchaseCueFor(card),
           searchPhrase,
           searchUrl,
-          actionLabel: actionLabelFor(stage, hasDirectPurchaseClue),
+            actionLabel: actionLabelFor(hasDirectPurchaseClue),
           hasDirectPurchaseClue,
         } satisfies RebuyTimingCandidate,
       };
@@ -181,11 +203,13 @@ export function buildRebuyTimingMemory(
   const overdueCount = ranked.filter(({ candidate }) => candidate.stage === "overdue").length;
   const summary = ranked.length === 0
     ? "다시 살 원두를 하나만 표시하면 다음 방문 때 이름과 로스터리를 바로 꺼내드릴게요."
-    : `${ranked.length}개 후보 중 ${overdueCount}개는 기억이 흐려지기 전에 다시 확인할 타이밍입니다.`;
+    : `${ranked.length}개 후보 중 ${overdueCount}개를 다시 확인할 때예요.`;
 
   return {
     totalCandidates: ranked.length,
     summary,
     candidates,
+    choiceConditions: buildChoiceConditions(sourceCards),
+    evidenceLabel: `${sourceCards.length}개의 다시 살 기록에서 확인한 취향 단서`,
   };
 }
