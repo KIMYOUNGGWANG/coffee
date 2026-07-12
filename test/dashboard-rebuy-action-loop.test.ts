@@ -23,6 +23,8 @@ const shelfResponse = {
     rebuy_reminder_date: null,
     rebuy_action: "none",
     rebuy_action_at: null,
+    purchase_date: "2026-07-11",
+    rebuy_sequence: 2,
   }],
 } as const;
 
@@ -190,6 +192,8 @@ test("saves a Rebuy Intelligence action without opening the shelf item", async (
   await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
 
   await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+  await expect(page.getByText("2번째 구매", { exact: true })).toBeVisible();
+  await page.locator(".coffee-shelf-item").first().screenshot({ path: testInfo.outputPath("rebuy-continuity-card.png") });
   await expect(page.getByTestId("rebuy-action-loop")).toBeVisible();
 
   await page.getByTestId("rebuy-action-loop").getByRole("button", { name: "다시 살래요" }).click();
