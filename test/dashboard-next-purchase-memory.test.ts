@@ -154,7 +154,7 @@ test("Given an automatic taste brief, When the user rewrites it in their own wor
   await panel.getByRole("button", { name: "내 말로 고치기" }).click();
   await panel.getByRole("button", { name: "자동 문장 사용" }).click();
   await expect.poll(() => profileUpdates.at(-1)).toEqual({ personalTasteLine: null });
-  await expect(panel.getByText(automaticLine ?? "", { exact: true })).toBeVisible();
+  await expect(panel.getByText("기록에서 만든 초안").locator("xpath=following-sibling::p")).toHaveText(automaticLine ?? "");
   await panel.getByRole("button", { name: "내 취향 문장 복사" }).click();
   expect(await page.evaluate(() => window.localStorage.getItem("coffeedex_test_clipboard"))).toBe(automaticLine);
 
