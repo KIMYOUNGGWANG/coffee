@@ -91,24 +91,24 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .update({ personal_taste_line: parsed.data.personalTasteLine })
-      .eq("id", user.id)
-      .select(profileFields)
-      .single();
+    const { data: profiles, error: profileError } = await supabase.rpc(
+      "update_personal_taste_line",
+      { new_personal_taste_line: parsed.data.personalTasteLine },
+    );
 
-    if (profileError) {
+    const profile = Array.isArray(profiles) ? profiles[0] : null;
+    if (profileError || !profile) {
       return NextResponse.json(
-        { error: { code: 500, message: "취향 문장을 저장하지 못했습니다.", details: profileError.message } },
+        { error: { code: 500, message: "취향 문장을 저장하지 못했습니다." } },
         { status: 500 },
       );
     }
 
     return NextResponse.json({ data: profile });
   } catch (error: unknown) {
+    console.error("Personal taste line update failed:", getErrorMessage(error));
     return NextResponse.json(
-      { error: { code: 500, message: "서버 내부 오류가 발생했습니다.", details: getErrorMessage(error) } },
+      { error: { code: 500, message: "서버 내부 오류가 발생했습니다." } },
       { status: 500 },
     );
   }

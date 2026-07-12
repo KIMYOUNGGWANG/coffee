@@ -83,7 +83,7 @@ export function DashboardRebuyTasteBriefPanel({
             취향 주문 문장
           </span>
           <h2 className="mt-3 break-keep font-serif text-2xl font-black leading-tight text-background-dark">
-            다시 살 때 내 취향을 한 문장으로 꺼내세요
+            다음 원두를 고를 내 취향 한 문장
           </h2>
           <p className="mt-2 break-keep text-sm font-bold leading-6 text-muted-foreground">
             많이 모으는 보상이 아니라, 내가 다시 찾는 향과 질감이 선명해지는 보상입니다.
@@ -105,7 +105,7 @@ export function DashboardRebuyTasteBriefPanel({
         </div>
 
         <div className="rounded-2xl border border-background-dark/10 bg-[#fff8ec] p-4">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">
                 <Sparkles size={12} />
@@ -115,11 +115,11 @@ export function DashboardRebuyTasteBriefPanel({
                 {brief.preferenceLine}
               </p>
             </div>
-            <div className="flex shrink-0 flex-wrap justify-end gap-2">
+            <div className="flex w-full shrink-0 flex-wrap gap-2 sm:w-auto sm:justify-end">
               <button
                 type="button"
                 onClick={startEditing}
-                className="inline-flex min-h-11 items-center justify-center gap-1 rounded-full border border-[#8C5E35]/20 bg-white px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-full border border-[#8C5E35]/20 bg-white px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5 sm:flex-none"
                 aria-label="내 말로 고치기"
               >
                 <PencilLine size={13} />
@@ -128,7 +128,7 @@ export function DashboardRebuyTasteBriefPanel({
               <button
                 type="button"
                 onClick={() => void copyOrderPhrase()}
-                className="inline-flex min-h-11 items-center justify-center gap-1 rounded-full border border-[#8C5E35]/20 bg-white px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-full border border-[#8C5E35]/20 bg-white px-3 text-xs font-black text-background-dark transition hover:-translate-y-0.5 sm:flex-none"
                 aria-label="내 취향 문장 복사"
               >
                 {isCopied ? <Check size={13} /> : <Copy size={13} />}
@@ -149,7 +149,7 @@ export function DashboardRebuyTasteBriefPanel({
                 maxLength={160}
                 rows={3}
                 onChange={(event) => setDraft(event.target.value)}
-                className="mt-2 w-full resize-none rounded-xl border border-background-dark/15 bg-[#fffaf2] px-3 py-3 text-sm font-bold leading-6 text-background-dark outline-none transition focus:border-primary-amber"
+                className="mt-2 w-full resize-none rounded-xl border border-background-dark/15 bg-[#fffaf2] px-3 py-3 text-sm font-bold leading-6 text-background-dark transition focus:border-primary-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-amber focus-visible:ring-offset-2"
               />
               <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[10px] font-bold text-muted-foreground">{draft.length}/160 · 원두 이름보다 내가 느낀 기준으로 적어보세요.</span>
