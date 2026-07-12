@@ -101,7 +101,12 @@ export default function DashboardClient({
     isLoading: isRebuyIntelligenceLoading,
     error: rebuyIntelligenceError,
     failureReason: rebuyIntelligenceFailureReason,
+    refetch: refetchRebuyIntelligence,
   } = useRebuyIntelligence();
+  const handleShelfDataChange = () => {
+    void refetchDialInCoach();
+    void refetchRebuyIntelligence();
+  };
   const deleteCardMutation = useDeleteTastingCard();
   const filteredCards = useMemo(() => filterDashboardCards(cards, {
     searchQuery,
@@ -382,8 +387,10 @@ export default function DashboardClient({
             onOpenPassport={() => setActiveTab("passport")}
             dnaData={null}
             isDnaLoading={false}
+            shelfRefreshTrigger={shelfRefreshTrigger}
             onShareDNA={() => {}}
-            onShelfDataChange={() => {}}
+            onShelfDataChange={handleShelfDataChange}
+            onShelfMemoryStarted={triggerShelfRefresh}
           />
         )}
 

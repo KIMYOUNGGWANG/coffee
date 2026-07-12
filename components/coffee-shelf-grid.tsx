@@ -469,6 +469,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
 
       setItems((currentItems) => currentItems.map(applyReminderUpdate));
       setArchivedItems((currentItems) => currentItems.map(applyReminderUpdate));
+      onDataChange?.();
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error updating rebuy reminder state:", error);
