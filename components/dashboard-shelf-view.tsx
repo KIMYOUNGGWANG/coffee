@@ -5,6 +5,7 @@ import { DashboardFeaturedArchiveCard } from "@/components/dashboard-featured-ar
 import { DashboardPassportSidebar } from "@/components/dashboard-passport-sidebar";
 import { DashboardRebuyClueRescuePanel } from "@/components/dashboard-rebuy-clue-rescue-panel";
 import { DashboardRebuyIntelligencePanel } from "@/components/dashboard-rebuy-intelligence-panel";
+import { DashboardRebuyTasteBriefPanel } from "@/components/dashboard-rebuy-taste-brief-panel";
 import { DashboardRebuyTimingMemoryPanel } from "@/components/dashboard-rebuy-timing-memory-panel";
 import { DashboardRetentionLoop } from "@/components/dashboard-retention-loop";
 import { DashboardShelfFilters } from "@/components/dashboard-shelf-filters";
@@ -15,6 +16,10 @@ import CoffeeDNACard, { type CoffeeDNAData } from "@/components/coffee-dna/Coffe
 
 type DashboardShelfViewProps = {
   readonly cards: readonly TastingCardData[];
+  readonly tasteBriefCards: readonly TastingCardData[];
+  readonly personalTasteLine: string | null;
+  readonly isPersonalTasteLineSaving: boolean;
+  readonly onSavePersonalTasteLine: (line: string | null) => Promise<void>;
   readonly totalCardCount: number;
   readonly hasCards: boolean;
   readonly hasActiveFilters: boolean;
@@ -145,6 +150,10 @@ function DashboardFirstSaveReward({
 
 export function DashboardShelfView({
   cards,
+  tasteBriefCards,
+  personalTasteLine,
+  isPersonalTasteLineSaving,
+  onSavePersonalTasteLine,
   totalCardCount,
   hasCards,
   hasActiveFilters,
@@ -192,6 +201,12 @@ export function DashboardShelfView({
     <>
       <DashboardFirstSaveReward cards={cards} onQuickAdd={onQuickAdd} />
       <DashboardRebuyTimingMemoryPanel cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />
+      <DashboardRebuyTasteBriefPanel
+        cards={tasteBriefCards}
+        personalTasteLine={personalTasteLine}
+        isSaving={isPersonalTasteLineSaving}
+        onSavePersonalTasteLine={onSavePersonalTasteLine}
+      />
       <DashboardRebuyClueRescuePanel cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />
       {(cards.length > 0 || rebuyIntelligence) && (
         <DashboardRebuyIntelligencePanel

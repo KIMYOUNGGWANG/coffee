@@ -40,6 +40,8 @@ export const analyticsEventNames = [
   "rebuy_purchase_clue_opened",
   "rebuy_shelf_memory_started",
   "next_purchase_memory_opened",
+  "taste_preference_saved",
+  "taste_preference_copied",
 ] as const;
 
 export type AnalyticsEventName = (typeof analyticsEventNames)[number];

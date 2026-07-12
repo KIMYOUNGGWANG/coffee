@@ -95,6 +95,12 @@ The same new-bag action includes the private purchase check-in, so a current sto
 Given the user has confirmed private `again` or `maybe` records, when the shelf dashboard opens, then CoffeeDex shows up to three ranked memories with their saved bag photos and up to three flavor conditions derived only from those confirmed records. The user can reopen the private card, copy a search phrase, open a saved purchase clue or search, or explicitly start a new shelf memory after buying. The `next_purchase_memory_opened` event stores only the action and clue kind; it never stores coffee identity, image, note, URL, card ID, or shelf ID.
 
 Evidence surfaces: `/dashboard`, `buildRebuyTimingMemory`, `DashboardRebuyTimingMemoryPanel`, `next_purchase_memory_opened`
+
+## Flow 4D. Keep a personal taste sentence
+
+Given the user has confirmed `again` or `maybe` memories, when CoffeeDex derives a taste brief, then the user can rewrite it in their own words, save up to 160 characters privately on their owner-scoped profile, copy it before choosing beans, or return to the automatic record-derived sentence. `taste_preference_saved` and `taste_preference_copied` record only the surface and whether the sentence was custom or automatic; the sentence, bean, roaster, photo, note, URL, and record identifiers never enter event properties.
+
+Evidence surfaces: `/dashboard`, `GET/PATCH /api/v1/profile`, `DashboardRebuyTasteBriefPanel`, `taste_preference_saved`, `taste_preference_copied`
 ## Flow 5. Review a Progressive Taste Snapshot
 
 Given a user has confirmed memories, when they open the snapshot, then CoffeeDex displays literal sample count and coverage. One to two records form a collage, three to four show first signals, five to nine show an early preview, and ten or more sufficiently varied records show a current snapshot. Sparse data never appears complete.
