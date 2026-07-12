@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Playfair_Display } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
@@ -28,6 +29,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        {process.env.NODE_ENV === "development" && (
+          <Script
+            src="https://unpkg.com/react-scan/dist/auto.global.js"
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
+
+        {process.env.NODE_ENV === "development" && (
+          <Script
+            src="//unpkg.com/react-grab/dist/index.global.js"
+            crossOrigin="anonymous"
+            strategy="beforeInteractive"
+          />
+        )}
+      </head>
       <body className={`${playfair.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
         {shouldRenderVercelAnalytics && <Analytics />}

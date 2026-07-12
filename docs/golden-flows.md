@@ -86,6 +86,12 @@ Given a user has owned cards, shelf items, or brewing logs, when CoffeeDex opens
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/rebuy-intelligence`, `PATCH /api/v1/shelf/:id`, `buildRebuyIntelligence`, `DashboardRebuyIntelligencePanel`
 
+## Flow 4C. Reopen a photo-backed memory before buying
+
+Given the user has confirmed private `again` or `maybe` records, when the shelf dashboard opens, then CoffeeDex shows up to three ranked memories with their saved bag photos and up to three flavor conditions derived only from those confirmed records. The user can reopen the private card, copy a search phrase, open a saved purchase clue or search, or explicitly start a new shelf memory after buying. The `next_purchase_memory_opened` event stores only the action and clue kind; it never stores coffee identity, image, note, URL, card ID, or shelf ID.
+
+Evidence surfaces: `/dashboard`, `buildRebuyTimingMemory`, `DashboardRebuyTimingMemoryPanel`, `next_purchase_memory_opened`
+
 ## Flow 5. Review a Progressive Taste Snapshot
 
 Given a user has confirmed memories, when they open the snapshot, then CoffeeDex displays literal sample count and coverage. One to two records form a collage, three to four show first signals, five to nine show an early preview, and ten or more sufficiently varied records show a current snapshot. Sparse data never appears complete.
