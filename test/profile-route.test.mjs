@@ -32,6 +32,7 @@ export class NextResponse extends Response {
 }
 `);
   writeFileSync(path.join(tempDirectory, "api-errors.mjs"), "export function getErrorMessage(error) { return error instanceof Error ? error.message : String(error); }\n");
+  writeFileSync(path.join(tempDirectory, "zod.mjs"), `export { z } from ${JSON.stringify(pathToFileURL(path.join(projectRoot, "node_modules/zod/index.js")).href)};\n`);
   writeFileSync(path.join(tempDirectory, "supabase-server.mjs"), `
 const state = {
   authResult: { data: { user: null }, error: { message: "anonymous" } },
@@ -89,6 +90,15 @@ export async function createServerSupabase() {
   return {
     auth: { getUser: () => Promise.resolve(state.authResult) },
     from: (tableName) => new Query(tableName),
+    rpc: async (functionName, args) => {
+      state.operations.push(\`rpc:\${functionName}\`);
+      const userId = state.authResult.data.user?.id;
+      const profile = userId ? state.profiles.get(userId) : null;
+      if (!profile) return { data: [], error: { message: "No profile" } };
+      const updated = { ...profile, personal_taste_line: args.new_personal_taste_line };
+      state.profiles.set(userId, updated);
+      return { data: [updated], error: null };
+    },
   };
 }
 `);
@@ -96,6 +106,7 @@ export async function createServerSupabase() {
   const routePath = path.join(projectRoot, "app/api/v1/profile/route.ts");
   const routeSource = readFileSync(routePath, "utf8")
     .replaceAll('"next/server"', '"./next-server.mjs"')
+    .replaceAll('"zod"', '"./zod.mjs"')
     .replaceAll('"@/lib/supabase/server"', '"./supabase-server.mjs"')
     .replaceAll('"@/lib/api-errors"', '"./api-errors.mjs"');
   writeFileSync(path.join(tempDirectory, "route.mjs"), transpile(routeSource, routePath));
@@ -119,6 +130,7 @@ test("Given no authenticated user, When profile is requested, Then the route fai
         is_premium: true,
         scans_used: 4,
         monthly_scan_limit: 50,
+        personal_taste_line: null,
       }],
     });
 
@@ -147,6 +159,7 @@ test("Given an authenticated user, When profile is requested, Then the profile l
           is_premium: true,
           scans_used: 4,
           monthly_scan_limit: 50,
+          personal_taste_line: null,
         },
         {
           id: "real-user-456",
@@ -155,6 +168,7 @@ test("Given an authenticated user, When profile is requested, Then the profile l
           is_premium: false,
           scans_used: 1,
           monthly_scan_limit: 5,
+          personal_taste_line: null,
         },
       ],
     });
@@ -169,12 +183,44 @@ test("Given an authenticated user, When profile is requested, Then the profile l
         is_premium: false,
         scans_used: 1,
         monthly_scan_limit: 5,
+        personal_taste_line: null,
       },
     });
     assert.deepEqual(loaded.supabase.readOperations(), [
-      "select:profiles:credits, has_pdf_access, is_premium, scans_used, monthly_scan_limit",
+      "select:profiles:credits, has_pdf_access, is_premium, scans_used, monthly_scan_limit, personal_taste_line",
       "eq:profiles:id:real-user-456",
     ]);
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("Given an authenticated user, When a personal taste line is patched, Then only the scoped RPC performs the update", async () => {
+  const loaded = await loadProfileRoute();
+  try {
+    loaded.supabase.configure({
+      authResult: { data: { user: { id: "real-user-456" } }, error: null },
+      profiles: [{
+        id: "real-user-456",
+        credits: 7,
+        has_pdf_access: false,
+        is_premium: false,
+        scans_used: 1,
+        monthly_scan_limit: 5,
+        personal_taste_line: null,
+      }],
+    });
+    const request = new Request("http://localhost/api/v1/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ personalTasteLine: "식었을 때 단맛이 남는 원두" }),
+    });
+
+    const response = await loaded.route.PATCH(request);
+
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).data.personal_taste_line, "식었을 때 단맛이 남는 원두");
+    assert.deepEqual(loaded.supabase.readOperations(), ["rpc:update_personal_taste_line"]);
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }

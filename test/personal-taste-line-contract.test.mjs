@@ -13,10 +13,11 @@ test("Given a private taste line, When its contract is inspected, Then storage a
 
   // When / Then
   assert.match(route, /personalTasteLine: z\.string\(\)\.trim\(\)\.min\(1\)\.max\(160\)\.nullable\(\)/);
-  assert.match(route, /\.eq\("id", user\.id\)/);
+  assert.match(route, /"update_personal_taste_line"/);
   assert.match(migration, /personal_taste_line text/);
   assert.match(migration, /char_length\(personal_taste_line\) between 1 and 160/);
-  assert.match(migration, /using \(auth\.uid\(\) = id\)/);
-  assert.match(migration, /with check \(auth\.uid\(\) = id\)/);
+  assert.match(migration, /where profile\.id = auth\.uid\(\)/);
+  assert.match(migration, /revoke all on function public\.update_personal_taste_line\(text\) from public/);
+  assert.match(migration, /grant execute on function public\.update_personal_taste_line\(text\) to authenticated/);
   assert.match(migration, /'taste_preference_saved', 'taste_preference_copied'/);
 });

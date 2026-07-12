@@ -63,6 +63,11 @@ const analyticsPropertiesSchema = z
   .record(analyticsPropertyKeySchema, analyticsPropertySchema)
   .refine((properties) => Object.keys(properties).length <= 20, "Too many analytics properties.");
 
+const tastePreferencePropertiesSchema = z.object({
+  source: z.literal("rebuy_taste_brief"),
+  mode: z.enum(["custom", "auto"]),
+}).strict();
+
 export const analyticsEventSchema = z
   .object({
     eventId: z.string().uuid().default(() => crypto.randomUUID()),
@@ -72,6 +77,18 @@ export const analyticsEventSchema = z
     anonymousId: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/).nullable().optional(),
     properties: analyticsPropertiesSchema.default({}),
   })
-  .strict();
+  .strict()
+  .superRefine((event, context) => {
+    if (event.eventName !== "taste_preference_saved" && event.eventName !== "taste_preference_copied") return;
+
+    const parsedProperties = tastePreferencePropertiesSchema.safeParse(event.properties);
+    if (!parsedProperties.success) {
+      context.addIssue({
+        code: "custom",
+        message: "Taste preference events accept only source and mode.",
+        path: ["properties"],
+      });
+    }
+  });
 
 export type AnalyticsEventPayload = Readonly<z.infer<typeof analyticsEventSchema>>;
