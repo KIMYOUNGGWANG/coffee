@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page, Route } from "@playwright/test";
-import { analyticsEventNames } from "../lib/analytics-events";
+import { analyticsEventNames, analyticsEventSchema } from "../lib/analytics-events";
 
 const emptyCardsResponse = { data: [] } as const;
 const profileResponse = {
@@ -10,6 +10,7 @@ const profileResponse = {
     is_premium: false,
     monthly_scan_limit: 5,
     scans_used: 0,
+    personal_taste_line: null,
   },
 } as const;
 const analyticsResponse = {
@@ -78,10 +79,27 @@ const memoryEventNames = [
   "rebuy_purchase_clue_opened",
   "rebuy_shelf_memory_started",
   "next_purchase_memory_opened",
+  "taste_preference_saved",
+  "taste_preference_copied",
 ] as const;
 
 test("pins legacy commerce/share and validated-memory event names", () => {
   expect(analyticsEventNames).toEqual([...legacyEventNames, ...memoryEventNames]);
+});
+
+test("rejects private taste text at the analytics boundary", () => {
+  const result = analyticsEventSchema.safeParse({
+    eventName: "taste_preference_saved",
+    occurredAt: "2026-07-12T00:00:00.000Z",
+    path: "/dashboard",
+    properties: {
+      source: "rebuy_taste_brief",
+      mode: "custom",
+      sentence: "private taste text",
+    },
+  });
+
+  expect(result.success).toBe(false);
 });
 
 async function fulfillJson(route: Route, body: unknown): Promise<void> {

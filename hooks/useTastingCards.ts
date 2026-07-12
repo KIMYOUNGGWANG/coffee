@@ -452,11 +452,12 @@ export function useGenerateAiNote() {
 }
 
 export interface UserProfileData {
-  credits: number;
-  has_pdf_access: boolean;
-  is_premium: boolean;
-  scans_used: number;
-  monthly_scan_limit: number;
+  readonly credits: number;
+  readonly has_pdf_access: boolean;
+  readonly is_premium: boolean;
+  readonly scans_used: number;
+  readonly monthly_scan_limit: number;
+  readonly personal_taste_line: string | null;
 }
 
 export function useUserProfile() {
@@ -466,7 +467,7 @@ export function useUserProfile() {
       const response = await fetch("/api/v1/profile");
       const json = await readJsonResponse(response);
       if (!response.ok) {
-        if (response.status === 401) return { credits: 10, has_pdf_access: true, is_premium: true, scans_used: 0, monthly_scan_limit: 100 }; // TEMPORARY MOCK
+        if (response.status === 401) return { credits: 10, has_pdf_access: true, is_premium: true, scans_used: 0, monthly_scan_limit: 100, personal_taste_line: null }; // TEMPORARY MOCK
         throw new Error(getResponseErrorMessage(json, "프로필 데이터를 가져오는 데 실패했습니다."));
       }
       const data = getResponseData<UserProfileData>(json);
@@ -474,6 +475,32 @@ export function useUserProfile() {
         throw new Error("프로필 응답이 비어 있습니다.");
       }
       return data;
+    },
+  });
+}
+
+export function useUpdatePersonalTasteLine() {
+  const queryClient = useQueryClient();
+
+  return useMutation<UserProfileData, Error, string | null>({
+    mutationFn: async (personalTasteLine) => {
+      const response = await fetch("/api/v1/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ personalTasteLine }),
+      });
+      const json = await readJsonResponse(response);
+      if (!response.ok) {
+        throw new Error(getResponseErrorMessage(json, "취향 문장을 저장하지 못했습니다."));
+      }
+      const data = getResponseData<UserProfileData>(json);
+      if (!data) {
+        throw new Error("프로필 응답이 비어 있습니다.");
+      }
+      return data;
+    },
+    onSuccess: (profile) => {
+      queryClient.setQueryData(["user-profile"], profile);
     },
   });
 }

@@ -73,7 +73,9 @@ async function json(route: Route, body: unknown): Promise<void> {
   await route.fulfill({ contentType: "application/json", body: JSON.stringify(body) });
 }
 
-async function mockRoutes(page: Page, events: EventPayload[]): Promise<void> {
+async function mockRoutes(page: Page, events: EventPayload[], profileUpdates: unknown[] = []): Promise<void> {
+  let personalTasteLine: string | null = null;
+
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
     const pathname = new URL(request.url()).pathname;
@@ -83,9 +85,27 @@ async function mockRoutes(page: Page, events: EventPayload[]): Promise<void> {
       return;
     }
 
+    if (pathname === "/api/v1/profile") {
+      if (request.method() === "PATCH") {
+        const update = request.postDataJSON();
+        profileUpdates.push(update);
+        personalTasteLine = typeof update.personalTasteLine === "string" ? update.personalTasteLine : null;
+      }
+      await json(route, {
+        data: {
+          credits: 1,
+          has_pdf_access: false,
+          is_premium: false,
+          monthly_scan_limit: 5,
+          scans_used: 0,
+          personal_taste_line: personalTasteLine,
+        },
+      });
+      return;
+    }
+
     const responses: Readonly<Record<string, unknown>> = {
       "/api/v1/cards": { data: cards },
-      "/api/v1/profile": { data: { credits: 1, has_pdf_access: false, is_premium: false, monthly_scan_limit: 5, scans_used: 0 } },
       "/api/v1/profile/analytics": { data: { aiAnalysis: "", averageAcidity: 4, averageBody: 2.5, averageSweetness: 4.5, topTags: ["꽃향"], totalCards: 2 } },
       "/api/v1/subscription": { data: { cancelAtPeriodEnd: false, currentPeriodEnd: null, isPremium: false, lastInvoiceStatus: null, plan: "free", status: "inactive", stripeSubscriptionId: null, updatedAt: null } },
       "/api/v1/rebuy-intelligence": { data: null },
@@ -101,6 +121,56 @@ async function mockRoutes(page: Page, events: EventPayload[]): Promise<void> {
     await route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: { message: pathname } }) });
   });
 }
+
+test("Given an automatic taste brief, When the user rewrites it in their own words, Then the private line is saved and copied without its text entering analytics", async ({ page }, testInfo: TestInfo) => {
+  const events: EventPayload[] = [];
+  const profileUpdates: unknown[] = [];
+  await page.setViewportSize({ width: 360, height: 800 });
+  await mockRoutes(page, events, profileUpdates);
+  await page.addInitScript(() => {
+    window.localStorage.setItem("coffeedex_analytics_test", "true");
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async (value: string) => window.localStorage.setItem("coffeedex_test_clipboard", value) },
+    });
+  });
+
+  await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+  const panel = page.getByRole("region", { name: "재구매 취향 문장" });
+  await expect(panel).toBeVisible();
+  const automaticLine = await panel.getByText("기록에서 만든 초안").locator("xpath=following-sibling::p").textContent();
+  expect(automaticLine).toBeTruthy();
+  await panel.getByRole("button", { name: "내 말로 고치기" }).click();
+  await panel.getByRole("textbox", { name: "내 취향 문장" }).fill("밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.");
+  await panel.getByRole("button", { name: "내 취향으로 저장" }).click();
+
+  await expect.poll(() => profileUpdates.at(-1)).toEqual({
+    personalTasteLine: "밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.",
+  });
+  await expect(panel.getByText("밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.", { exact: true })).toBeVisible();
+  await panel.screenshot({ path: testInfo.outputPath("personal-taste-line-panel-360.png") });
+  await panel.getByRole("button", { name: "내 취향 문장 복사" }).click();
+  await expect(panel.getByRole("button", { name: "내 취향 문장 복사" })).toContainText("복사됨");
+  expect(await page.evaluate(() => window.localStorage.getItem("coffeedex_test_clipboard"))).toBe("밝은 산미는 좋지만 발효향은 적고, 식었을 때 단맛이 남는 원두를 좋아해요.");
+
+  await panel.getByRole("button", { name: "내 말로 고치기" }).click();
+  await panel.getByRole("button", { name: "자동 문장 사용" }).click();
+  await expect.poll(() => profileUpdates.at(-1)).toEqual({ personalTasteLine: null });
+  await expect(panel.getByText("기록에서 만든 초안").locator("xpath=following-sibling::p")).toHaveText(automaticLine ?? "");
+  await panel.getByRole("button", { name: "내 취향 문장 복사" }).click();
+  expect(await page.evaluate(() => window.localStorage.getItem("coffeedex_test_clipboard"))).toBe(automaticLine);
+
+  await expect.poll(() => events.find((event) => event.eventName === "taste_preference_saved")).toMatchObject({
+    properties: { mode: "custom", source: "rebuy_taste_brief" },
+  });
+  const serializedEvents = JSON.stringify(events);
+  expect(serializedEvents).not.toContain("밝은 산미는 좋지만");
+  expect(serializedEvents).not.toContain("발효향");
+  expect(events).toContainEqual(expect.objectContaining({
+    eventName: "taste_preference_saved",
+    properties: { mode: "auto", source: "rebuy_taste_brief" },
+  }));
+});
 
 test("Given liked photo memories, When the dashboard opens a purchase clue, Then it shows personal conditions and tracks no coffee identity", async ({ page }, testInfo: TestInfo) => {
   const events: EventPayload[] = [];
