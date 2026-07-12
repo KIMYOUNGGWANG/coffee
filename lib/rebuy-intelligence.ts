@@ -1,4 +1,5 @@
 import { evaluateFreshPeakWindow, evaluateFreshShelfStatus } from "@/lib/fresh-shelf";
+import type { RebuyShelfReplenishSource } from "@/lib/rebuy-shelf-transfer";
 
 export type RebuyIntelligenceCard = {
   readonly id: string;
@@ -29,6 +30,7 @@ export type RebuyIntelligenceShelfItem = {
   readonly origin: string | null;
   readonly roast_date: string | null;
   readonly opened_date: string | null;
+  readonly total_weight: number;
   readonly fill_level: number;
   readonly is_finished: boolean;
   readonly tasting_card_id: string | null;
@@ -121,6 +123,7 @@ export type RebuyIntelligenceResponse = {
     readonly purchaseMemory: PurchaseMemoryInsight;
     readonly brewFailureMemory: BrewFailureInsight;
     readonly nextCupPlan: NextCupInsight;
+    readonly rebuyContinuation: RebuyShelfReplenishSource | null;
   };
 };
 
@@ -286,6 +289,26 @@ function buildRebuyReminder(
     priority: "medium",
     cardId: cardCandidate.id,
     shelfItemId: null,
+  };
+}
+
+function buildRebuyContinuation(
+  shelfItems: readonly RebuyIntelligenceShelfItem[],
+  shelfItemId: string | null,
+): RebuyShelfReplenishSource | null {
+  if (!shelfItemId) return null;
+  const shelfItem = shelfItems.find((item) => item.id === shelfItemId);
+  if (!shelfItem) return null;
+
+  return {
+    id: shelfItem.id,
+    roasterName: shelfItem.roaster_name,
+    beanName: shelfItem.bean_name,
+    origin: shelfItem.origin,
+    totalWeight: shelfItem.total_weight,
+    tastingCardId: shelfItem.tasting_card_id,
+    purchaseUrl: shelfItem.purchase_url,
+    purchaseNote: shelfItem.purchase_note,
   };
 }
 
@@ -582,6 +605,8 @@ export function buildRebuyIntelligence(input: BuildRebuyIntelligenceInput): Rebu
   const tasteMatch = buildTasteMatch(input.cards);
   const purchaseMemory = buildPurchaseMemory(input.cards, input.shelfItems);
   const brewFailureMemory = buildBrewFailureMemory(input.brewingLogs);
+  const rebuyActionShelfItemId = rebuyReminder.shelfItemId ?? purchaseMemory.shelfItemId ?? nextCupPlan.shelfItemId;
+  const rebuyContinuation = buildRebuyContinuation(input.shelfItems, rebuyActionShelfItemId);
 
   return {
     generatedAt: now.toISOString(),
@@ -638,5 +663,6 @@ export function buildRebuyIntelligence(input: BuildRebuyIntelligenceInput): Rebu
     purchaseMemory,
     brewFailureMemory,
     nextCupPlan,
+    rebuyContinuation,
   };
 }

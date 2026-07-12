@@ -101,6 +101,7 @@ test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is buil
           origin: "Ethiopia Sidama Washed",
           roast_date: "2026-06-01",
           opened_date: "2026-06-10",
+          total_weight: 200,
           fill_level: 8,
           is_finished: false,
           tasting_card_id: "card-sidama",
@@ -146,6 +147,16 @@ test("Given shelf, card, and failed brew memory, When Rebuy Intelligence is buil
 
     assert.equal(result.rebuyReminder.priority, "high");
     assert.equal(result.rebuyReminder.cardId, "card-sidama");
+    assert.deepEqual(result.rebuyContinuation, {
+      id: "shelf-sidama",
+      roasterName: "Fritz",
+      beanName: "Ethiopia Sidama",
+      origin: "Ethiopia Sidama Washed",
+      totalWeight: 200,
+      tastingCardId: "card-sidama",
+      purchaseUrl: "https://fritz.example/sidama",
+      purchaseNote: "Fritz 공식몰 200g 옵션",
+    });
     assert.equal(result.tasteMatch.matchCardId, "card-kenya");
     assert.deepEqual(result.tasteMatch.sharedTags, ["citrus"]);
     assert.equal(result.purchaseMemory.source, "shelf");
@@ -221,6 +232,52 @@ test("Given a pinned or due shelf reminder, When Rebuy Intelligence is built, Th
     assert.equal(result.rebuyReminder.priority, "high");
     assert.equal(result.rebuyReminder.actionLabel, "다시 찾기");
     assert.match(result.rebuyReminder.reason, /재구매 예정일|다시 살/);
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("Given a card reminder and shelf purchase memory, When Rebuy Intelligence is built, Then continuation follows the selected shelf action", async () => {
+  const loaded = await loadRebuyIntelligenceModule();
+  try {
+    const { buildRebuyIntelligence } = loaded.module;
+    const result = buildRebuyIntelligence({
+      now: new Date("2026-06-29T12:00:00.000Z"),
+      cards: [card()],
+      shelfItems: [{
+        id: "shelf-current",
+        roaster_name: "Momos",
+        bean_name: "Colombia El Diviso",
+        origin: "Colombia Huila",
+        roast_date: "2026-06-28",
+        opened_date: null,
+        total_weight: 250,
+        fill_level: 100,
+        is_finished: false,
+        tasting_card_id: null,
+        purchase_url: "https://momos.example/el-diviso",
+        purchase_note: "모모스 공식몰 250g",
+        rebuy_priority: "normal",
+        rebuy_reminder_date: null,
+        rebuy_action: "none",
+        rebuy_action_at: null,
+        created_at: "2026-06-28T00:00:00.000Z",
+      }],
+      brewingLogs: [],
+    });
+
+    assert.equal(result.rebuyReminder.shelfItemId, null);
+    assert.equal(result.purchaseMemory.shelfItemId, "shelf-current");
+    assert.deepEqual(result.rebuyContinuation, {
+      id: "shelf-current",
+      roasterName: "Momos",
+      beanName: "Colombia El Diviso",
+      origin: "Colombia Huila",
+      totalWeight: 250,
+      tastingCardId: null,
+      purchaseUrl: "https://momos.example/el-diviso",
+      purchaseNote: "모모스 공식몰 250g",
+    });
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }

@@ -619,4 +619,33 @@ test.describe("CoffeeDex Fresh Shelf dashboard surface", () => {
     await expect(page.getByText("오늘의 시작 레시피와 선반 잔량을 함께 저장했어요.")).toBeVisible();
     expect(savedCoachSource).toBe("dial_in_coach");
   });
+
+  test("refreshes rebuy and brew advice after a shelf rebuy decision", async ({ page }) => {
+    const shelfPatchBodies: unknown[] = [];
+    let rebuyIntelligenceRequests = 0;
+    let dialInCoachRequests = 0;
+
+    page.on("request", (request) => {
+      const pathname = new URL(request.url()).pathname;
+      if (pathname === "/api/v1/rebuy-intelligence") rebuyIntelligenceRequests += 1;
+      if (pathname === "/api/v1/dial-in-coach") dialInCoachRequests += 1;
+    });
+    await mockDashboardRoutes(page, shelfPatchBodies);
+    await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
+    await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+    await expect.poll(() => rebuyIntelligenceRequests).toBeGreaterThan(0);
+    await expect.poll(() => dialInCoachRequests).toBeGreaterThan(0);
+
+    const rebuyRequestCountBeforeDecision = rebuyIntelligenceRequests;
+    const dialInCoachRequestCountBeforeDecision = dialInCoachRequests;
+    await page.getByRole("heading", { name: "에티오피아 시다마" }).click();
+    await page.getByTestId("shelf-rebuy-reminder-controls").getByRole("button", { name: "다시 살래요" }).click();
+
+    await expect.poll(() => shelfPatchBodies).toContainEqual({
+      rebuyAction: "will_rebuy",
+      rebuyPriority: "pinned",
+    });
+    await expect.poll(() => rebuyIntelligenceRequests).toBeGreaterThan(rebuyRequestCountBeforeDecision);
+    await expect.poll(() => dialInCoachRequests).toBeGreaterThan(dialInCoachRequestCountBeforeDecision);
+  });
 });

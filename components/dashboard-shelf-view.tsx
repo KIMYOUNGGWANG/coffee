@@ -54,8 +54,10 @@ type DashboardShelfViewProps = {
   readonly onOpenPassport: () => void;
   readonly dnaData: CoffeeDNAData | null;
   readonly isDnaLoading: boolean;
+  readonly shelfRefreshTrigger: number;
   readonly onShareDNA: () => void;
   readonly onShelfDataChange: () => void;
+  readonly onShelfMemoryStarted: () => void;
 };
 
 function buildCoffeeSearchUrl(card: TastingCardData): string {
@@ -182,8 +184,10 @@ export function DashboardShelfView({
   onOpenPassport,
   dnaData,
   isDnaLoading,
+  shelfRefreshTrigger,
   onShareDNA,
   onShelfDataChange,
+  onShelfMemoryStarted,
 }: DashboardShelfViewProps) {
   return (
     <>
@@ -199,6 +203,7 @@ export function DashboardShelfView({
           error={rebuyIntelligenceError}
           onQuickAdd={onQuickAdd}
           onOpenLog={onOpenLog}
+          onShelfMemoryStarted={onShelfMemoryStarted}
           onSelectCard={onSelectCard}
         />
       )}
@@ -224,7 +229,7 @@ export function DashboardShelfView({
           onReset={onResetFilters}
         />
       )}
-      <CoffeeShelfGrid onDataChange={onShelfDataChange} />
+      <CoffeeShelfGrid refreshTrigger={shelfRefreshTrigger} onDataChange={onShelfDataChange} />
       {cards.length > 0 && (
         <>
           <DashboardRetentionLoop cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />
