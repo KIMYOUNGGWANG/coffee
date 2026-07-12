@@ -181,7 +181,9 @@ export function DashboardRebuyTasteBriefPanel({
               <p className="text-[10px] font-black uppercase tracking-[0.14em] text-primary-amber">
                 {savedLine ? "내가 저장한 표현" : "기록에서 만든 초안"}
               </p>
-              <p className="mt-1 text-pretty break-keep text-sm font-bold leading-6 text-background-dark">{visibleLine}</p>
+              <p className="mt-1 text-pretty break-keep text-sm font-bold leading-6 text-background-dark">
+                {visibleLine.replace(/\s+때(?=[\s,.!?]|$)/g, "\u00a0때")}
+              </p>
             </div>
           )}
 
