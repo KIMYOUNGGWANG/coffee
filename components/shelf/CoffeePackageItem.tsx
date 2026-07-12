@@ -27,6 +27,8 @@ export interface ShelfItem {
   rebuy_reminder_date: string | null;
   rebuy_action: "none" | "drank" | "will_rebuy" | "rebought";
   rebuy_action_at: string | null;
+  purchase_date?: string | null;
+  rebuy_sequence?: number;
 }
 
 interface CoffeePackageItemProps {
@@ -115,6 +117,11 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
           </div>
           
           <div className="z-10 w-full mb-3">
+            {(item.rebuy_sequence ?? 1) > 1 && (
+              <span className="mb-3 inline-flex min-h-7 items-center rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-2.5 text-[10px] font-bold text-[#F2D16B]">
+                {item.rebuy_sequence}번째 구매
+              </span>
+            )}
             <p className="text-[10px] uppercase tracking-[0.2em] text-[#D4AF37] font-light mb-3 line-clamp-1">{item.roaster_name}</p>
             <h3 className="font-serif font-light text-2xl text-white leading-tight mb-1.5 break-keep">{item.bean_name}</h3>
             {item.origin && (
@@ -153,6 +160,12 @@ export function CoffeePackageItem({ item, onUpdateFillLevel, onToggleFinished, o
                   <span className="text-white/50">개봉 일자</span>
                   <span>{item.opened_date || "미기재"}</span>
                 </div>
+                {(item.rebuy_sequence ?? 1) > 1 && (
+                  <div className="flex justify-between items-center min-h-[24px]">
+                    <span className="text-white/50">재구매 기억</span>
+                    <span>{item.rebuy_sequence}번째 · {item.purchase_date ?? "날짜 미기재"}</span>
+                  </div>
+                )}
              </div>
 
              <div className="text-[10px] bg-white/[0.03] rounded-md p-3 border border-white/5">
