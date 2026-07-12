@@ -3,6 +3,11 @@ drop policy if exists "Users can update their own profile" on public.profiles;
 alter table public.profiles
   drop constraint if exists profiles_personal_taste_line_length_check;
 
+update public.profiles
+set personal_taste_line = null
+where personal_taste_line is not null
+  and btrim(personal_taste_line) = '';
+
 alter table public.profiles
   add constraint profiles_personal_taste_line_length_check
   check (personal_taste_line is null or char_length(btrim(personal_taste_line)) between 1 and 160);

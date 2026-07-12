@@ -83,7 +83,7 @@ export function DashboardRebuyTasteBriefPanel({
             취향 주문 문장
           </span>
           <h2 className="mt-3 break-keep font-serif text-2xl font-black leading-tight text-background-dark">
-            다음 원두를 고를 내 취향 한 문장
+            다음 원두를 고를 내 취향 한{"\u00a0"}문장
           </h2>
           <p className="mt-2 break-keep text-sm font-bold leading-6 text-muted-foreground">
             많이 모으는 보상이 아니라, 내가 다시 찾는 향과 질감이 선명해지는 보상입니다.
