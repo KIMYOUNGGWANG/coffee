@@ -180,6 +180,16 @@ export type RebuyIntelligenceData = {
     readonly cardId: string | null;
     readonly shelfItemId: string | null;
   };
+  readonly rebuyContinuation: {
+    readonly id: string;
+    readonly roasterName: string | null;
+    readonly beanName: string | null;
+    readonly origin: string | null;
+    readonly totalWeight: number | null;
+    readonly tastingCardId: string | null;
+    readonly purchaseUrl: string | null;
+    readonly purchaseNote: string | null;
+  } | null;
   readonly brewFailureMemory: {
     readonly title: string;
     readonly subtitle: string;
