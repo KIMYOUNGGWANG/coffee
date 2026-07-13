@@ -292,7 +292,7 @@ test("Given an invisible-only purchase clue, When a card is patched, Then valida
 
   // When
   const response = await item.PATCH(
-    jsonRequest("PATCH", { purchaseNote: "\u200B", repurchaseReasons: ["\u2060"], confirmed: true }),
+    jsonRequest("PATCH", { purchaseNote: "\u034F", repurchaseReasons: ["\u00AD"], confirmed: true }),
     { params: Promise.resolve({ id: "card-1" }) },
   );
 

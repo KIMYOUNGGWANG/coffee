@@ -227,7 +227,7 @@ test("Given a rebuy card with a missing clue, When its rescue form contains no n
   await expect(sidamaCard.getByText("빠진 단서를 하나 이상 채운 뒤 저장하세요.")).toBeVisible();
   expect(cardUpdates).toEqual([]);
 
-  await sidamaCard.getByLabel("다시 살 이유").fill("\u200B");
+  await sidamaCard.getByLabel("다시 살 이유").fill("\u034F");
   await expect(saveButton).toBeDisabled();
   expect(cardUpdates).toEqual([]);
 

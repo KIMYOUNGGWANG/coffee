@@ -170,8 +170,8 @@ test("Given invisible-only rescue values, When progress is checked, Then no clue
     const { buildRebuyClueRescuePatch, hasRebuyClueRescueProgress } = loaded.module;
     const sourceCard = card({ repurchase_reasons: [] });
     const form = {
-      purchaseNote: "\u200B",
-      purchaseUrl: "\u2060",
+      purchaseNote: "\u034F",
+      purchaseUrl: "\u00AD",
       rebuyReason: "\u200B\u2060",
     };
 
