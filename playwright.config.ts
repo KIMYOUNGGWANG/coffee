@@ -2,7 +2,6 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./test",
-  testMatch: ["**/*.test.ts", "**/*.spec.ts"],
   testIgnore: "**/mobile-note-detail.test.ts",
   workers: 1,
   timeout: 60000,
