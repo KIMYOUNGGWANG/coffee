@@ -107,7 +107,7 @@ test.describe("PaymentDialog checkout honesty", () => {
     });
 
     await page.goto("/settings");
-    await page.getByRole("link", { name: "추가 기능 및 결제 보기" }).click();
+    await page.getByRole("button", { name: "추가 기능 보기", exact: true }).click();
 
     const dialog = page.getByRole("dialog", { name: "추가 기능 및 결제" });
     await expect(dialog.getByRole("heading", { name: "CoffeeDex Premium 구독 (월간)" })).toBeVisible();
@@ -288,7 +288,7 @@ test.describe("PaymentDialog checkout honesty", () => {
     });
 
     await page.goto("/settings");
-    await page.getByRole("link", { name: "추가 기능 및 결제 보기" }).click();
+    await page.getByRole("button", { name: "추가 기능 보기", exact: true }).click();
 
     const dialog = page.getByRole("dialog", { name: "추가 기능 및 결제" });
     await expect(dialog).toBeVisible();
