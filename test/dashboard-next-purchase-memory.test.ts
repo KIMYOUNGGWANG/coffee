@@ -201,6 +201,46 @@ test("Given liked photo memories, When the dashboard opens a purchase clue, Then
   });
 });
 
+test("Given a rebuy card with a missing clue, When its rescue form contains no new clue, Then saving stays blocked until the missing clue is filled", async ({ page }) => {
+  const events: EventPayload[] = [];
+  const cardUpdates: unknown[] = [];
+  await mockRoutes(page, events);
+  await page.route("**/api/v1/cards/card-sidama", async (route) => {
+    const request = route.request();
+    cardUpdates.push(request.postDataJSON());
+    await json(route, {
+      data: {
+        ...cards[1],
+        purchase_url: "https://shop.example/sidama",
+      },
+    });
+  });
+
+  await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+  const panel = page.getByRole("region", { name: "재구매 단서 보강" });
+  const sidamaCard = panel.locator("article").filter({ hasText: "에티오피아 시다마" });
+  await expect(sidamaCard).toBeVisible();
+
+  await sidamaCard.getByRole("button", { name: "여기서 보강" }).click();
+  const saveButton = sidamaCard.getByRole("button", { name: "단서 저장" });
+  await expect(saveButton).toBeDisabled();
+  await expect(sidamaCard.getByText("빠진 단서를 하나 이상 채운 뒤 저장하세요.")).toBeVisible();
+  expect(cardUpdates).toEqual([]);
+
+  await sidamaCard.getByLabel("구매 링크").fill("https://shop.example/sidama");
+  await expect(saveButton).toBeEnabled();
+  await saveButton.click();
+  await expect.poll(() => cardUpdates).toEqual([
+    {
+      confirmed: true,
+      purchaseNote: null,
+      purchaseUrl: "https://shop.example/sidama",
+      repurchaseReasons: ["꽃향이 오래 남았어요"],
+    },
+  ]);
+  await expect(sidamaCard.getByRole("button", { name: "보강 저장됨" })).toBeVisible();
+});
+
 for (const viewport of [
   { label: "mobile", width: 375, height: 812 },
   { label: "tablet", width: 768, height: 1024 },

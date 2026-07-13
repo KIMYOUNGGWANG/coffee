@@ -185,3 +185,18 @@ export function buildRebuyClueRescuePatch(
     repurchaseReasons,
   };
 }
+
+export function hasRebuyClueRescueProgress(
+  card: RebuyClueRescueCard,
+  form: RebuyClueRescueForm,
+): boolean {
+  const patch = buildRebuyClueRescuePatch(card, form);
+  const updatedCard: RebuyClueRescueCard = {
+    ...card,
+    purchase_note: patch.purchaseNote,
+    purchase_url: patch.purchaseUrl,
+    repurchase_reasons: patch.repurchaseReasons,
+  };
+
+  return readMissingClues(updatedCard).length < readMissingClues(card).length;
+}
