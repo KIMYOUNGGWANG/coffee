@@ -12,7 +12,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "CI=1 npm run web -- --port 8081",
+    command: "CI=1 npm run web -- --port 8081 --clear",
     cwd: "../mobile",
     port: 8081,
     reuseExistingServer: false,
