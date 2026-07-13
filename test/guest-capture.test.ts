@@ -111,7 +111,7 @@ test.describe("CoffeeDex guest capture", () => {
     await expect(page.getByLabel("원두 이름")).toHaveValue("");
     await expect(page.getByLabel("로스터리")).toHaveValue("");
     await expect(page.getByLabel("한 줄 메모")).toBeVisible();
-    await expect(page.getByText("사진 원본은 저장하지 않아요. 저장할 때만 로그인하고, 비공개 기록으로 저장돼요.")).toBeVisible();
+    await expect(page.getByText("사진 원본은 저장하지 않아요. 저장할 때만 로그인하고, 내 Rebuy List를 위한 비공개 기록으로 저장돼요.")).toBeVisible();
     await expect(page.getByText(/Ethiopia|Guji|Fritz|Sidama/)).toHaveCount(0);
     expect(scanRequests).toBe(0);
   });
