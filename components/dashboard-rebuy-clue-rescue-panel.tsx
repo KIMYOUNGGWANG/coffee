@@ -6,6 +6,7 @@ import { useUpdateTastingCard, type TastingCardData } from "@/hooks/useTastingCa
 import {
   buildRebuyClueRescue,
   buildRebuyClueRescuePatch,
+  hasRebuyClueRescueProgress,
   type RebuyClueRescueCandidate,
   type RebuyClueRescueForm,
 } from "@/lib/rebuy-clue-rescue";
@@ -67,6 +68,11 @@ export function DashboardRebuyClueRescuePanel({
 
   async function saveClues(card: TastingCardData) {
     setErrorMessage(null);
+    if (!hasRebuyClueRescueProgress(card, form)) {
+      setErrorMessage("빠진 단서를 하나 이상 채운 뒤 저장하세요.");
+      return;
+    }
+
     try {
       await updateCardMutation.mutateAsync({
         id: card.id,
@@ -111,6 +117,8 @@ export function DashboardRebuyClueRescuePanel({
             const isEditing = editingCardId === candidate.cardId;
             const isSaving = updateCardMutation.isPending && updateCardMutation.variables?.id === candidate.cardId;
             const isSaved = savedCardId === candidate.cardId;
+            const canSaveClues = card ? hasRebuyClueRescueProgress(card, form) : false;
+            const saveHelpId = `rescue-save-help-${candidate.cardId}`;
             return (
               <article
                 key={candidate.cardId}
@@ -197,6 +205,11 @@ export function DashboardRebuyClueRescuePanel({
                         className="min-h-10 rounded-xl border border-background-dark/10 bg-white px-3 text-sm font-bold text-background-dark outline-none focus:border-primary-amber focus:ring-2 focus:ring-primary-amber/20"
                       />
                     </div>
+                    {!canSaveClues && (
+                      <p id={saveHelpId} className="text-[11px] font-bold leading-5 text-muted-foreground" aria-live="polite">
+                        빠진 단서를 하나 이상 채운 뒤 저장하세요.
+                      </p>
+                    )}
                     {errorMessage && (
                       <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] font-bold leading-5 text-red-700">
                         {errorMessage}
@@ -216,7 +229,8 @@ export function DashboardRebuyClueRescuePanel({
                       </button>
                       <button
                         type="submit"
-                        disabled={isSaving}
+                        disabled={isSaving || !canSaveClues}
+                        aria-describedby={!canSaveClues ? saveHelpId : undefined}
                         className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-background-dark px-3 text-xs font-black text-[#fff8ec] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
                       >
                         {isSaving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
