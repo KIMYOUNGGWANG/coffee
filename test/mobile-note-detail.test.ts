@@ -1,8 +1,5 @@
-import { mkdir } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
-import type { Page } from "@playwright/test";
-
-const evidenceDirectory = "artifacts/mobile-note-detail";
+import type { Page, TestInfo } from "@playwright/test";
 
 async function createNote(page: Page, values: {
   readonly coffeeName: string;
@@ -22,17 +19,13 @@ async function createNote(page: Page, values: {
   await expect(page).toHaveURL(/\/note\/[^/]+$/);
 }
 
-test.beforeAll(async () => {
-  await mkdir(evidenceDirectory, { recursive: true });
-});
-
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await page.evaluate(() => window.localStorage.clear());
 });
 
-test("shows a focused Coffee Note detail for a complete memory", async ({ page }) => {
+test("shows a focused Coffee Note detail for a complete memory", async ({ page }, testInfo: TestInfo) => {
   await createNote(page, {
     coffeeName: "에티오피아 구지",
     roaster: "커피 리브레",
@@ -45,7 +38,7 @@ test("shows a focused Coffee Note detail for a complete memory", async ({ page }
   await expect(page.getByTestId("note-detail-memory")).toContainText("식으니까 복숭아 향이 더 편했다.");
   await expect(page.getByTestId("note-detail-facts")).toContainText("커피 리브레");
   await expect(page.getByText("다시 살래요", { exact: true })).toBeVisible();
-  await page.screenshot({ path: `${evidenceDirectory}/happy-mobile.png`, fullPage: true });
+  await page.screenshot({ path: testInfo.outputPath("happy-mobile.png"), fullPage: true });
 
   for (const viewport of [
     { width: 375, height: 812, name: "375" },
@@ -55,7 +48,7 @@ test("shows a focused Coffee Note detail for a complete memory", async ({ page }
   ] as const) {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    await page.screenshot({ path: `${evidenceDirectory}/happy-${viewport.name}.png`, fullPage: true });
+    await page.screenshot({ path: testInfo.outputPath(`happy-${viewport.name}.png`), fullPage: true });
   }
 
   for (const control of [page.getByLabel("뒤로가기"), ...await page.getByLabel("노트 수정").all(), page.getByLabel("노트 삭제")]) {
@@ -65,12 +58,12 @@ test("shows a focused Coffee Note detail for a complete memory", async ({ page }
   }
 });
 
-test("keeps sparse and missing notes recoverable", async ({ page }) => {
+test("keeps sparse and missing notes recoverable", async ({ page }, testInfo: TestInfo) => {
   await createNote(page, { coffeeName: "이름만 남긴 컵" });
 
   await expect(page.getByText("로스터리 미정", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("메모 없이 저장한 컵입니다.", { exact: true })).toBeVisible();
-  await page.screenshot({ path: `${evidenceDirectory}/sparse-mobile.png`, fullPage: true });
+  await page.screenshot({ path: testInfo.outputPath("sparse-mobile.png"), fullPage: true });
 
   await page.goto("/note/not-found");
   await expect(page.getByText("노트를 찾지 못했습니다.", { exact: true })).toBeVisible();
@@ -79,7 +72,7 @@ test("keeps sparse and missing notes recoverable", async ({ page }) => {
   const missingBackBox = await missingBackButton.boundingBox();
   expect(missingBackBox?.width ?? 0).toBeGreaterThanOrEqual(44);
   expect(missingBackBox?.height ?? 0).toBeGreaterThanOrEqual(44);
-  await page.screenshot({ path: `${evidenceDirectory}/missing-mobile.png`, fullPage: true });
+  await page.screenshot({ path: testInfo.outputPath("missing-mobile.png"), fullPage: true });
 });
 
 test("preserves edit and two-step delete navigation", async ({ page }) => {
