@@ -4,15 +4,15 @@ import { getErrorMessage } from "@/lib/api-errors";
 import {
   coffeeMemorySchema,
   correctableCoffeeFieldSchema,
+  purchaseNoteInputSchema,
   repurchaseIntentSchema,
-  repurchaseReasonSchema,
+  repurchaseReasonInputSchema,
   scanSourceSchema,
 } from "@/lib/coffee-memory";
 import { z } from "zod";
 
 const packageClaimSchema = z.string().trim().min(1).max(160).nullable();
 const purchaseUrlSchema = z.string().trim().url().max(500).nullable();
-const purchaseNoteSchema = z.string().trim().min(1).max(160).nullable();
 const cardRowSchema = z.record(z.unknown());
 
 const updateCardSchema = z.object({
@@ -36,9 +36,9 @@ const updateCardSchema = z.object({
   packageOrigin: packageClaimSchema.optional(),
   packageProcess: packageClaimSchema.optional(),
   purchaseUrl: purchaseUrlSchema.optional(),
-  purchaseNote: purchaseNoteSchema.optional(),
+  purchaseNote: purchaseNoteInputSchema.optional(),
   repurchaseIntent: repurchaseIntentSchema.optional(),
-  repurchaseReasons: z.array(repurchaseReasonSchema).max(8).optional(),
+  repurchaseReasons: z.array(repurchaseReasonInputSchema).max(8).optional(),
   scanSource: scanSourceSchema.nullable().optional(),
   scanConfidence: z.number().min(0).max(1).nullable().optional(),
   correctedFields: z.array(correctableCoffeeFieldSchema).max(5).optional(),
