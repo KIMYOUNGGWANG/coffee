@@ -63,7 +63,7 @@ test("create-card API validates camelCase request fields and maps them to databa
   assert.match(routeSource, /aiDescription:\s*z\.string\(\)\.default\(""\)/);
   assert.match(routeSource, /footerMeta:\s*z\.object\(\{/);
   assert.match(routeSource, /purchaseUrl:\s*purchaseUrlSchema\.optional\(\)/);
-  assert.match(routeSource, /purchaseNote:\s*purchaseNoteSchema\.optional\(\)/);
+  assert.match(routeSource, /purchaseNote:\s*purchaseNoteInputSchema\.optional\(\)/);
   assert.match(routeSource, /image_url:\s*validatedData\.imageUrl\s*\|\|\s*null/);
   assert.match(routeSource, /ai_description:\s*validatedData\.aiDescription/);
   assert.match(routeSource, /footer_meta:\s*validatedData\.footerMeta/);
