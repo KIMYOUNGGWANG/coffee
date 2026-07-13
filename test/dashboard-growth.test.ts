@@ -63,19 +63,6 @@ const subscriptionResponse = {
     updatedAt: null,
   },
 } as const;
-const premiumSubscriptionResponse = {
-  data: {
-    cancelAtPeriodEnd: false,
-    currentPeriodEnd: "2026-07-15",
-    isPremium: true,
-    lastInvoiceStatus: "paid",
-    plan: "premium",
-    status: "active",
-    stripeSubscriptionId: "sub_growth_001",
-    updatedAt: "2026-06-15T00:00:00.000Z",
-  },
-};
-
 async function fulfillJson(route: Route, body: unknown): Promise<void> {
   await route.fulfill({
     contentType: "application/json",
@@ -86,7 +73,6 @@ async function fulfillJson(route: Route, body: unknown): Promise<void> {
 async function mockDashboardApiRoutes(
   page: Page,
   cardsResponse: unknown = emptyCardsResponse,
-  subscriptionSummary: unknown = subscriptionResponse,
 ): Promise<void> {
   await page.route("**/api/v1/**", async (route) => {
     const pathname = new URL(route.request().url()).pathname;
@@ -116,7 +102,7 @@ async function mockDashboardApiRoutes(
         await fulfillJson(route, analyticsResponse);
         return;
       case "/api/v1/subscription":
-        await fulfillJson(route, subscriptionSummary);
+        await fulfillJson(route, subscriptionResponse);
         return;
       case "/api/v1/analytics":
         await fulfillJson(route, { received: true });
@@ -214,7 +200,7 @@ test.describe("CoffeeDex growth dashboard", () => {
     await expect(page.getByRole("dialog").getByText("인스타그램 스토리 공유")).toBeVisible();
   });
 
-  test("shows scan allowance, credits, and roaster memory status", async ({ page }) => {
+  test("keeps coffee memories and data controls free", async ({ page }) => {
     // Given
     await mockDashboardApiRoutes(page);
 
@@ -222,25 +208,22 @@ test.describe("CoffeeDex growth dashboard", () => {
     await page.goto("/settings");
 
     // Then
-    await expect(page.getByRole("heading", { name: "기록과 온보딩 건강도" })).toBeVisible();
-    await expect(page.getByText("게스트 저장 흐름 점검")).toBeVisible();
-    await expect(page.getByText("무료 사진 판독 3 / 5")).toBeVisible();
-    await expect(page.getByText("보유 크레딧 2개")).toBeVisible();
-    await expect(page.getByText("PDF 기록북 미보유")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "기록과 데이터 관리는 무료입니다" })).toBeVisible();
+    await expect(page.getByText("비공개 기록", { exact: true })).toBeVisible();
+    await expect(page.getByText("JSON/CSV 내보내기", { exact: true })).toBeVisible();
+    await expect(page.getByText("계정 삭제", { exact: true })).toBeVisible();
   });
 
-  test("shows compact billing plan and current period metadata", async ({ page }) => {
+  test("keeps paid tools secondary to the private rebuy memory", async ({ page }) => {
     // Given
-    await mockDashboardApiRoutes(page, emptyCardsResponse, premiumSubscriptionResponse);
+    await mockDashboardApiRoutes(page);
 
     // When
     await page.goto("/settings");
 
     // Then
-    await expect(page.getByText("플랜 Premium")).toBeVisible();
-    await expect(page.getByText("현재 기간 종료 2026년 7월 15일")).toBeVisible();
-    await expect(page.getByText("최근 청구서 결제 완료")).toBeVisible();
-    await expect(page.getByText("취소 예약 아니오")).toBeVisible();
-    await expect(page.getByText("마지막 동기화 2026년 6월 15일")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "필요할 때만 추가 기능을 엽니다" })).toBeVisible();
+    await expect(page.getByText("재구매 기억 자체는 결제 없이 유지됩니다.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "추가 기능 보기", exact: true })).toBeVisible();
   });
 });

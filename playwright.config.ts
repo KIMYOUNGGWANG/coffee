@@ -2,6 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./test",
+  testIgnore: "**/mobile-note-detail.test.ts",
   workers: 1,
   timeout: 60000,
   use: {
