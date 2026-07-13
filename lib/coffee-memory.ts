@@ -15,7 +15,7 @@ export const scanSourceSchema = z.enum(scanSources);
 export const correctableCoffeeFieldSchema = z.enum(correctableCoffeeFields);
 
 export function hasMeaningfulCoffeeMemoryText(value: string | null | undefined): value is string {
-  return typeof value === "string" && /[^\s\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]/u.test(value);
+  return typeof value === "string" && /[^\s\p{Default_Ignorable_Code_Point}]/u.test(value);
 }
 
 export function normalizeCoffeeMemoryText(value: string): string {
