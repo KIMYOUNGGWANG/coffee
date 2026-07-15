@@ -272,15 +272,15 @@ export function GuestCaptureClient() {
     <FigmaDashboardShell
       activeHref="/capture"
       actions={<span className="grid size-10 place-items-center rounded-2xl bg-[var(--surface-strong)] text-[var(--accent-foreground)]"><Coffee size={18} aria-hidden="true" /></span>}
-      description="로그인 없이 짧게 기록하고, 내 CoffeeDex에 저장할 때만 계정이 필요합니다. 사진 원본은 저장하지 않아요."
-      eyebrow="Guest-first memory"
+      description="로그인 없이 빠른 비공개 기록을 시작하고, 내 CoffeeDex에 저장할 때만 계정이 필요합니다. 사진 원본은 저장하지 않아요."
+      eyebrow="Quick Private Record"
       title="다시 살 원두를 20초 만에 남겨요"
     >
       <div className="mx-auto w-full max-w-3xl">
         <section className="dashboard-panel mb-5 p-5 sm:p-7">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#C58948]">Guest-first memory</p>
-          <h2 className="mt-3 break-keep text-2xl font-black leading-tight sm:text-3xl">새 노트 시작</h2>
-          <p className="mt-3 text-sm font-semibold leading-6 text-muted-foreground">사진 기록으로 먼저 채우거나, 바로 내 문장으로 입력할 수 있어요.</p>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#C58948]">Quick Private Record</p>
+          <h2 className="mt-3 break-keep text-2xl font-black leading-tight sm:text-3xl">새 Rebuy Memory 시작</h2>
+          <p className="mt-3 text-sm font-semibold leading-6 text-muted-foreground">사진 기록으로 먼저 채우거나, 바로 내 문장으로 입력해 다시 살 단서를 남길 수 있어요.</p>
           {activationCopy(activation) && (
             <p className="mt-4 rounded-2xl border border-[#C58948]/30 bg-[#C58948]/10 px-4 py-3 text-sm font-bold text-foreground">
               {activationCopy(activation)}

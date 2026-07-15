@@ -27,7 +27,7 @@ type DashboardAnalyticsPanelProps = {
 };
 
 const stateLabels: Readonly<Record<PassportState["kind"], string>> = {
-  empty: "패스포트 시작 전",
+  empty: "기록 시작 전",
   collage: "커피 기억 콜라주",
   first_signals: "취향의 첫 신호",
   early_snapshot: "초기 취향 스냅샷",
@@ -42,7 +42,7 @@ const coverageLabels: Readonly<Record<PassportCoverage, string>> = {
 
 function AnalyticsSkeleton() {
   return (
-    <div className="space-y-3 py-3 animate-pulse" aria-label="패스포트 불러오는 중">
+    <div className="space-y-3 py-3 animate-pulse" aria-label="기록 분석 불러오는 중">
       <div className="h-64 rounded-2xl bg-white/10" />
       <div className="grid grid-cols-3 gap-2">
         <div className="h-16 rounded-xl bg-white/10" />
@@ -57,12 +57,12 @@ export default function DashboardAnalyticsPanel({ analytics, isLoading }: Dashbo
   const passport = analytics?.passport;
 
   return (
-    <section className="glass-card space-y-4 rounded-3xl p-5 shadow-sm" aria-labelledby="passport-heading">
+    <section className="glass-card space-y-4 rounded-3xl p-5 shadow-sm" aria-labelledby="rebuy-intelligence-heading">
       <div className="flex items-center gap-2 border-b border-white/10 pb-3">
         <BookOpen aria-hidden="true" size={15} className="text-primary-amber" />
         <div>
-          <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-primary-amber">CoffeeDex Passport</p>
-          <h2 id="passport-heading" className="font-serif text-sm font-bold text-foreground">기록으로 갱신되는 패스포트</h2>
+          <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-primary-amber">Rebuy Intelligence</p>
+          <h2 id="rebuy-intelligence-heading" className="font-serif text-sm font-bold text-foreground">기록으로 갱신되는 구매 단서</h2>
         </div>
       </div>
 
@@ -125,7 +125,7 @@ export default function DashboardAnalyticsPanel({ analytics, isLoading }: Dashbo
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-2" aria-label="패스포트 기록 범위">
+          <div className="grid grid-cols-3 gap-2" aria-label="기록 범위">
             {[
               ["원산지", passport.distinctOriginCount],
               ["가공 방식", passport.distinctProcessCount],
@@ -162,7 +162,7 @@ export default function DashboardAnalyticsPanel({ analytics, isLoading }: Dashbo
         </div>
       ) : (
         <div className="py-7 text-center text-xs leading-5 text-muted-foreground">
-          첫 커피 기억을 확정하면 패스포트가 콜라주부터 시작됩니다.
+          첫 커피 기억을 확정하면 구매 단서가 콜라주부터 시작됩니다.
         </div>
       )}
     </section>

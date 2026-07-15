@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Check, ChevronRight, Circle, Share2, Sparkles } from "lucide-react";
+import { BookOpen, Check, ChevronRight, Circle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { TastingCardData, UserProfileData } from "@/hooks/useTastingCards";
 import {
@@ -15,12 +15,7 @@ type RevenueFunnelPanelProps = {
   readonly profile: UserProfileData | undefined;
   readonly onCreateCard: () => void;
   readonly onOpenPayment: () => void;
-  readonly onShareLatestCard: () => void;
 };
-
-function hasPublishedCard(cards: readonly TastingCardData[] | undefined): boolean {
-  return cards?.some((card) => card.is_public === true || !!card.public_share_token) ?? false;
-}
 
 function stepIcon(step: RevenueFunnelStep) {
   if (step.status === "complete") {
@@ -36,15 +31,12 @@ function actionHandler(
   action: RevenueFunnelAction,
   onCreateCard: () => void,
   onOpenPayment: () => void,
-  onShareLatestCard: () => void,
 ) {
   switch (action) {
     case "create_card":
       return onCreateCard;
     case "open_payment":
       return onOpenPayment;
-    case "share_latest":
-      return onShareLatestCard;
   }
 }
 
@@ -53,14 +45,12 @@ export default function RevenueFunnelPanel({
   profile,
   onCreateCard,
   onOpenPayment,
-  onShareLatestCard,
 }: RevenueFunnelPanelProps) {
   const state = getRevenueFunnelState({
     cardCount: cards?.length ?? 0,
-    hasPublicCard: hasPublishedCard(cards),
     profile,
   });
-  const handlePrimaryAction = actionHandler(state.primaryAction, onCreateCard, onOpenPayment, onShareLatestCard);
+  const handlePrimaryAction = actionHandler(state.primaryAction, onCreateCard, onOpenPayment);
 
   return (
     <section className="surface-panel border border-white/10 rounded-3xl glass-card p-5 shadow-sm space-y-5">
@@ -117,7 +107,7 @@ export default function RevenueFunnelPanel({
             onClick={handlePrimaryAction}
             className="glass-card border border-white/10 hover:glass-card border border-white/10/90 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer"
           >
-            {state.primaryAction === "share_latest" ? <Share2 size={13} /> : <BookOpen size={13} />}
+            <BookOpen size={13} />
             {state.primaryLabel}
             <ChevronRight size={13} />
           </Button>

@@ -38,7 +38,7 @@ async function loadRevenueFunnelModule() {
   }
 }
 
-test("revenue funnel starts free users on the first Taste Card", async () => {
+test("revenue funnel starts free users on the first quick private record", async () => {
   // Given
   const { module, tempDirectory } = await loadRevenueFunnelModule();
 
@@ -46,7 +46,6 @@ test("revenue funnel starts free users on the first Taste Card", async () => {
     // When
     const state = module.getRevenueFunnelState({
       cardCount: 0,
-      hasPublicCard: false,
       profile: {
         credits: 1,
         has_pdf_access: false,
@@ -59,26 +58,34 @@ test("revenue funnel starts free users on the first Taste Card", async () => {
     // Then
     assert.equal(state.stage, "capture");
     assert.equal(state.primaryAction, "create_card");
-    assert.equal(state.primaryLabel, "첫 Taste Card 만들기");
-    assert.equal(state.progressLabel, "0 / 4");
+    assert.equal(state.primaryLabel, "첫 20초 기록 만들기");
+    assert.equal(state.progressLabel, "0 / 3");
+    assert.deepEqual(
+      state.steps.map((step) => [step.id, step.status]),
+      [
+        ["capture", "active"],
+        ["rebuy", "locked"],
+        ["premium", "locked"],
+      ],
+    );
     assert.deepEqual(
       module.revenueOffers.map((offer) => offer.label),
-      ["무료 Taste Card", "CoffeeDex Premium", "테이스팅 10팩", "Taste Passport"],
+      ["무료 20초 기록", "CoffeeDex Premium", "테이스팅 10팩", "Rebuy Memory"],
     );
+    assert.ok(module.revenueOffers.every((offer) => !/Taste Passport/i.test(offer.label)));
   } finally {
     rmSync(tempDirectory, { force: true, recursive: true });
   }
 });
 
-test("revenue funnel moves saved cards toward sharing and paid artifacts", async () => {
+test("revenue funnel advances card owners through paid Rebuy Memory before Premium", async () => {
   // Given
   const { module, tempDirectory } = await loadRevenueFunnelModule();
 
   try {
     // When
-    const shareState = module.getRevenueFunnelState({
+    const rebuyState = module.getRevenueFunnelState({
       cardCount: 2,
-      hasPublicCard: false,
       profile: {
         credits: 0,
         has_pdf_access: false,
@@ -87,12 +94,11 @@ test("revenue funnel moves saved cards toward sharing and paid artifacts", async
         scans_used: 5,
       },
     });
-    const passportState = module.getRevenueFunnelState({
+    const paidRebuyState = module.getRevenueFunnelState({
       cardCount: 2,
-      hasPublicCard: true,
       profile: {
         credits: 0,
-        has_pdf_access: false,
+        has_pdf_access: true,
         is_premium: false,
         monthly_scan_limit: 5,
         scans_used: 5,
@@ -100,11 +106,31 @@ test("revenue funnel moves saved cards toward sharing and paid artifacts", async
     });
 
     // Then
-    assert.equal(shareState.stage, "share");
-    assert.equal(shareState.primaryAction, "share_latest");
-    assert.equal(passportState.stage, "passport");
-    assert.equal(passportState.primaryAction, "open_payment");
-    assert.match(passportState.monetizationHint, /Taste Passport/);
+    assert.equal(rebuyState.stage, "rebuy");
+    assert.equal(rebuyState.primaryAction, "open_payment");
+    assert.match(rebuyState.primaryLabel, /Rebuy Memory|다시 살 기억|재구매 기억/);
+    assert.equal(rebuyState.progressLabel, "1 / 3");
+    assert.deepEqual(
+      rebuyState.steps.map((step) => [step.id, step.status]),
+      [
+        ["capture", "complete"],
+        ["rebuy", "active"],
+        ["premium", "locked"],
+      ],
+    );
+    assert.ok(rebuyState.steps.every((step) => step.id !== "ownership"));
+    assert.equal(paidRebuyState.stage, "premium");
+    assert.equal(paidRebuyState.primaryAction, "open_payment");
+    assert.equal(paidRebuyState.progressLabel, "2 / 3");
+    assert.deepEqual(
+      paidRebuyState.steps.map((step) => [step.id, step.status]),
+      [
+        ["capture", "complete"],
+        ["rebuy", "complete"],
+        ["premium", "active"],
+      ],
+    );
+    assert.ok(paidRebuyState.steps.every((step) => step.id !== "ownership"));
   } finally {
     rmSync(tempDirectory, { force: true, recursive: true });
   }

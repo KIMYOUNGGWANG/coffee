@@ -78,7 +78,7 @@ export async function generateCoffeeDexTastePassportPdf(
   let yOffset = height - 80;
 
   // Header Title
-  page.drawText("CoffeeDex Taste Passport", {
+  page.drawText("CoffeeDex Rebuy Memory Export", {
     x: 60,
     y: yOffset,
     size: 20,

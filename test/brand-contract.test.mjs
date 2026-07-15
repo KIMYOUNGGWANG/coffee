@@ -49,7 +49,7 @@ test("CoffeeDex brand constants expose the recall and repurchase contract when l
     englishTagline: "Remember coffee worth buying again.",
     artifacts: {
       free: "Taste Card",
-      paid: "Taste Passport",
+      paid: "Rebuy Memory",
     },
     analytics: "Taste Snapshot",
     dashboard: "Memory Shelf",
@@ -64,6 +64,7 @@ test("CoffeeDex brand constants expose the recall and repurchase contract when l
     assert.equal("default" in brandModule, false);
     assert.deepEqual(brandModule.coffeeDexBrand, approvedBrand);
     assert.equal(brandModule.hyangmiBrand, brandModule.coffeeDexBrand);
+    assert.notEqual(brandModule.coffeeDexBrand.artifacts.paid, "Taste Passport");
   } finally {
     rmSync(tempDirectory, { force: true, recursive: true });
   }

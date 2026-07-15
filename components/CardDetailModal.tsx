@@ -349,7 +349,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
         <div className="w-full md:w-5/12 bg-black/40 p-6 md:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-white/10 overflow-y-auto relative z-10">
           <div>
             <div className="flex justify-between items-center pb-3 border-b border-primary-amber/20">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold text-primary-amber">CoffeeDex Taste Passport</span>
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-primary-amber">CoffeeDex Rebuy Memory</span>
               <button
                 onClick={onClose}
                 className="md:hidden p-1.5 rounded-full hover:bg-white/10 text-muted-foreground"
@@ -884,7 +884,7 @@ export default function CardDetailModal({ card, isOpen, onClose }: CardDetailMod
 
           {/* Modal footer info */}
           <div className="border-t border-white/10 pt-4 text-center text-[10px] text-muted-foreground/60 mt-4">
-            CoffeeDex Taste Passport | Brewing History
+            CoffeeDex Rebuy Memory | Brewing History
           </div>
         </div>
       </div>

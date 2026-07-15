@@ -12,24 +12,29 @@ const copyrightYear = 2026;
 
 const englishProductOutputs = [
   {
-    tag: "Taste Passport",
-    title: "Private coffee stamps",
-    body: "Save the bean, roaster, origin, process, and cup memory as a personal tasting archive.",
-  },
-  {
-    tag: "Note Draft",
-    title: "Package scan drafts",
-    body: "Turn a bag photo into editable package claims, then confirm what is true before saving.",
+    tag: "Quick Private Record",
+    title: "Private 20-sec record",
+    body: "Capture the bean, roaster, and buy-again cue before the memory fades. Sign-in appears only when you save.",
   },
   {
     tag: "Rebuy Memory",
-    title: "Buy-again cues",
-    body: "Connect why you liked a coffee, what is left on the shelf, and where to find it again.",
+    title: "Memory worth buying again",
+    body: "Keep the reason you loved a coffee, the context of the cup, and the shelf note in one private memory.",
   },
   {
-    tag: "Story Export",
-    title: "Shareable artifacts",
-    body: "Export a saved coffee memory as an optional story card after the private record exists.",
+    tag: "Rebuy List",
+    title: "Buy-again list",
+    body: "Separate coffees you would buy again from maybes, so the next bag starts from a clear shortlist.",
+  },
+  {
+    tag: "Rebuy Intelligence",
+    title: "Buy-again intelligence",
+    body: "Use taste patterns, roaster memory, and shelf timing to understand what is worth searching for next.",
+  },
+  {
+    tag: "Owned Data Export",
+    title: "JSON/CSV ownership export",
+    body: "Your CoffeeDex records can leave as JSON and CSV. Share and PDF outputs stay secondary compatibility layers.",
   },
 ] as const;
 
@@ -145,7 +150,7 @@ export default function EnglishCoffeeDexHomePage() {
               </span>
             </div>
 
-            <div className="relative z-10 grid grid-cols-1 gap-6 pt-8 md:grid-cols-4">
+            <div className="relative z-10 grid grid-cols-1 gap-6 pt-8 md:grid-cols-5">
               {englishProductOutputs.map((item) => (
                 <div key={item.tag} className="flex flex-col space-y-4">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-primary-amber">/ {item.tag}</span>

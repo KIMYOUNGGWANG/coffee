@@ -210,7 +210,7 @@ test("GET /api/v1/pdf returns a downloadable PDF for an entitled user", async ()
     assert.match(response.headers.get("content-type") ?? "", /^application\/pdf/);
     assert.match(
       response.headers.get("content-disposition") ?? "",
-      /^attachment; filename="coffeedex-taste-passport-\d{4}-\d{2}-\d{2}\.pdf"$/,
+      /^attachment; filename="coffeedex-rebuy-memory-export-\d{4}-\d{2}-\d{2}\.pdf"$/,
     );
 
     const bytes = new Uint8Array(await response.arrayBuffer());

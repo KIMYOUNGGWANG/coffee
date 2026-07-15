@@ -18,7 +18,7 @@ const successNoticeContentByItemType = {
   pdf_book: {
     tone: "success",
     title: "PDF 테이스팅북 구매가 완료되었습니다",
-    description: "프로필과 카드 정보를 새로 확인했어요. CoffeeDex Taste Passport 권한 반영을 준비했습니다.",
+    description: "프로필과 카드 정보를 새로 확인했어요. Rebuy Memory PDF 내보내기 권한 반영을 준비했습니다.",
   },
   premium_subscription: {
     tone: "success",

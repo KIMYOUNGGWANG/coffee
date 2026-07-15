@@ -16,7 +16,7 @@ type DashboardHeaderProps = {
   readonly onTabChange: (tab: DashboardTab) => void;
 };
 
-const passportMilestones = [3, 5, 10] as const;
+const memoryMilestones = [3, 5, 10] as const;
 const sortOptions = ["newest", "title_asc", "acidity_desc"] as const;
 
 const tabTitles = {
@@ -39,7 +39,7 @@ export function DashboardHeader({
   onSortChange,
   onTabChange,
 }: DashboardHeaderProps) {
-  const nextMilestone = passportMilestones.find((milestone) => cardCount < milestone) ?? passportMilestones[2];
+  const nextMilestone = memoryMilestones.find((milestone) => cardCount < milestone) ?? memoryMilestones[2];
   const completedCount = Math.min(cardCount, nextMilestone);
   const remainingCount = Math.max(0, nextMilestone - cardCount);
   const progress = (completedCount / nextMilestone) * 100;
@@ -54,7 +54,7 @@ export function DashboardHeader({
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden min-w-44 sm:block" aria-label={`패스포트 다음 단계 ${completedCount}/${nextMilestone}`}>
+          <div className="hidden min-w-44 sm:block" aria-label={`기록 다음 단계 ${completedCount}/${nextMilestone}`}>
             <div className="flex justify-between text-xs font-black text-background-dark">
               <span>{milestoneLabel}</span>
               <span className="text-primary-amber">{completedCount} / {nextMilestone}</span>
@@ -76,7 +76,7 @@ export function DashboardHeader({
         </div>
       </div>
 
-      <div className="premium-card mt-6 flex flex-col gap-5 p-4 sm:hidden" aria-label={`패스포트 다음 단계 ${completedCount}/${nextMilestone}`}>
+      <div className="premium-card mt-6 flex flex-col gap-5 p-4 sm:hidden" aria-label={`기록 다음 단계 ${completedCount}/${nextMilestone}`}>
         <div className="flex justify-between items-center px-2">
           {[
             { label: "기록", value: cardCount.toString().padStart(2, "0") },

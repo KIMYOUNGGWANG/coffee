@@ -29,7 +29,7 @@ const references = [
   },
   {
     label: "제품 기준",
-    copy: "개인 기록, 스캔 초안, Taste Passport 범위 안에서만 표현합니다.",
+    copy: "Quick Private Record, Rebuy Memory, Rebuy List, owned JSON/CSV export 범위 안에서만 표현합니다.",
   },
 ];
 
@@ -45,7 +45,7 @@ const radarShapePoints = radarPoints.join(" ");
 const navItems = [
   { label: "선반", icon: Home, active: true },
   { label: "기록", icon: Archive, active: false },
-  { label: "여권", icon: BookOpen, active: false },
+  { label: "리스트", icon: BookOpen, active: false },
   { label: "설정", icon: Settings, active: false },
 ];
 
@@ -62,7 +62,7 @@ export default function MobileMockupsPage() {
             향미 기록실
           </h1>
           <p className="mt-4 max-w-xl text-sm font-semibold leading-6 text-muted-foreground">
-            기존 다크 바 무드와 Taste Passport 문법은 유지하되, 분석 카드는 더 밝고 촉각적인 세라믹 표면으로
+            기존 다크 바 무드와 Rebuy Memory 문법은 유지하되, 분석 카드는 더 밝고 촉각적인 세라믹 표면으로
             정리했습니다. 이제 설명보다 실제 모바일 화면이 먼저 보이도록 구성했습니다.
           </p>
 
