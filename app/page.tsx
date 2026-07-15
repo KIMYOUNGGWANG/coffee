@@ -12,6 +12,34 @@ import { LandingSectionViewTracker } from "@/components/landing-analytics-client
 
 const copyrightYear = 2026;
 
+const koreanProductOutputs = [
+  {
+    tag: "Quick Private Record",
+    title: "비공개 20초 기록",
+    body: "원두명, 로스터리, 다시 살 단서만 빠르게 남기고 저장할 때만 로그인합니다.",
+  },
+  {
+    tag: "Rebuy Memory",
+    title: "재구매 기억",
+    body: "좋았던 이유와 마지막 컵의 맥락을 개인 기록으로 쌓아 다음 선택에 연결합니다.",
+  },
+  {
+    tag: "Rebuy List",
+    title: "다시 살 후보 리스트",
+    body: "또 사고 싶은 원두와 고민 중인 원두를 한곳에서 분리해 다음 구매 후보를 정리합니다.",
+  },
+  {
+    tag: "Rebuy Intelligence",
+    title: "다시 살 타이밍과 구매 단서",
+    body: "남은 원두, 취향 흐름, 자주 찾은 로스터를 바탕으로 다시 살 이유를 좁힙니다.",
+  },
+  {
+    tag: "Owned Data Export",
+    title: "내 데이터 JSON/CSV 내보내기",
+    body: "내가 저장한 CoffeeDex 기록은 JSON과 CSV로 소유권 있게 꺼낼 수 있고, 공유 이미지는 보조 기능입니다.",
+  },
+] as const;
+
 export default function CoffeeDexHomePage() {
   return (
     <main className="min-h-screen overflow-x-clip bg-[var(--background)] p-4 text-foreground selection:bg-primary-amber/20 md:p-10">
@@ -153,19 +181,14 @@ export default function CoffeeDexHomePage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-8 relative z-10">
-            {["Taste Passport", "Note Draft", "Rebuy Memory", "Story Export"].map((tag, idx) => (
-              <div key={idx} className="flex flex-col space-y-4">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-primary-amber">/ {tag}</span>
+          <div className="grid grid-cols-1 gap-6 pt-8 relative z-10 md:grid-cols-5">
+            {koreanProductOutputs.map((item) => (
+              <div key={item.tag} className="flex flex-col space-y-4">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-primary-amber">/ {item.tag}</span>
                 <div className="h-px w-8 bg-primary-amber/30" />
-                <h3 className="text-base font-bold text-foreground">
-                  {idx === 0 ? "맛 여권 스탬프 적립" : idx === 1 ? "원두 라벨 스캔 초안" : idx === 2 ? "재구매 기억과 다음 행동" : "공유용 스토리 카드"}
-                </h3>
+                <h3 className="text-base font-bold text-foreground">{item.title}</h3>
                 <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
-                  {idx === 0 ? "원두명, 로스터리, 산지, 가공 방식, 그리고 컵 노트를 디지털 여권 스탬프로 기록" :
-                   idx === 1 ? "패키지 사진에서 읽은 정보를 자동 완성 후보로 제안하고 저장 전 사용자가 수정" :
-                   idx === 2 ? "좋았던 이유, 남은 원두, 구매 단서를 바탕으로 다시 살 타이밍을 정리" :
-                   "내가 저장한 원두와 컵 노트를 SNS에 올리기 좋은 이미지 아티팩트로 다운로드"}
+                  {item.body}
                 </p>
               </div>
             ))}

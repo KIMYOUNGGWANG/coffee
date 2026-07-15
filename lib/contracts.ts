@@ -67,8 +67,20 @@ export const starterSurfaces: StarterSurface[] = [
   },
   {
     id: "cards",
-    title: "Tasting Cards",
-    summary: "Korean specialty coffee cards with roaster, origin, process, and flavor notes.",
+    title: "Rebuy Memory",
+    summary: "Private 20-second Korean specialty coffee cards that preserve roaster, origin, taste, and buy-again cues.",
+    status: "healthy",
+  },
+  {
+    id: "rebuy-list",
+    title: "Rebuy List",
+    summary: "Saved coffee memories become a private buy-again list for deciding what to reorder next.",
+    status: "healthy",
+  },
+  {
+    id: "rebuy-intelligence",
+    title: "Rebuy Intelligence",
+    summary: "Owned records surface taste snapshots, freshness timing, and repurchase signals without claiming marketplace or community features.",
     status: "healthy",
   },
   {
@@ -79,8 +91,8 @@ export const starterSurfaces: StarterSurface[] = [
   },
   {
     id: "exports",
-    title: "Share And PDF Exports",
-    summary: "Digital story-card and PDF artifacts from the user's saved coffee memories.",
+    title: "Owned JSON/CSV Export",
+    summary: "Users can keep an owned JSON or CSV copy of their private coffee memories and rebuy data.",
     status: "manual",
   },
 ];
@@ -127,7 +139,7 @@ export const starterGoldenFlows = [
   "onboarding -> first Korean specialty coffee card",
   "package scan -> editable draft -> user-confirmed card",
   "raw taste memo -> assisted SCA-style note -> saved memory",
-  "dashboard -> saved-record taste recap",
-  "card detail -> story export image",
-  "PDF access -> digital home-cafe archive export",
+  "dashboard -> Rebuy List of saved coffee memories",
+  "saved memory -> Rebuy Intelligence taste snapshot and reorder cue",
+  "settings -> owned JSON/CSV export of private coffee data",
 ];

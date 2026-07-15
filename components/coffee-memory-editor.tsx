@@ -44,7 +44,7 @@ export function CoffeeMemoryEditor({
   return (
     <section className="hyangmi-paper rounded-3xl border border-[var(--paper-border)] p-5 shadow-sm sm:p-7">
       <header className="border-b border-[var(--paper-border)] pb-5">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8C5E35]">20-second memory</p>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8C5E35]">Rebuy Memory</p>
         <h2 className="mt-2 font-serif text-2xl font-bold">다시 살 단서만 먼저 남겨요</h2>
         <p className="mt-2 text-sm leading-6 text-[var(--paper-muted-foreground)]">
           원두 이름, 로스터리, 다시 살지, 한 줄 메모만 있으면 충분합니다. 자세한 맛 정보는 나중에 덧붙일 수 있어요.
@@ -58,7 +58,7 @@ export function CoffeeMemoryEditor({
       </header>
 
       <fieldset className="mt-6 grid gap-4 sm:grid-cols-2">
-        <legend className="mb-3 font-serif text-lg font-bold">20초 빠른 기록</legend>
+        <legend className="mb-3 font-serif text-lg font-bold">20초 비공개 기록</legend>
         <label className="text-sm font-semibold">
           원두 이름
           <input className={inputClassName} value={value.title} maxLength={160} required onChange={(event) => onChange({ ...value, title: event.target.value })} />
@@ -131,7 +131,7 @@ export function CoffeeMemoryEditor({
           <input className="size-5 accent-[#8C5E35]" type="checkbox" checked={confirmed} onChange={(event) => onConfirmChange(event.target.checked)} />
           이 내용으로 기록할게요
         </label>
-        <p className="mt-1 pl-8 text-xs leading-5 text-[var(--paper-muted-foreground)]">사진 원본은 저장하지 않아요. 저장할 때만 로그인하고, 비공개 기록으로 저장돼요.</p>
+        <p className="mt-1 pl-8 text-xs leading-5 text-[var(--paper-muted-foreground)]">사진 원본은 저장하지 않아요. 저장할 때만 로그인하고, 내 Rebuy List를 위한 비공개 기록으로 저장돼요.</p>
         <Button className="mt-4 min-h-12 w-full rounded-xl bg-[#8C5E35] text-[#F7F7F4] hover:bg-[#6f4828]" disabled={!confirmed || pending || !value.title.trim() || !value.subtitle.trim() || !value.raw_note.trim()} onClick={onSave}>
           <Check size={17} aria-hidden="true" />
           {pending ? "저장 중..." : retrying ? "저장 다시 시도" : "내 CoffeeDex에 저장"}

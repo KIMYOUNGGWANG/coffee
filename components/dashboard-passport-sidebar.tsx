@@ -54,16 +54,16 @@ export function DashboardPassportSidebar({
   ];
 
   return (
-    <aside className="coffee-passport-sidebar" aria-label="나의 Taste Passport 요약">
+    <aside className="coffee-passport-sidebar" aria-label="나의 Rebuy Memory 요약">
       <section className="coffee-passport-title space-y-2">
-        <p className="text-[10px] font-black uppercase text-primary-amber">Taste Passport</p>
-        <h2 className="break-keep font-serif text-2xl font-black leading-tight text-foreground">오늘의 향미 프로필</h2>
+        <p className="text-[10px] font-black uppercase text-primary-amber">Rebuy Memory</p>
+        <h2 className="break-keep font-serif text-2xl font-black leading-tight text-foreground">오늘의 재구매 단서</h2>
         <button
           type="button"
           onClick={onOpenPassport}
           className="inline-flex min-h-8 items-center gap-1 rounded-full border border-primary-amber/25 bg-primary-amber/10 px-3 text-[11px] font-black text-primary-amber"
         >
-          등급 안내 <ChevronRight aria-hidden="true" size={13} />
+          기록 기준 <ChevronRight aria-hidden="true" size={13} />
         </button>
       </section>
 
@@ -74,17 +74,17 @@ export function DashboardPassportSidebar({
           ))}
         </div>
         <strong>{stampCount} / 5</strong>
-        <span>스탬프</span>
+        <span>기록</span>
       </section>
 
       <div className="coffee-passport-progress-copy space-y-2 border-b border-white/10 pb-4 text-xs text-muted-foreground">
-        <p>다음 등급까지 {remainingStamps}개 남았어요.</p>
+        <p>다음 취향 스냅샷까지 {remainingStamps}개 남았어요.</p>
         <button
           type="button"
           onClick={onOpenPassport}
           className="inline-flex min-h-9 items-center gap-1 text-xs font-black text-primary-amber"
         >
-          스탬프 혜택 보기 <ChevronRight aria-hidden="true" size={13} />
+          재구매 기준 보기 <ChevronRight aria-hidden="true" size={13} />
         </button>
       </div>
 

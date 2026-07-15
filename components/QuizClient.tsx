@@ -164,13 +164,13 @@ export default function QuizClient({ token }: QuizClientProps) {
                   <p className="text-[10px] font-extrabold uppercase tracking-widest text-primary-amber mb-2">Taste Card Loop</p>
                   <h3 className="font-serif text-base font-bold text-foreground">당신도 훌륭한 미각을 가졌군요!</h3>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground/60 mb-4">
-                    나만의 스페셜티 커피 여권을 만들고 친구들과 공유해보세요.
+                    나만의 비공개 커피 기억을 만들고 Rebuy List로 이어가보세요.
                   </p>
                   <Link
                     href="/"
                     className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary-amber px-4 py-3 text-sm font-bold text-[#0D0A07] shadow-sm transition hover:opacity-90"
                   >
-                    내 Taste Passport 만들기
+                    내 Rebuy Memory 시작하기
                     <ChevronRight size={15} />
                   </Link>
                 </div>
