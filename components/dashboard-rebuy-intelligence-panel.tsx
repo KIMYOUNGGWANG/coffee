@@ -1,9 +1,7 @@
 "use client";
 
 import { AlertTriangle, Coffee, ExternalLink, RefreshCcw, Search, ShoppingBag, Sparkles } from "lucide-react";
-import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
-import { useUpdateShelfRebuyState } from "@/hooks/use-shelf-rebuy-state";
-import type { ShelfRebuyAction } from "@/hooks/use-shelf-rebuy-state";
+import { DashboardRebuyActionLoop } from "@/components/dashboard-rebuy-action-loop";
 import type { RebuyIntelligenceData, TastingCardData } from "@/hooks/useTastingCards";
 
 type DashboardRebuyIntelligencePanelProps = {
@@ -13,6 +11,7 @@ type DashboardRebuyIntelligencePanelProps = {
   readonly error: unknown;
   readonly onQuickAdd: () => void;
   readonly onOpenLog: () => void;
+  readonly onShelfMemoryStarted: () => void;
   readonly onSelectCard: (card: TastingCardData) => void;
 };
 
@@ -32,11 +31,9 @@ export function DashboardRebuyIntelligencePanel({
   error,
   onQuickAdd,
   onOpenLog,
+  onShelfMemoryStarted,
   onSelectCard,
 }: DashboardRebuyIntelligencePanelProps) {
-  const { trackEvent } = useAnalyticsEvents();
-  const updateShelfRebuyStateMutation = useUpdateShelfRebuyState();
-
   if (isLoading) {
     return (
       <section className="espresso-panel p-5" aria-label="다시 살 단서">
@@ -78,20 +75,6 @@ export function DashboardRebuyIntelligencePanel({
   const purchaseCard = findCard(cards, data.purchaseMemory.cardId);
   const topScore = data.featureScores[0];
   const actionShelfItemId = data.rebuyReminder.shelfItemId ?? data.purchaseMemory.shelfItemId ?? data.nextCupPlan.shelfItemId;
-  const isSavingRebuyAction = actionShelfItemId !== null
-    && updateShelfRebuyStateMutation.isPending
-    && updateShelfRebuyStateMutation.variables?.shelfItemId === actionShelfItemId;
-  const saveRebuyAction = async (shelfItemId: string, rebuyAction: ShelfRebuyAction) => {
-    const rebuyPriority = rebuyAction === "will_rebuy" ? "pinned" : "normal";
-    const rebuyReminderDate = rebuyAction === "rebought" ? null : undefined;
-
-    try {
-      await updateShelfRebuyStateMutation.mutateAsync({ shelfItemId, rebuyAction, rebuyPriority, rebuyReminderDate });
-      trackEvent("rebuy_action_saved", { action: rebuyAction, source: "rebuy_intelligence" });
-    } catch (error: unknown) {
-      window.alert(error instanceof Error ? error.message : "재구매 상태를 저장하지 못했습니다.");
-    }
-  };
 
   return (
     <section className="espresso-panel p-4 sm:p-5" aria-label="다시 살 단서">
@@ -200,36 +183,12 @@ export function DashboardRebuyIntelligencePanel({
         </button>
       </div>
 
-      {actionShelfItemId && (
-        <div className="mt-4 rounded-2xl border border-primary-amber/20 bg-primary-amber/10 p-4" data-testid="rebuy-action-loop">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber/85">Saved Rebuy Loop</p>
-              <p className="mt-1 break-keep text-sm font-black text-[#FFF8EC]">
-                {data.rebuyReminder.title} 상태를 바로 저장해 다음 방문의 첫 단서로 남겨요.
-              </p>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-2">
-              <button
-                type="button"
-                disabled={isSavingRebuyAction}
-                onClick={() => void saveRebuyAction(actionShelfItemId, "will_rebuy")}
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-primary-amber/30 bg-primary-amber px-4 text-xs font-black text-background-dark transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSavingRebuyAction ? "저장 중" : "다시 살래요"}
-              </button>
-              <button
-                type="button"
-                disabled={isSavingRebuyAction}
-                onClick={() => void saveRebuyAction(actionShelfItemId, "rebought")}
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#FFF8EC]/15 bg-[#FFF8EC]/8 px-4 text-xs font-black text-[#FFF8EC] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSavingRebuyAction ? "저장 중" : "다시 샀음"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DashboardRebuyActionLoop
+        actionShelfItemId={actionShelfItemId}
+        continuation={data.rebuyContinuation}
+        title={data.rebuyContinuation?.beanName ?? data.rebuyReminder.title}
+        onShelfMemoryStarted={onShelfMemoryStarted}
+      />
     </section>
   );
 }

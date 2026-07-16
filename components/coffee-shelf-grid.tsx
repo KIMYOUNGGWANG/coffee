@@ -39,6 +39,8 @@ interface ShelfItem {
   rebuy_reminder_date: string | null;
   rebuy_action: "none" | "drank" | "will_rebuy" | "rebought";
   rebuy_action_at: string | null;
+  purchase_date?: string | null;
+  rebuy_sequence?: number;
   tasting_cards?: TastingCard | null;
 }
 
@@ -86,6 +88,8 @@ function isShelfItem(value: unknown): value is ShelfItem {
     && (typeof value.roast_date === "string" || value.roast_date === null)
     && (typeof value.opened_date === "string" || value.opened_date === null)
     && typeof value.total_weight === "number"
+    && (value.purchase_date === undefined || typeof value.purchase_date === "string" || value.purchase_date === null)
+    && (value.rebuy_sequence === undefined || typeof value.rebuy_sequence === "number")
     && typeof value.fill_level === "number"
     && typeof value.is_finished === "boolean"
     && (typeof value.tasting_card_id === "string" || value.tasting_card_id === null)
@@ -273,6 +277,8 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
           rebuy_reminder_date: null,
           rebuy_action: "none",
           rebuy_action_at: null,
+          purchase_date: null,
+          rebuy_sequence: 1,
         } as ShelfItem]);
         setArchivedItems([]);
         setTastingCards([]);
@@ -469,6 +475,7 @@ export default function CoffeeShelfGrid({ onItemSelect, refreshTrigger = 0, onDa
 
       setItems((currentItems) => currentItems.map(applyReminderUpdate));
       setArchivedItems((currentItems) => currentItems.map(applyReminderUpdate));
+      onDataChange?.();
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error updating rebuy reminder state:", error);

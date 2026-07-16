@@ -82,9 +82,21 @@ Evidence surfaces: `/dashboard`, `POST /api/v1/brewing-logs`, `GET /api/v1/shelf
 
 ## Flow 4B. Follow Rebuy Intelligence
 
-Given a user has owned cards, shelf items, or brewing logs, when CoffeeDex opens the shelf dashboard, then it leads with private rebuy recall before inventory browsing: the first screen shows the current rebuy candidate, the latest saved bean, a 20-second record action, and then a private Rebuy Intelligence panel with five owner-data actions. Those actions are a Next Cup plan for what to brew today, a rebuy timing reminder, a taste-match criterion from liked cards, a package or shelf based repurchase memory, and a brew-failure adjustment prompt. Saved purchase URLs and buying notes take precedence over generic search links. If the selected loop points to an owned shelf item, the user can save an in-app rebuy action directly from the panel: `will_rebuy` pins the item for follow-up, and `rebought` clears the reminder after purchase. This is a personal memory loop only; it does not claim community recommendations, partner offers, marketplace listings, roaster orders, or background notification delivery.
+Given a user has owned cards, shelf items, or brewing logs, when CoffeeDex opens the shelf dashboard, then it leads with private rebuy recall before inventory browsing: the first screen shows the current rebuy candidate, the latest saved bean, a 20-second record action, and then a private Rebuy Intelligence panel with five owner-data actions. Those actions are a Next Cup plan for what to brew today, a rebuy timing reminder, a taste-match criterion from liked cards, a package or shelf based repurchase memory, and a brew-failure adjustment prompt. Saved purchase URLs and buying notes take precedence over generic search links. If the selected loop points to an owned shelf item, the user can save an in-app rebuy action directly from the panel: `will_rebuy` pins the item for follow-up, and `rebought` clears the reminder after purchase. After `rebought`, the same panel offers an explicit new-bag action that carries the owned roaster, bean, origin, bag weight, tasting-card link, and purchase clues into a separate active shelf memory with reset fill and rebuy state. The source shelf ID makes retries idempotent. Each owner-verified successor also records the Korean purchase date and increments its visible purchase sequence, so the shelf shows that this is the second or later bag instead of losing the earlier memory. This is a personal memory loop only; it does not claim community recommendations, partner offers, marketplace listings, roaster orders, or background notification delivery.
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/rebuy-intelligence`, `PATCH /api/v1/shelf/:id`, `buildRebuyIntelligence`, `DashboardRebuyIntelligencePanel`
+
+## Flow 4C. Reopen a photo-backed memory before buying
+
+Given the user has confirmed private `again` or `maybe` records, when the shelf dashboard opens, then CoffeeDex shows up to three ranked memories with their saved bag photos and up to three flavor conditions derived only from those confirmed records. The user can reopen the private card, copy a search phrase, open a saved purchase clue or search, or explicitly start a new shelf memory after buying. The `next_purchase_memory_opened` event stores only the action and clue kind; it never stores coffee identity, image, note, URL, card ID, or shelf ID.
+
+Evidence surfaces: `/dashboard`, `buildRebuyTimingMemory`, `DashboardRebuyTimingMemoryPanel`, `next_purchase_memory_opened`
+
+## Flow 4D. Keep a personal taste sentence
+
+Given the user has confirmed `again` or `maybe` memories, when CoffeeDex derives a taste brief, then the user can rewrite it in their own words, save up to 160 characters privately on their owner-scoped profile, copy it before choosing beans, or return to the automatic record-derived sentence. `taste_preference_saved` and `taste_preference_copied` record only the surface and whether the sentence was custom or automatic; the sentence, bean, roaster, photo, note, URL, and record identifiers never enter event properties.
+
+Evidence surfaces: `/dashboard`, `GET/PATCH /api/v1/profile`, `DashboardRebuyTasteBriefPanel`, `taste_preference_saved`, `taste_preference_copied`
 
 ## Flow 5. Review a Progressive Taste Snapshot
 

@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
-import type { Page, Route } from "@playwright/test";
+import type { Page, Route, TestInfo } from "@playwright/test";
 
 const dashboardUrl = `${process.env.COFFEEDEX_E2E_BASE_URL ?? ""}/dashboard`;
+const rebuyShelfItemId = "93493987-4800-4b7c-836f-c0a35f39244e";
 
 const shelfResponse = {
   data: [{
@@ -22,6 +23,8 @@ const shelfResponse = {
     rebuy_reminder_date: null,
     rebuy_action: "none",
     rebuy_action_at: null,
+    purchase_date: "2026-07-11",
+    rebuy_sequence: 2,
   }],
 } as const;
 
@@ -45,7 +48,7 @@ const rebuyIntelligenceResponse = {
       actionLabel: "재구매 후보 열기",
       priority: "high",
       cardId: null,
-      shelfItemId: "shelf-sidama",
+      shelfItemId: rebuyShelfItemId,
     },
     tasteMatch: {
       anchorCardId: null,
@@ -63,7 +66,7 @@ const rebuyIntelligenceResponse = {
       searchUrl: "https://www.google.com/search?q=sidama",
       reason: "서랍에 남긴 로스터와 원두명으로 재구매 검색을 열 수 있어요.",
       cardId: null,
-      shelfItemId: "shelf-sidama",
+      shelfItemId: rebuyShelfItemId,
     },
     brewFailureMemory: {
       title: "실패 컵도 다음 컵의 레시피가 됩니다",
@@ -81,8 +84,18 @@ const rebuyIntelligenceResponse = {
       actionLabel: "오늘 마무리 컵",
       priority: "high",
       suggestedMethod: "V60",
-      shelfItemId: "shelf-sidama",
+      shelfItemId: rebuyShelfItemId,
       lastBrewLogId: null,
+    },
+    rebuyContinuation: {
+      id: rebuyShelfItemId,
+      roasterName: "프릳츠 커피",
+      beanName: "에티오피아 시다마",
+      origin: "Ethiopia Sidama Washed",
+      totalWeight: 200,
+      tastingCardId: null,
+      purchaseUrl: "https://fritz.example/sidama",
+      purchaseNote: "프릳츠 공식몰 200g 18,000원",
     },
   },
 } as const;
@@ -96,18 +109,21 @@ async function fulfillJson(route: Route, body: unknown, status = 200): Promise<v
 }
 
 type DashboardRouteOptions = {
+  readonly rebuyIntelligenceBody?: unknown;
   readonly rebuyReturnDelayMs?: number;
   readonly shelfPostBodies?: unknown[];
+  readonly shelfPatchPaths?: string[];
 };
 
 async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[], options: DashboardRouteOptions = {}): Promise<void> {
-  const { rebuyReturnDelayMs = 0, shelfPostBodies = [] } = options;
+  const { rebuyIntelligenceBody = rebuyIntelligenceResponse, rebuyReturnDelayMs = 0, shelfPostBodies = [], shelfPatchPaths = [] } = options;
 
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
     const pathname = new URL(request.url()).pathname;
 
     if (pathname.startsWith("/api/v1/shelf/") && request.method() === "PATCH") {
+      shelfPatchPaths.push(pathname);
       shelfPatchBodies.push(JSON.parse(request.postData() ?? "{}"));
       await fulfillJson(route, { data: { id: "shelf-sidama" } });
       return;
@@ -123,7 +139,7 @@ async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[], opti
         await fulfillJson(route, shelfResponse);
         return;
       case "/api/v1/rebuy-intelligence":
-        await fulfillJson(route, rebuyIntelligenceResponse);
+        await fulfillJson(route, rebuyIntelligenceBody);
         return;
       case "/api/v1/shelf/rebuy-return":
         if (rebuyReturnDelayMs > 0) {
@@ -168,13 +184,16 @@ async function mockDashboardRoutes(page: Page, shelfPatchBodies: unknown[], opti
   });
 }
 
-test("saves a Rebuy Intelligence action without opening the shelf item", async ({ page }) => {
+test("saves a Rebuy Intelligence action without opening the shelf item", async ({ page }, testInfo: TestInfo) => {
   const patchBodies: unknown[] = [];
-  await mockDashboardRoutes(page, patchBodies);
+  const shelfPostBodies: unknown[] = [];
+  await mockDashboardRoutes(page, patchBodies, { shelfPostBodies });
 
   await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
 
   await expect(page.getByTestId("dashboard-ready")).toBeVisible();
+  await expect(page.getByText("2번째 구매", { exact: true })).toBeVisible();
+  await page.locator(".coffee-shelf-item").first().screenshot({ path: testInfo.outputPath("rebuy-continuity-card.png") });
   await expect(page.getByTestId("rebuy-action-loop")).toBeVisible();
 
   await page.getByTestId("rebuy-action-loop").getByRole("button", { name: "다시 살래요" }).click();
@@ -187,6 +206,92 @@ test("saves a Rebuy Intelligence action without opening the shelf item", async (
     { rebuyAction: "will_rebuy", rebuyPriority: "pinned" },
     { rebuyAction: "rebought", rebuyPriority: "normal", rebuyReminderDate: null },
   ]);
+
+  const actionLoop = page.getByTestId("rebuy-action-loop");
+  await expect(actionLoop).toContainText("새 봉투도 선반에 담아 다음 재구매 시점을 이어가세요.");
+  await actionLoop.screenshot({ path: testInfo.outputPath("rebuy-continuation-desktop.png") });
+  await actionLoop.getByRole("button", { name: "새 봉투도 선반에 담기" }).click();
+  await expect.poll(() => shelfPostBodies).toEqual([{
+    roasterName: "프릳츠 커피",
+    beanName: "에티오피아 시다마",
+    origin: "Ethiopia Sidama Washed",
+    roastDate: null,
+    openedDate: null,
+    totalWeight: 200,
+    fillLevel: 100,
+    tastingCardId: null,
+    purchaseUrl: "https://fritz.example/sidama",
+    purchaseNote: "프릳츠 공식몰 200g 18,000원",
+    rebuyPriority: "normal",
+    rebuyAction: "none",
+    rebuySourceShelfItemId: rebuyShelfItemId,
+    rating: 5,
+    wantAgain: true,
+  }]);
+});
+
+test("keeps the direct rebuy continuation usable on mobile", async ({ page }, testInfo: TestInfo) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const patchBodies: unknown[] = [];
+  await mockDashboardRoutes(page, patchBodies);
+
+  await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
+  const actionLoop = page.getByTestId("rebuy-action-loop");
+  await actionLoop.getByRole("button", { name: "다시 샀음" }).click();
+
+  const continuationButton = actionLoop.getByRole("button", { name: "새 봉투도 선반에 담기" });
+  await expect(continuationButton).toBeVisible();
+  await expect(continuationButton).toHaveCSS("min-height", "44px");
+  expect(await continuationButton.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.left >= 0 && rect.right <= window.innerWidth;
+  })).toBe(true);
+  await actionLoop.screenshot({ path: testInfo.outputPath("rebuy-continuation-mobile.png") });
+});
+
+test("continues from a shelf-backed action when the reminder is card-backed", async ({ page }) => {
+  const patchBodies: unknown[] = [];
+  const patchPaths: string[] = [];
+  await mockDashboardRoutes(page, patchBodies, {
+    rebuyIntelligenceBody: {
+      data: {
+        ...rebuyIntelligenceResponse.data,
+        rebuyReminder: {
+          ...rebuyIntelligenceResponse.data.rebuyReminder,
+          cardId: "card-sidama",
+          shelfItemId: null,
+        },
+        purchaseMemory: {
+          ...rebuyIntelligenceResponse.data.purchaseMemory,
+          title: "콜롬비아 엘 디비소",
+          subtitle: "모모스",
+        },
+        rebuyContinuation: {
+          ...rebuyIntelligenceResponse.data.rebuyContinuation,
+          roasterName: "모모스",
+          beanName: "콜롬비아 엘 디비소",
+        },
+      },
+    },
+    shelfPatchPaths: patchPaths,
+  });
+
+  await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
+  const actionLoop = page.getByTestId("rebuy-action-loop");
+  await expect(actionLoop).toContainText("콜롬비아 엘 디비소 상태를 바로 저장해");
+  const reboughtButton = actionLoop.getByRole("button", { name: "다시 샀음" });
+  await reboughtButton.focus();
+  await page.keyboard.press("Enter");
+
+  await expect.poll(() => patchBodies).toContainEqual({
+    rebuyAction: "rebought",
+    rebuyPriority: "normal",
+    rebuyReminderDate: null,
+  });
+  expect(patchPaths).toEqual([`/api/v1/shelf/${rebuyShelfItemId}`]);
+  const continuationButton = actionLoop.getByRole("button", { name: "새 봉투도 선반에 담기" });
+  await expect(continuationButton).toBeVisible();
+  await expect(continuationButton).toBeFocused();
 });
 
 test("saves an exact private bean decision after a calendar return", async ({ page }) => {

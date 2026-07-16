@@ -16,6 +16,10 @@ import CoffeeDNACard, { type CoffeeDNAData } from "@/components/coffee-dna/Coffe
 
 type DashboardShelfViewProps = {
   readonly cards: readonly TastingCardData[];
+  readonly tasteBriefCards: readonly TastingCardData[];
+  readonly personalTasteLine: string | null;
+  readonly isPersonalTasteLineSaving: boolean;
+  readonly onSavePersonalTasteLine: (line: string | null) => Promise<void>;
   readonly totalCardCount: number;
   readonly hasCards: boolean;
   readonly hasActiveFilters: boolean;
@@ -54,8 +58,10 @@ type DashboardShelfViewProps = {
   readonly onOpenPassport: () => void;
   readonly dnaData: CoffeeDNAData | null;
   readonly isDnaLoading: boolean;
+  readonly shelfRefreshTrigger: number;
   readonly onShareDNA: () => void;
   readonly onShelfDataChange: () => void;
+  readonly onShelfMemoryStarted: () => void;
 };
 
 function buildCoffeeSearchUrl(card: TastingCardData): string {
@@ -144,6 +150,10 @@ function DashboardFirstSaveReward({
 
 export function DashboardShelfView({
   cards,
+  tasteBriefCards,
+  personalTasteLine,
+  isPersonalTasteLineSaving,
+  onSavePersonalTasteLine,
   totalCardCount,
   hasCards,
   hasActiveFilters,
@@ -182,15 +192,22 @@ export function DashboardShelfView({
   onOpenPassport,
   dnaData,
   isDnaLoading,
+  shelfRefreshTrigger,
   onShareDNA,
   onShelfDataChange,
+  onShelfMemoryStarted,
 }: DashboardShelfViewProps) {
   return (
     <>
       <DashboardFirstSaveReward cards={cards} onQuickAdd={onQuickAdd} />
       <DashboardRebuyTimingMemoryPanel cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />
+      <DashboardRebuyTasteBriefPanel
+        cards={tasteBriefCards}
+        personalTasteLine={personalTasteLine}
+        isSaving={isPersonalTasteLineSaving}
+        onSavePersonalTasteLine={onSavePersonalTasteLine}
+      />
       <DashboardRebuyClueRescuePanel cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />
-      <DashboardRebuyTasteBriefPanel cards={cards} />
       {(cards.length > 0 || rebuyIntelligence) && (
         <DashboardRebuyIntelligencePanel
           data={rebuyIntelligence}
@@ -199,6 +216,7 @@ export function DashboardShelfView({
           error={rebuyIntelligenceError}
           onQuickAdd={onQuickAdd}
           onOpenLog={onOpenLog}
+          onShelfMemoryStarted={onShelfMemoryStarted}
           onSelectCard={onSelectCard}
         />
       )}
@@ -224,7 +242,7 @@ export function DashboardShelfView({
           onReset={onResetFilters}
         />
       )}
-      <CoffeeShelfGrid onDataChange={onShelfDataChange} />
+      <CoffeeShelfGrid refreshTrigger={shelfRefreshTrigger} onDataChange={onShelfDataChange} />
       {cards.length > 0 && (
         <>
           <DashboardRetentionLoop cards={cards} onQuickAdd={onQuickAdd} onSelectCard={onSelectCard} />

@@ -18,7 +18,7 @@ import { useRebuyCalendarReturn } from "@/hooks/use-rebuy-calendar-return";
 import { useStartRebuyShelfMemory } from "@/hooks/use-rebuy-shelf-memory";
 import { useUpdateShelfRebuyState } from "@/hooks/use-shelf-rebuy-state";
 import type { ShelfRebuyAction } from "@/hooks/use-shelf-rebuy-state";
-import { useDeleteTastingCard, useDialInCoach, useRebuyIntelligence, useTasteAnalytics, useTastingCards, useUserProfile } from "@/hooks/useTastingCards";
+import { useDeleteTastingCard, useDialInCoach, useRebuyIntelligence, useTasteAnalytics, useTastingCards, useUpdatePersonalTasteLine, useUserProfile } from "@/hooks/useTastingCards";
 import type { CardCreatorWizardMode } from "@/components/CardCreatorWizard";
 import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import { buildAuthGateHref, isAuthRequiredError } from "@/lib/auth-redirect";
@@ -78,6 +78,7 @@ export default function DashboardClient({
   const calendarReturnItemQuery = useRebuyCalendarReturn(calendarReturnToken);
   const updateShelfRebuyStateMutation = useUpdateShelfRebuyState();
   const startRebuyShelfMemoryMutation = useStartRebuyShelfMemory();
+  const updatePersonalTasteLineMutation = useUpdatePersonalTasteLine();
 
   const triggerShelfRefresh = () => setShelfRefreshTrigger(prev => prev + 1);
 
@@ -101,7 +102,12 @@ export default function DashboardClient({
     isLoading: isRebuyIntelligenceLoading,
     error: rebuyIntelligenceError,
     failureReason: rebuyIntelligenceFailureReason,
+    refetch: refetchRebuyIntelligence,
   } = useRebuyIntelligence();
+  const handleShelfDataChange = () => {
+    void refetchDialInCoach();
+    void refetchRebuyIntelligence();
+  };
   const deleteCardMutation = useDeleteTastingCard();
   const filteredCards = useMemo(() => filterDashboardCards(cards, {
     searchQuery,
@@ -340,6 +346,12 @@ export default function DashboardClient({
         {activeTab === "shelf" && (
           <DashboardShelfView
             cards={filteredCards}
+            tasteBriefCards={cards ?? []}
+            personalTasteLine={profile?.personal_taste_line ?? null}
+            isPersonalTasteLineSaving={updatePersonalTasteLineMutation.isPending}
+            onSavePersonalTasteLine={async (line) => {
+              await updatePersonalTasteLineMutation.mutateAsync(line);
+            }}
             totalCardCount={cards?.length ?? 0}
             hasCards={hasCards}
             hasActiveFilters={hasActiveFilters}
@@ -382,8 +394,10 @@ export default function DashboardClient({
             onOpenPassport={() => setActiveTab("passport")}
             dnaData={null}
             isDnaLoading={false}
+            shelfRefreshTrigger={shelfRefreshTrigger}
             onShareDNA={() => {}}
-            onShelfDataChange={() => {}}
+            onShelfDataChange={handleShelfDataChange}
+            onShelfMemoryStarted={triggerShelfRefresh}
           />
         )}
 
