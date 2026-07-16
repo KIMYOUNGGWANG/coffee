@@ -230,6 +230,42 @@ test("saves a Rebuy Intelligence action without opening the shelf item", async (
   }]);
 });
 
+test("saves this purchase's clue on the new shelf bag after a rebuy", async ({ page }) => {
+  const patchBodies: unknown[] = [];
+  const shelfPostBodies: unknown[] = [];
+  await mockDashboardRoutes(page, patchBodies, { shelfPostBodies });
+
+  await page.goto(dashboardUrl, { waitUntil: "domcontentloaded" });
+
+  const actionLoop = page.getByTestId("rebuy-action-loop");
+  await actionLoop.getByRole("button", { name: "다시 샀음" }).click();
+
+  const checkIn = page.getByTestId("rebuy-purchase-check-in");
+  await expect(checkIn).toBeVisible();
+  await checkIn.getByLabel("이번 구매 단서").fill("프릳츠 합정 쇼룸 200g 21,000원");
+  await checkIn.getByLabel("이번 구매 링크").fill("https://fritz.example/current-sidama");
+  await checkIn.getByLabel("새 봉투 로스팅일").fill("2026-07-14");
+  await checkIn.getByRole("button", { name: "새 봉투도 선반에 담기" }).click();
+
+  await expect.poll(() => shelfPostBodies).toEqual([{
+    roasterName: "프릳츠 커피",
+    beanName: "에티오피아 시다마",
+    origin: "Ethiopia Sidama Washed",
+    roastDate: "2026-07-14",
+    openedDate: null,
+    totalWeight: 200,
+    fillLevel: 100,
+    tastingCardId: null,
+    purchaseUrl: "https://fritz.example/current-sidama",
+    purchaseNote: "프릳츠 합정 쇼룸 200g 21,000원",
+    rebuyPriority: "normal",
+    rebuyAction: "none",
+    rebuySourceShelfItemId: rebuyShelfItemId,
+    rating: 5,
+    wantAgain: true,
+  }]);
+});
+
 test("keeps the direct rebuy continuation usable on mobile", async ({ page }, testInfo: TestInfo) => {
   await page.setViewportSize({ width: 375, height: 812 });
   const patchBodies: unknown[] = [];

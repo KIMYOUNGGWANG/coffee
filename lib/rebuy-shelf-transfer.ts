@@ -17,7 +17,7 @@ export type RebuyShelfTransferPayload = {
   readonly roasterName: string;
   readonly beanName: string;
   readonly origin: string | null;
-  readonly roastDate: null;
+  readonly roastDate: string | null;
   readonly openedDate: null;
   readonly totalWeight: number;
   readonly fillLevel: 100;
@@ -40,6 +40,12 @@ export type RebuyShelfReplenishSource = {
   readonly tastingCardId: string | null;
   readonly purchaseUrl: string | null;
   readonly purchaseNote: string | null;
+};
+
+export type RebuyShelfPurchaseCheckIn = {
+  readonly purchaseNote: string | null;
+  readonly purchaseUrl: string | null;
+  readonly roastDate: string | null;
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -72,18 +78,24 @@ export function buildRebuyShelfTransferPayload(card: RebuyShelfTransferCard): Re
   };
 }
 
-export function buildRebuyShelfReplenishPayload(source: RebuyShelfReplenishSource): RebuyShelfTransferPayload {
+export function buildRebuyShelfReplenishPayload(
+  source: RebuyShelfReplenishSource,
+  purchaseCheckIn?: RebuyShelfPurchaseCheckIn,
+): RebuyShelfTransferPayload {
+  const purchaseNote = purchaseCheckIn ? normalize(purchaseCheckIn.purchaseNote) : normalize(source.purchaseNote);
+  const purchaseUrl = purchaseCheckIn ? normalize(purchaseCheckIn.purchaseUrl) : normalize(source.purchaseUrl);
+
   return {
     roasterName: normalize(source.roasterName) ?? "기록한 로스터리",
     beanName: normalize(source.beanName) ?? "다시 산 원두",
     origin: normalize(source.origin),
-    roastDate: null,
+    roastDate: normalize(purchaseCheckIn?.roastDate),
     openedDate: null,
     totalWeight: typeof source.totalWeight === "number" && Number.isInteger(source.totalWeight) && source.totalWeight > 0 ? source.totalWeight : 200,
     fillLevel: 100,
     tastingCardId: source.tastingCardId && UUID_PATTERN.test(source.tastingCardId) ? source.tastingCardId : null,
-    purchaseUrl: normalize(source.purchaseUrl),
-    purchaseNote: normalize(source.purchaseNote),
+    purchaseUrl,
+    purchaseNote,
     rebuyPriority: "normal",
     rebuyAction: "none",
     rebuySourceShelfItemId: UUID_PATTERN.test(source.id) ? source.id : null,
