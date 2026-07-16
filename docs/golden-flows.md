@@ -62,6 +62,8 @@ Given a user has beans on the private shelf, when CoffeeDex renders the shelf ca
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/shelf`, `PATCH /api/v1/shelf/:id`, `GET /api/v1/shelf/:id/rebuy-calendar`, `evaluateFreshShelfStatus`, `evaluateFreshPeakWindow`, `evaluateShelfRunway`
 
+After `rebought`, the explicit new-bag save prefills the old private purchase clue but lets the user replace this purchase's note, link, and roast date. The successor retains the current clue rather than silently copying a stale store or price.
+
 ## Flow 4A. Start a Dial-in Coach Recipe
 
 Given a user has a current shelf bean, when they open the brewing log tab, then CoffeeDex derives a first-cup starting recipe from the owned shelf item, roast/open timing, and recent owned brew logs. The user can save that suggestion as a private `brewing_logs` row with a `coach_snapshot`, then tap a one-cup feedback button such as sour, bitter, weak, heavy, or balanced after tasting. CoffeeDex stores that private `coach_feedback` and uses it to change the next recipe by one variable. This is personal brew guidance only, not a community recipe feed, marketplace recommendation, or roaster order.
@@ -85,6 +87,8 @@ Evidence surfaces: `/dashboard`, `POST /api/v1/brewing-logs`, `GET /api/v1/shelf
 Given a user has owned cards, shelf items, or brewing logs, when CoffeeDex opens the shelf dashboard, then it leads with private rebuy recall before inventory browsing: the first screen shows the current rebuy candidate, the latest saved bean, a 20-second record action, and then a private Rebuy Intelligence panel with five owner-data actions. Those actions are a Next Cup plan for what to brew today, a rebuy timing reminder, a taste-match criterion from liked cards, a package or shelf based repurchase memory, and a brew-failure adjustment prompt. Saved purchase URLs and buying notes take precedence over generic search links. If the selected loop points to an owned shelf item, the user can save an in-app rebuy action directly from the panel: `will_rebuy` pins the item for follow-up, and `rebought` clears the reminder after purchase. After `rebought`, the same panel offers an explicit new-bag action that carries the owned roaster, bean, origin, bag weight, tasting-card link, and purchase clues into a separate active shelf memory with reset fill and rebuy state. The source shelf ID makes retries idempotent. Each owner-verified successor also records the Korean purchase date and increments its visible purchase sequence, so the shelf shows that this is the second or later bag instead of losing the earlier memory. This is a personal memory loop only; it does not claim community recommendations, partner offers, marketplace listings, roaster orders, or background notification delivery.
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/rebuy-intelligence`, `PATCH /api/v1/shelf/:id`, `buildRebuyIntelligence`, `DashboardRebuyIntelligencePanel`
+
+The same new-bag action includes the private purchase check-in, so a current store, price, link, or roast date can replace the inherited clue before the successor is saved.
 
 ## Flow 4C. Reopen a photo-backed memory before buying
 

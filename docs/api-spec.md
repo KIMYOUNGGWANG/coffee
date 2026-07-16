@@ -208,6 +208,8 @@ This authenticated owner-only lookup resolves the exact shelf memory referenced 
 
 The explicit new-bag POST carries the owned source shelf ID. A retry for that same source returns the already-created successor rather than making a duplicate.
 
+Before the explicit new-bag save, the dashboard may replace inherited `purchaseNote` and `purchaseUrl` and add the current bag's `roastDate`. These owner-scoped values describe the current purchase and never enter analytics.
+
 ### `GET /api/v1/rebuy-intelligence`
 
 Return a private action loop that helps the user decide what to drink, fix, or buy again next. The route reads only owner-scoped `tasting_cards`, `coffee_shelf_items`, and `brewing_logs`; it does not create community recommendations, partner referrals, marketplace listings, roaster orders, or persisted notification jobs. When a returned insight includes `shelfItemId`, the dashboard may persist the user's direct rebuy action through `PATCH /api/v1/shelf/:id` by sending `rebuyAction`, optional `rebuyPriority`, and optional `rebuyReminderDate`.
