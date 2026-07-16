@@ -1,3 +1,5 @@
+import { hasMeaningfulCoffeeMemoryText, normalizeCoffeeMemoryText } from "@/lib/coffee-memory";
+
 export type RebuyClueRescueCard = {
   readonly id: string;
   readonly title: string;
@@ -55,7 +57,7 @@ const clueLabels: Record<RebuyClueKey, string> = {
 };
 
 function isNonBlank(value: string | null | undefined): value is string {
-  return typeof value === "string" && value.trim().length > 0;
+  return hasMeaningfulCoffeeMemoryText(value);
 }
 
 function readDaysSince(createdAt: string, now: Date): number {
@@ -170,10 +172,10 @@ export function buildRebuyClueRescuePatch(
   card: RebuyClueRescuePatchCard,
   form: RebuyClueRescueForm,
 ): RebuyClueRescuePatch {
-  const purchaseNote = form.purchaseNote.trim();
-  const purchaseUrl = form.purchaseUrl.trim();
-  const rebuyReason = form.rebuyReason.trim();
-  const existingReasons = card.repurchase_reasons.map((reason) => reason.trim()).filter(Boolean);
+  const purchaseNote = normalizeCoffeeMemoryText(form.purchaseNote);
+  const purchaseUrl = normalizeCoffeeMemoryText(form.purchaseUrl);
+  const rebuyReason = normalizeCoffeeMemoryText(form.rebuyReason);
+  const existingReasons = card.repurchase_reasons.map(normalizeCoffeeMemoryText).filter(Boolean);
   const repurchaseReasons = rebuyReason
     ? Array.from(new Set([rebuyReason, ...existingReasons])).slice(0, 8)
     : existingReasons.slice(0, 8);
@@ -184,4 +186,19 @@ export function buildRebuyClueRescuePatch(
     purchaseUrl: purchaseUrl || null,
     repurchaseReasons,
   };
+}
+
+export function hasRebuyClueRescueProgress(
+  card: RebuyClueRescueCard,
+  form: RebuyClueRescueForm,
+): boolean {
+  const patch = buildRebuyClueRescuePatch(card, form);
+  const updatedCard: RebuyClueRescueCard = {
+    ...card,
+    purchase_note: patch.purchaseNote,
+    purchase_url: patch.purchaseUrl,
+    repurchase_reasons: patch.repurchaseReasons,
+  };
+
+  return readMissingClues(updatedCard).length < readMissingClues(card).length;
 }

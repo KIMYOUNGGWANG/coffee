@@ -285,6 +285,22 @@ test("Given a memory update, When patched, Then all intents map and the owner fi
   ]);
 });
 
+test("Given an invisible-only purchase clue, When a card is patched, Then validation rejects it before any update", async () => {
+  // Given
+  const { item, supabase } = await loadRoutes();
+  supabase.configure({ authenticated: true });
+
+  // When
+  const response = await item.PATCH(
+    jsonRequest("PATCH", { purchaseNote: "\u034F", repurchaseReasons: ["\u00AD"], confirmed: true }),
+    { params: Promise.resolve({ id: "card-1" }) },
+  );
+
+  // Then
+  assert.equal(response.status, 400);
+  assert.equal(supabase.getCalls().some((call) => call.method === "update"), false);
+});
+
 test("Given a cross-owner update, When no owned row is returned, Then existence stays hidden behind 404", async () => {
   // Given
   const { item, supabase } = await loadRoutes();

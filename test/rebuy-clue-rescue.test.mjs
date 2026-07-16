@@ -22,11 +22,20 @@ function transpile(source, fileName) {
 async function loadRebuyClueRescueModule() {
   const tempDirectory = mkdtempSync(path.join(tmpdir(), "coffeedex-rebuy-clue-rescue-"));
   const sourcePath = path.join(projectRoot, "lib/rebuy-clue-rescue.ts");
+  const coffeeMemoryPath = path.join(projectRoot, "lib/coffee-memory.ts");
+  const zodUrl = pathToFileURL(path.join(projectRoot, "node_modules/zod/index.js")).href;
 
   assert.equal(existsSync(sourcePath), true);
   writeFileSync(
+    path.join(tempDirectory, "coffee-memory.mjs"),
+    transpile(readFileSync(coffeeMemoryPath, "utf8").replaceAll('"zod"', `"${zodUrl}"`), coffeeMemoryPath),
+  );
+  writeFileSync(
     path.join(tempDirectory, "rebuy-clue-rescue.mjs"),
-    transpile(readFileSync(sourcePath, "utf8"), sourcePath),
+    transpile(
+      readFileSync(sourcePath, "utf8").replaceAll('"@/lib/coffee-memory"', '"./coffee-memory.mjs"'),
+      sourcePath,
+    ),
   );
 
   try {
@@ -150,6 +159,29 @@ test("Given inline rescue form values, When patch is built, Then empty fields no
       purchaseUrl: null,
       repurchaseReasons: ["복숭아 단맛", "기존 이유"],
     });
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("Given invisible-only rescue values, When progress is checked, Then no clue is saved or counted", async () => {
+  const loaded = await loadRebuyClueRescueModule();
+  try {
+    const { buildRebuyClueRescuePatch, hasRebuyClueRescueProgress } = loaded.module;
+    const sourceCard = card({ repurchase_reasons: [] });
+    const form = {
+      purchaseNote: "\u034F",
+      purchaseUrl: "\u00AD",
+      rebuyReason: "\u200B\u2060",
+    };
+
+    assert.deepEqual(buildRebuyClueRescuePatch(sourceCard, form), {
+      confirmed: true,
+      purchaseNote: null,
+      purchaseUrl: null,
+      repurchaseReasons: [],
+    });
+    assert.equal(hasRebuyClueRescueProgress(sourceCard, form), false);
   } finally {
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }

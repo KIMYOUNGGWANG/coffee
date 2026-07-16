@@ -38,7 +38,7 @@ test("shows a memory collage without claiming a complete taste profile for one c
   // When
   await page.goto(dashboardUrl);
   await expect(page.getByTestId("dashboard-ready")).toBeVisible();
-  await page.getByRole("button", { name: "취향" }).click();
+  await page.getByRole("button", { name: "취향", exact: true }).click();
 
   // Then
   await expect(page.getByRole("heading", { name: "커피 기억 콜라주" })).toBeVisible();
