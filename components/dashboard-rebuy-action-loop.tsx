@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { PackagePlus } from "lucide-react";
+import { useState } from "react";
+import { DashboardRebuyPurchaseCheckIn } from "@/components/dashboard-rebuy-purchase-check-in";
 import { useAnalyticsEvents } from "@/hooks/use-analytics-events";
 import { useStartRebuyShelfMemory } from "@/hooks/use-rebuy-shelf-memory";
 import { useUpdateShelfRebuyState } from "@/hooks/use-shelf-rebuy-state";
 import type { ShelfRebuyAction } from "@/hooks/use-shelf-rebuy-state";
-import { buildRebuyShelfReplenishPayload } from "@/lib/rebuy-shelf-transfer";
-import type { RebuyShelfReplenishSource } from "@/lib/rebuy-shelf-transfer";
+import { buildRebuyShelfReplenishPayload, type RebuyShelfPurchaseCheckIn, type RebuyShelfReplenishSource } from "@/lib/rebuy-shelf-transfer";
 
 type DashboardRebuyActionLoopProps = {
   readonly actionShelfItemId: string | null;
@@ -25,7 +24,6 @@ export function DashboardRebuyActionLoop({
   const { trackEvent } = useAnalyticsEvents();
   const [confirmedRebuySource, setConfirmedRebuySource] = useState<RebuyShelfReplenishSource | null>(null);
   const [hasStartedNewBag, setHasStartedNewBag] = useState(false);
-  const continuationButtonRef = useRef<HTMLButtonElement>(null);
   const updateShelfRebuyStateMutation = useUpdateShelfRebuyState();
   const startRebuyShelfMemoryMutation = useStartRebuyShelfMemory();
   const isSavingRebuyAction = actionShelfItemId !== null
@@ -50,11 +48,11 @@ export function DashboardRebuyActionLoop({
     }
   };
 
-  const startNewBag = async () => {
+  const startNewBag = async (purchaseCheckIn: RebuyShelfPurchaseCheckIn) => {
     if (!confirmedRebuySource) return;
 
     try {
-      const result = await startRebuyShelfMemoryMutation.mutateAsync(buildRebuyShelfReplenishPayload(confirmedRebuySource));
+      const result = await startRebuyShelfMemoryMutation.mutateAsync(buildRebuyShelfReplenishPayload(confirmedRebuySource, purchaseCheckIn));
       if (!result.reused) {
         trackEvent("rebuy_shelf_memory_started", { source: "rebuy_intelligence" });
       }
@@ -65,18 +63,11 @@ export function DashboardRebuyActionLoop({
     }
   };
 
-  useEffect(() => {
-    if (confirmedRebuySource) continuationButtonRef.current?.focus();
-  }, [confirmedRebuySource]);
-
   if (!actionShelfItemId && !confirmedRebuySource) return null;
-  let continuationButtonLabel = "새 봉투도 선반에 담기";
-  if (startRebuyShelfMemoryMutation.isPending) continuationButtonLabel = "선반에 저장 중";
-  if (hasStartedNewBag) continuationButtonLabel = "새 봉투 선반에 저장됨";
 
   return (
     <div className="mt-4 rounded-2xl border border-primary-amber/20 bg-primary-amber/10 p-4" data-testid="rebuy-action-loop">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-3">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#F6C892]">재구매 이어가기</p>
           <p className="mt-1 break-keep text-sm font-black text-[#FFF8EC]" aria-live="polite">
@@ -86,16 +77,13 @@ export function DashboardRebuyActionLoop({
           </p>
         </div>
         {confirmedRebuySource ? (
-          <button
-            ref={continuationButtonRef}
-            type="button"
-            disabled={startRebuyShelfMemoryMutation.isPending || hasStartedNewBag}
-            onClick={() => void startNewBag()}
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-primary-amber/30 bg-primary-amber px-4 text-xs font-black text-background-dark transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <PackagePlus aria-hidden="true" size={14} />
-            {continuationButtonLabel}
-          </button>
+          <DashboardRebuyPurchaseCheckIn
+            autoFocus
+            isComplete={hasStartedNewBag}
+            isSaving={startRebuyShelfMemoryMutation.isPending}
+            onSave={(purchaseCheckIn) => void startNewBag(purchaseCheckIn)}
+            source={confirmedRebuySource}
+          />
         ) : actionShelfItemId ? (
           <div className="grid gap-2 sm:grid-cols-2">
             <button

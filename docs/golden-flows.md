@@ -62,6 +62,8 @@ Given a user has beans on the private shelf, when CoffeeDex renders the shelf ca
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/shelf`, `PATCH /api/v1/shelf/:id`, `GET /api/v1/shelf/:id/rebuy-calendar`, `evaluateFreshShelfStatus`, `evaluateFreshPeakWindow`, `evaluateShelfRunway`
 
+After `rebought`, the explicit new-bag save prefills the old private purchase clue but lets the user replace this purchase's note, link, and roast date. The successor retains the current clue rather than silently copying a stale store or price.
+
 ## Flow 4A. Start a Dial-in Coach Recipe
 
 Given a user has a current shelf bean, when they open the brewing log tab, then CoffeeDex derives a first-cup starting recipe from the owned shelf item, roast/open timing, and recent owned brew logs. The user can save that suggestion as a private `brewing_logs` row with a `coach_snapshot`, then tap a one-cup feedback button such as sour, bitter, weak, heavy, or balanced after tasting. CoffeeDex stores that private `coach_feedback` and uses it to change the next recipe by one variable. This is personal brew guidance only, not a community recipe feed, marketplace recommendation, or roaster order.
@@ -86,6 +88,7 @@ Given a user has owned cards, shelf items, or brewing logs, when CoffeeDex opens
 
 Evidence surfaces: `/dashboard`, `GET /api/v1/rebuy-intelligence`, `PATCH /api/v1/shelf/:id`, `buildRebuyIntelligence`, `DashboardRebuyIntelligencePanel`
 
+The same new-bag action includes the private purchase check-in, so a current store, price, link, or roast date can replace the inherited clue before the successor is saved.
 ## Flow 5. Review a Progressive Taste Snapshot
 
 Given a user has confirmed memories, when they open the snapshot, then CoffeeDex displays literal sample count and coverage. One to two records form a collage, three to four show first signals, five to nine show an early preview, and ten or more sufficiently varied records show a current snapshot. Sparse data never appears complete.

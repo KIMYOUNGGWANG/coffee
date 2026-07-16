@@ -22,7 +22,7 @@ import { useDeleteTastingCard, useDialInCoach, useRebuyIntelligence, useTasteAna
 import type { CardCreatorWizardMode } from "@/components/CardCreatorWizard";
 import type { DashboardActivationIntent, DashboardActivationMode } from "@/lib/activation-intent";
 import { buildAuthGateHref, isAuthRequiredError } from "@/lib/auth-redirect";
-import { buildRebuyShelfReplenishPayload } from "@/lib/rebuy-shelf-transfer";
+import { buildRebuyShelfReplenishPayload, type RebuyShelfPurchaseCheckIn } from "@/lib/rebuy-shelf-transfer";
 import type { CheckoutIntent, CheckoutItemType, CheckoutNotice } from "@/lib/checkout-return";
 import { filterDashboardCards, type RepurchaseFilter } from "@/lib/dashboard-card-filter";
 import type { DashboardReturnSource } from "@/lib/dashboard-return-source";
@@ -251,12 +251,12 @@ export default function DashboardClient({
       window.alert(error instanceof Error ? error.message : "재구매 상태를 저장하지 못했습니다.");
     }
   };
-  const startCalendarReturnNewBag = async () => {
+  const startCalendarReturnNewBag = async (purchaseCheckIn: RebuyShelfPurchaseCheckIn) => {
     const shelfItem = calendarReturnItemQuery.data;
     if (!shelfItem) return;
 
     try {
-      const result = await startRebuyShelfMemoryMutation.mutateAsync(buildRebuyShelfReplenishPayload(shelfItem));
+      const result = await startRebuyShelfMemoryMutation.mutateAsync(buildRebuyShelfReplenishPayload(shelfItem, purchaseCheckIn));
       if (!result.reused) {
         trackEvent("rebuy_shelf_memory_started", { source: "rebuy_calendar_return" });
       }
