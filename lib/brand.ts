@@ -6,7 +6,7 @@ export type CoffeeDexBrand = {
   readonly englishTagline: "Remember coffee worth buying again.";
   readonly artifacts: {
     readonly free: "Taste Card";
-    readonly paid: "Taste Passport";
+    readonly paid: "Rebuy Memory";
   };
   readonly analytics: "Taste Snapshot";
   readonly dashboard: "Memory Shelf";
@@ -21,7 +21,7 @@ export const coffeeDexBrand = {
   englishTagline: "Remember coffee worth buying again.",
   artifacts: {
     free: "Taste Card",
-    paid: "Taste Passport",
+    paid: "Rebuy Memory",
   },
   analytics: "Taste Snapshot",
   dashboard: "Memory Shelf",

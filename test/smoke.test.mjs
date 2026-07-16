@@ -25,6 +25,7 @@ function assertDependency(packageJson, dependencyName) {
 const unsupportedCommunityClaimPattern = new RegExp(
   "Discover brewing recipes and tasting notes from the CoffeeDex " + "comm" + "unity",
 );
+const stalePrimaryProductPattern = /Taste Passport|Story Export|맛 여권|스토리 카드|공유용 스토리 카드/i;
 
 test("CoffeeDex package identity exposes the real app stack", () => {
   const packageJson = readJson("package.json");
@@ -139,6 +140,7 @@ test("CoffeeDex docs cover memory contracts and golden flows", () => {
   assert.match(goldenFlows, /forgetting and timing pain.*not direct first-person.*\.ics/s);
   assert.match(goldenFlows, /Flow 5\. Review a Progressive Taste Snapshot/);
   assert.match(goldenFlows, /Flow 6\. Export or Delete Owned Data/);
+  assert.match(goldenFlows, /JSON and CSV|JSON.*CSV|CSV.*JSON/i);
   assert.match(goldenFlows, /Secondary Compatibility Flow\. Share a Story Card/);
   assert.match(goldenFlows, /Secondary Compatibility Flow\. Export PDF or Purchase an Entitlement/);
   assert.match(goldenFlows, /node --test test\/brand-contract\.test\.mjs/);
@@ -183,6 +185,13 @@ test("CoffeeDex pages and routes present the coffee memory product", () => {
   assert.match(homePage, /href="\/en"/);
   assert.match(englishHomePage, /Remember coffees worth buying again/);
   assert.match(englishHomePage, /Start a 20-sec record/);
+  assert.match(englishHomePage, /Quick Private Record|private 20-sec record|private record/i);
+  assert.match(englishHomePage, /Rebuy Memory/);
+  assert.match(englishHomePage, /Rebuy List|buy-again list/i);
+  assert.match(englishHomePage, /Rebuy Intelligence|buy-again intelligence/i);
+  assert.match(englishHomePage, /JSON.*CSV|CSV.*JSON|ownership export|owned data export/i);
+  assert.doesNotMatch(homePage, stalePrimaryProductPattern);
+  assert.doesNotMatch(englishHomePage, stalePrimaryProductPattern);
   assert.match(englishHomePage, /Marketplace, referral, roaster partnerships, and community feeds are future layers/);
   assert.match(englishHomePage, /href="\/"/);
   assert.match(homePage, /Fritz Ethiopia Sidama/);

@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
     }, fontBuffer);
     
     const pdfBuffer = Buffer.from(pdfUint8Array);
-    const filename = `${coffeeDexBrand.filenameSlug}-taste-passport-${exportedAt.slice(0, 10)}.pdf`;
+    const filename = `${coffeeDexBrand.filenameSlug}-rebuy-memory-export-${exportedAt.slice(0, 10)}.pdf`;
 
     return new NextResponse(pdfBuffer, {
       status: 200,

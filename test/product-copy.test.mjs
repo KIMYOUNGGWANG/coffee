@@ -15,6 +15,10 @@ function assertDoesNotShow(source, pattern, label) {
   assert.doesNotMatch(source, pattern, `${label} must not contain unsupported product copy`);
 }
 
+function assertShows(source, pattern, label) {
+  assert.match(source, pattern, `${label} must contain Rebuy PRD product truth`);
+}
+
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -66,6 +70,8 @@ const unsupportedVisibleCopyPattern = new RegExp(
 const unsupportedCommunityClaimPattern = new RegExp(
   "Discover brewing recipes and tasting notes from the CoffeeDex " + "comm" + "unity",
 );
+const stalePrimaryProductPattern = /Taste Passport|Story Export|맛 여권|스토리 카드|공유용 스토리 카드/i;
+const sharePdfPrimaryPattern = /Share And PDF Exports|story-card and PDF artifacts|story export image|PDF access -> digital home-cafe archive export/i;
 
 test("CoffeeDex pages lead with recall and repurchase within the scoped product boundary", () => {
   // Given
@@ -115,6 +121,29 @@ test("CoffeeDex pages lead with recall and repurchase within the scoped product 
   assert.match(dashboardUsagePanel, /기록|스냅샷/);
   assert.match(onboardingPage, /CoffeeDex/);
   assert.match(onboardingPage, /원두|커피/);
+});
+
+test("CoffeeDex landing product outputs lead with private Rebuy memory and ownership export", () => {
+  // Given
+  const homePage = read("app/page.tsx");
+  const englishHomePage = read("app/en/page.tsx");
+
+  // When / Then
+  assertShows(homePage, /비공개|개인|private/i, "Korean landing");
+  assertShows(homePage, /20초 기록|빠른 기록|quick/i, "Korean landing");
+  assertShows(homePage, /Rebuy Memory|재구매 기억|다시 살/i, "Korean landing");
+  assertShows(homePage, /Rebuy List|재구매 리스트|다시 살 리스트|다시 살 후보/i, "Korean landing");
+  assertShows(homePage, /Rebuy Intelligence|재구매 인텔리전스|다시 살 타이밍|구매 단서/i, "Korean landing");
+  assertShows(homePage, /JSON.*CSV|CSV.*JSON|소유권.*내보내기|내 데이터/i, "Korean landing");
+  assert.doesNotMatch(homePage, stalePrimaryProductPattern);
+
+  assertShows(englishHomePage, /Quick Private Record|private 20-sec record|private record/i, "English landing");
+  assertShows(englishHomePage, /Rebuy Memory/i, "English landing");
+  assertShows(englishHomePage, /Rebuy List|buy-again list/i, "English landing");
+  assertShows(englishHomePage, /Rebuy Intelligence|buy-again intelligence/i, "English landing");
+  assertShows(englishHomePage, /JSON.*CSV|CSV.*JSON|ownership export|owned data export/i, "English landing");
+  assertShows(englishHomePage, /Share|PDF|compatibility/i, "English landing secondary compatibility");
+  assert.doesNotMatch(englishHomePage, stalePrimaryProductPattern);
 });
 
 test("CoffeeDex docs keep memory primary and compatibility surfaces secondary", () => {
@@ -309,5 +338,9 @@ test("CoffeeDex contract constants no longer expose starter product surfaces", (
   );
   assert.match(contracts, /export const starterServiceName = (?:coffeeDexBrand|hyangmiBrand)\.filenameSlug/);
   assert.match(contracts, /Korean specialty coffee cards/);
-  assert.match(contracts, /digital home-cafe archive export/);
+  assert.match(contracts, /Rebuy Memory|rebuy memory|repurchase memory|buy-again memory/i);
+  assert.match(contracts, /Rebuy List|rebuy list|repurchase list|buy-again list/i);
+  assert.match(contracts, /Rebuy Intelligence|rebuy intelligence|repurchase intelligence|buy-again intelligence/i);
+  assert.match(contracts, /JSON.*CSV|CSV.*JSON/);
+  assert.doesNotMatch(contracts, sharePdfPrimaryPattern);
 });
