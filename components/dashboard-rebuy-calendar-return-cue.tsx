@@ -1,8 +1,10 @@
 "use client";
 
-import { CalendarCheck2, Check, ExternalLink, PackagePlus, RotateCcw, X } from "lucide-react";
+import { CalendarCheck2, Check, ExternalLink, RotateCcw, X } from "lucide-react";
+import { DashboardRebuyPurchaseCheckIn } from "@/components/dashboard-rebuy-purchase-check-in";
 import type { RebuyCalendarReturnItem } from "@/hooks/use-rebuy-calendar-return";
 import type { ShelfRebuyAction } from "@/hooks/use-shelf-rebuy-state";
+import type { RebuyShelfPurchaseCheckIn } from "@/lib/rebuy-shelf-transfer";
 
 type DashboardRebuyCalendarReturnCueProps = {
   readonly onDismiss: () => void;
@@ -12,7 +14,7 @@ type DashboardRebuyCalendarReturnCueProps = {
   readonly isSaving: boolean;
   readonly hasConfirmedRebuy: boolean;
   readonly onSaveDecision: (action: Extract<ShelfRebuyAction, "will_rebuy" | "rebought">) => void;
-  readonly onStartNewBag: () => void;
+  readonly onStartNewBag: (purchaseCheckIn: RebuyShelfPurchaseCheckIn) => void;
   readonly onOpenPurchaseClue: (kind: "saved_link" | "search") => void;
 };
 
@@ -45,7 +47,7 @@ export function DashboardRebuyCalendarReturnCue({
           <CalendarCheck2 aria-hidden="true" size={18} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary-amber">Rebuy return</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#8F533B]">캘린더 재구매</p>
           <h2 className="mt-1 break-keep text-base font-black text-background-dark">
             {isLoadingItem ? "캘린더의 원두 기억을 꺼내는 중이에요." : hasConfirmedRebuy ? "다시 산 기록을 남겼어요." : isExactReturn ? `${itemLabel(item)} 기억났어요. 이번에 어떻게 할까요?` : "캘린더에서 돌아왔어요. 이번 원두, 다시 살까요?"}
           </h2>
@@ -55,10 +57,12 @@ export function DashboardRebuyCalendarReturnCue({
           {isExactReturn ? (
             <>
               {hasConfirmedRebuy ? (
-                <button type="button" onClick={onStartNewBag} disabled={isSaving} className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-background-dark px-4 text-xs font-black text-[#FFF8EC] transition hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60">
-                  <PackagePlus aria-hidden="true" size={14} />
-                  새 봉투도 선반에 담기
-                </button>
+                <DashboardRebuyPurchaseCheckIn
+                  isComplete={false}
+                  isSaving={isSaving}
+                  onSave={onStartNewBag}
+                  source={item}
+                />
               ) : (
                 <div className="mt-3 flex flex-wrap gap-2">
                   <a href={purchaseHref(item)} target="_blank" rel="noopener noreferrer" onClick={() => onOpenPurchaseClue(item.purchaseUrl ? "saved_link" : "search")} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-primary-amber/40 px-4 text-xs font-black text-background-dark transition hover:-translate-y-0.5">

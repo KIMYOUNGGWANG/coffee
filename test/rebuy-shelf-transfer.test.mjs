@@ -142,3 +142,31 @@ test("Given an owned shelf memory after a confirmed rebuy, When a new bag payloa
     rmSync(loaded.tempDirectory, { recursive: true, force: true });
   }
 });
+
+test("Given a confirmed rebuy with this purchase's clue, When a new bag payload is built, Then the current clue replaces the older purchase memory", async () => {
+  const loaded = await loadRebuyShelfTransferModule();
+  try {
+    const { buildRebuyShelfReplenishPayload } = loaded.module;
+    const payload = buildRebuyShelfReplenishPayload({
+      id: "93493987-4800-4b7c-836f-c0a35f39244e",
+      roasterName: "프릳츠 커피",
+      beanName: "에티오피아 시다마",
+      origin: "Ethiopia Sidama Washed",
+      totalWeight: 200,
+      tastingCardId: null,
+      purchaseUrl: "https://fritz.example/old-sidama",
+      purchaseNote: "프릳츠 공식몰 200g 18,000원",
+    }, {
+      purchaseNote: "프릳츠 합정 쇼룸 200g 21,000원",
+      purchaseUrl: "https://fritz.example/current-sidama",
+      roastDate: "2026-07-14",
+    });
+
+    assert.equal(payload.purchaseNote, "프릳츠 합정 쇼룸 200g 21,000원");
+    assert.equal(payload.purchaseUrl, "https://fritz.example/current-sidama");
+    assert.equal(payload.roastDate, "2026-07-14");
+    assert.equal(payload.rebuySourceShelfItemId, "93493987-4800-4b7c-836f-c0a35f39244e");
+  } finally {
+    rmSync(loaded.tempDirectory, { recursive: true, force: true });
+  }
+});
